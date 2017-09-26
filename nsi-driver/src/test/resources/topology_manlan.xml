@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:Topology xmlns:ns2="http://schemas.ogf.org/nml/2013/05/base#" xmlns:ns3="http://schemas.ogf.org/nml/2012/10/ethernet" xmlns:ns4="http://schemas.ogf.org/nsi/2013/12/services/definition" id="urn:ogf:network:manlan.internet2.edu:2013:" version="2017-09-19T10:15:20.992Z">
+    <ns2:name>manlan.internet2.edu</ns2:name>
+    <ns2:Lifetime>
+        <ns2:start>2017-09-19T10:15:20.992Z</ns2:start>
+        <ns2:end>2017-11-18T10:15:20.993Z</ns2:end>
+    </ns2:Lifetime>
+    <ns2:BidirectionalPort id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_6:+">
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_6:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_6:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_3:uslhcnet">
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_3:uslhcnet:in"/>
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_3:uslhcnet:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:13_1:+">
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:13_1:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:13_1:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_1:al2s">
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_1:al2s:in"/>
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_1:al2s:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_2:esnet">
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_2:esnet:in"/>
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_2:esnet:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_7:perfsonar">
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_7:perfsonar:in"/>
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_7:perfsonar:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_6:autobahn">
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_6:autobahn:in"/>
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_6:autobahn:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_1:geant-lag">
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_1:geant-lag:in"/>
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_1:geant-lag:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:4_3:ion">
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:4_3:ion:in"/>
+        <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:4_3:ion:out"/>
+    </ns2:BidirectionalPort>
+    <ns4:serviceDefinition id="urn:ogf:network:manlan.internet2.edu:2013::ServiceDefinition:EVTS.A-GOLE">
+        <name>GLIF Automated GOLE Ethernet VLAN Transfer Service</name>
+        <serviceType>http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE</serviceType>
+    </ns4:serviceDefinition>
+    <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasService">
+        <ns2:SwitchingService encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::ServiceDomain:EVTS.A-GOLE" labelSwapping="false" labelType="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasInboundPort">
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_6:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_3:uslhcnet:in"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:13_1:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_1:al2s:in"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_2:esnet:in"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_7:perfsonar:in"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_6:autobahn:in"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_1:geant-lag:in"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:4_3:ion:in"/>
+            </ns2:Relation>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasOutboundPort">
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_6:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_3:uslhcnet:out"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:13_1:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_1:al2s:out"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_2:esnet:out"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_7:perfsonar:out"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_6:autobahn:out"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_1:geant-lag:out"/>
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:4_3:ion:out"/>
+            </ns2:Relation>
+            <ns4:serviceDefinition id="urn:ogf:network:manlan.internet2.edu:2013::ServiceDefinition:EVTS.A-GOLE"/>
+        </ns2:SwitchingService>
+    </ns2:Relation>
+    <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasInboundPort">
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_6:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:sinet.ac.jp:2013:topology:sinet_manlan"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>2000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_3:uslhcnet:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1800-1819,3160-3179,3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>2000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:13_1:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1819,3400-3598,4006-4019</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:netherlight.net:2013:production7:manlan:1-out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_1:al2s:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1125-1164,1779-1799,3200-3210,3320-3339,3400-3499,3500-3598,4006-4019</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:icair.org:2013:topology:manlan-out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>1000000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_2:esnet:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799,1800-1819,3400-3499</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>1000000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_7:perfsonar:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>2000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_6:autobahn:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>2000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_1:geant-lag:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799,3400-3499,3500-3598</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:geant.net:2013:topology:manlan-out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>2000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>30000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:4_3:ion:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+    </ns2:Relation>
+    <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasOutboundPort">
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_6:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:sinet.ac.jp:2013:topology:manlan_sinet"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>2000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:3_3:uslhcnet:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1800-1819,3160-3179,3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>2000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:13_1:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1819,3400-3598,4006-4019</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:netherlight.net:2013:production7:manlan:1-in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_1:al2s:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1125-1164,1779-1799,3200-3210,3320-3339,3400-3499,3500-3598,4006-4019</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:icair.org:2013:topology:manlan-in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>1000000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_2:esnet:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799,1800-1819,3400-3499</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>1000000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_7:perfsonar:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>2000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_6:autobahn:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>2000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:1_1:geant-lag:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799,3400-3499,3500-3598</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:geant.net:2013:topology:manlan-in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>2000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>30000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:4_3:ion:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+    </ns2:Relation>
+</ns2:Topology>

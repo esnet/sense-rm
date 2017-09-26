@@ -1,0 +1,1071 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:Topology xmlns:ns2="http://schemas.ogf.org/nml/2013/05/base#"
+        xmlns:ns3="http://schemas.ogf.org/nml/2012/10/ethernet"
+        xmlns:ns4="http://schemas.ogf.org/nsi/2013/12/services/definition"
+        id="urn:ogf:network:es.net:2013:" version="2017-09-15T10:15:13.128Z">
+    <ns2:name>es.net</ns2:name>
+    <ns2:Lifetime>
+        <ns2:start>2017-09-15T10:15:13.128Z</ns2:start>
+        <ns2:end>2017-11-14T10:15:13.129Z</ns2:end>
+    </ns2:Lifetime>
+    <ns2:Location>
+        <ns2:name>ESnet Berkeley</ns2:name>
+        <ns2:long>37.876190</ns2:long>
+        <ns2:lat>-122.249974</ns2:lat>
+        <ns2:alt>809</ns2:alt>
+        <ns2:unlocode>Bogus String</ns2:unlocode>
+        <ns2:address>
+            <vcards xmlns="urn:ietf:params:xml:ns:vcard-4.0">
+                <vcard>
+                    <fn><text>Simon Perreault</text></fn>
+                    <n>
+                        <surname>Perreault</surname>
+                        <given>Simon</given>
+                        <additional/>
+                        <prefix/>
+                        <suffix>ing. jr</suffix>
+                        <suffix>M.Sc.</suffix>
+                    </n>
+                    <bday><date>--0203</date></bday>
+                    <anniversary>
+                        <date-time>20090808T1430-0500</date-time>
+                    </anniversary>
+                    <gender><sex>M</sex></gender>
+                    <lang>
+                        <parameters><pref><integer>1</integer></pref></parameters>
+                        <language-tag>fr</language-tag>
+                    </lang>
+                    <lang>
+                        <parameters><pref><integer>2</integer></pref></parameters>
+                        <language-tag>en</language-tag>
+                    </lang>
+                    <org>
+                        <parameters><type><text>work</text></type></parameters>
+                        <text>Viagenie</text>
+                    </org>
+                    <adr>
+                        <parameters>
+                            <type><text>work</text></type>
+                            <label><text>Simon Perreault
+                                2875 boul. Laurier, suite D2-630
+                                Quebec, QC, Canada
+                                G1V 2M2</text></label>
+                        </parameters>
+                        <pobox/>
+                        <ext/>
+                        <street>2875 boul. Laurier, suite D2-630</street>
+                        <locality>Quebec</locality>
+                        <region>QC</region>
+                        <code>G1V 2M2</code>
+                        <country>Canada</country>
+                    </adr>
+                    <tel>
+                        <parameters>
+                            <type>
+                                <text>work</text>
+                                <text>voice</text>
+                            </type>
+                        </parameters>
+                        <uri>tel:+1-418-656-9254;ext=102</uri>
+                    </tel>
+                    <tel>
+                        <parameters>
+                            <type>
+                                <text>work</text>
+                                <text>text</text>
+                                <text>voice</text>
+                                <text>cell</text>
+                                <text>video</text>
+                            </type>
+                        </parameters>
+                        <uri>tel:+1-418-262-6501</uri>
+                    </tel>
+                    <email>
+                        <parameters><type><text>work</text></type></parameters>
+                        <text>simon.perreault@viagenie.ca</text>
+                    </email>
+                    <geo>
+                        <parameters><type><text>work</text></type></parameters>
+                        <uri>geo:46.766336,-71.28955</uri>
+                    </geo>
+                    <key>
+                        <parameters><type><text>work</text></type></parameters>
+                        <uri>http://www.viagenie.ca/simon.perreault/simon.asc</uri>
+                    </key>
+                    <tz><text>America/Montreal</text></tz>
+                    <url>
+                        <parameters><type><text>home</text></type></parameters>
+                        <uri>http://nomis80.org</uri>
+                    </url>
+                </vcard>
+            </vcards>
+        </ns2:address>
+    </ns2:Location>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+">
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns4:serviceDefinition id="urn:ogf:network:es.net:2013::ServiceDefinition:EVTS.A-GOLE">
+        <name>GLIF Automated GOLE Ethernet VLAN Transfer Service</name>
+        <serviceType>
+            http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE
+        </serviceType>
+    </ns4:serviceDefinition>
+    <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasService">
+        <ns2:SwitchingService encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::ServiceDomain:EVTS.A-GOLE" labelSwapping="true" labelType="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasInboundPort">
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:in"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:in"/>
+            </ns2:Relation>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasOutboundPort">
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:out"/>
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:out"/>
+            </ns2:Relation>
+            <ns4:serviceDefinition id="urn:ogf:network:es.net:2013::ServiceDefinition:EVTS.A-GOLE"/>
+        </ns2:SwitchingService>
+    </ns2:Relation>
+    <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasInboundPort">
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1662-1664</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1662,1720-1725</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-908,910-918,920-1800,1802-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:snvaca.pacificwave.net:2016:topology:esnet-sunnyvale-out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>40000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3600-3619</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:esnet:out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>40000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:sttlwa.pacificwave.net:2016:topology:esnet-seattle-out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1000-1019</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:netherlight.net:2013:production7:esnet-1-out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4089</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>80000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-911,913-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-910,912-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1662,1720-1725</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-911,913-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799,1800-1819,3400-3499</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_2:esnet:out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-1799,1801-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1720-1725,1860-1899,3400-3499</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_2:esnet:out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3176-3179,3800-3809</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:oess.dcn.umnet.umich.edu:2013::f10-dynes.dcn.umnet.umich.edu:Te0_20:esnet:out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:icair.org:2013:topology:esnet-out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-499,501-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-998,1000-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+    </ns2:Relation>
+    <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasOutboundPort">
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1662-1664</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1662,1720-1725</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-908,910-918,920-1800,1802-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:snvaca.pacificwave.net:2016:topology:esnet-sunnyvale-in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>40000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3600-3619</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:esnet:in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>40000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:sttlwa.pacificwave.net:2016:topology:esnet-seattle-in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1000-1019</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:netherlight.net:2013:production7:esnet-1-in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4089</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>80000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-911,913-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-910,912-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1662,1720-1725</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-911,913-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799,1800-1819,3400-3499</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_2:esnet:in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-1799,1801-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1720-1725,1860-1899,3400-3499</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_2:esnet:in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3176-3179,3800-3809</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:oess.dcn.umnet.umich.edu:2013::f10-dynes.dcn.umnet.umich.edu:Te0_20:esnet:in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:icair.org:2013:topology:esnet-in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-499,501-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-998,1000-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">2-4094</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+    </ns2:Relation>
+</ns2:Topology>

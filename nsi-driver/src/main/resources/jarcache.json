@@ -1,0 +1,8 @@
+[
+  {
+  	"Content-Location": "http://nonexisting.example.com/context",
+  	"X-Classpath": "context/test.jsonld",
+  	"Content-Type": "application/ld+json"
+  }
+]
+

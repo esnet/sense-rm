@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="urn:ietf:params:xml:ns:vcard-4.0" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xcard="urn:ietf:params:xml:ns:vcard-4.0"
+    elementFormDefault="qualified">
+
+    <xs:annotation>
+        <xs:documentation xml:lang="en">
+            This is an XML schema document describing the xCard XML format as
+            defined in RFC 6351.
+        </xs:documentation>
+    </xs:annotation>
+    
+    <!-- Root element definitions -->
+    <xs:element name="vcards" type="xcard:VcardsType" />
+
+    <xs:complexType name="VcardsType">
+        <xs:sequence>
+            <xs:element name="vcard">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="uid" type="xcard:uidPropType" />
+                        <xs:element name="prodid" type="xcard:prodidPropType" />
+                        <xs:element name="rev" type="xcard:revPropType" />
+                        <xs:element name="categories" type="xcard:categoriesPropType" minOccurs="0" />
+                        <xs:element name="kind" type="xcard:kindPropType" />
+                        <xs:element name="fn" type="xcard:fnPropType" />
+                        <xs:element name="n" type="xcard:nPropType" minOccurs="0" />
+                        <xs:element name="note" type="xcard:notePropType" minOccurs="0" />
+                        <xs:element name="fburl" type="xcard:fburlPropType" minOccurs="0" />
+                        <xs:element name="title" type="xcard:titlePropType" minOccurs="0"
+                            maxOccurs="unbounded" />
+                        <xs:element name="group" type="xcard:affiliationPropType" minOccurs="0"
+                            maxOccurs="unbounded" />
+                        <xs:element name="url" type="xcard:urlPropType" minOccurs="0"
+                            maxOccurs="unbounded" />
+                        <xs:element name="adr" type="xcard:adrPropType" minOccurs="0"
+                            maxOccurs="unbounded" />
+                        <xs:element name="nickname" type="xcard:nicknamePropType" minOccurs="0" />
+                        <xs:element name="related" type="xcard:relatedPropType" minOccurs="0"
+                            maxOccurs="unbounded" />
+                        <xs:element name="bday" type="xcard:bdayPropType" minOccurs="0" />
+                        <xs:element name="anniversary" type="xcard:anniversaryPropType" minOccurs="0" />
+                        <xs:element name="photo" type="xcard:photoPropType" minOccurs="0" />
+                        <xs:element name="gender" type="xcard:genderPropType" minOccurs="0" />
+                        <xs:element name="lang" type="xcard:langPropType" minOccurs="0"
+                            maxOccurs="unbounded" />
+                        <xs:element name="tel" type="xcard:telPropType" minOccurs="0"
+                            maxOccurs="unbounded" />
+                        <xs:element name="impp" type="xcard:imppPropType" minOccurs="0"
+                            maxOccurs="unbounded" />
+                        <xs:element name="email" type="xcard:emailPropType" minOccurs="0"
+                            maxOccurs="unbounded" />
+                        <xs:element name="geo" type="xcard:geoPropType" minOccurs="0"
+                            maxOccurs="unbounded" />
+                        <xs:element name="key" type="xcard:keyPropType" minOccurs="0"
+                            maxOccurs="unbounded" />
+                        <xs:element name="member" type="xcard:memberPropType" minOccurs="0"
+                            maxOccurs="unbounded" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Plain Types -->
+
+    <xs:element name="uri" type="xs:anyURI" />
+
+    <xs:element name="text" type="xs:string" />
+
+    <xs:simpleType name="DateType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d{8}|\d{4}-\d\d|--\d\d(\d\d)?|---\d\d" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="date" type="xcard:DateType" />
+
+    <xs:simpleType name="DateTimeType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="(\d{8}|--\d{4}|---\d\d)T\d\d(\d\d(\d\d)?)?(Z|[+\-]\d\d(\d\d)?)?" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="date-time" type="xcard:DateTimeType" />
+
+
+    <xs:simpleType name="TimeStampType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d{8}T\d{6}(Z|[+\-]\d\d(\d\d)?)?" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="timestamp" type="xcard:TimeStampType" />
+
+    <!-- Parameters -->
+
+    <xs:complexType name="BaseParameterType" abstract="true" />
+    <xs:element name="baseParameter" type="xcard:BaseParameterType" />
+    <xs:complexType name="ArrayOfParameters">
+        <xs:sequence>
+            <xs:element ref="xcard:baseParameter" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="TextParameterType" mixed="false">
+        <xs:complexContent>
+            <xs:extension base="xcard:BaseParameterType">
+                <xs:sequence>
+                    <xs:element ref="xcard:text" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="UriParameterType" mixed="false">
+        <xs:complexContent>
+            <xs:extension base="xcard:BaseParameterType">
+                <xs:sequence>
+                    <xs:element ref="xcard:uri" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!--  We mix types from different properties here for simplicity  -->
+    <xs:simpleType name="TypeValueType">
+        <xs:restriction base="xs:token">
+            <!--Address-->
+            <xs:enumeration value="work" />
+            <xs:enumeration value="home" />
+            <!--Telephone-->
+            <xs:enumeration value="text" />
+            <xs:enumeration value="voice" />
+            <xs:enumeration value="fax" />
+            <xs:enumeration value="cell" />
+            <xs:enumeration value="video" />
+            <xs:enumeration value="pager" />
+            <xs:enumeration value="textphone" />
+            <xs:enumeration value="x-car" />
+            <!-- Related -->
+            <xs:enumeration value="spouse" />
+            <xs:enumeration value="child" />
+            <xs:enumeration value="x-assistant" />
+            <xs:enumeration value="x-manager" />
+            <!-- Url -->
+            <xs:enumeration value="x-blog" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="typeParamType" mixed="false">
+        <xs:complexContent>
+            <xs:extension base="xcard:BaseParameterType">
+                <xs:sequence>
+                    <xs:element name="text" type="xcard:TypeValueType" minOccurs="1"
+                        maxOccurs="unbounded" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="labelParamType" mixed="false">
+        <xs:complexContent>
+            <xs:extension base="xcard:TextParameterType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="prefParamType" mixed="false">
+        <xs:complexContent>
+            <xs:extension base="xcard:BaseParameterType">
+                <xs:sequence>
+                    <xs:element name="integer" type="xs:string" fixed="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="xuidParamType" mixed="false">
+        <xs:complexContent>
+            <xs:extension base="xcard:UriParameterType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- WARNING: don't forget to add those, otherwise the serialization code will not be built and you're up for a long debugging session       -->
+    <xs:element name="type" type="xcard:typeParamType" substitutionGroup="xcard:baseParameter" />
+    <xs:element name="label" type="xcard:labelParamType" substitutionGroup="xcard:baseParameter" />
+    <xs:element name="pref" type="xcard:prefParamType" substitutionGroup="xcard:baseParameter" />
+    <xs:element name="x-uid" type="xcard:xuidParamType" substitutionGroup="xcard:baseParameter" />
+
+    <!-- Properties -->
+    <xs:complexType name="BasePropertyType" abstract="true">
+        <xs:sequence>
+            <xs:element ref="xcard:parameters" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="parameters" type="xcard:ArrayOfParameters" />
+
+    <xs:element name="baseProperty" type="xcard:BasePropertyType" />
+
+    <xs:element name="fn" type="xcard:fnPropType" substitutionGroup="xcard:baseProperty" />
+
+    <xs:element name="n" type="xcard:nPropType" substitutionGroup="xcard:baseProperty" />
+
+    <xs:element name="bday" type="xcard:bdayPropType" substitutionGroup="xcard:baseProperty" />
+
+
+
+    <!-- Properties that take a simple text value -->
+    <xs:complexType name="TextPropertyType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:BasePropertyType">
+                <xs:sequence>
+                    <xs:element ref="xcard:text" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="TextListPropertyType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:BasePropertyType">
+                <xs:sequence>
+                    <xs:element ref="xcard:text" minOccurs="0" maxOccurs="unbounded" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="NonEmptyTextListPropertyType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:BasePropertyType">
+                <xs:sequence>
+                    <xs:element ref="xcard:text" minOccurs="1" maxOccurs="unbounded" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="UriPropertyType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:BasePropertyType">
+                <xs:sequence>
+                    <xs:element ref="xcard:uri" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="TextOrUriPropertyType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:BasePropertyType">
+                <xs:sequence>
+                    <xs:choice>
+                        <xs:element ref="xcard:text" />
+                        <xs:element ref="xcard:uri" />
+                    </xs:choice>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- Properties that take a date or date-time value -->
+    <xs:complexType name="DateDatetimePropertyType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:BasePropertyType">
+                <xs:sequence>
+                    <xs:choice>
+                        <xs:element ref="xcard:date-time" />
+                        <xs:element ref="xcard:date" />
+                    </xs:choice>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- Properties -->
+
+    <xs:complexType name="kindPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:TextPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="revPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:BasePropertyType">
+                <xs:sequence>
+                    <xs:element ref="xcard:timestamp" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="prodidPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:TextPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="categoriesPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:TextListPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="fnPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:TextPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="uidPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:UriPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="nPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:BasePropertyType">
+                <xs:sequence>
+                    <xs:element name="surname" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="given" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="additional" type="xs:string" minOccurs="0"
+                        maxOccurs="unbounded" />
+                    <xs:element name="prefix" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="suffix" type="xs:string" minOccurs="0" maxOccurs="unbounded"
+                     />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="notePropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:TextPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="fburlPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:UriPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="titlePropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:TextPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="affiliationPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:BasePropertyType">
+                <xs:sequence>
+                    <xs:element name="org" type="xcard:NonEmptyTextListPropertyType" />
+                    <xs:element name="logo" type="xcard:UriPropertyType" minOccurs="0" />
+                    <xs:element name="role" type="xcard:TextPropertyType" minOccurs="0"
+                        maxOccurs="unbounded" />
+                    <xs:element name="related" type="xcard:relatedPropType" minOccurs="0"
+                        maxOccurs="unbounded" />
+                    <xs:element name="adr" type="xcard:adrPropType" minOccurs="0"
+                        maxOccurs="unbounded" />
+                </xs:sequence>
+                <xs:attribute name="name" type="xs:string" fixed="Affiliation" />
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="urlPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:UriPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="adrPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:BasePropertyType">
+                <xs:sequence>
+                    <xs:element name="pobox" type="xs:string" />
+                    <xs:element name="ext" type="xs:string" />
+                    <xs:element name="street" type="xs:string" />
+                    <xs:element name="locality" type="xs:string" />
+                    <xs:element name="region" type="xs:string" />
+                    <xs:element name="code" type="xs:string" />
+                    <xs:element name="country" type="xs:string" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="nicknamePropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:TextListPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="relatedPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:TextOrUriPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="bdayPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:DateDatetimePropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="anniversaryPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:DateDatetimePropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="photoPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:UriPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:simpleType name="SexType">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="" />
+            <xs:enumeration value="M" />
+            <xs:enumeration value="F" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="genderPropType">
+        <xs:sequence>
+            <xs:element name="sex" type="xcard:SexType" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="langPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:BasePropertyType">
+                <xs:sequence>
+                    <xs:element name="language-tag" type="xs:string" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="telPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:TextPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="imppPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:UriPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="emailPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:TextPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="keyPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:UriPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="geoPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:UriPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="memberPropType">
+        <xs:complexContent mixed="false">
+            <xs:extension base="xcard:UriPropertyType" />
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>

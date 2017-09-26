@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:Topology xmlns:ns2="http://schemas.ogf.org/nml/2013/05/base#" xmlns:ns3="http://schemas.ogf.org/nml/2012/10/ethernet" xmlns:ns4="http://schemas.ogf.org/nsi/2013/12/services/definition" id="urn:ogf:network:wix.internet2.edu:2013:" version="2017-09-19T10:15:49.771Z">
+    <ns2:name>wix.internet2.edu</ns2:name>
+    <ns2:Lifetime>
+        <ns2:start>2017-09-19T10:15:49.771Z</ns2:start>
+        <ns2:end>2017-11-18T10:15:49.772Z</ns2:end>
+    </ns2:Lifetime>
+    <ns2:BidirectionalPort id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:max100">
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:max100:in"/>
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:max100:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_2:esnet">
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_2:esnet:in"/>
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_2:esnet:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_1:al3s">
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_1:al3s:in"/>
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_1:al3s:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxaws">
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxaws:in"/>
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxaws:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:11_2:iminds">
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:11_2:iminds:in"/>
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:11_2:iminds:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxdragon">
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxdragon:in"/>
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxdragon:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:1_4:perfsonar">
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:1_4:perfsonar:in"/>
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:1_4:perfsonar:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:2_2:+">
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:2_2:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:2_2:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_1:al2s">
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_1:al2s:in"/>
+        <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_1:al2s:out"/>
+    </ns2:BidirectionalPort>
+    <ns4:serviceDefinition id="urn:ogf:network:wix.internet2.edu:2013::ServiceDefinition:EVTS.A-GOLE">
+        <name>GLIF Automated GOLE Ethernet VLAN Transfer Service</name>
+        <serviceType>http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE</serviceType>
+    </ns4:serviceDefinition>
+    <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasService">
+        <ns2:SwitchingService encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::ServiceDomain:EVTS.A-GOLE" labelSwapping="false" labelType="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasInboundPort">
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:max100:in"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_2:esnet:in"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_1:al3s:in"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxaws:in"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:11_2:iminds:in"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxdragon:in"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:1_4:perfsonar:in"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:2_2:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_1:al2s:in"/>
+            </ns2:Relation>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasOutboundPort">
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:max100:out"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_2:esnet:out"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_1:al3s:out"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxaws:out"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:11_2:iminds:out"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxdragon:out"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:1_4:perfsonar:out"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:2_2:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_1:al2s:out"/>
+            </ns2:Relation>
+            <ns4:serviceDefinition id="urn:ogf:network:wix.internet2.edu:2013::ServiceDefinition:EVTS.A-GOLE"/>
+        </ns2:SwitchingService>
+    </ns2:Relation>
+    <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasInboundPort">
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:max100:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1860-1899</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_2:esnet:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1700-1729,1860-1899,3400-3499</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_1:al3s:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxaws:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1720-1729</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:11_2:iminds:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1165-1174</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxdragon:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1165-1174,1700-1719</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:1_4:perfsonar:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>5000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:2_2:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1720-1729,3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>5000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_1:al2s:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1700-1729,3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+    </ns2:Relation>
+    <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasOutboundPort">
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:max100:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1860-1899</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_2:esnet:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1700-1729,1860-1899,3400-3499</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_1:al3s:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxaws:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1720-1729</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:11_2:iminds:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1165-1174</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>100000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:15_2:maxdragon:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1165-1174,1700-1719</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:1_4:perfsonar:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>5000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:2_2:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1720-1729,3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>5000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_1:al2s:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1700-1729,3400-3499</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>100000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+    </ns2:Relation>
+</ns2:Topology>

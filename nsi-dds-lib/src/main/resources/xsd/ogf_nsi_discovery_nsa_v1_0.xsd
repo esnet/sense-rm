@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+The OGF takes no position regarding the validity or scope of any intellectual
+property or other rights that might be claimed to pertain to the implementation
+or use of the technology described in this document or the extent to which any
+license under such rights might or might not be available; neither does it
+represent that it has made any effort to identify any such rights.  Copies of
+claims of rights made available for publication and any assurances of licenses
+to be made available, or the result of an attempt made to obtain a general
+license or permission for the use of such proprietary rights by implementers or
+users of this specification can be obtained from the OGF Secretariat.
+
+The OGF invites any interested party to bring to its attention any copyrights,
+patents or patent applications, or other proprietary rights which may cover
+technology that may be required to practice this recommendation.  Please
+address the information to the OGF Executive Director.
+
+This document and the information contained herein is provided on an "As Is"
+basis and the OGF disclaims all warranties, express or implied, including but
+not limited to any warranty that the use of the information herein will not
+infringe any rights or any implied warranties of merchantability or fitness
+for a particular purpose.
+
+Copyright (C) Open Grid Forum (2009-2012). All Rights Reserved.
+
+This document and translations of it may be copied and furnished to others, and
+derivative works that comment on or otherwise explain it or assist in its
+implementation may be prepared, copied, published and distributed, in whole or
+in part, without restriction of any kind, provided that the above copyright
+notice and this paragraph are included on all such copies and derivative works.
+However, this document itself may not be modified in any way, such as by removing
+the copyright notice or references to the OGF or other organizations, except as
+needed for the purpose of developing Grid Recommendations in which case the
+procedures for copyrights defined in the OGF Document process must be followed,
+or as required to translate it into languages other than English.
+
+The limited permissions granted above are perpetual and will not be revoked by
+the OGF or its successors or assignees.
+
+Open Grid Forum NSI NSA Discovery Document v1.0.
+
+Description: This is the NSA Discovery Document schema defined for use in the
+OGF NSI Discovery Service v1.0. Comments and questions can be directed to the
+mailing list group mailing list (nsi-wg@ogf.org).
+-->
+<xsd:schema targetNamespace="http://schemas.ogf.org/nsi/2014/02/discovery/nsa"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xcard="urn:ietf:params:xml:ns:vcard-4.0"
+    xmlns:tns="http://schemas.ogf.org/nsi/2014/02/discovery/nsa"
+    version="1.0">
+    <xsd:annotation>
+        <xsd:appinfo>ogf_nsi_discovery_nsa_v1_0.xsd 2014-12-01</xsd:appinfo>
+        <xsd:documentation xml:lang="en">
+            This is an XML schema document describing the NSA element of the
+            OGF NSI Interface Discovery Protocol v1.0.  There is a corresponding
+            document providing a description of the RESTful service definition
+            and protocol specific types.
+            
+            Within the NSI reference architecture the Network Services Agent
+            (NSA) is an entity that offers network services.  These services
+            can be varied in functionality, and an NSA does not need to offer
+            all services defined within a network.  For example, one NSA may
+            offer Connection Services and Topology Services for a specific
+            network, while a second NSA offers Monitoring Services for that
+            same network.  In addition, the versions of the services offered
+            can vary from NSA to NSA.  The NSI Discovery Protocol is a metadata
+            service designed to enable self-description of all NSI services
+            and associated protocol interfaces offered by these NSA.
+            
+            The NSI Discovery schema allows an NSA to describe the
+            interfaces and versions of interfaces that it supports.  Through
+            the REST API access methods defined, an NSA can dynamically
+            discover interfaces and capabilities supported by a peer NSA,
+            perform protocol version negotiation based on the supplied
+            metadata, identify protocol endpoints, and bootstrap peer
+            communications with minimal configuration.
+            
+            This document encapsulates the types used to model meta-data
+            associated with an NSA.  By defining these type in a separate
+            namespace, it is hoped that new versions of the meta-data will not
+            impact the base discovery protocol.
+        </xsd:documentation>
+    </xsd:annotation>
+    
+    <!-- Import additional standard name spaces. -->
+    <xsd:import namespace="urn:ietf:params:xml:ns:vcard-4.0"
+        schemaLocation="xCard.xsd"/>
+    
+    <!-- ******************************************************************
+         *                     XML element types                          *
+         ****************************************************************** -->
+    
+    <!-- NSA resource definition. -->
+    <xsd:element name="nsa" type="tns:NsaType" />
+    
+    <!-- ******************************************************************
+         *                       XML base types                           *
+         ****************************************************************** -->
+    
+    <xsd:complexType name="NsaType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This is the type definition for meta-data associated with an
+                NSA resource.
+                
+                Attributes:
+                
+                id - The globally unique NSA identifier for this resource.
+                
+                version - The version of this NSA resource based on the date
+                and time the entry was created at the source NSA.  This
+                attribute can be used to compare two versions of the document
+                for equality (same version) or to determine the new and older
+                versions through date comparison.
+                
+                expires - The date this version of the document expires and should
+                no longer be used.
+                
+                anyAttribute - Permit inclusion of attributes from other namespaces
+                for flexible extension without needing to update this schema
+                definition.
+                
+                Elements:
+                
+                name - A descriptive name for this NSA resource.  This value is
+                typically used for display purposes.
+                
+                softwareVersion - A descriptive string describing the NSA software
+                type and version.   This value will allow a peer NSA to adapt
+                behaviors to specific versions of an NSA when required.
+                
+                startTime - The time at which this NSA last started to provide
+                uninterrupted service.   This is effectively the last restart
+                time of the NSA.  A peer discovering a change in this value
+                can initiate recovery procedures.
+                
+                adminContact - A list of zero or more administrative contacts
+                associated with this NSA.
+                
+                location - The physical location of the logical NSA resource.
+                This can be the location of the server hosting the NSA, or
+                some other location related to the service being offered.
+                
+                networkId - A list of zero or more network identifiers for which
+                this NSA is providing the listed service interfaces and
+                features.  These network identifiers can be mapped into network
+                topology to determine the network resources being managed by
+                this NSA.
+                
+                interface - A list of zero or more service interfaces supported
+                by the NSA.
+                
+                peersWith - A list of zero or more NSA entries enumerating the
+                peer NSA that have set up a trusted control plane relationship
+                with this NSA.  Each entry in this list represents a trusted
+                unidirectional relationship with the direction described by the
+                "role" attribute associated with the peersWith element. 
+                
+                other - Provides a flexible mechanism allowing additional elements
+                to be provided from other namespaces without needing to update
+                this schema definition.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:string" minOccurs="0" />
+            <xsd:element name="softwareVersion" type="xsd:string" minOccurs="0" />
+            <xsd:element name="startTime" type="xsd:dateTime" minOccurs="0" />
+            <xsd:element name="adminContact" type="xcard:VcardsType" minOccurs="0" />
+            <xsd:element name="location" type="tns:LocationType"  minOccurs="0" />
+            <xsd:element name="networkId" type="xsd:anyURI" minOccurs="0"
+                maxOccurs="unbounded" />
+            <xsd:element name="interface" type="tns:InterfaceType" minOccurs="0"
+                maxOccurs="unbounded" />
+            <xsd:element name="feature" type="tns:FeatureType" minOccurs="0"
+                maxOccurs="unbounded" />
+            <xsd:element name="peersWith" type="tns:PeersWithType" minOccurs="0"
+                maxOccurs="unbounded" />
+            <xsd:element name="other" type="tns:HolderType" minOccurs="0"
+                maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute   name="id"      use="required" type="xsd:anyURI" />
+        <xsd:attribute   name="version" use="required" type="xsd:dateTime" />
+        <xsd:attribute   name="expires" use="optional" type="xsd:dateTime" />
+        <xsd:anyAttribute namespace="##other" processContents="lax" />
+    </xsd:complexType>
+
+    <xsd:complexType name="LocationType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This is a type definition modeling the location of an NSA.  A
+                Location is a reference to a geographical location or area for
+                the NSA.
+                
+                Elements:
+                
+                name  - A human readable string naming this location.
+                
+                longitude - The longitude of the NSA in WGS84 coordinate system
+                (in decimal degrees).
+                
+                latitude - The latitude of the NSA in WGS84 coordinate system (in
+                decimal degrees).
+                
+                altitude  - The altitude of the NSA in WGS84 coordinate system (in
+                decimal meters).
+                
+                unlocode - The UN/LOCODE location identifier for the NSA
+                location.
+                
+                address - The address of the NSA location specified using the
+                vCard address format.
+            </xsd:documentation>
+        </xsd:annotation>        
+        <xsd:all>
+            <xsd:element name="name"       type="xsd:string"        minOccurs="0" />
+            <xsd:element name="longitude"  type="xsd:float"         minOccurs="0" />
+            <xsd:element name="latitude"   type="xsd:float"         minOccurs="0" />
+            <xsd:element name="altitude"   type="xsd:float"         minOccurs="0" />
+            <xsd:element name="unlocode"   type="xsd:string"        minOccurs="0" />
+            <xsd:element name="address"    type="xcard:adrPropType" minOccurs="0" />
+        </xsd:all>
+    </xsd:complexType>
+    
+    <xsd:complexType name="InterfaceType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                Type definition that models an NSA protocol interface.  This
+                type encapsulates the meta-data needed to determine the version,
+                location, and schema associated with a specific NSA interface.
+                
+                Elements:
+                
+                type - The unique string identifying the type and version of
+                the NSA interface.  Application Internet media types
+                (Content-types)  are used to identify the NSI interface,
+                version, and supported encoding type.  For example, the
+                first string below identifies the NSI Interface Discovery
+                Protocol Version 1 XML encoded representation, while the
+                second string identifies the same protocol and version, but
+                the JSON representation:
+                
+                type="application/vnd.ogf.nsi.discovery.v1+xml"
+                type="application/vnd.ogf.nsi.discovery.v1+json"
+                
+                href - This attribute contains the protocol endpoint for the
+                interface identified in this interface reference.  For example, the
+                following URL provides the protocol endpoint for the interface type
+                identified in this interface reference.
+                
+                href="https://nsa.ogf.org/discovery"     
+                
+                describedBy - This attribute contains a reference to the WSDL
+                or WADL file corresponding to this interface's version (if
+                available).  For example, the following URL provides the
+                location for a WADL description of the NSI Interface Discovery
+                Protocol Version 1.
+                
+                describedBy="https://nsa.ogf.org/discovery/wadl"    
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="type"        type="xsd:string" />
+            <xsd:element name="href"        type="xsd:anyURI" />
+            <xsd:element name="describedBy" type="xsd:anyURI" minOccurs="0" />
+        </xsd:sequence>
+        <xsd:attribute name="id" use="optional" type="xsd:string" />
+    </xsd:complexType>
+    
+    <xsd:complexType name="FeatureType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                Type definition for an NSA feature within the network.  This type
+                is left underspecified so that external values can be defined
+                as additional features and protocol interfaces are introduced.
+                
+                As an example we can model the NSA's CS "role" within the network
+                as shown below:
+                
+                <feature type="org.ogf.nsi.cs.v2.role.aggregator"/>
+                <feature type="org.ogf.nsi.cs.v2.role.uPA"/>
+                <feature type="org.ogf.nsi.cs.v2.role.uRA"/>
+                
+                We could also model the NSI CS 2.0 reservation commit timeout
+                value for an NSA:
+                
+                <feature type="org.ogf.nsi.cs.v2.commitTimeout">120</feature>
+                
+                Attributes:
+                
+                type - Identifies the type of role modeled by the supplied
+                value.
+                
+                value - The optional string value associated with the type.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleContent>
+            <xsd:extension  base="xsd:string">
+                <xsd:attribute  name="type"  type="xsd:string"  use="required"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="PeersWithType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                Type definition models a unidirectional trusted control plane
+                relationship between an NSA and its peer.
+
+                Attributes:
+                
+                role - Identifies the directionality of the peering relationship
+                being modeled by the value.  A value of "RA" indicates the NSA
+                represented by the document is performing the RA role (source NSA)
+                in the unidirectional relationship.   A value of "PA" indicates
+                the NSA is performing the PA role (destination NSA) in the
+                unidirectional relationship.
+                
+                value - The NSA identifier of the remote peer NSA modeled by
+                this relationship.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleContent>
+            <xsd:extension  base="xsd:anyURI">
+                <xsd:attribute  name="role"  type="tns:PeerRoleEnum"  default="RA"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    
+    <xsd:simpleType name="PeerRoleEnum">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                Type enumerating the role of a unidirectional trusted
+                control plane relationship.  
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="RA" />
+            <xsd:enumeration value="PA" />
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:complexType name="HolderType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                A simple holder type for inclusion of elements and attributes
+                from external namespaces.  This separate type is required to
+                get around bugs in Libxml2 library used by command line tools
+                like xmllint.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:any namespace="##other" processContents="lax" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:anyAttribute namespace="##other" processContents="lax" />
+    </xsd:complexType>
+</xsd:schema>

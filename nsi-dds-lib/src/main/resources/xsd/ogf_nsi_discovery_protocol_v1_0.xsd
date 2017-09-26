@@ -1,0 +1,1170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+The OGF takes no position regarding the validity or scope of any intellectual
+property or other rights that might be claimed to pertain to the implementation
+or use of the technology described in this document or the extent to which any
+license under such rights might or might not be available; neither does it
+represent that it has made any effort to identify any such rights.  Copies of
+claims of rights made available for publication and any assurances of licenses
+to be made available, or the result of an attempt made to obtain a general
+license or permission for the use of such proprietary rights by implementers or
+users of this specification can be obtained from the OGF Secretariat.
+
+The OGF invites any interested party to bring to its attention any copyrights,
+patents or patent applications, or other proprietary rights, which may cover
+technology that may be required to practice this recommendation.  Please
+address the information to the OGF Executive Director.
+
+This document and the information contained herein is provided on an "As Is"
+basis and the OGF disclaims all warranties, express or implied, including but
+not limited to any warranty that the use of the information herein will not
+infringe any rights or any implied warranties of merchantability or fitness
+for a particular purpose.
+
+Copyright (C) Open Grid Forum (2009-2012). All Rights Reserved.
+
+This document and translations of it may be copied and furnished to others, and
+derivative works that comment on or otherwise explain it or assist in its
+implementation may be prepared, copied, published and distributed, in whole or
+in part, without restriction of any kind, provided that the above copyright
+notice and this paragraph are included on all such copies and derivative works.
+However, this document itself may not be modified in any way, such as by removing
+the copyright notice or references to the OGF or other organizations, except as
+needed for the purpose of developing Grid Recommendations in which case the
+procedures for copyrights defined in the OGF Document process must be followed,
+or as required to translate it into languages other than English.
+
+The limited permissions granted above are perpetual and will not be revoked by
+the OGF or its successors or assignees.
+
+Open Grid Forum NSI Document Distribution Service Protocol v1.0.
+
+Description: This is the NSI Document Distribution Protocol types schema for
+the reference web services implementation of the OGF NSI Document Distribution
+Service v1.0.  The Document Distribution Service provides the primary mechanism
+for information discovery within the Network Service Framwork suite of protocols.
+Comments and questions can be directed to the mailing list group
+mailing list (nsi-wg@ogf.org).
+-->
+<xsd:schema targetNamespace="http://schemas.ogf.org/nsi/2014/02/discovery/types"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="http://schemas.ogf.org/nsi/2014/02/discovery/types"
+    version="1.0">
+
+    <xsd:annotation>
+        <xsd:appinfo>ogf_nsi_discovery_protocol_v1_0.xsd 2014-02-20</xsd:appinfo>
+        <xsd:documentation xml:lang="en">
+            This is an XML schema document describing the OGF NSI Document
+            Distribution Service Protocol v1.0.
+        </xsd:documentation>
+    </xsd:annotation>
+
+    <!-- Collection for root resource definition. -->
+    <xsd:element name="collection" type="tns:CollectionType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This root resource contains a collection of zero or more
+                subscriptions and documents held within the NSA.
+
+                HTTP operations: GET
+                URI: /
+
+                HTTP Parameters:
+                  Accept - Identifies the content type encoding requested for
+                  the returned results. Must be a content type supported by the
+                  protocol.
+
+                  If-Modified-Since - Return only entries discovered or
+                    modified since this time.
+
+                Query Parameters: None
+
+                Returns (code, element):
+                    200	collection
+                        Return collection element containing all subscription
+                        and document resources matching the query.  If no
+                        subscriptions or documents match the query, then an empty
+                        documents collection is returned.
+
+                    304	None
+                        Successful operation where there were no changes to any
+                        subscription or document resource given the If-Modified-Since
+                        criteria.  Returns no message body.
+
+                    400	error
+                        Returned if a client specifies an invalid request.  An
+                        error element will be included populated with appropriate
+                        error information.
+
+                    500	error
+                        Returned if an internal server error occurred during the
+                        processing of this request. An error element will be
+                        included populated with appropriate error information.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="CollectionType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                Type definition for a collection of discoverable resources.
+                This type contains a list of subscriptions and docuemnts
+                matching the query parameters.  Extensibility is added to
+                allow inclusion of resources from other namespaces as needed.
+
+                Elements:
+
+                subscriptions - A list of subscription resources within the
+                system.
+
+                documents - A list of document resources stored within the
+                document space of this provider.
+
+                local - A list of document resources published by the local
+                provider.
+
+                other - Provides a flexible mechanism allowing additional elements
+                to be provided from other namespaces without needing to update
+                this schema definition.
+
+                Attributes:
+
+                other - Provides a flexible mechanism allowing additional attributes
+                to be provided from other namespaces without needing to update
+                this schema definition.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element ref="tns:subscriptions" minOccurs="0" />
+            <xsd:element ref="tns:documents" minOccurs="0" />
+            <xsd:element ref="tns:local" minOccurs="0" />
+            <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:anyAttribute namespace="##other" processContents="lax" />
+    </xsd:complexType>
+
+    <!-- A list of subscriptions. -->
+    <xsd:element name="subscriptions" type="tns:SubscriptionListType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                The subscriptions resource contains a collection of zero or
+                more subscriptions held within the provider NSA.
+
+                HTTP operations: GET
+                URI: /subscriptions
+
+                HTTP Parameters:
+                  Accept - Identifies the content type encoding requested for
+                  the returned results. Must be a content type supported by the
+                  protocol.
+
+                  If-Modified-Since - Constrains the GET request to return only
+                  those subscriptions that have been created or updated since the
+                  time specified in this parameter.
+
+                Query Parameters:
+                  requesterId - Return all subscription resources containing the
+                  specified requesterId.
+
+                Returns (code, element):
+
+                  200	subscriptions
+                        Return all subscription resources matching the query in a
+                        subscriptions element.  If no subscriptions match the query,
+                        then an empty subscriptions element is returned.
+
+                  304   None
+                        Successful operation where there were no changes to any
+                        subscription resources matching the query filter given the
+                        If-Modified-Since criteria. Returns no message body.
+
+                  400	error
+                        Returned if a client specifies an invalid request. An error
+                        element will be included populated with appropriate error
+                        information.
+
+                  500	error
+                        Returned if an internal server error occurred during the
+                        processing of this request. An error element will be included
+                        populated with appropriate error information.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="SubscriptionListType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                Type definition for a list of subscription resources.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element ref="tns:subscription" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:anyAttribute namespace="##other" processContents="lax" />
+    </xsd:complexType>
+
+    <!-- A signle subscription resource definition. -->
+    <xsd:element name="subscription" type="tns:SubscriptionType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                The subscription resource contains a single subscription from
+                the provider NSA.
+
+                HTTP operations: GET
+                URI: /subscriptions/{id}
+                        {id} is the unique subscription identifier.
+
+                HTTP Parameters:
+                Accept - Identifies the content type encoding requested for
+                the returned results. Must be a content type supported by the
+                protocol.
+
+                If-Modified-Since - Constrains the GET request to return only
+                the subscription if it has been updated since the time specified
+                in this parameter.
+
+                Query Parameters: None
+
+                Returns (code, element):
+
+                200	subscription
+                    Successful operation returns the subscription identified by
+                    id in a subscription element.  The Last-Modified header
+                    parameter will contain the time this subscription resource
+                    was last modified.
+
+                304 None
+                    Successful operation where there were no changes to the
+                    subscription resource identified by id given the
+                    If-Modified-Since criteria. Returns no message body.
+
+                400	error
+                    Returned if a client specifies an invalid request. An error
+                    element will be included populated with appropriate error
+                    information.
+
+                404 error
+                    Returned if the requested subscription was not found.  An
+                    error element will be included populated with appropriate
+                    error information.
+
+                500	error
+                    Returned if an internal server error occurred during the
+                    processing of this request. An error element will be included
+                    populated with appropriate error information.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="SubscriptionType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This type models the subscription resource.
+
+                Elements:
+
+                requesterId	- The identifier of the requester client that created
+                the subscription.  An NSA must use its unique NSA identifier for
+                requesterId.
+
+                callback - The HTTP endpoint on the client host that will receive
+                the notifications delivered for this subscription.
+
+                filter - The filter criteria to apply to document events to determine
+                if a notification should be sent to the client.
+
+                other - Provides a flexible mechanism allowing additional elements
+                to be provided from other namespaces without needing to update
+                this schema definition.
+
+                Attributes:
+
+                id - The provider assigned subscription identifier.
+
+                href - The direct URI reference to the resource.
+
+                version - The version of the subscription.  Indicates the last
+                time the subscription was modified.
+
+                other - Provides a flexible mechanism allowing additional attributes
+                to be provided from other namespaces without needing to update
+                this schema definition.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="requesterId" type="xsd:string" />
+            <xsd:element name="callback"    type="xsd:anyURI" />
+            <xsd:element name="filter"      type="tns:FilterType" minOccurs="0" />
+            <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="id"      use="required" type="xsd:string" />
+        <xsd:attribute name="href"    use="required" type="xsd:anyURI" />
+        <xsd:attribute name="version" use="required" type="xsd:dateTime" />
+        <xsd:anyAttribute namespace="##other" processContents="lax" />
+    </xsd:complexType>
+
+    <xsd:element name="subscriptionRequest" type="tns:SubscriptionRequestType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                The subscriptionRequest is a collection of parameters from the
+                subscription resource that is used to create a new subscription
+                resource or update an existing subscription resource.
+
+                Once a subscription has been successfully created or updated on
+                the provider the server will immediately send notifications for
+                all documents matching the filter criteria independent of the
+                event filter.
+
+                HTTP operations: POST (create), PUT (update)
+                URI: /subscriptions
+
+                HTTP Parameters:
+                Content-Type - Identifies the content type encoding of the POST
+                body contents.  Must be a content type supported by the protocol.
+
+                Accept - Identifies the content type encoding requested for
+                the returned results. Must be a content type supported by the
+                protocol.
+
+                If-Modified-Since - Constrains the GET request to return only
+                the subscription if it has been updated since the time specified
+                in this parameter.
+
+                Query Parameters: N/A
+
+                Returns (code, element):
+
+                201	subscription
+                    Returns a copy of the new subscription resource created as
+                    the result of a successful operation.  The HTTP Location
+                    header field will contain the URI of the new subscription
+                    resource.
+
+                400	error
+                    Returned if a client specifies an invalid request. An error
+                    element will be included populated with appropriate error
+                    information.
+
+                403	error
+                    The server understood the request, but is refusing to fulfill
+                    it. Authorization will not help and the request SHOULD NOT be
+                    repeated.  An error element will be included populated with
+                    appropriate error information.
+
+                500	error
+                    Returned if an internal server error occurred during the
+                    processing of this request. An error element will be included
+                    populated with appropriate error information.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="SubscriptionRequestType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This type models a subset of parameters from the subscription
+                resource used during creation and updates.
+
+                Elements:
+
+                requesterId	- The identifier the requesting client would like to
+                use for unique identification.  An NSA must use its unique NSA
+                identifier for requesterId.
+
+                callback - The HTTP endpoint on the client host that will receive
+                the notifications delivered for this subscription.
+
+                filter - The filter criteria to apply to document events to determine
+                if a notification should be sent to the client.
+
+                other - Provides a flexible mechanism allowing additional elements
+                to be provided from other namespaces without needing to update
+                this schema definition.
+
+                Attributes:
+
+                other - Provides a flexible mechanism allowing additional attributes
+                to be provided from other namespaces without needing to update
+                this schema definition.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="requesterId" type="xsd:string" />
+            <xsd:element name="callback"    type="xsd:anyURI" />
+            <xsd:element name="filter"      type="tns:FilterType" minOccurs="0" />
+            <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:anyAttribute namespace="##other" processContents="lax" />
+    </xsd:complexType>
+
+    <xsd:complexType name="FilterType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This type is the base notification filter for subscriptions.
+                The include element specifies the document event match criteria
+                to include, while the exclude element specifies those to
+                specifically exclude.  The include will be evaluated first, then
+                the exclude will be applied.
+
+                Elements:
+
+                include – Include notifications matching these criteria.
+
+                exclude - Exclude the notifications matching these criteria.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="include" type="tns:FilterCriteriaType" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="exclude" type="tns:FilterCriteriaType" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="FilterCriteriaType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This type models the criteria that can be included in the
+                notfication filter for subscriptions.
+
+                Elements:
+
+                event – The type of document event that will generate a
+                notification.  Currently only three events are supported (All,
+                New, Updated).  At least one of event criteria must be
+                supplied.  The default event criteria is All.
+
+                or – Any document matching any of the supplied nsa, document
+                type, or document id values.
+
+                and - Any document matching all of the supplied nsa, document
+                type, or document id values (logical AND).
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="event" type="tns:DocumentEventType" default="All" minOccurs="1" maxOccurs="3" />
+            <xsd:element name="or"    type="tns:FilterOrType" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="and"   type="tns:FilterAndType" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:simpleType name="DocumentEventType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This is a simple string type enumerating the types of document
+                events that can be included in a filter.
+
+                All - Matches all document events.
+
+                New - Matches new documents that are discovered in the space.
+
+                Updated - Matches existing documents in the space that are updated.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="All"/>
+            <xsd:enumeration value="New"/>
+            <xsd:enumeration value="Updated"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="FilterAndType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This filter criteria type lists elements that can be matched in a
+                document as part of the decision to generate or not generate a
+                notification.  The supplied nsa, document type, and document id
+                values are evaluted as a logical AND so that all included values
+                must match.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="nsa"  type="xsd:anyURI" minOccurs="0" />
+            <xsd:element name="type" type="xsd:string" minOccurs="0" />
+            <xsd:element name="id"   type="xsd:string" minOccurs="0" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="FilterOrType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This filter criteria type lists elements that can be matched in a
+                document as part of the decision to generate or not generate a
+                notification.  The supplied nsa, document type, and document id
+                values are evaluted as a logical OR so that any included values
+                that match result in a criteria match.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:choice maxOccurs="unbounded">
+                <xsd:element name="nsa"  type="xsd:anyURI" />
+                <xsd:element name="type" type="xsd:string" />
+                <xsd:element name="id"   type="xsd:string" />
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- A list of notifications. -->
+    <xsd:element name="notifications" type="tns:NotificationListType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                When a document event occurs matching a registered subscription
+                the provider must issue a notification to the requester endpoint
+                identified in the subscription resource.  This element is sent
+                in the body of a POST request to the requester endpoint.
+
+                Multiple events can be grouped and delivered together in a single
+                notification if these events occur within a reasonable period of
+                time of each other. Notification delivery should not be delayed.
+
+                Notifications are also sent when a subscription is first created,
+                and after a subscription is modified.  This notification will
+                include any documents matching the filter criteria.
+
+                HTTP operations: POST
+                URI: /client-supplied-endpoint
+
+                HTTP Parameters:
+
+                Content-Type - Identifies the content type encoding of the POST
+                body contents.  Must be identical to the value as used by the
+                client on subscription.
+
+                Query Parameters: N/A
+
+                Returns (code, element):
+
+                202	None
+                    Indicates the subscribed client has accepted the notification
+                    for processing.  The client receiving the notification must
+                    return an HTTP 202 status code in response to the POST.
+                    Any other status code will result in a deletion of the
+                    subscription.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="NotificationListType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                Type definition for a list of notifications.
+
+                Elements:
+
+                notification - A list of zero or more notifications matching the
+                subscription filter criteria.
+
+                Attributes:
+
+                providerId - The identifier of the provider generating the
+                notification.  This is the provider on which the subscription
+                was created.
+
+                id - The identifier of the subscription that generated the
+                notifications.
+
+                href - The URI reference for subscription that generated the
+                notification.  This can be used to directly access the
+                subscription.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element ref="tns:notification" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="providerId" use="required" type="xsd:anyURI" />
+        <xsd:attribute name="id"         use="required" type="xsd:string" />
+        <xsd:attribute name="href"       use="required" type="xsd:anyURI" />
+    </xsd:complexType>
+
+    <!-- A single notfication. -->
+    <xsd:element name="notification" type="tns:NotificationType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This element models a single document notification and is
+                included in the notifications element.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="NotificationType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This type models a single document notification event.
+
+                Elements:
+
+                discovered - The time this document event was detected on the
+                provider.  It is not the time the notification was generated.
+                It also should be noted that this time could be a considerable
+                period in the past if the notification was sent as the result
+                of a subscription creation or edit.
+
+                event - The type of document event this notification represents.
+
+                document - The document metadata entry associated with the
+                notification.
+
+                other - Provides a flexible mechanism allowing additional element
+                to be provided from other namespaces without needing to update
+                this schema definition.
+
+                Attributes:
+
+                other - Provides a flexible mechanism allowing additional attributes
+                to be provided from other namespaces without needing to update
+                this schema definition.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="discovered" type="xsd:dateTime" />
+            <xsd:element name="event"      type="tns:DocumentEventType" />
+            <xsd:element name="document"   type="tns:DocumentType" />
+            <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:anyAttribute namespace="##other" processContents="lax" />
+    </xsd:complexType>
+
+    <!-- A list of documents. -->
+    <xsd:element name="documents" type="tns:DocumentListType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                The documents element models a list of documents from the
+                document space.
+
+                HTTP operations: GET
+                URI: /documents/{nsa}/{type}
+
+                The documents element contains document resources discovered
+                within the document space, or a subset of documents based on
+                supplied query parameters.  Zero or more document instances will
+                be returned in a documents element.
+
+                The URI template “/documents/{nsa}/{type}” can be used as an
+                alternative to, or in conjunction with, the use of query
+                parameters.  Performing a GET on “/documents/{nsa}/” will
+                return all documents associated with the specified NSA.
+                Performing a GET on “/documents/{nsa}/{type}” will return
+                all documents of {type} from the specified NSA.
+
+                HTTP Parameters:
+
+                Accept - Identifies the content type encoding requested for
+                the returned results. Must be a content type supported by the
+                protocol.
+
+                If-Modified-Since - Constrains the GET request to return only
+                those documents that have been created or updated since the
+                time specified in this parameter.
+
+                Query Parameters:
+
+                id (string) - Return all document resources containing the specified Id.
+
+                nsa (string) - Return all document resources containing the
+                specified nsa identifier.  Cannot be used if the {nsa} URI
+                component is provided.
+
+                type (string) - Return all document resources containing the
+                specified type. Cannot be used if the {type} URI component is
+                provided.
+
+                summary	(none) - Will return summary results of any documents
+                matching the query criteria.  Summary results includes all
+                document meta-data but not the signature or document contents.
+
+                Returns (code, element):
+
+                200	documents
+                Return all document resources matching the query in a
+                documents element.  If no documents match the query,
+                then an empty documents element is returned.
+
+                304   None
+                Successful operation where there were no changes to any
+                subscription resources matching the query filter given the
+                If-Modified-Since criteria. Returns no message body.
+
+                400	error
+                Returned if a client specifies an invalid request. An error
+                element will be included populated with appropriate error
+                information.
+
+                500	error
+                Returned if an internal server error occurred during the
+                processing of this request. An error element will be included
+                populated with appropriate error information.
+
+                HTTP operations: POST
+                URI: /documents
+
+                The POST operation on the “/documents” resource will create a
+                new document using the information supplied in the document
+                element contained in the POST body.  A successful operation
+                will return the new document resource.  This operation has
+                restricted access for clients and is made available by the
+                server based on access control permissions.
+
+                Once a document has been successfully created on the server,
+                the server will immediately send notifications to all
+                subscriptions with filter criteria matching the document.
+
+                HTTP Parameters:
+
+                Content-Type - Identifies the content type encoding of the POST
+                body contents.  Must be a content type supported by the protocol.
+
+                Accept - Identifies the content type encoding requested for
+                the returned results. Must be a content type supported by the
+                protocol.
+
+                If-Modified-Since - Constrains the GET request to return only
+                those documents that have been created or updated since the
+                time specified in this parameter.
+
+                Body Parameters:
+
+                document - The document to add to the document space of the
+                local provider.
+
+                Returns (code, element):
+
+                201	document
+                    Returns a copy of the new document resource created as the
+                    result of a successful operation.  The HTTP Location header
+                    field will contain the direct URI reference of the new
+                    document resource.  It will be structured using the URI
+                    template $root/documents/{nsa}/{type}/{id}.
+
+                400	error
+                    Returned if a client specifies an invalid request.  An error
+                    element will be included populated with appropriate error
+                    information.
+
+                403	error
+                    The server understood the request, but is refusing to fulfill
+                    it. Authorization will not help and the request SHOULD NOT
+                    be repeated.  An error element will be included populated
+                    with appropriate error information.
+
+                409	error
+                    A document already exists with the same name (nsa/type/id).
+                    An update of an existing document should use the PUT
+                    operation.
+
+                500	error
+                    Returned if an internal server error occurred during the
+                    processing of this request. An error element will be
+                    included populated with appropriate error information.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="local" type="tns:DocumentListType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                The local element models a list of documents from the document
+                space published by the local provider NSA.
+
+                HTTP operations: GET
+                URI: /local/{type}
+
+                The local element contains document resources published by the
+                local provider, or a subset of documents based on supplied query
+                parameters.  Zero or more document instances will be returned in
+                a local element.
+
+                A client can perform a GET operation on the special “/local” URI
+                when it would like to discover all documents associated with the
+                local provider NSA.  This operation is equivalent to performing a
+                GET operation on the URI “/documents/{nsa}”, however, for “/local”
+                the client is not required to have previous knowledge of the
+                provider NSA identifier.
+
+                The URI template “/local/{type}” can be used as an alternative to,
+                or in conjunction with, the use of query parameters.  Performing
+                a GET on “/local/{type}/” will return all documents of {type}
+                associated with the local NSA.
+
+                HTTP Parameters:
+
+                Accept - Identifies the content type encoding requested for
+                the returned results. Must be a content type supported by the
+                protocol.
+
+                If-Modified-Since - Constrains the GET request to return only
+                those documents that have been created or updated since the
+                time specified in this parameter.
+
+                Query Parameters:
+
+                id (string) - Return all document resources containing the
+                specified Id.
+
+                type (string) - Return all document resources containing the
+                specified type. Cannot be used if the {type} URI component is
+                provided.
+
+                summary	(none) - Will return summary results of any documents
+                matching the query criteria.  Summary results includes all
+                document meta-data but not the signature or document contents.
+
+                Returns (code, element):
+
+                200	local
+                    Return all document resources matching the query in a
+                    documents element.  If no documents match the query,
+                    then an empty documents element is returned.
+
+                304   None
+                    Successful operation where there were no changes to any
+                    document resources matching the query filter given the
+                    If-Modified-Since criteria. Returns no message body.
+
+                400	error
+                    Returned if a client specifies an invalid request. An error
+                    element will be included populated with appropriate error
+                    information.
+
+                500	error
+                    Returned if an internal server error occurred during the
+                    processing of this request. An error element will be included
+                    populated with appropriate error information.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="DocumentListType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This type provides a list of zero or more documents.
+
+                Elements:
+
+                document - The document meta-data entry within the document space.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element ref="tns:document" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- A single document. -->
+    <xsd:element name="document" type="tns:DocumentType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                The document element models the metadata for a single document
+                from the document space.
+
+                HTTP operations: GET
+                URI: /documents/{nsa}/{type}/{id}
+
+                This operation will return a specific document instance
+                discovered within the document space based on the URI template
+                “/documents/{nsa}/{type}/{id}”, where {nsa} is the NSA sourcing
+                the document, {type} is the type of document, and {id} is the
+                identifier of the specific document.  The matching document is
+                returned in a single document element.
+
+                HTTP Parameters:
+
+                Accept - Identifies the content type encoding requested for
+                the returned results. Must be a content type supported by the
+                protocol.
+
+                If-Modified-Since - Constrains the GET request to return only
+                those documents that have been created or updated since the
+                time specified in this parameter.
+
+                Query Parameters: None.
+
+                Returns (code, element):
+
+                200	local
+                    Successful operation returns the document identified by
+                    {nsa}/{type}/{id} in a document element.  The Last-Modified
+                    header parameter will contain the time this document resource
+                    was last discovered.
+
+                304   None
+                    Successful operation returns the document identified by
+                    {nsa}/{type}/{id} in a document element.  The Last-Modified
+                    header parameter will contain the time this document resource
+                    was last discovered.
+
+                400	error
+                    Returned if a client specifies an invalid request. An error
+                    element will be included populated with appropriate error
+                    information.
+
+                404	error
+                    Returned if the requested document was not found.  An error
+                    element will be included populated with appropriate error
+                    information.
+
+                500	error
+                    Returned if an internal server error occurred during the
+                    processing of this request. An error element will be included
+                    populated with appropriate error information.
+
+                HTTP operations: PUT
+                URI: /documents/{nsa}/{type}/{id}
+
+                The PUT operation on the “/documents/{nsa}/{type}/{id}” resource
+                will allow a client to edit the document corresponding to the
+                identifier {id}, using the information supplied in the document
+                element contained in the PUT body.  A successful operation will
+                return the modified document and trigger any associated
+                notifications within the NSA.
+
+                A document is deleted from the document space by updating it’s
+                expire date to a reasonably short period in the future.  This
+                updated document will get propagated throughout the document
+                space and then expire, removing it from the space.
+
+                 HTTP Parameters:
+
+                 Content-Type - Identifies the content type encoding of the PUT
+                 body contents.  Must be a content type supported by the
+                 protocol.
+
+                 Accept - Identifies the content type encoding requested for
+                 the returned results. Must be a content type supported by the
+                 protocol.
+
+                 Body Parameters:
+
+                 document - The document to update in the document space of the
+                 local provider. The PUT request must contain the document
+                 element containing the existing parameters of the document
+                 resource if they were not modified, as well as any new/edited
+                 values.
+
+                 Returns (code, element):
+
+                 200 document
+                    Returns a copy of the modified document resource as the
+                    result of a successful operation.
+
+                 400 error
+                    Returned if a client specifies an invalid request.  An
+                    error element will be included populated with appropriate
+                    error information.
+
+                 403 error
+                    The server understood the request, but is refusing to fulfill
+                    it. Authorization will not help and the request SHOULD NOT be
+                    repeated.  An error element will be included populated with
+                    appropriate error information.
+
+                 404 error
+                    Returned if the requested document was not found.  An error
+                    element will be included populated with appropriate error
+                    information.
+
+                 500 error
+                    Returned if an internal server error occurred during the
+                    processing of this request. An error element will be included
+                    populated with appropriate error information.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="DocumentType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                The DocumentType type definition models all data relating to
+                a single document exchanged within the network.  Meta-data
+                associated with the document, document signature, and the
+                document itself is encapsulated in this type.  The type
+                itself is structured such that it does not need to be
+                manipulated between receiving and propagating to a peer.
+
+                A document is uniquely named within the network by the tuple
+                of nsa, type, and id.  The identifier (id) element itself does 
+                not need to be unique within the network; it must just be unique
+                within the context of the nsa and type elements.  These rules
+                allow the reuse of the same id value for a document of different
+                types under the same source NSA.  This is important for both
+                searching, and for associating the same naming attribute to
+                related documents.
+
+                An NSA must not modify the contents of a DocumentType before
+                propagating on to a peer unless that NSA is the owner of the
+                document.
+
+                Elements:
+
+                nsa	- The source NSA associated with the generation and management
+                of the document within the network. This is assumed to be the NSA
+                to which the document relates, however, there may be situations
+                such as proxy publishing where this assumption is not true.
+                
+                For example, if the document being generated is the NSA Description
+                Document for NSA “urn:ogf:network:example.com:2013:nsa:vixen”, then
+                the nsa element should contain is the NSA identifier
+                “urn:ogf:network:example.com:2013:nsa:vixen”.
+
+                type - The unique string identifying the type of this document.
+                A document type is defined by the type and release of a data
+                document.  For example, NSI Topology version 1.0 and a NSI
+                Topology version 2.0 would be considered two different document
+                types:
+                    - vnd.ogf.nsi.topology.v1+xml
+                    - vnd.ogf.nsi.topology.v2+xml
+                
+                The NSA Description Document 1.0 is defined as the type:
+                    - vnd.ogf.nsi.nsa.v1+xml
+
+                signature - The OPTIONAL digital signature of the document
+                contents.
+
+                content - The contents of the document modeled by this document
+                resource.  The document containted in this element must be
+                encoded as a MIMW string following the content transfer encoding
+                rules as defined in RFC1341.
+
+                other - Provides a flexible mechanism allowing additional elements
+                to be provided from other namespaces without needing to update
+                this schema definition.
+
+                Attributes:
+
+                id - The identifier of the document.  This value must be unique
+                in the context of the nsa and type element values within the
+                global document space. 
+
+                version	- The version of the document, or more specifically, the
+                date this version of the document was created.  Any updates to the
+                document must be tagged with a new version.
+
+                expires	- The date this version of the document expires and
+                should be deleted from the Global Document Space by an NSA and
+                any clients caching the document.
+
+                other - Provides a flexible mechanism allowing additional attributes
+                to be provided from other namespaces without needing to update
+                this schema definition.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="nsa"       type="xsd:anyURI" />
+            <xsd:element name="type"      type="xsd:string" />
+            <xsd:element name="signature" type="tns:ContentType" minOccurs="0" />
+            <xsd:element name="content"   type="tns:ContentType" minOccurs="0" />
+            <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="id"      use="required" type="xsd:string" />
+        <xsd:attribute name="href"    use="optional" type="xsd:anyURI" />
+        <xsd:attribute name="version" use="required" type="xsd:dateTime" />
+        <xsd:attribute name="expires" use="required" type="xsd:dateTime" />
+        <xsd:anyAttribute namespace="##other" processContents="lax" />
+    </xsd:complexType>
+    
+    <xsd:complexType name="ContentType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This simple string type is used to hold a document contents or
+                digital signature within the document metadata.  Elements of
+                is type use the contentTransferEncoding and contentType
+                attributes to describe the encoding of the document within
+                this string value.  The document meta-data "type" element
+                identifies the document type itself.
+                
+                When encoding a document to be contained in this element, the
+                contentType attribute is applied first using rules defined in
+                RFC1341 (section 4), followed by the contentTransferEncoding
+                attribute using rules defined in RFC1341 (section 5).  As an
+                example, an NSI topology document version 2 is encoded as
+                follows:
+                
+                type="vnd.ogf.nsi.topology.v2+xml"
+                contentType="application/x-gzip"
+                contentTransferEncoding="base64"
+                
+                In this case the "vnd.ogf.nsi.topology.v2+xml" document type
+                (XML) is compressed using gzip into a binary encoding, then
+                base64 encoded before being stored in the content element for
+                addition to the DDS.
+                
+                When decoding the contents contained in this element, the
+                contentTransferEncoding attribute is applied first using rules
+                defined in RFC1341 (section 5), followed by the contentType
+                attribute using rules defined in RFC1341 (section 4).  As an
+                example, an NSI Description Document version 1 is encoded as
+                follows:
+                
+                type="vnd.ogf.nsi.nsa.v1+xml"
+                contentType="application/x-gzip"
+                contentTransferEncoding="base64"
+                
+                In this case the "vnd.ogf.nsi.nsa.v1+xml" document type
+                (XML) will need to decoded from base64 as indicated by the 
+                contentTransferEncoding attribute, then decompressed using
+                gzip from the binary encoding into the resulting XML as
+                specified by the type.
+                
+                Attributes:
+                
+                contentType - This attribute is used to specify the nature
+                of the data in the body of the content element, by giving type
+                and subtype identifiers, and by providing auxiliary information
+                that may be required for certain document types.  RFC1341
+                (section 4) describes this in more detail.
+                
+                contentTransferEncoding - This attribute is used to indicate 
+                the type of transformation that has been used in order
+                to represent the body in an acceptable manner for transport in
+                the string content element of the document meta-data.  The
+                supported values of this attribute are defined in RFC1341
+                (section 5).
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="contentType"             use="optional" type="xsd:string" />
+                <xsd:attribute name="contentTransferEncoding" use="optional" type="xsd:string" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:element name="error" type="tns:ErrorType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                The error element is returned in an HTTP response when an error
+                has occured servicing the request on the provider.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="ErrorType">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                This type models errors returned from Document Distribution
+                Service operations.
+
+                Elements:
+
+                code - The integer error code for the specific error.
+
+                label - A character string label for the error.
+
+                description - A detailed description of error.
+
+                resource - The resource that caused the error.
+
+                Attributes:
+
+                id - The unique identifier of the error for correlation with logs.
+
+                date - The date and time the error occured.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="code"        type="xsd:int" />
+            <xsd:element name="label"       type="xsd:string" />
+            <xsd:element name="description" type="xsd:string" />
+            <xsd:element name="resource"    type="xsd:anyURI" />
+        </xsd:sequence>
+        <xsd:attribute name="id"   use="required" type="xsd:string" />
+        <xsd:attribute name="date" use="required" type="xsd:dateTime" />
+    </xsd:complexType>
+</xsd:schema>

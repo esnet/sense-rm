@@ -1,0 +1,84 @@
+nsi:
+  # DDS related configuration.
+  ddsUrl: http://localhost:8080/api/dds/v1
+  proxy:
+  nsaId: urn:ogf:network:example.net:2013:nsa:application
+  ddsAuditTimer: 600
+  ddsExpiryInterval: 600
+  ddsPoolSize: 4
+  peers:
+    - http://localhost:8401/dds
+
+  # NSI CS related configuration - the NSA we are connected to.
+  providerNsaId: urn:ogf:network:es.net:2013:nsa:nsi-aggr-west
+
+  # This is the list of topologies exposed through the SENSE-N-RM.
+  networkId: urn:ogf:network:network2:2015:topology
+
+  defaultServiceType: http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE
+  defaultUnits: "bps"
+  defaultGranularity: 1
+
+  # Control the polling of change within the network.
+  modelAuditTimer: 120
+
+  # This was for the DDS HTTP server configuation for incoming requests but now springboot handles this.  Will need
+  # a specific springboot configuration section.
+  server:
+    address: example.net
+    port: 8401
+    packageName: net.es.sense.rm.driver.nsi
+    secure:
+      production: false
+      keyStore:
+        type: JKS
+        file: config/keystore.jks
+        password: changeit
+      trustStore:
+        type: JKS
+        file: config/keystore.jks
+        password: changeit
+
+  # This configures the local HTTP client (currently within DDS code).
+  client:
+    production: false
+    keyStore:
+      type: JKS
+      file: config/keystore.jks
+      password: changeit
+    trustStore:
+      type: JKS
+      file: config/keystore.jks
+      password: changeit
+
+  # Left over from DDS server access control enforcement.
+  accessControl:
+    enabled: true
+    rules:
+      - access: READ
+        dn:
+          - "EMAILADDRESS=bob@example.com, CN=Bobby Boogie, OU=Sciences Network, O=Example Networks, L=New York, ST=NY, C=US"
+        nsaId:
+          - "urn:ogf:network:example.com:2013:nsa:aggr"
+      - access: WRITE
+        dn:
+          - "CN=nsi-aggr-west.es.net, OU=Domain Control Validated"
+        nsaId:
+          - "urn:ogf:network:es.net:2013:nsa:nsi-aggr-west"
+
+# Configuration for database.
+spring:
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sense-n-rm
+    driver-class-name: org.postgresql.Driver
+    username: sense-n-rm
+    password: bubbles
+    continue-on-error: true
+
+#spring.jpa.hibernate.ddl-auto=create
+#spring.jpa.hibernate.ddl-auto=update
+#spring.jpa.hibernate.ddl-auto=validate

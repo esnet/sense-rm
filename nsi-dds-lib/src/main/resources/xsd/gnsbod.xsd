@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Schema for NSI topology reachability and header extensions.
+
+Author: Henrik Thostrup Jensen <htj at nordu.net>
+Copyright: NORDUnet (2014)
+
+License: NORDUnet License (BSD 3-clause)
+-->
+
+<xsd:schema targetNamespace="http://nordu.net/namespaces/2013/12/gnsbod"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:gns="http://nordu.net/namespaces/2013/12/gnsbod"
+            version="1.2">
+
+  <!-- elements -->
+
+  <!-- this goes under the other element in the nsi:nsa document -->
+  <xsd:element name="TopologyReachability" type="gns:TopologyReachabilityType" />
+
+  <!-- this goes under the any element in the nsi cs header -->
+  <xsd:element name="ConnectionTrace"      type="gns:ConnectionTraceType" />
+
+  <!-- types -->
+
+  <xsd:complexType name="TopologyType">
+    <xsd:attribute   name="id"      use="required" type="xsd:anyURI" />
+    <xsd:attribute   name="cost"    use="required" type="xsd:int" />
+  </xsd:complexType>
+
+  <xsd:complexType name="TopologyReachabilityType">
+    <xsd:sequence>
+      <xsd:element name="Topology" type="gns:TopologyType" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ConnectionTraceType">
+    <xsd:sequence>
+      <xsd:element name="Connection" type="gns:ConnectionType" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ConnectionType">
+    <xsd:simpleContent>
+      <xsd:extension  base="xsd:string">
+        <xsd:attribute  name="index"  type="xsd:int"  use="required"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+</xsd:schema>

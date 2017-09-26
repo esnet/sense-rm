@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:Topology xmlns:ns2="http://schemas.ogf.org/nml/2013/05/base#" xmlns:ns3="http://schemas.ogf.org/nml/2012/10/ethernet" xmlns:ns4="http://schemas.ogf.org/nsi/2013/12/services/definition" id="urn:ogf:network:caltech.edu:2013:" version="2017-09-19T10:15:28.810Z">
+    <ns2:name>caltech.edu</ns2:name>
+    <ns2:Lifetime>
+        <ns2:start>2017-09-19T10:15:28.810Z</ns2:start>
+        <ns2:end>2017-11-18T10:15:28.811Z</ns2:end>
+    </ns2:Lifetime>
+    <ns2:BidirectionalPort id="urn:ogf:network:caltech.edu:2013::CER2024:eth1_24:+">
+        <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth1_24:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth1_24:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_2:+">
+        <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_2:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_2:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_3:+">
+        <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_3:+:in"/>
+        <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_3:+:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:esnet">
+        <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:esnet:in"/>
+        <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:esnet:out"/>
+    </ns2:BidirectionalPort>
+    <ns2:BidirectionalPort id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:PWave">
+        <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:PWave:in"/>
+        <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:PWave:out"/>
+    </ns2:BidirectionalPort>
+    <ns4:serviceDefinition id="urn:ogf:network:caltech.edu:2013::ServiceDefinition:EVTS.A-GOLE">
+        <name>GLIF Automated GOLE Ethernet VLAN Transfer Service</name>
+        <serviceType>http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE</serviceType>
+    </ns4:serviceDefinition>
+    <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasService">
+        <ns2:SwitchingService encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:caltech.edu:2013::ServiceDomain:EVTS.A-GOLE" labelSwapping="false" labelType="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasInboundPort">
+                <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth1_24:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_2:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_3:+:in"/>
+                <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:esnet:in"/>
+                <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:PWave:in"/>
+            </ns2:Relation>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasOutboundPort">
+                <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth1_24:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_2:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_3:+:out"/>
+                <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:esnet:out"/>
+                <ns2:PortGroup id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:PWave:out"/>
+            </ns2:Relation>
+            <ns4:serviceDefinition id="urn:ogf:network:caltech.edu:2013::ServiceDefinition:EVTS.A-GOLE"/>
+        </ns2:SwitchingService>
+    </ns2:Relation>
+    <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasInboundPort">
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:caltech.edu:2013::CER2024:eth1_24:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">0,1-4095</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_2:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">0,1-4095</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_3:+:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">0,1-4095</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:esnet:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3600-3610</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:PWave:in">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:lsanca.pacificwave.net:2016:topology:caltech-out"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+    </ns2:Relation>
+    <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#hasOutboundPort">
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:caltech.edu:2013::CER2024:eth1_24:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">0,1-4095</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_2:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">0,1-4095</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_3:+:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">0,1-4095</ns2:LabelGroup>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:esnet:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">3600-3610</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+        <ns2:PortGroup encoding="http://schemas.ogf.org/nml/2012/10/ethernet" id="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:PWave:out">
+            <ns2:LabelGroup labeltype="http://schemas.ogf.org/nml/2012/10/ethernet#vlan">1779-1799</ns2:LabelGroup>
+            <ns2:Relation type="http://schemas.ogf.org/nml/2013/05/base#isAlias">
+                <ns2:PortGroup id="urn:ogf:network:lsanca.pacificwave.net:2016:topology:caltech-in"/>
+            </ns2:Relation>
+            <ns3:maximumReservableCapacity>10000000000</ns3:maximumReservableCapacity>
+            <ns3:minimumReservableCapacity>1000000</ns3:minimumReservableCapacity>
+            <ns3:capacity>10000000000</ns3:capacity>
+            <ns3:granularity>1000000</ns3:granularity>
+        </ns2:PortGroup>
+    </ns2:Relation>
+</ns2:Topology>

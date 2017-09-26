@@ -1,5 +1,6 @@
-package net.es.sense.rm.driver.nsi.configuration;
+package net.es.sense.rm.driver.nsi.actors;
 
+import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import akka.actor.ActorSystem;
 import com.typesafe.config.ConfigFactory;
 import javax.annotation.PostConstruct;

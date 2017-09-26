@@ -1,5 +1,6 @@
 package net.es.sense.rm.driver.nsi.configuration;
 
+import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import akka.actor.ActorSystem;
 import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.spring.SpringApplicationContext;

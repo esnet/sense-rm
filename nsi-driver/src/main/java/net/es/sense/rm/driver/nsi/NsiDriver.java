@@ -12,7 +12,7 @@ import net.es.sense.rm.driver.api.Delta;
 import net.es.sense.rm.driver.api.DeltaRequest;
 import net.es.sense.rm.driver.api.Driver;
 import net.es.sense.rm.driver.api.Model;
-import net.es.sense.rm.driver.nsi.configuration.NsiProperties;
+import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.db.ModelReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;

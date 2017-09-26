@@ -23,7 +23,7 @@ import net.es.nsi.dds.lib.jaxb.dds.FilterType;
 import net.es.nsi.dds.lib.jaxb.dds.NotificationType;
 import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
 import net.es.nsi.dds.lib.util.XmlUtilities;
-import net.es.sense.rm.driver.nsi.configuration.NsiProperties;
+import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.dds.api.DiscoveryError;
 import net.es.sense.rm.driver.nsi.dds.api.Exceptions;
 import net.es.sense.rm.driver.nsi.dds.db.Document;

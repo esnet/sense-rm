@@ -1,4 +1,4 @@
-package net.es.sense.rm.driver.nsi.configuration;
+package net.es.sense.rm.driver.nsi.properties;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 import java.util.List;

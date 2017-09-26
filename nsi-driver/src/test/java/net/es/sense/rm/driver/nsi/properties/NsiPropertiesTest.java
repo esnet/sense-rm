@@ -1,4 +1,4 @@
-package net.es.sense.rm.driver.nsi.configuration;
+package net.es.sense.rm.driver.nsi.properties;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,7 +6,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import net.es.sense.rm.driver.nsi.CoreUnitTestConfiguration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = CoreUnitTestConfiguration.class)
+@SpringBootTest(classes = UnitTestConfiguration.class)
 @ActiveProfiles("test")
 @ContextConfiguration
 public class NsiPropertiesTest {

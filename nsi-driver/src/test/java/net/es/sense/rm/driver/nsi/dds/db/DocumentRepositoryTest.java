@@ -12,7 +12,6 @@ import net.es.nsi.dds.lib.jaxb.dds.ContentType;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentType;
 import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
 import net.es.nsi.dds.lib.util.XmlUtilities;
-import net.es.sense.rm.driver.nsi.CoreUnitTestConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +28,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { DocumentRepository.class, Document.class, CoreUnitTestConfiguration.class })
+@SpringBootTest(classes = { DocumentRepository.class, Document.class, DbUnitTestConfiguration.class })
 @DataJpaTest
 @ActiveProfiles("test")
 public class DocumentRepositoryTest {

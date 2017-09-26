@@ -24,7 +24,7 @@ import net.es.nsi.dds.lib.jaxb.dds.SubscriptionListType;
 import net.es.nsi.dds.lib.jaxb.dds.SubscriptionRequestType;
 import net.es.nsi.dds.lib.jaxb.dds.SubscriptionType;
 import net.es.nsi.dds.lib.util.UrlHelper;
-import net.es.sense.rm.driver.nsi.configuration.NsiProperties;
+import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.dds.DdsClient;
 import net.es.sense.rm.driver.nsi.dds.db.Subscription;
 import net.es.sense.rm.driver.nsi.dds.db.SubscriptionRepository;

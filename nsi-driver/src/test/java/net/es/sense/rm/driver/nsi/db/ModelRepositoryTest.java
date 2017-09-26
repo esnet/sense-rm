@@ -5,7 +5,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
-import net.es.sense.rm.driver.nsi.CoreUnitTestConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { ModelRepository.class, Model.class, CoreUnitTestConfiguration.class })
+@SpringBootTest(classes = { ModelRepository.class, Model.class, DbUnitTestConfiguration.class })
 @DataJpaTest
 @ActiveProfiles("test")
 public class ModelRepositoryTest {

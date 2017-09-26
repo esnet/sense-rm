@@ -8,7 +8,7 @@ import akka.testkit.TestProbe;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
-import net.es.sense.rm.driver.nsi.configuration.NsiActorSystem;
+import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.dds.messages.StartMsg;
 import net.es.sense.rm.driver.nsi.spring.SpringExtension;
 import org.springframework.beans.factory.annotation.Autowired;

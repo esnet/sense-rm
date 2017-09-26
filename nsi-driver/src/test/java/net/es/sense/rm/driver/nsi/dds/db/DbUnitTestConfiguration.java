@@ -1,4 +1,4 @@
-package net.es.sense.rm.driver.nsi;
+package net.es.sense.rm.driver.nsi.dds.db;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
@@ -11,6 +11,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ComponentScan
 @EnableAutoConfiguration
-public class CoreUnitTestConfiguration {
+public class DbUnitTestConfiguration {
 
 }

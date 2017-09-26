@@ -2,7 +2,6 @@ package net.es.sense.rm.driver.nsi.dds.db;
 
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
-import net.es.sense.rm.driver.nsi.CoreUnitTestConfiguration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { SubscriptionRepository.class, Subscription.class, CoreUnitTestConfiguration.class })
+@SpringBootTest(classes = { SubscriptionRepository.class, Subscription.class, DbUnitTestConfiguration.class })
 @DataJpaTest
 @ActiveProfiles("test")
 public class SubscriptionRepositoryTest {

@@ -10,7 +10,7 @@ import akka.routing.Routee;
 import akka.routing.Router;
 import java.util.ArrayList;
 import java.util.List;
-import net.es.sense.rm.driver.nsi.configuration.NsiProperties;
+import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.messages.ModelQueryRequest;
 import net.es.sense.rm.driver.nsi.spring.SpringExtension;
 import org.springframework.beans.factory.annotation.Autowired;

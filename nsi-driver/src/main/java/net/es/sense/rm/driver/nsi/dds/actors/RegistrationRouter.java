@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import net.es.sense.rm.driver.nsi.configuration.NsiProperties;
+import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.dds.db.Subscription;
 import net.es.sense.rm.driver.nsi.dds.db.SubscriptionRepository;
 import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent;

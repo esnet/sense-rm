@@ -26,7 +26,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
-import lombok.NonNull;
 
 /**
  *
@@ -43,10 +42,11 @@ public class Model {
   @GeneratedValue
   long id;
 
-  @NonNull
+
+  @Basic(optional=false)
   String topologyId;
 
-  @NonNull
+  @Basic(optional=false)
   String modelId;
 
   long version;

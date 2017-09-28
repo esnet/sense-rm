@@ -7,11 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Slf4j
 @SpringBootApplication
 @EnableSwagger2
+@EnableTransactionManagement
 public class Application {
   // Keep running while true.
   private static boolean keepRunning = true;

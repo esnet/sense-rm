@@ -14,13 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.dds.db.Subscription;
-import net.es.sense.rm.driver.nsi.dds.db.SubscriptionRepository;
+import net.es.sense.rm.driver.nsi.dds.db.SubscriptionService;
 import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent;
 import net.es.sense.rm.driver.nsi.dds.messages.StartMsg;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQuery;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQueryResult;
+import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.spring.SpringExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -42,7 +42,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
   private NsiProperties nsiProperties;
 
   @Autowired
-  private SubscriptionRepository subscriptionRepository;
+  private SubscriptionService subscriptionService;
 
   private final LoggingAdapter log = Logging.getLogger(getContext().system(), "RegistrationRouter");
 
@@ -137,12 +137,12 @@ public class RegistrationRouter extends UntypedAbstractActor {
   private void routeAudit() {
     // Check the list of discovery URL against what we already have.
     List<String> discoveryURL = nsiProperties.getPeers();
-    Set<String> subscriptionURL = subscriptionRepository.keySet();
+    Set<String> subscriptionURL = subscriptionService.keySet();
 
     for (String url : discoveryURL) {
       // See if we already have seen this URL.  If we have not then
       // we need to create a new remote subscription.
-      Subscription sub = subscriptionRepository.findOne(url);
+      Subscription sub = subscriptionService.get(url);
       if (sub == null) {
         // We have not seen this before.
         log.debug("[onReceive] creating new registration for url={}.", url);
@@ -167,7 +167,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
     // Now we see if there are any URL we missed from the old list and
     // unsubscribe them since we seem to no longer be interested.
     subscriptionURL.stream()
-            .map((url) -> subscriptionRepository.findOne(url))
+            .map((url) -> subscriptionService.get(url))
             .filter((sub) -> (sub != null)).map((sub) -> {
       // Should always be true unless modified while we are processing.
       RegistrationEvent regEvent = new RegistrationEvent();
@@ -180,7 +180,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
   }
 
   private void routeShutdown() {
-    subscriptionRepository.keySet().stream().map((url) -> subscriptionRepository.findOne(url))
+    subscriptionService.keySet().stream().map((url) -> subscriptionService.get(url))
             .filter((sub) -> (sub != null)).map((sub) -> {
       // Should always be true unless modified while we are processing.
       RegistrationEvent regEvent = new RegistrationEvent();
@@ -193,10 +193,10 @@ public class RegistrationRouter extends UntypedAbstractActor {
   }
 
   public boolean isSubscription(String url) {
-    return subscriptionRepository.findByHref(url) != null;
+    return subscriptionService.getByHref(url) != null;
   }
 
   public Subscription getSubscription(String url) {
-    return subscriptionRepository.findByHref(url);
+    return subscriptionService.getByHref(url);
   }
 }

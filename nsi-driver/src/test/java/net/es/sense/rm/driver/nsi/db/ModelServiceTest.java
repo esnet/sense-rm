@@ -20,13 +20,15 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { ModelRepository.class, Model.class, DbUnitTestConfiguration.class })
+@SpringBootTest(classes = { ModelService.class, ModelServiceBean.class, ModelRepository.class, Model.class, DbUnitTestConfiguration.class })
 @DataJpaTest
 @ActiveProfiles("test")
-public class ModelRepositoryTest {
-
+public class ModelServiceTest {
   @Autowired
   private ModelRepository models;
+
+  @Autowired
+  private ModelService modelService;
 
   public void buildDatabase() throws JAXBException, IOException, DatatypeConfigurationException {
     // Clear the contents of the database so he have a fresh start.
@@ -45,7 +47,7 @@ public class ModelRepositoryTest {
     // Set up test data.
     buildDatabase();
 
-    for (Model model : models.findAll()) {
+    for (Model model : modelService.get()) {
       log.info("id: {}", model.getId());
     }
 

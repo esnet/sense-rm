@@ -7,14 +7,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Date;
+import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
-import lombok.NonNull;
 import net.es.nsi.dds.lib.jaxb.DdsParser;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentType;
 import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
@@ -38,16 +39,16 @@ public class Document implements Serializable {
   private static final ObjectFactory FACTORY = new ObjectFactory();
 
   @Id
-  @NonNull
+  @Basic(optional=false)
   private String id;
 
-  @NonNull
+  @Basic(optional=false)
   private String nsa;
 
-  @NonNull
+  @Basic(optional=false)
   private String type;
 
-  @NonNull
+  @Basic(optional=false)
   private String documentId;
 
   // When we first encountered this document.
@@ -58,6 +59,7 @@ public class Document implements Serializable {
 
   // The document discovered from the DDS.
   @Lob
+  @Basic(fetch=FetchType.LAZY, optional=true)
   private String document;
 
   /**

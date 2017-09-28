@@ -24,12 +24,12 @@ import net.es.nsi.dds.lib.jaxb.dds.SubscriptionListType;
 import net.es.nsi.dds.lib.jaxb.dds.SubscriptionRequestType;
 import net.es.nsi.dds.lib.jaxb.dds.SubscriptionType;
 import net.es.nsi.dds.lib.util.UrlHelper;
-import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.dds.DdsClient;
 import net.es.sense.rm.driver.nsi.dds.db.Subscription;
-import net.es.sense.rm.driver.nsi.dds.db.SubscriptionRepository;
+import net.es.sense.rm.driver.nsi.dds.db.SubscriptionService;
 import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent;
 import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent.Event;
+import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.apache.http.client.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -50,7 +50,7 @@ public class RegistrationActor extends UntypedAbstractActor {
   private NsiProperties nsiProperties;
 
   @Autowired
-  private SubscriptionRepository subscriptionRepository;
+  private SubscriptionService subscriptionService;
 
   @Autowired
   private DdsClient ddsClient;
@@ -156,7 +156,7 @@ public class RegistrationActor extends UntypedAbstractActor {
           subscription.setCreated(response.getLastModified().getTime());
         }
 
-        subscriptionRepository.save(subscription);
+        subscriptionService.create(subscription);
 
         // Now that we have registered a new subscription make sure we clean up
         // any old ones that may exist on the remote DDS.
@@ -240,7 +240,7 @@ public class RegistrationActor extends UntypedAbstractActor {
     // First we retrieve the remote subscription to see if it is still
     // valid.  If it is not then we register again, otherwise we leave it
     // alone for now.
-    Subscription subscription = subscriptionRepository.findOne(event.getUrl());
+    Subscription subscription = subscriptionService.get(event.getUrl());
     String subscriptionURL = subscription.getHref();
 
     // Check to see if the remote subscription URL is absolute or relative.
@@ -286,7 +286,7 @@ public class RegistrationActor extends UntypedAbstractActor {
         log.error("[RegistrationActor] Subscription not found, url={}", absoluteURL);
 
         // Remove the stored subscription since a new one will be created.
-        subscriptionRepository.delete(subscription.getDdsURL());
+        subscriptionService.delete(subscription.getDdsURL());
         event.setEvent(Event.Register);
         register(event);
       } // An unexpected error has occured.
@@ -314,9 +314,9 @@ public class RegistrationActor extends UntypedAbstractActor {
       throw new IllegalArgumentException("[RegistrationActor] Delete contains invalid event type " + event.getEvent());
     }
 
-    Subscription subscription = subscriptionRepository.findOne(event.getUrl());
+    Subscription subscription = subscriptionService.get(event.getUrl());
     if (deleteSubscription(subscription.getDdsURL(), subscription.getHref())) {
-      subscriptionRepository.delete(subscription.getDdsURL());
+      subscriptionService.delete(subscription.getDdsURL());
     }
   }
 

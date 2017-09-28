@@ -21,19 +21,16 @@ import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentType;
 import net.es.nsi.dds.lib.jaxb.dds.FilterType;
 import net.es.nsi.dds.lib.jaxb.dds.NotificationType;
-import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
 import net.es.nsi.dds.lib.util.XmlUtilities;
-import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.dds.api.DiscoveryError;
 import net.es.sense.rm.driver.nsi.dds.api.Exceptions;
 import net.es.sense.rm.driver.nsi.dds.db.Document;
-import net.es.sense.rm.driver.nsi.dds.db.DocumentRepository;
+import net.es.sense.rm.driver.nsi.dds.db.DocumentService;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQuery;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQueryResult;
-import net.es.sense.rm.driver.nsi.spring.SpringApplicationContext;
+import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -43,30 +40,23 @@ import scala.concurrent.duration.Duration;
  * @author hacksaw
  */
 @Slf4j
-@Transactional
 @Component
 public class DdsProvider implements DdsProviderI {
-  private final ObjectFactory FACTORY = new ObjectFactory();
 
   // Runtime properties.
   @Autowired
   private NsiProperties nsiProperties;
 
   @Autowired
-  private DocumentRepository documentRepository;
+  private DocumentService documentService;
 
   // The actor system used to send notifications.
   @Autowired
   private DdsController ddsController;
 
-  public static DdsProvider getInstance() {
-    DdsProvider ddsProvider = SpringApplicationContext.getBean("ddsProvider", DdsProvider.class);
-    return ddsProvider;
-  }
-
   public void init() {
     log.debug("[DdsProvider] Initializing DDS provider with database contents:");
-    for (Document document : documentRepository.findAll()) {
+    for (Document document : documentService.get()) {
       try {
         log.debug("[DdsProvider] id=" + URLDecoder.decode(document.getId(), "UTF-8"));
       } catch (UnsupportedEncodingException ex) {
@@ -96,7 +86,7 @@ public class DdsProvider implements DdsProviderI {
 
     String documentId = Document.documentId(document);
 
-    Document entry = documentRepository.findOne(documentId);
+    Document entry = documentService.get(documentId);
     if (entry == null) {
       // This must be the first time we have seen the document so add it
       // into our cache.
@@ -122,7 +112,7 @@ public class DdsProvider implements DdsProviderI {
     Document document = new Document(request, nsiProperties.getDdsUrl());
 
     // See if we already have a document under this id.
-    Optional<Document> get = Optional.fromNullable(documentRepository.findOne(document.getId()));
+    Optional<Document> get = Optional.fromNullable(documentService.get(document.getId()));
     if (get.isPresent()) {
       throw Exceptions.resourceExistsException(DiscoveryError.DOCUMENT_EXISTS, "document", document.getId());
     }
@@ -149,7 +139,7 @@ public class DdsProvider implements DdsProviderI {
     }
 
     // This is a new document so add it into the document space.
-    documentRepository.save(document);
+    documentService.create(document);
 /**
     // Route a new document event.
     DocumentEvent de = new DocumentEvent();
@@ -177,7 +167,7 @@ public class DdsProvider implements DdsProviderI {
 
     log.debug("[deleteDocument] documentId=" + documentId);
 
-    Document document = documentRepository.findOne(documentId);
+    Document document = documentService.get(documentId);
     if (document == null) {
       throw Exceptions.doesNotExistException(DiscoveryError.DOCUMENT_DOES_NOT_EXIST, "document", documentId);
     }
@@ -204,7 +194,7 @@ public class DdsProvider implements DdsProviderI {
       throw Exceptions.internalServerErrorException("getDocumentFull", ex.getMessage());
     }
 
-    documentRepository.save(document);
+    documentService.create(document);
 /**
     // Route a update document event.
     DocumentEvent de = new DocumentEvent();
@@ -221,7 +211,7 @@ public class DdsProvider implements DdsProviderI {
     String documentId = Document.documentId(nsa, type, id);
 
     // See if we have a document under this id.
-    Document document = documentRepository.findOne(documentId);
+    Document document = documentService.get(documentId);
     if (document == null) {
       String error = DiscoveryError.getErrorString(DiscoveryError.DOCUMENT_DOES_NOT_EXIST, "document", documentId);
       throw Exceptions.doesNotExistException(DiscoveryError.NOT_FOUND, "document", documentId);
@@ -265,7 +255,7 @@ public class DdsProvider implements DdsProviderI {
     }
 
     Document newDoc = new Document(request, nsiProperties.getDdsUrl());
-    documentRepository.save(newDoc);
+    documentService.create(newDoc);
     log.debug("[updateDocument] updated documentId=" + documentId);
 
     // Route a update document event.
@@ -286,10 +276,10 @@ public class DdsProvider implements DdsProviderI {
   @Override
   public Collection<Document> getNewerDocuments(long lastDiscovered) {
     if (lastDiscovered != 0) {
-      return Lists.newArrayList(documentRepository.findNewer(lastDiscovered));
+      return Lists.newArrayList(documentService.get(lastDiscovered));
     }
     else {
-       return Lists.newArrayList(documentRepository.findAll());
+       return Lists.newArrayList(documentService.get());
     }
   }
 
@@ -300,7 +290,7 @@ public class DdsProvider implements DdsProviderI {
     // to make this faster.
 
     // Seed the results.
-    Collection<Document> results = Lists.newArrayList(documentRepository.findAll());
+    Collection<Document> results = Lists.newArrayList(documentService.get());
 
     // This may be the most often used so filter by this first.
     if (lastDiscovered != 0) {
@@ -329,7 +319,7 @@ public class DdsProvider implements DdsProviderI {
 
     // This is the primary search value.  Make sure it is present.
     if (!!Strings.isNullOrEmpty(nsa)) {
-      results = Lists.newArrayList(documentRepository.findByNsa(nsa));
+      results = Lists.newArrayList(documentService.getByNsa(nsa));
       if (results.isEmpty()) {
         throw Exceptions.doesNotExistException(DiscoveryError.NOT_FOUND, "nsa", nsa);
       }
@@ -364,7 +354,7 @@ public class DdsProvider implements DdsProviderI {
       throw Exceptions.illegalArgumentException(DiscoveryError.MISSING_PARAMETER, "document", "type");
     }
 
-    Collection<Document> results = Lists.newArrayList(documentRepository.findByNsaAndType(nsa, type));
+    Collection<Document> results = Lists.newArrayList(documentService.getByNsaAndType(nsa, type));
 
     // The rest are additional filters.
     if (lastDiscovered != 0) {
@@ -389,7 +379,7 @@ public class DdsProvider implements DdsProviderI {
       throw Exceptions.illegalArgumentException(DiscoveryError.MISSING_PARAMETER, "document", "id");
     }
 
-    Collection<Document> results = Lists.newArrayList(documentRepository.findByNsaAndTypeAndDocumentId(nsa, type, id));
+    Collection<Document> results = Lists.newArrayList(documentService.getByNsaAndTypeAndDocumentId(nsa, type, id));
 
     // The rest are additional filters.
     if (lastDiscovered != 0) {
@@ -402,7 +392,7 @@ public class DdsProvider implements DdsProviderI {
   @Override
   public Document getDocument(String nsa, String type, String id, long lastDiscovered) throws WebApplicationException {
     String documentId = Document.documentId(nsa, type, id);
-    Document document = documentRepository.findOne(documentId);
+    Document document = documentService.get(documentId);
 
     if (document == null) {
       throw Exceptions.doesNotExistException(DiscoveryError.DOCUMENT_DOES_NOT_EXIST, "document", "nsa=" + nsa + ", type=" + type + ", id=" + id);
@@ -420,7 +410,7 @@ public class DdsProvider implements DdsProviderI {
   /*@Override
   public Document getDocument(DocumentType document) throws IllegalArgumentException, NotFoundException {
     String documentId = Document.documentId(document);
-    return documentRepository.findOne(documentId);
+    return documentService.get(documentId);
   }*/
 
   @Override
@@ -433,7 +423,7 @@ public class DdsProvider implements DdsProviderI {
     }
 
     // Seed the results.
-    Collection<Document> results = Lists.newArrayList(documentRepository.findByNsa(nsaId));
+    Collection<Document> results = Lists.newArrayList(documentService.getByNsa(nsaId));
 
     // The rest are additional filters.
     if (lastDiscovered != 0) {
@@ -462,7 +452,7 @@ public class DdsProvider implements DdsProviderI {
   }
 
   public Collection<Document> getDocumentsByDate(long lastDiscovered, Collection<Document> input) {
-    return Lists.newArrayList(documentRepository.findNewer(lastDiscovered));
+    return Lists.newArrayList(documentService.get(lastDiscovered));
   }
 
   private Collection<Document> getDocumentsByNsa(String nsa, Collection<Document> input) {
@@ -476,7 +466,7 @@ public class DdsProvider implements DdsProviderI {
   }
 
   public Iterable<Document> getDocumentsByNsa(String nsa) {
-    return documentRepository.findByNsa(nsa);
+    return documentService.getByNsa(nsa);
   }
 
   private Collection<Document> getDocumentsByType(String type, Collection<Document> input) {
@@ -490,7 +480,7 @@ public class DdsProvider implements DdsProviderI {
   }
 
   public Iterable<Document> getDocumentsByType(String type) {
-    return documentRepository.findByType(type);
+    return documentService.getByType(type);
   }
 
   private Collection<Document> getDocumentsById(String id, Collection<Document> input) {
@@ -504,11 +494,11 @@ public class DdsProvider implements DdsProviderI {
   }
 
   public Iterable<Document> getDocumentsById(String id) {
-    return documentRepository.findByDocumentId(id);
+    return documentService.getByDocumentId(id);
   }
 
   public Iterable<Document> getDocumentsByTypeAndId(String type, String id) {
-    return documentRepository.findByTypeAndDocumentId(type, id);
+    return documentService.getByTypeAndDocumentId(type, id);
   }
 
   /**
@@ -519,7 +509,7 @@ public class DdsProvider implements DdsProviderI {
   @Override
   public Collection<Document> getDocuments(FilterType filter) {
     // TODO: Match everything for demo.  Need to fix later.
-    return Lists.newArrayList(documentRepository.findAll());
+    return Lists.newArrayList(documentService.get());
   }
 
   public boolean isSubscription(String url) {

@@ -12,8 +12,8 @@ import net.es.sense.rm.driver.api.Delta;
 import net.es.sense.rm.driver.api.DeltaRequest;
 import net.es.sense.rm.driver.api.Driver;
 import net.es.sense.rm.driver.api.Model;
+import net.es.sense.rm.driver.nsi.db.ModelService;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
-import net.es.sense.rm.driver.nsi.db.ModelReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -52,10 +52,10 @@ public class NsiDriver implements Driver {
       throw new ExecutionException(new IllegalArgumentException("No network specified in configuration."));
     }
 
-    // Convert the topologies NML topologies to MRML.
+    // Convert the internal model representation to the driver interface model.
     try {
-      ModelReader modelReader = raController.getModelReader();
-      net.es.sense.rm.driver.nsi.db.Model model = modelReader.getModel(lastModified, id);
+      ModelService modelService = raController.getModelService();
+      net.es.sense.rm.driver.nsi.db.Model model = modelService.get(lastModified, id);
       if (model == null) {
         return new AsyncResult<>(null);
       }
@@ -83,8 +83,8 @@ public class NsiDriver implements Driver {
     // Convert the topologies NML topologies to MRML.
     try {
       Collection<Model> results = new ArrayList<>();
-      ModelReader modelReader = raController.getModelReader();
-      Collection<net.es.sense.rm.driver.nsi.db.Model> models = modelReader.getModels(lastModified, current, networkId);
+      ModelService modelService = raController.getModelService();
+      Collection<net.es.sense.rm.driver.nsi.db.Model> models = modelService.get(lastModified, current, networkId);
       models.stream().map((m) -> Model.builder()
               .id(m.getModelId())
               .creationTime(m.getVersion())

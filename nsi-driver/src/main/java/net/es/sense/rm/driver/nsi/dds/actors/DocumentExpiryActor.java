@@ -8,14 +8,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
-import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.dds.db.Document;
-import net.es.sense.rm.driver.nsi.dds.db.DocumentRepository;
+import net.es.sense.rm.driver.nsi.dds.db.DocumentService;
 import net.es.sense.rm.driver.nsi.dds.messages.TimerMsg;
+import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import scala.concurrent.duration.Duration;
 
 /**
@@ -23,7 +22,6 @@ import scala.concurrent.duration.Duration;
  *
  * @author hacksaw
  */
-@Transactional
 @Component
 @Scope("prototype")
 public class DocumentExpiryActor extends UntypedAbstractActor {
@@ -35,7 +33,7 @@ public class DocumentExpiryActor extends UntypedAbstractActor {
   private NsiProperties nsiProperties;
 
   @Autowired
-  private DocumentRepository documentRepository;
+  private DocumentService documentService;
 
   private final LoggingAdapter log = Logging.getLogger(getContext().system(), "DocumentExpiryActor");
 
@@ -68,11 +66,11 @@ public class DocumentExpiryActor extends UntypedAbstractActor {
     Date now = new Date();
     now.setTime(now.getTime() + nsiProperties.getDdsExpiryInterval() * 1000);
 
-    Collection<Document> expired = Lists.newArrayList(documentRepository.findExpired(now.getTime()));
+    Collection<Document> expired = Lists.newArrayList(documentService.getExpired(now.getTime()));
 
     for (Document document : expired) {
       log.debug("[DocumentExpiryActor] document has expired, id = {}, expires = {} ", document.getId(), new Date(document.getExpires()));
-      documentRepository.delete(document.getId());
+      documentService.delete(document.getId());
 
       // Send notification to user API??
     }

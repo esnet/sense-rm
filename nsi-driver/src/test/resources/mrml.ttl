@@ -1,0 +1,1216 @@
+@prefix sd:    <http://schemas.ogf.org/nsi/2013/12/services/definition#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix nml:   <http://schemas.ogf.org/nml/2013/03/base#> .
+@prefix mrs:   <http://schemas.ogf.org/mrs/2013/12/topology#> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:BandwidthService> ;
+        nml:isAlias        <urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_2:esnet> .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:BandwidthService> ;
+        nml:isAlias        <urn:ogf:network:netherlight.net:2013:production7:esnet-1> .
+
+<urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "40000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "40000000000"^^xsd:long ;
+        mrs:maximumCapacity     "40000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "40000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech> .
+
+<urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+> .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+> .
+
+<urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+> .
+
+<urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::star-cr5:3_1_1:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "1662-1664" .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan> .
+
+<urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4089" .
+
+<urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+> .
+
+<urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-998,1000-4094" .
+
+<urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:BandwidthService> ;
+        nml:isAlias        <urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:esnet> .
+
+<urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+> .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+> .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+> .
+
+<urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+> .
+
+<urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1> .
+
+<urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr5:3_1_1:+> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1> .
+
+<urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+> .
+
+<urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+> .
+
+<urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+> .
+
+<urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-911,913-4094" .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-1799,1801-4094" .
+
+<urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "1779-1799" .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::star-cr5:10_1_8:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "1779-1799" .
+
+<urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+> .
+
+<urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-911,913-4094" .
+
+<urn:ogf:network:es.net:2013::star-cr5:3_1_1:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+> .
+
+<urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "1000-1019" .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+> .
+
+<urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich> .
+
+<urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "1720-1725,1860-1899,3400-3499" .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+> .
+
+<urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "1779-1799,1800-1819,3400-3499" .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+> .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "3176-3179,3800-3809" .
+
+<urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+> .
+
+<urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+> .
+
+<urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+> .
+
+<urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-910,912-4094" .
+
+<urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr5:10_1_8:+> .
+
+<urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr5:10_1_7:+> .
+
+<urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+> .
+
+<urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:BandwidthService> ;
+        nml:isAlias        <urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_2:esnet> .
+
+<urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "80000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "80000000000"^^xsd:long ;
+        mrs:maximumCapacity     "80000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "80000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s> .
+
+<urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "1779-1799" .
+
+<urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:BandwidthService> ;
+        nml:isAlias        <urn:ogf:network:snvaca.pacificwave.net:2016:topology:esnet-sunnyvale> .
+
+<urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+> .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "3600-3619" .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+> .
+
+<urn:ogf:network:es.net:2013::star-cr5:6_1_1:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::star-cr5:10_1_8:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "1662,1720-1725" .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-908,910-918,920-1800,1802-4094" .
+
+<urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::star-cr5:6_1_1:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::ServiceDefinition:EVTS.A-GOLE>
+        a               sd:ServiceDefinition ;
+        nml:belongsTo   <urn:ogf:network:es.net:2013:> ;
+        nml:name        "GLIF Automated GOLE Ethernet VLAN Transfer Service" ;
+        sd:serviceType  "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE" .
+
+<urn:ogf:network:es.net:2013::star-cr5:10_1_7:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013:>
+        a                         nml:Topology ;
+        nml:existsDuring          [ a          nml:Lifetime ;
+                                    nml:end    "2017-11-14T10:15:13.129Z" ;
+                                    nml:start  "2017-09-15T10:15:13.128Z"
+                                  ] ;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech> , <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+> , <urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1> , <urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+> , <urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+> , <urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+> , <urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+> , <urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+> , <urn:ogf:network:es.net:2013::ServiceDomain:EVTS.A-GOLE> , <urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+> , <urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave> , <urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+> , <urn:ogf:network:es.net:2013::star-cr5:10_1_7:+> , <urn:ogf:network:es.net:2013::star-cr5:10_1_8:+> , <urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+> , <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+> , <urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+> , <urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+> , <urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix> , <urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+> , <urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+> , <urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s> , <urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+> , <urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+> , <urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+> , <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+> , <urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+> , <urn:ogf:network:es.net:2013::star-cr5:3_1_1:+> , <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+> , <urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich> , <urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+> , <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+> , <urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan> , <urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+> , <urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1> , <urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+> , <urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+> , <urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+> , <urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+> , <urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+> , <urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1> , <urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+> , <urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+> , <urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+> , <urn:ogf:network:es.net:2013::star-cr5:6_1_1:+> , <urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+> ;
+        nml:locatedAt             [ a             nml:Location ;
+                                    nml:alt       "809.0"^^xsd:float ;
+                                    nml:lat       "-122.24998"^^xsd:float ;
+                                    nml:long      "37.87619"^^xsd:float ;
+                                    nml:name      "ESnet Berkeley" ;
+                                    nml:unlocode  "Bogus String"
+                                  ] ;
+        nml:name                  "es.net" ;
+        nml:version               "2017-09-15T10:15:13.128Z" ;
+        sd:hasServiceDefinition   <urn:ogf:network:es.net:2013::ServiceDefinition:EVTS.A-GOLE> .
+
+<urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::star-cr5:10_1_7:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+> .
+
+<urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "40000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "40000000000"^^xsd:long ;
+        mrs:maximumCapacity     "40000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "40000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave> .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr5:6_1_1:+> .
+
+<urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "1662,1720-1725" .
+
+<urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1>
+        a                  nml:BidirectionalPort ;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:> ;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:vlan> ;
+        nml:hasService     <urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "100000000000"^^xsd:long ;
+        mrs:maximumCapacity     "100000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "100000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+> .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::ServiceDomain:EVTS.A-GOLE>
+        a                         nml:SwitchingService ;
+        nml:belongsTo             <urn:ogf:network:es.net:2013:> ;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::star-cr5:10_1_8:+> , <urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+> , <urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+> , <urn:ogf:network:es.net:2013::star-cr5:10_1_7:+> , <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+> , <urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+> , <urn:ogf:network:es.net:2013::star-cr5:3_1_1:+> , <urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+> , <urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave> , <urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+> , <urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+> , <urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+> , <urn:ogf:network:es.net:2013::star-cr5:6_1_1:+> , <urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+> , <urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+> , <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+> , <urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+> , <urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1> , <urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix> , <urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan> , <urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich> , <urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+> , <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+> , <urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+> , <urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+> , <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+> , <urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s> , <urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+> , <urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+> , <urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1> , <urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+> , <urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+> , <urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1> , <urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+> , <urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+> , <urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+> , <urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+> , <urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+> , <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+> , <urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+> , <urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+> , <urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+> , <urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+> , <urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+> , <urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech> ;
+        nml:labelSwapping         true ;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        sd:hasServiceDefinition   <urn:ogf:network:es.net:2013::ServiceDefinition:EVTS.A-GOLE> .
+
+<urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-499,501-4094" .
+
+<urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "2-4094" .
+
+<urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "10000000000"^^xsd:long ;
+        mrs:granularity         "1000000"^^xsd:long ;
+        mrs:individualCapacity  "10000000000"^^xsd:long ;
+        mrs:maximumCapacity     "10000000000"^^xsd:long ;
+        mrs:minimumCapacity     "1000000"^^xsd:long ;
+        mrs:reservableCapacity  "10000000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        mrs:usedCapacity        "0"^^xsd:long ;
+        nml:belongsTo           <urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+> .
+

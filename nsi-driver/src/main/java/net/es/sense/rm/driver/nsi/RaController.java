@@ -6,13 +6,13 @@ import akka.actor.PoisonPill;
 import akka.actor.Terminated;
 import akka.testkit.TestProbe;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
-import net.es.sense.rm.driver.nsi.properties.NsiProperties;
-import net.es.sense.rm.driver.nsi.db.ModelReader;
+import net.es.sense.rm.driver.nsi.db.ModelService;
 import net.es.sense.rm.driver.nsi.dds.DdsProvider;
-import net.es.sense.rm.driver.nsi.dds.api.DocumentReader;
-import net.es.sense.rm.driver.nsi.spring.SpringApplicationContext;
+import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.spring.SpringExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,23 +42,19 @@ public class RaController {
   private DdsProvider ddsProvider;
 
   @Autowired
-  private DocumentReader documentReader;
-
-  @Autowired
-  private ModelReader modelReader;
+  private ModelService modelService;
 
   // The AKKA actors we start in the RA.
   private ActorRef modelAuditActor;
-  //private ActorRef modelRouter;
 
-  /**
-   * Get a managed instance of an RaController.
-   *
-   * @return The Spring managed RaController instance.
-   */
-  public static RaController getInstance() {
-    RaController controller = SpringApplicationContext.getBean("raController", RaController.class);
-    return controller;
+  @PostConstruct
+  public void init() {
+    log.info("[RaController] created.");
+  }
+
+  @PreDestroy
+  public void destroy() {
+    log.info("[RaController] destroyed.");
   }
 
   /**
@@ -130,51 +126,7 @@ public class RaController {
     }
   }
 
-  public DocumentReader getDocumentReader() {
-    return documentReader;
+  public ModelService getModelService() {
+    return modelService;
   }
-
-  public ModelReader getModelReader() {
-    return modelReader;
-  }
-
-  public DdsProvider getDdsProvider() {
-    return ddsProvider;
-  }
-
-  /**
-  @Async
-  public Future<Model> getModel(long lastModified, String id) throws ExecutionException, Exception {
-    ModelQueryRequest mqr = ModelQueryRequest.builder()
-            .type(ModelQueryType.QUERY_MODEL)
-            .lastModified(lastModified)
-            .id(id)
-            .build();
-
-    log.info("[RaController] sending query to model router.");
-    Timeout timeout = new Timeout(Duration.create(5, "seconds"));
-    scala.concurrent.Future<Object> future = Patterns.ask(modelRouter, mqr, timeout);
-    log.info("[RaController] asking for topology {}", mqr);
-    ModelQueryResult result = (ModelQueryResult) Await.result(future, timeout.duration());
-    log.info("[RaController] response received, {}.", result);
-
-    Collection<Model> models = result.getModels();
-
-    if (ModelQueryType.QUERY_RESULT == result.getType()) {
-      if (models == null || models.isEmpty()) {
-        return new AsyncResult<>(null);
-      } else if (models.size() > 1) {
-        log.error("[RaController] multiple results returned for query.");
-        models.forEach((model) -> {
-          log.error("[RaController] {}", model);
-        });
-        throw new ExecutionException(new IllegalArgumentException("[RaController] multiple results returned for query."));
-      } else {
-        return new AsyncResult<>(models.iterator().next());
-      }
-    } else {
-      throw new ExecutionException(new IllegalArgumentException("[RaController] invalid operation for context " + result.getType()));
-    }
-  }
-  * **/
 }

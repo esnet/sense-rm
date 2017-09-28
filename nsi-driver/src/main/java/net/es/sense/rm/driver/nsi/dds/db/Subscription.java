@@ -2,10 +2,10 @@ package net.es.sense.rm.driver.nsi.dds.db;
 
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import lombok.NonNull;
 
 /**
  *
@@ -20,10 +20,10 @@ public class Subscription implements Serializable {
   private static final long serialVersionUID = -3009157732242241606L;
 
   @Id
-  @NonNull
+  @Basic(optional=false)
   private String ddsURL;
 
-  @NonNull
+  @Basic(optional=false)
   private String href;
   private long created = System.currentTimeMillis();
   private long lastModified = 0;

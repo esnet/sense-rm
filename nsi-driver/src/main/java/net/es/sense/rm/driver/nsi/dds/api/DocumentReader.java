@@ -15,14 +15,14 @@ import net.es.nsi.dds.lib.util.XmlUtilities;
 import net.es.sense.rm.driver.nsi.dds.DdsProvider;
 import net.es.sense.rm.driver.nsi.dds.db.Document;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author hacksaw
  */
 @Slf4j
-@Component
+@Service
 public class DocumentReader {
   @Autowired
   private DdsProvider ddsProvider;

@@ -115,12 +115,6 @@
       <artifactId>hibernate-validator</artifactId>
     </dependency>
 
-    <!-- Google JSON parsers perform better than Moxy. -->
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>

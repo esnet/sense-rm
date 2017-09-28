@@ -25,7 +25,8 @@
     <module>nsi-dds-lib</module>
     <module>driver</module>
     <module>nsi-driver</module>
-    <module>core</module>
+    <module>api</module>
+    <module>rm</module>
   </modules>
 
   <build>

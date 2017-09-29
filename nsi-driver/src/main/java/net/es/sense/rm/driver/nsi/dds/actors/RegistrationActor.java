@@ -154,6 +154,7 @@ public class RegistrationActor extends UntypedAbstractActor {
           subscription.setCreated((System.currentTimeMillis() / 1000) * 1000);
         } else {
           subscription.setCreated(response.getLastModified().getTime());
+          subscription.setLastModified(response.getLastModified().getTime());
         }
 
         subscriptionService.create(subscription);
@@ -260,7 +261,8 @@ public class RegistrationActor extends UntypedAbstractActor {
       Date lastModified = new Date();
       lastModified.setTime(subscription.getLastModified());
 
-      log.debug("[RegistrationActor] getting subscription={},lastModified={}", absoluteURL, lastModified);
+      log.debug("[RegistrationActor] getting subscription={},lastModified={}, subLastModified={}", absoluteURL,
+              lastModified, subscription.getLastModified());
 
       response = webTarget.request(Nsi.NSI_DDS_V1_XML).header("If-Modified-Since",
               DateUtils.formatDate(lastModified, DateUtils.PATTERN_RFC1123)).get();
@@ -270,6 +272,7 @@ public class RegistrationActor extends UntypedAbstractActor {
         // The subscription exists and has not been modified.
         log.debug("[RegistrationActor] subscription exists (not modified), url={}.", absoluteURL);
         subscription.setLastSuccessfulAudit(System.currentTimeMillis());
+        subscriptionService.update(subscription);
       } // We found the subscription and it was updated.
       else if (response.getStatus() == Response.Status.OK.getStatusCode()) {
         // The subscription exists but was modified since our last query.
@@ -280,6 +283,7 @@ public class RegistrationActor extends UntypedAbstractActor {
         subscription.setHref(update.getHref());
         log.info("[RegistrationActor] Subscription update detected, url={}, lastModified={}",
                 absoluteURL, response.getLastModified().toString());
+        subscriptionService.update(subscription);
       } // We did not find the subscription so will need to create a new one.
       else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
         // Looks like our subscription was removed. We need to add it back in.

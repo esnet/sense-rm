@@ -95,13 +95,15 @@ public class RaController {
       throw new UnsupportedOperationException("actorSystem has not been initialized: must invoke start().");
     }
     scala.concurrent.Future<Terminated> terminate = nsiActorSystem.getActorSystem().terminate();
-    while (!terminate.isCompleted()) {
+    int count = 0;
+    while (!terminate.isCompleted() && count < 20) {
       log.info("[RaController] Waiting for shutdown...");
       try {
-        Thread.sleep(100);
+        Thread.sleep(1000);
       } catch (InterruptedException ie) {
         log.info("[RaController] sleep interupted...");
       }
+      count++;
     }
   }
 

@@ -99,3 +99,13 @@ spring:
 #   username: sense-n-rm
 #   password: bubbles
 
+
+logging:
+  config: file:./config/logback.xml
+  level:
+    ROOT: INFO 
+    org.springframework: INFO
+    org.springframework.data: INFO
+    net.es.sense.rm: DEBUG
+  file: "sense-rm.log"
+

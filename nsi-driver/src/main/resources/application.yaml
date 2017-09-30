@@ -82,3 +82,7 @@ spring:
 #spring.jpa.hibernate.ddl-auto=create
 #spring.jpa.hibernate.ddl-auto=update
 #spring.jpa.hibernate.ddl-auto=validate
+
+logging.level.org.springframework.web: INFO
+logging.level.org.hibernate: ERROR
+

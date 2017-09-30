@@ -81,7 +81,7 @@ public class ModelAuditActor extends UntypedAbstractActor {
       MrmlFactory mrml = new MrmlFactory(nml, topologyId);
       // Check to see if this is a new version.
       if (modelService.isPresent(topologyId, mrml.getVersion())) {
-        log.debug("[ModelAuditActor] found matching model topologyId = {}, version = {}.", topologyId, mrml.getVersion());
+        log.info("[ModelAuditActor] found matching model topologyId = {}, version = {}.", topologyId, mrml.getVersion());
       } else {
         log.info("[ModelAuditActor] adding new topology version, topologyId = {}, version = {}", topologyId, mrml.getVersion());
         UUID uuid = UUID.randomUUID();

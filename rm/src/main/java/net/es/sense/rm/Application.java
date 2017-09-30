@@ -27,6 +27,7 @@ public class Application {
    */
   public static void main(String[] args) throws ExecutionException, InterruptedException {
     log.info("[SENSE-N-RM] Starting...");
+
     ApplicationContext context = SpringApplication.run(Application.class, args);
 
     // Dump some runtime information.
@@ -54,6 +55,7 @@ public class Application {
     while (keepRunning) {
       Thread.sleep(1000);
     }
+
     log.info("[SENSE-N-RM] Shutdown complete with uptime: " + mxBean.getUptime() + " ms");
     System.exit(0);
   }

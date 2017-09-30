@@ -63,3 +63,6 @@ spring:
     username: sense-n-rm
     password: bubbles
 
+logging.level.org.springframework.web: DEBUG
+logging.level.org.hibernate: ERROR
+

@@ -107,7 +107,7 @@ public class DiscoveryService {
                   defaultValue = Nsi.NSI_DDS_V1_XML) String encoding,
           InputStream request) throws WebApplicationException {
 
-    log.error("[notifications] Incoming notification from Host={}, X-Forwarded-For={}, Accept={}", host, source, encoding);
+    log.info("[notifications] Incoming notification from Host={}, X-Forwarded-For={}, Accept={}", host, source, encoding);
 
     // Parse the XML into JAXB objects.
     NotificationListType notifications;

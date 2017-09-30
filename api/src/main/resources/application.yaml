@@ -3,3 +3,5 @@ sense:
   proxy:
   driver: net.es.sense.rm.driver.nsi.NsiDriver
 
+logging.level.org.springframework.web: INFO
+logging.level.org.hibernate: ERROR

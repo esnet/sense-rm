@@ -2,6 +2,7 @@ package net.es.sense.rm.driver.nsi.db;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.Collection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +33,23 @@ public class ModelServiceBean implements ModelService {
   }
 
   @Override
+  public Model get(String modelId) {
+    return modelRepository.findByModelId(modelId);
+  }
+
+  @Override
   public Collection<Model> get(long lastModified, boolean current, String topologyId) {
     if (current) {
-      return Lists.newArrayList(modelRepository.findCurrentModelForTopologyId(topologyId));
+      Model result = modelRepository.findCurrentModelForTopologyId(topologyId);
+      return (result.getVersion() > lastModified) ? Lists.newArrayList(result) : new ArrayList<>();
     }
 
     return Lists.newArrayList(modelRepository.findTopologyIdNewerThanVersion(topologyId, lastModified));
+  }
+
+  @Override
+  public Collection<Model> get(boolean current, String topologyId) {
+    return Lists.newArrayList(modelRepository.findCurrentModelForTopologyId(topologyId));
   }
 
   @Override
@@ -68,5 +80,19 @@ public class ModelServiceBean implements ModelService {
   @Override
   public void delete(Model model) {
     modelRepository.delete(model);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public void delete(String id) {
+    modelRepository.delete(id);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public void delete() {
+    for (Model model : modelRepository.findAll()) {
+      modelRepository.delete(model);
+    }
   }
 }

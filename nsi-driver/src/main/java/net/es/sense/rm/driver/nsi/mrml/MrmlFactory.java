@@ -281,8 +281,8 @@ public class MrmlFactory {
       // This belongs to the parent topology.
       ssr.addProperty(Nml.belongsTo, topology);
 
-      // The parent topology has this.
-      topology.addProperty(Nml.hasBidirectionalPort, ssr);
+      // The parent topology has this service.
+      topology.addProperty(Nml.hasService, ssr);
 
       // At the NML properties.
       if (!Strings.isNullOrEmpty(ss.getName())) {

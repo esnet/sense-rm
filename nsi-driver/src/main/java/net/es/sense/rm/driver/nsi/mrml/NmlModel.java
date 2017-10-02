@@ -128,7 +128,7 @@ public class NmlModel {
     }
     return results;
   }
-  
+
   /**
    * @param defaultGranularity the defaultGranularity to set
    */
@@ -203,7 +203,7 @@ public class NmlModel {
 
   private NmlPort convertPortGroup(NmlPortGroupType portGroup, Orientation orientation, String topologyId) {
 
-    log.info("[NmlModel] processing portGroup {}", portGroup.getId());
+    log.debug("[NmlModel] processing portGroup {}", portGroup.getId());
 
     // Extract the labels associated with this port.  We
     // currently expect a single labelType with a range of
@@ -259,7 +259,7 @@ public class NmlModel {
 
   private NmlPort convertPort(NmlPortType port, Orientation orientation, String topologyId) {
 
-    log.info("[NmlModel] processing port {}", port.getId());
+    log.debug("[NmlModel] processing port {}", port.getId());
 
     // Port relationship has isAlias connection information.
     String isAlias = null;
@@ -310,7 +310,7 @@ public class NmlModel {
 
   private Optional<NmlPort> convertBidirectionalPort(NmlBidirectionalPortType port, String topologyId, Map<String, NmlPort> portMap) {
 
-    log.info("[NmlModel] processing bidirectional port {}", port.getId());
+    log.debug("[NmlModel] processing bidirectional port {}", port.getId());
 
     // Process port groups containing the unidirectional references.
     NmlPort inbound = null;

@@ -45,7 +45,7 @@ public class NsiDriver implements Driver {
 
   @Override
   @Async
-  public Future<Model> getModel(long lastModified, String modelType, String id) throws ExecutionException {
+  public Future<Model> getModel(String modelType, String id) throws ExecutionException {
     String networkId = nsiProperties.getNetworkId();
     if (Strings.isNullOrEmpty(networkId)) {
       log.error("[NsiDriver] no network specified in configuration.");
@@ -55,7 +55,7 @@ public class NsiDriver implements Driver {
     // Convert the internal model representation to the driver interface model.
     try {
       ModelService modelService = raController.getModelService();
-      net.es.sense.rm.driver.nsi.db.Model model = modelService.get(lastModified, id);
+      net.es.sense.rm.driver.nsi.db.Model model = modelService.get(id);
       if (model == null) {
         return new AsyncResult<>(null);
       }
@@ -73,7 +73,7 @@ public class NsiDriver implements Driver {
 
   @Override
   @Async
-  public Future<Collection<Model>> getModels(long lastModified, boolean current, String modelType) throws ExecutionException {
+  public Future<Collection<Model>> getModels(boolean current, String modelType) throws ExecutionException {
     String networkId = nsiProperties.getNetworkId();
     if (Strings.isNullOrEmpty(networkId)) {
       log.error("[NsiDriver] no network specified in configuration.");
@@ -84,7 +84,7 @@ public class NsiDriver implements Driver {
     try {
       Collection<Model> results = new ArrayList<>();
       ModelService modelService = raController.getModelService();
-      Collection<net.es.sense.rm.driver.nsi.db.Model> models = modelService.get(lastModified, current, networkId);
+      Collection<net.es.sense.rm.driver.nsi.db.Model> models = modelService.get(current, networkId);
       models.stream().map((m) -> Model.builder()
               .id(m.getModelId())
               .creationTime(m.getVersion())

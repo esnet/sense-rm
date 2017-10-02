@@ -12,11 +12,19 @@ public interface ModelService {
 
   void delete(Model model);
 
+  void delete(String id);
+
+  void delete();
+
   Collection<Model> get();
 
   Model get(long lastModified, String modelId);
 
+  Model get(String modelId);
+
   Collection<Model> get(long lastModified, boolean current, String topologyId);
+
+  Collection<Model> get(boolean current, String topologyId);
 
   boolean isPresent(String topologyId, long version);
 

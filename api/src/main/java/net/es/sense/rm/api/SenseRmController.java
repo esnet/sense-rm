@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -97,8 +98,7 @@ public class SenseRmController extends SenseController {
 
   /**
    * *********************************************************************
-   * GET /api/sense/v1
-   **********************************************************************
+   * GET /api/sense/v1 *********************************************************************
    */
   /**
    * Returns a list of available SENSE service API resources.
@@ -158,10 +158,6 @@ public class SenseRmController extends SenseController {
     return resources;
   }
 
-  /**
-   * ***********************************************************************
-   * GET /api/sense/v1/models ***********************************************************************
-   */
   /**
    * Returns a list of available SENSE topology models.
    *
@@ -310,43 +306,59 @@ public class SenseRmController extends SenseController {
           @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model) {
 
     final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
-    Collection<Model> result;
-    try {
-      Date lastModified = DateUtils.parseDate(ifModifiedSince);
-      log.info("[getModels] querying with params {} {} {}.", lastModified, current, model);
-      result = driver.getModels(lastModified.getTime(), current, model).get();
-    } catch (InterruptedException | ExecutionException ex) {
-      log.error("pullModels failed, ex = {}", ex);
-      Error error = Error.builder()
-              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-              .error_description(ex.getMessage())
-              .build();
 
-      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    log.info("[SenseRmController] GET operation = {}, accept = {}, ifModifiedSince = {}, current = {}, summary = {}, model = {}",
+            location, accept, ifModifiedSince, current, summary, model);
 
-    List<ModelResource> models = new ArrayList<>();
+    Date lastModified = DateUtils.parseDate(ifModifiedSince);
+
+    // First case is to handle a targeted request for the current model.
     try {
-      for (Model m : result) {
+      List<ModelResource> models = new ArrayList<>();
+      Collection<Model> result = driver.getModels(current, model).get();
+      if (current) {
+        Optional<Model> first = result.stream().reduce((e1, e2) -> {
+          throw new IllegalArgumentException("Multiple models returned for parameter current = " + current);
+        });
+
+        // No results means resource not found.
+        if (!first.isPresent()) {
+          return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Model m = first.get();
+        if (m.getCreationTime() <= lastModified.getTime()) {
+          return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+        }
+
         ModelResource resource = new ModelResource();
         resource.setId(m.getId());
         resource.setCreationTime(DateUtils.formatDate(new Date(m.getCreationTime())));
         resource.setHref(buildURL(location.toASCIIString(), m.getId()));
         resource.setModel(m.getModel());
         models.add(resource);
+      } else {
+        for (Model m : result) {
+          if (m.getCreationTime() > lastModified.getTime()) {
+            ModelResource resource = new ModelResource();
+            resource.setId(m.getId());
+            resource.setCreationTime(DateUtils.formatDate(new Date(m.getCreationTime())));
+            resource.setHref(buildURL(location.toASCIIString(), m.getId()));
+            resource.setModel(m.getModel());
+            models.add(resource);
+          }
+        }
       }
 
-    } catch (IOException ex) {
-      log.error("pullModels failed to parse URL, ex = {}", ex);
+      return new ResponseEntity<>(models, HttpStatus.OK);
+    } catch (InterruptedException | ExecutionException | IOException | IllegalArgumentException ex) {
+      log.error("[SenseRmController] Exception caught, ex = {}", ex.getMessage());
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
-
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    return new ResponseEntity<>(models, HttpStatus.OK);
   }
 
   private String buildURL(String root, String leaf) throws MalformedURLException {
@@ -361,8 +373,7 @@ public class SenseRmController extends SenseController {
 
   /**
    ***********************************************************************
-   * GET /api/sense/v1/models/{id}
-   ***********************************************************************
+   * GET /api/sense/v1/models/{id} **********************************************************************
    */
   /**
    * Returns the model identified by id within the Resource Manager.
@@ -499,10 +510,15 @@ public class SenseRmController extends SenseController {
           @ApiParam(value = HttpConstants.ID_MSG, required = true) String id) {
 
     final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+
+    log.info("[SenseRmController] operation = {}, id = {}, accept = {}, ifModifiedSince = {}, model = {}",
+            location, id, accept, ifModifiedSince, model);
+
+    Date lastModified = DateUtils.parseDate(ifModifiedSince);
+
     Model result;
     try {
-      Date lastModified = DateUtils.parseDate(ifModifiedSince);
-      result = driver.getModel(lastModified.getTime(), model, id).get();
+      result = driver.getModel(model, id).get();
     } catch (InterruptedException | ExecutionException ex) {
       log.error("pullModel failed, ex = {}", ex);
       Error error = Error.builder()
@@ -515,6 +531,8 @@ public class SenseRmController extends SenseController {
 
     if (result == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } else if (result.getCreationTime() <= lastModified.getTime()) {
+      return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
     ModelResource resource = new ModelResource();

@@ -11,10 +11,10 @@ import org.springframework.scheduling.annotation.Async;
  */
 public interface Driver {
   @Async
-  public Future<Model> getModel(long lastModified, String modelType, String id) throws ExecutionException;
+  public Future<Model> getModel(String modelType, String id) throws ExecutionException;
 
   @Async
-  public Future<Collection<Model>> getModels(long lastModified, boolean current, String modelType) throws ExecutionException;
+  public Future<Collection<Model>> getModels(boolean current, String modelType) throws ExecutionException;
 
   @Async
   public Future<Delta> propagateDelta(DeltaRequest delta) throws ExecutionException;

@@ -3,6 +3,7 @@ package net.es.sense.rm.driver.nsi.actors;
 import akka.actor.UntypedAbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import net.es.sense.rm.driver.nsi.db.Model;
@@ -74,6 +75,8 @@ public class ModelAuditActor extends UntypedAbstractActor {
   }
 
   private void audit() {
+    log.info("[ModelAuditActor] starting audit.");
+
     // Get the new document context.
     NmlModel nml = new NmlModel(documentReader);
 
@@ -96,9 +99,16 @@ public class ModelAuditActor extends UntypedAbstractActor {
 
     // TODO: Go through and delete any models for topologies no longer avalable.
     // TODO: Write an audit to clean up old model versions.
+    Collection<Model> models = modelService.get();
+    log.info("[ModelAuditActor] stored models after the audit...");
+    for (Model m : models) {
+      log.info("id = {}, modelId= {}, topologyId = {}, version = {}, ", m.getId(), m.getModelId(), m.getTopologyId(), m.getVersion());
+    }
   }
 
   private void audit(String topologyId) {
+    log.info("[ModelAuditActor] starting audit for {}.", topologyId);
+
     // Get the new document context.
     NmlModel nml = new NmlModel(documentReader);
     MrmlFactory mrml = new MrmlFactory(nml, topologyId);

@@ -49,7 +49,11 @@ public class ModelServiceBean implements ModelService {
 
   @Override
   public Collection<Model> get(boolean current, String topologyId) {
-    return Lists.newArrayList(modelRepository.findCurrentModelForTopologyId(topologyId));
+    if (current) {
+      return Lists.newArrayList(modelRepository.findCurrentModelForTopologyId(topologyId));
+    }
+
+    return Lists.newArrayList(modelRepository.findByTopologyId(topologyId));
   }
 
   @Override

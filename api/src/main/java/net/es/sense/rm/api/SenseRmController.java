@@ -38,7 +38,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.PostConstruct;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
 import lombok.extern.slf4j.Slf4j;
+import net.es.nsi.dds.lib.util.XmlUtilities;
 import net.es.sense.rm.api.common.Error;
 import net.es.sense.rm.api.common.HttpConstants;
 import net.es.sense.rm.api.common.Resource;
@@ -311,6 +314,11 @@ public class SenseRmController extends SenseController {
             location, accept, ifModifiedSince, current, summary, model);
 
     Date lastModified = DateUtils.parseDate(ifModifiedSince);
+    if (lastModified == null) {
+      log.error("[SenseRmController] invalid header {}, value = {}.", HttpConstants.IF_MODIFIED_SINCE_NAME,
+              ifModifiedSince);
+      lastModified = DateUtils.parseDate(HttpConstants.IF_MODIFIED_SINCE_DEFAULT);
+    }
 
     // First case is to handle a targeted request for the current model.
     try {
@@ -342,7 +350,9 @@ public class SenseRmController extends SenseController {
           if (m.getCreationTime() > lastModified.getTime()) {
             ModelResource resource = new ModelResource();
             resource.setId(m.getId());
-            resource.setCreationTime(DateUtils.formatDate(new Date(m.getCreationTime())));
+            XMLGregorianCalendar cal = XmlUtilities.longToXMLGregorianCalendar(m.getCreationTime());
+            cal.setTimezone(0);
+            resource.setCreationTime(cal.toXMLFormat());
             resource.setHref(buildURL(location.toASCIIString(), m.getId()));
             resource.setModel(m.getModel());
             models.add(resource);
@@ -351,7 +361,7 @@ public class SenseRmController extends SenseController {
       }
 
       return new ResponseEntity<>(models, HttpStatus.OK);
-    } catch (InterruptedException | ExecutionException | IOException | IllegalArgumentException ex) {
+    } catch (InterruptedException | ExecutionException | IOException | IllegalArgumentException | DatatypeConfigurationException ex) {
       log.error("[SenseRmController] Exception caught, ex = {}", ex.getMessage());
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
@@ -515,11 +525,32 @@ public class SenseRmController extends SenseController {
             location, id, accept, ifModifiedSince, model);
 
     Date lastModified = DateUtils.parseDate(ifModifiedSince);
+    if (lastModified == null) {
+      log.error("[SenseRmController] invalid header {}, value = {}.", HttpConstants.IF_MODIFIED_SINCE_NAME,
+              ifModifiedSince);
+      lastModified = DateUtils.parseDate(HttpConstants.IF_MODIFIED_SINCE_DEFAULT);
+    }
 
     Model result;
     try {
       result = driver.getModel(model, id).get();
-    } catch (InterruptedException | ExecutionException ex) {
+
+      if (result == null) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      } else if (result.getCreationTime() <= lastModified.getTime()) {
+        return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+      }
+
+      ModelResource resource = new ModelResource();
+      resource.setId(result.getId());
+      resource.setHref(location.toASCIIString());
+      XMLGregorianCalendar cal = XmlUtilities.longToXMLGregorianCalendar(result.getCreationTime());
+      cal.setTimezone(0);
+      resource.setCreationTime(cal.toXMLFormat());
+      resource.setModel(result.getModel());
+      return new ResponseEntity<>(resource, HttpStatus.OK);
+
+    } catch (InterruptedException | ExecutionException | DatatypeConfigurationException ex) {
       log.error("pullModel failed, ex = {}", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
@@ -528,19 +559,6 @@ public class SenseRmController extends SenseController {
 
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    if (result == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } else if (result.getCreationTime() <= lastModified.getTime()) {
-      return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
-    }
-
-    ModelResource resource = new ModelResource();
-    resource.setId(result.getId());
-    resource.setHref(location.toASCIIString());
-    resource.setCreationTime(DateUtils.formatDate(new Date(result.getCreationTime())));
-    resource.setModel(result.getModel());
-    return new ResponseEntity<>(resource, HttpStatus.OK);
   }
 
   /**

@@ -3,6 +3,48 @@ sense:
   proxy:
   driver: net.es.sense.rm.driver.nsi.NsiDriver
 
+server.contextPath: /
+
+springfox.documentation.swagger.v2.path: /v2/api-docs
+springfox.documentation.swagger.v1.path: /v1/api-docs
+
+logging:
+  config: file:./config/logback.xml
+  level:
+    ROOT: INFO
+    org.springframework: INFO
+    org.springframework.data: INFO
+    net.es.sense.rm: DEBUG
+  file: "sense-rm.log"
+
+# Configuration for database.
+spring:
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sense-n-rm
+    driver-class-name: org.postgresql.Driver
+    username: sense-n-rm
+    password: bubbles
+    continue-on-error: true
+
+#spring.jpa.hibernate.ddl-auto: create
+#spring.jpa.hibernate.ddl-auto: update
+#spring.jpa.hibernate.ddl-auto: validate
+
+#spring:
+# jpa:
+#   generate-ddl: true
+#   hibernate:
+#     ddl-auto: create
+# datasource:
+#   url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+#   driver-class-name: org.h2.Driver
+#   username: sense-n-rm
+#   password: bubbles
+
 nsi:
   # DDS related configuration.
   ddsUrl: http://localhost:8080/api/dds/v1
@@ -70,42 +112,4 @@ nsi:
           - "CN=nsi-aggr-west.es.net, OU=Domain Control Validated"
         nsaId:
           - "urn:ogf:network:es.net:2013:nsa:nsi-aggr-west"
-
-# Configuration for database.
-spring:
-  jpa:
-    generate-ddl: true
-    hibernate:
-      ddl-auto: validate
-  datasource:
-    url: jdbc:postgresql://localhost:5432/sense-n-rm
-    driver-class-name: org.postgresql.Driver
-    username: sense-n-rm
-    password: bubbles
-    continue-on-error: true
-
-#spring.jpa.hibernate.ddl-auto=create
-#spring.jpa.hibernate.ddl-auto=update
-#spring.jpa.hibernate.ddl-auto=validate
-
-#spring:
-# jpa:
-#   generate-ddl: true
-#   hibernate:
-#     ddl-auto: create
-# datasource:
-#   url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
-#   driver-class-name: org.h2.Driver
-#   username: sense-n-rm
-#   password: bubbles
-
-
-logging:
-  config: file:./config/logback.xml
-  level:
-    ROOT: INFO 
-    org.springframework: INFO
-    org.springframework.data: INFO
-    net.es.sense.rm: DEBUG
-  file: "sense-rm.log"
 

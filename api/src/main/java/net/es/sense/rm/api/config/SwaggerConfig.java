@@ -1,5 +1,6 @@
 package net.es.sense.rm.api.config;
 
+import javax.servlet.ServletContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -14,9 +15,9 @@ import springfox.documentation.spring.web.plugins.Docket;
 public class SwaggerConfig {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
- @Bean
-  public Docket api() {
-    logger.error("Initializing swagger.");
+  @Bean
+  public Docket api(ServletContext servletContext) {
+    logger.info("Initializing swagger.");
 
     return new Docket(DocumentationType.SWAGGER_2)
             .apiInfo(apiInfo())

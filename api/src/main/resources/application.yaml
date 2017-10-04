@@ -5,3 +5,8 @@ sense:
 
 logging.level.org.springframework.web: INFO
 logging.level.org.hibernate: ERROR
+
+springfox.documentation.swagger.v2.path: /v2/api-docs
+springfox.documentation.swagger.v1.path: /v1/api-docs
+
+server.contextPath: /

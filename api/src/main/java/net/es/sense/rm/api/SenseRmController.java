@@ -42,6 +42,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.dds.lib.util.XmlUtilities;
+import net.es.sense.rm.api.common.Encoder;
 import net.es.sense.rm.api.common.Error;
 import net.es.sense.rm.api.common.HttpConstants;
 import net.es.sense.rm.api.common.Resource;
@@ -171,6 +172,7 @@ public class SenseRmController extends SenseController {
    * creationTime after the specified date. The date must be specified in RFC 1123 format.
    * @param current If current=true then a collection of models containing only the most recent model will be returned.
    * Default value is current=false.
+   * @param encode
    * @param summary If summary=true then a summary collection of models will be returned including the model meta-data
    * while excluding the model element. Default value is summary=true.
    * @param model This version’s detailed topology model in the requested format (TURTLE, etc.). To optimize transfer
@@ -304,6 +306,10 @@ public class SenseRmController extends SenseController {
                   defaultValue = "false")
           @ApiParam(value = HttpConstants.SUMMARY_MSG, required = false) boolean summary,
           @RequestParam(
+                  value = HttpConstants.ENCODE_NAME,
+                  defaultValue = "false")
+          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode,
+          @RequestParam(
                   value = HttpConstants.MODEL_NAME,
                   defaultValue = HttpConstants.MODEL_TURTLE)
           @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model) {
@@ -341,7 +347,9 @@ public class SenseRmController extends SenseController {
 
         ModelResource resource = new ModelResource();
         resource.setId(m.getId());
-        resource.setCreationTime(DateUtils.formatDate(new Date(m.getCreationTime())));
+        XMLGregorianCalendar cal = XmlUtilities.longToXMLGregorianCalendar(m.getCreationTime());
+        cal.setTimezone(0);
+        resource.setCreationTime(cal.toXMLFormat());
         resource.setHref(buildURL(location.toASCIIString(), m.getId()));
         resource.setModel(m.getModel());
         models.add(resource);
@@ -354,7 +362,11 @@ public class SenseRmController extends SenseController {
             cal.setTimezone(0);
             resource.setCreationTime(cal.toXMLFormat());
             resource.setHref(buildURL(location.toASCIIString(), m.getId()));
-            resource.setModel(m.getModel());
+            if (encode) {
+              resource.setModel(Encoder.encode(m.getModel()));
+            } else {
+              resource.setModel(m.getModel());
+            }
             models.add(resource);
           }
         }
@@ -393,6 +405,7 @@ public class SenseRmController extends SenseController {
    * supported response encoding.
    * @param ifModifiedSince The HTTP request may contain the If-Modified-Since header requesting all models with
    * creationTime after the specified date. The date must be specified in RFC 1123 format.
+   * @param encode
    * @param model This version’s detailed topology model in the requested format (TURTLE, etc.). To optimize transfer
    * the contents of this model element should be gzipped (contentType="application/x-gzip") and base64 encoded
    * (contentTransferEncoding="base64"). This will reduce the transfer size and encapsulate the original model contents.
@@ -516,6 +529,10 @@ public class SenseRmController extends SenseController {
                   value = HttpConstants.MODEL_NAME,
                   defaultValue = HttpConstants.MODEL_TURTLE)
           @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model,
+          @RequestParam(
+                  value = HttpConstants.ENCODE_NAME,
+                  defaultValue = "false")
+          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode,
           @PathVariable(HttpConstants.ID_NAME)
           @ApiParam(value = HttpConstants.ID_MSG, required = true) String id) {
 
@@ -531,26 +548,30 @@ public class SenseRmController extends SenseController {
       lastModified = DateUtils.parseDate(HttpConstants.IF_MODIFIED_SINCE_DEFAULT);
     }
 
-    Model result;
+    Model m;
     try {
-      result = driver.getModel(model, id).get();
+      m = driver.getModel(model, id).get();
 
-      if (result == null) {
+      if (m == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      } else if (result.getCreationTime() <= lastModified.getTime()) {
+      } else if (m.getCreationTime() <= lastModified.getTime()) {
         return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
       }
 
       ModelResource resource = new ModelResource();
-      resource.setId(result.getId());
+      resource.setId(m.getId());
       resource.setHref(location.toASCIIString());
-      XMLGregorianCalendar cal = XmlUtilities.longToXMLGregorianCalendar(result.getCreationTime());
+      XMLGregorianCalendar cal = XmlUtilities.longToXMLGregorianCalendar(m.getCreationTime());
       cal.setTimezone(0);
       resource.setCreationTime(cal.toXMLFormat());
-      resource.setModel(result.getModel());
+      if (encode) {
+        resource.setModel(Encoder.encode(m.getModel()));
+      } else {
+        resource.setModel(m.getModel());
+      }
       return new ResponseEntity<>(resource, HttpStatus.OK);
 
-    } catch (InterruptedException | ExecutionException | DatatypeConfigurationException ex) {
+    } catch (InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
       log.error("pullModel failed, ex = {}", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
@@ -568,15 +589,14 @@ public class SenseRmController extends SenseController {
   /**
    * Returns a list of accepted delta resources associated with the specified SENSE topology model.
    *
-   * @param uriInfo The incoming URI context used to invoke the service.
    * @param accept Provides media types that are acceptable for the response. At the moment 'application/json' is the
    * supported response encoding.
    * @param ifModifiedSince The HTTP request may contain the If-Modified-Since header requesting all models with
    * creationTime after the specified date. The date must be specified in RFC 1123 format.
    * @param summary If summary=true then a summary collection of delta resources will be returned including the delta
-   * meta-data while excluding the addition, reduction, and result elements. Default value is summary=true.
-   * @param model If model=turtle then the returned addition, reduction, and result elements will contain the full
-   * topology model in a TURTLE representation. Default value is model=turtle.
+ meta-data while excluding the addition, reduction, and m elements. Default value is summary=true.
+   * @param model If model=turtle then the returned addition, reduction, and m elements will contain the full
+ topology model in a TURTLE representation. Default value is model=turtle.
    * @param id The UUID uniquely identifying the topology model resource.
    * @return A RESTful response.
    */
@@ -1059,9 +1079,9 @@ public class SenseRmController extends SenseController {
    * @param ifModifiedSince The HTTP request may contain the If-Modified-Since header requesting all models with
    * creationTime after the specified date. The date must be specified in RFC 1123 format.
    * @param summary If summary=true then a summary collection of delta resources will be returned including the delta
-   * meta-data while excluding the addition, reduction, and result elements. Default value is summary=true.
-   * @param model If model=turtle then the returned addition, reduction, and result elements will contain the full
-   * topology model in a TURTLE representation. Default value is model=turtle.
+ meta-data while excluding the addition, reduction, and m elements. Default value is summary=true.
+   * @param model If model=turtle then the returned addition, reduction, and m elements will contain the full
+ topology model in a TURTLE representation. Default value is model=turtle.
    * @return A RESTful response.
    */
   @ApiOperation(

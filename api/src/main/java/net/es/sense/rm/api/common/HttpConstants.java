@@ -50,6 +50,13 @@ public class HttpConstants {
           + "in a TURTLE representation. Default value is model=turtle.";
   public static final String MODEL_TURTLE = "turtle";
 
+  public static final String ENCODE_NAME = "encode";
+  public static final String ENCODE_MSG =
+          "If encode=true then the embedded topology model will be transfer encoded using gzip "
+          + "(contentType=\"application/x-gzip\") and base64 encoding (contentTransferEncoding=\"base64\").  "
+          + "This will reduce the transfer size and encapsulate the original model contents.  Default "
+          + "value is encode=false.";
+
   // Path parameters.
   public static final String ID_NAME = "id";
   public static final String ID_MSG = "The UUID uniquely identifying the topology model resource.";

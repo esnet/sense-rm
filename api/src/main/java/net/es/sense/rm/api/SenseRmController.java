@@ -327,6 +327,9 @@ public class SenseRmController extends SenseController {
     }
 
     // First case is to handle a targeted request for the current model.
+    long newest = 0;
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Content-Location", location.toASCIIString());
     try {
       List<ModelResource> models = new ArrayList<>();
       Collection<Model> result = driver.getModels(current, model).get();
@@ -341,8 +344,12 @@ public class SenseRmController extends SenseController {
         }
 
         Model m = first.get();
+        log.info("[SenseRmController] getCreationTime = {}, lastModified = {}", m.getCreationTime(), lastModified.getTime());
+
         if (m.getCreationTime() <= lastModified.getTime()) {
-          return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+          log.info("[SenseRmController] resource not modified {}", m.getId());
+          headers.setLastModified(m.getCreationTime());
+          return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
         }
 
         ModelResource resource = new ModelResource();
@@ -353,9 +360,16 @@ public class SenseRmController extends SenseController {
         resource.setHref(buildURL(location.toASCIIString(), m.getId()));
         resource.setModel(m.getModel());
         models.add(resource);
+        newest = m.getCreationTime();
       } else {
         for (Model m : result) {
+          log.info("[SenseRmController] getCreationTime = {}, lastModified = {}", m.getCreationTime(), lastModified.getTime());
+          if (m.getCreationTime() > newest) {
+            newest = m.getCreationTime();
+          }
+
           if (m.getCreationTime() > lastModified.getTime()) {
+            log.info("[SenseRmController] returning matching resource {}", m.getId());
             ModelResource resource = new ModelResource();
             resource.setId(m.getId());
             XMLGregorianCalendar cal = XmlUtilities.longToXMLGregorianCalendar(m.getCreationTime());
@@ -372,7 +386,8 @@ public class SenseRmController extends SenseController {
         }
       }
 
-      return new ResponseEntity<>(models, HttpStatus.OK);
+      headers.setLastModified(newest);
+      return new ResponseEntity<>(models, headers, HttpStatus.OK);
     } catch (InterruptedException | ExecutionException | IOException | IllegalArgumentException | DatatypeConfigurationException ex) {
       log.error("[SenseRmController] Exception caught, ex = {}", ex.getMessage());
       Error error = Error.builder()
@@ -554,8 +569,15 @@ public class SenseRmController extends SenseController {
 
       if (m == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      } else if (m.getCreationTime() <= lastModified.getTime()) {
-        return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+      }
+
+      final HttpHeaders headers = new HttpHeaders();
+      headers.add("Content-Location", location.toASCIIString());
+
+      log.info("[SenseRmController] getCreationTime = {}, lastModified = {}", m.getCreationTime(), lastModified.getTime());
+      if (m.getCreationTime() <= lastModified.getTime()) {
+        log.info("[SenseRmController] returning not modified {}", m.getId());
+        return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
       }
 
       ModelResource resource = new ModelResource();
@@ -569,7 +591,10 @@ public class SenseRmController extends SenseController {
       } else {
         resource.setModel(m.getModel());
       }
-      return new ResponseEntity<>(resource, HttpStatus.OK);
+
+      log.info("[SenseRmController] returning matching resource {}", m.getId());
+      headers.setLastModified(m.getCreationTime());
+      return new ResponseEntity<>(resource, headers, HttpStatus.OK);
 
     } catch (InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
       log.error("pullModel failed, ex = {}", ex);

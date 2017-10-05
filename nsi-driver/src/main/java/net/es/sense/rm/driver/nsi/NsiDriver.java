@@ -87,7 +87,7 @@ public class NsiDriver implements Driver {
       Collection<net.es.sense.rm.driver.nsi.db.Model> models = modelService.get(current, networkId);
       models.stream().map((m) -> Model.builder()
               .id(m.getModelId())
-              .creationTime((m.getVersion() * 1000) / 1000)
+              .creationTime((m.getVersion() / 1000) * 1000)
               .model(m.getBase())
               .build()).forEachOrdered((model) -> {
                 results.add(model);

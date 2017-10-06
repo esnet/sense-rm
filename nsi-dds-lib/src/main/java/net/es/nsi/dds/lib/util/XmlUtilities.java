@@ -128,8 +128,8 @@ public class XmlUtilities {
   }
 
   public static XMLGregorianCalendar longToXMLGregorianCalendar(long time) throws DatatypeConfigurationException {
-    if (time <= 0) {
-      return null;
+    if (time < 0) {
+      throw new DatatypeConfigurationException("Illegal time value specified " + time);
     }
 
     GregorianCalendar cal = new GregorianCalendar();

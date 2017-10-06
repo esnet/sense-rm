@@ -2,7 +2,7 @@
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%date{ISO8601} %-5level %X{akkaSource} - %msg%n</pattern>
+      <pattern>%date [%thread] %-5level %logger{35} \(%line\) - %msg%n</pattern>
     </encoder>
   </appender>
 
@@ -10,7 +10,7 @@
     <file>sense-rm.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- daily rollover -->
-      <fileNamePattern>sense-rm.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
 
       <!-- keep 30 days' worth of history capped at 3GB total size -->
       <maxHistory>30</maxHistory>
@@ -19,9 +19,9 @@
     </rollingPolicy>
 
     <encoder>
-      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+      <pattern>%date [%thread] %-5level %logger{35} \(%line\) - %msg%n</pattern>
     </encoder>
-  </appender>
+  </appender> 
 
   <root level="INFO">
     <appender-ref ref="FILE" />

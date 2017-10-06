@@ -393,7 +393,7 @@ public class SenseRmController extends SenseController {
       headers.setLastModified(newest);
       return new ResponseEntity<>(models, headers, HttpStatus.OK);
     } catch (InterruptedException | ExecutionException | IOException | IllegalArgumentException | DatatypeConfigurationException ex) {
-      log.error("[SenseRmController] Exception caught, ex = {}", ex.getMessage());
+      log.error("[SenseRmController] Exception caught", ex.getMessage());
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())

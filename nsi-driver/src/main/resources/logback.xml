@@ -2,7 +2,7 @@
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%date{ISO8601} %-5level %X{akkaSource} - %msg%n</pattern>
+      <pattern>%date [%thread] %-5level %logger{35} \(%line\) - %msg%n</pattern>
     </encoder>
   </appender>
 
@@ -19,7 +19,7 @@
     </rollingPolicy>
 
     <encoder>
-      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+      <pattern>%date [%thread] %-5level %logger{35} \(%line\) - %msg%n</pattern>
     </encoder>
   </appender> 
 

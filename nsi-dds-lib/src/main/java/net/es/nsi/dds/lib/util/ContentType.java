@@ -8,6 +8,7 @@ package net.es.nsi.dds.lib.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.IOUtils;
@@ -41,10 +42,10 @@ public class ContentType {
 
     public static String decode2String(String contentType, InputStream is) throws IOException {
         if (XGZIP.equalsIgnoreCase(contentType)) {
-            return IOUtils.toString(new GZIPInputStream(is));
+            return IOUtils.toString(new GZIPInputStream(is), Charset.defaultCharset());
         }
         else {
-            return IOUtils.toString(is);
+            return IOUtils.toString(is, Charset.defaultCharset());
         }
     }
 

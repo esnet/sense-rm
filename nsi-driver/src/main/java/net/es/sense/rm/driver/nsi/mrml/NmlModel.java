@@ -47,8 +47,10 @@ public class NmlModel {
 
   public NmlModel(DocumentReader documentReader) {
     this.documentReader = documentReader;
+  }
 
-    // Resolve all ports across all networks for later access.
+  private void load() {
+     // Resolve all ports across all networks for later access.
     Collection<NmlTopologyType> topologies = documentReader.getNmlTopologyAll();
     for (NmlTopologyType nml : topologies) {
       log.info("[NmlModel] processing NML model {}", nml.getId());
@@ -137,16 +139,25 @@ public class NmlModel {
   }
 
   public Map<String, NmlPort> getPorts() {
+    if (ports.isEmpty()) {
+      load();
+    }
     return ports;
   }
 
   public Map<String, NmlPort> getPorts(String topologyId) {
+    if (ports.isEmpty()) {
+      load();
+    }
     return ports.values().stream()
             .filter(p -> p.getTopologyId().equalsIgnoreCase(topologyId))
             .collect(Collectors.toMap(p -> p.getId(), p -> p));
   }
 
   public Map<String, NmlPort> getPorts(String topologyId, Orientation orientation) {
+    if (ports.isEmpty()) {
+      load();
+    }
     return ports.values().stream()
             .filter(p -> p.getTopologyId().equalsIgnoreCase(topologyId) && p.getOrientation() == orientation)
             .collect(Collectors.toMap(p -> p.getId(), p -> p));
@@ -532,6 +543,9 @@ public class NmlModel {
   }
 
   private NmlSwitchingServiceType newNmlSwitchingService(String topologyId) throws IllegalArgumentException {
+    if (ports.isEmpty()) {
+      load();
+    }
     NmlTopologyType topology = getTopology(topologyId)
             .orElseThrow(new IllegalArgumentExceptionSupplier(
                     "[getServiceDefinition] Could not find NML document for networkId = " + topologyId));
@@ -627,6 +641,9 @@ public class NmlModel {
   }
 
   private NmlSwitchingServiceType populateWildcardSwitchingService(NmlSwitchingServiceType switchingService, String topologyId) {
+    if (ports.isEmpty()) {
+      load();
+    }
     Optional<String> encoding = Optional.ofNullable(switchingService.getEncoding());
     Optional<String> labelType = Optional.ofNullable(switchingService.getLabelType());
 
@@ -664,6 +681,10 @@ public class NmlModel {
   }
 
   public Collection<String> getBidirectionalPortIdFromSwitchingService(NmlSwitchingServiceType switchingService) {
+    if (ports.isEmpty()) {
+      load();
+    }
+    
     Set<String> inbound = new HashSet<>();
     Set<String> outbound = new HashSet<>();
 

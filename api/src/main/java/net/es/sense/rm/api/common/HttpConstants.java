@@ -42,7 +42,7 @@ public class HttpConstants {
   public static final String SUMMARY_NAME = "summary";
   public static final String SUMMARY_MSG =
           "If summary=true then a summary collection of models will be returned including the "
-          + "model meta-data while excluding the model element. Default value is summary=true.";
+          + "model meta-data while excluding the model element. Default value is summary=false.";
 
   public static final String MODEL_NAME = "model";
   public static final String MODEL_MSG =

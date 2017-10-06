@@ -19,6 +19,8 @@
  */
 package net.es.sense.rm.api.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -33,6 +35,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @ApiModel(value = "model", description = "This is a topology model resource.")
 @XmlRootElement(name = "model")
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonInclude(Include.NON_NULL)
 public class ModelResource {
 
   @XmlElement(required = true)

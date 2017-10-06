@@ -358,7 +358,9 @@ public class SenseRmController extends SenseController {
         cal.setTimezone(0);
         resource.setCreationTime(cal.toXMLFormat());
         resource.setHref(buildURL(location.toASCIIString(), m.getId()));
-        resource.setModel(m.getModel());
+        if (!summary) {
+          resource.setModel(m.getModel());
+        }
         models.add(resource);
         newest = m.getCreationTime();
       } else {
@@ -376,10 +378,12 @@ public class SenseRmController extends SenseController {
             cal.setTimezone(0);
             resource.setCreationTime(cal.toXMLFormat());
             resource.setHref(buildURL(location.toASCIIString(), m.getId()));
-            if (encode) {
-              resource.setModel(Encoder.encode(m.getModel()));
-            } else {
-              resource.setModel(m.getModel());
+            if (!summary) {
+              if (encode) {
+                resource.setModel(Encoder.encode(m.getModel()));
+              } else {
+                resource.setModel(m.getModel());
+              }
             }
             models.add(resource);
           }

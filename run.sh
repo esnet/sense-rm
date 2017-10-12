@@ -15,7 +15,8 @@ export PASSWORD="changeit"
         -Djavax.net.ssl.trustStorePassword=$PASSWORD \
         -Djavax.net.ssl.keyStore=$KEYSTORE \
         -Djavax.net.ssl.keyStorePassword=$PASSWORD \
-        -Dlogging.config="file:config/logback.xml" \
+	-Dlogback.configurationFile="file:$HOME/config/logback.xml" \
 	-XX:+StartAttachListener \
-        -jar "$HOME/rm-0.1.0.jar" 
+        -jar "$HOME/rm/target/rm-0.1.0.jar" \
+	--spring.config.location="file:$HOME/config/" 
 

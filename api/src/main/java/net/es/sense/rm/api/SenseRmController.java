@@ -315,7 +315,7 @@ public class SenseRmController extends SenseController {
 
     final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
 
-    log.info("[SenseRmController] GET operation = {}, accept = {}, ifModifiedSince = {}, current = {}, summary = {}, model = {}",
+    log.info("[SenseRmController] GET operation = {}, accept = {}, If-Modified-Since = {}, current = {}, summary = {}, model = {}",
             location, accept, ifModifiedSince, current, summary, model);
 
     Date lastModified = DateUtils.parseDate(ifModifiedSince);
@@ -343,8 +343,8 @@ public class SenseRmController extends SenseController {
         }
 
         Model m = first.get();
-        log.info("[SenseRmController] id = {}, getCreationTime = {}, lastModified = {}", m.getId(),
-                m.getCreationTime(), lastModified.getTime());
+        log.info("[SenseRmController] id = {}, getCreationTime = {}, If-Modified-Since = {}", m.getId(),
+                DateUtils.formatDate(new Date(m.getCreationTime())), DateUtils.formatDate(lastModified));
 
         if (m.getCreationTime() <= lastModified.getTime()) {
           log.info("[SenseRmController] resource not modified {}", m.getId());
@@ -357,7 +357,6 @@ public class SenseRmController extends SenseController {
         ModelResource resource = new ModelResource();
         resource.setId(m.getId());
         XMLGregorianCalendar cal = XmlUtilities.longToXMLGregorianCalendar(m.getCreationTime());
-        cal.setTimezone(0);
         resource.setCreationTime(cal.toXMLFormat());
         resource.setHref(buildURL(location.toASCIIString(), m.getId()));
         if (!summary) {
@@ -367,8 +366,8 @@ public class SenseRmController extends SenseController {
         newest = m.getCreationTime();
       } else {
         for (Model m : result) {
-          log.info("[SenseRmController] id = {}, getCreationTime = {}, lastModified = {}", m.getId(),
-                  m.getCreationTime(), lastModified.getTime());
+          log.info("[SenseRmController] id = {}, getCreationTime = {}, If-Modified-Since = {}", m.getId(),
+                  DateUtils.formatDate(new Date(m.getCreationTime())), DateUtils.formatDate(lastModified));
           if (m.getCreationTime() > newest) {
             newest = m.getCreationTime();
           }
@@ -378,7 +377,6 @@ public class SenseRmController extends SenseController {
             ModelResource resource = new ModelResource();
             resource.setId(m.getId());
             XMLGregorianCalendar cal = XmlUtilities.longToXMLGregorianCalendar(m.getCreationTime());
-            cal.setTimezone(0);
             resource.setCreationTime(cal.toXMLFormat());
             resource.setHref(buildURL(location.toASCIIString(), m.getId()));
             if (!summary) {
@@ -396,7 +394,7 @@ public class SenseRmController extends SenseController {
       headers.setLastModified(newest);
 
       for (ModelResource m : models) {
-        log.info("[SenseRmController] returning id = {}, creationTime = {}, new LastModfied = {}, queries If-Modified-Since = {}.", m.getId(), m.getCreationTime(), newest, lastModified);
+        log.info("[SenseRmController] returning id = {}, creationTime = {}, new LastModfied = {}, queries If-Modified-Since = {}.", m.getId(), m.getCreationTime(), DateUtils.formatDate(new Date(newest)), DateUtils.formatDate(lastModified));
       }
 
       return new ResponseEntity<>(models, headers, HttpStatus.OK);
@@ -586,7 +584,8 @@ public class SenseRmController extends SenseController {
       final HttpHeaders headers = new HttpHeaders();
       headers.add("Content-Location", location.toASCIIString());
 
-      log.info("[SenseRmController] getCreationTime = {}, lastModified = {}", m.getCreationTime(), lastModified.getTime());
+      log.info("[SenseRmController] id = {}, getCreationTime = {}, If-Modified-Since = {}", m.getId(),
+              DateUtils.formatDate(new Date(m.getCreationTime())), DateUtils.formatDate(lastModified));
       if (m.getCreationTime() <= lastModified.getTime()) {
         log.info("[SenseRmController] returning not modified {}", m.getId());
         return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
@@ -596,7 +595,6 @@ public class SenseRmController extends SenseController {
       resource.setId(m.getId());
       resource.setHref(location.toASCIIString());
       XMLGregorianCalendar cal = XmlUtilities.longToXMLGregorianCalendar(m.getCreationTime());
-      cal.setTimezone(0);
       resource.setCreationTime(cal.toXMLFormat());
       if (encode) {
         resource.setModel(Encoder.encode(m.getModel()));
@@ -606,7 +604,7 @@ public class SenseRmController extends SenseController {
 
       headers.setLastModified(m.getCreationTime());
 
-      log.info("[SenseRmController] returning id = {}, creationTime = {}, queries If-Modified-Since = {}.", m.getId(), m.getCreationTime(), lastModified);
+      log.info("[SenseRmController] returning id = {}, creationTime = {}, queried If-Modified-Since = {}.", m.getId(), m.getCreationTime(), DateUtils.formatDate(lastModified));
 
       return new ResponseEntity<>(resource, headers, HttpStatus.OK);
 

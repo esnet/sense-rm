@@ -1,9 +1,11 @@
+server.address: 127.0.0.1
+server.port: 8080
+server.contextPath: /
+
 sense:
   root: http://localhost:8080/
   proxy:
   driver: net.es.sense.rm.driver.nsi.NsiDriver
-
-server.contextPath: /
 
 springfox.documentation.swagger.v2.path: /v2/api-docs
 springfox.documentation.swagger.v1.path: /v1/api-docs

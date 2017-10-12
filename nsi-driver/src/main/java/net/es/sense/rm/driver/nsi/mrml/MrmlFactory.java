@@ -122,7 +122,6 @@ public class MrmlFactory {
     // Add the root topology element.
     Resource nmlTopology = createResource(model, network.getId(), Nml.Topology);
     model.add(model.createStatement(nmlTopology, Nml.name, getName()));
-    network.getVersion().setTimezone(0);
     model.add(model.createStatement(nmlTopology, Nml.version, network.getVersion().toXMLFormat()));
     model.add(model.createStatement(nmlTopology, Nml.existsDuring, createLifetime(model)));
     Resource location = createLocation(model, network.getLocation());
@@ -143,13 +142,11 @@ public class MrmlFactory {
       res.addProperty(Nml.start, network.getVersion().toXMLFormat());
     } else {
       XMLGregorianCalendar start = network.getLifetime().getStart();
-      start.setTimezone(0);
       res.addProperty(Nml.start, start.toXMLFormat());
     }
 
     if (network.getLifetime() != null && network.getLifetime().getEnd() != null) {
       XMLGregorianCalendar end = network.getLifetime().getEnd();
-      end.setTimezone(0);
       res.addProperty(Nml.end, end.toXMLFormat());
     }
 

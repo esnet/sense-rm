@@ -45,7 +45,6 @@ public class SenseAdminController extends SenseController {
 
   @PostConstruct
   public void init() throws Exception {
-    log.error("SenseAdminController: " + config.getProxy());
     utilities = new Utilities(config.getProxy());
   }
 

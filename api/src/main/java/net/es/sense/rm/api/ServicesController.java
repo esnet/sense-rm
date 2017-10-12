@@ -85,7 +85,6 @@ public class ServicesController extends SenseController {
 
   @PostConstruct
   public void init() throws Exception {
-    log.error("ServicesController: " + config.getProxy());
     utilities = new Utilities(config.getProxy());
   }
 

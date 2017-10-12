@@ -94,7 +94,6 @@ public class SenseRmController extends SenseController {
 
   @PostConstruct
   public void init() throws Exception {
-    log.error("SenseRmController: " + config.getProxy());
     utilities = new Utilities(config.getProxy());
     Class<?> forName = Class.forName(config.getDriver());
     driver = context.getBean(forName.asSubclass(Driver.class));
@@ -344,13 +343,16 @@ public class SenseRmController extends SenseController {
         }
 
         Model m = first.get();
-        log.info("[SenseRmController] getCreationTime = {}, lastModified = {}", m.getCreationTime(), lastModified.getTime());
+        log.info("[SenseRmController] id = {}, getCreationTime = {}, lastModified = {}", m.getId(),
+                m.getCreationTime(), lastModified.getTime());
 
         if (m.getCreationTime() <= lastModified.getTime()) {
           log.info("[SenseRmController] resource not modified {}", m.getId());
           headers.setLastModified(m.getCreationTime());
           return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
         }
+
+        log.info("[SenseRmController] returning matching resource {}", m.getId());
 
         ModelResource resource = new ModelResource();
         resource.setId(m.getId());
@@ -365,7 +367,8 @@ public class SenseRmController extends SenseController {
         newest = m.getCreationTime();
       } else {
         for (Model m : result) {
-          log.info("[SenseRmController] getCreationTime = {}, lastModified = {}", m.getCreationTime(), lastModified.getTime());
+          log.info("[SenseRmController] id = {}, getCreationTime = {}, lastModified = {}", m.getId(),
+                  m.getCreationTime(), lastModified.getTime());
           if (m.getCreationTime() > newest) {
             newest = m.getCreationTime();
           }
@@ -391,6 +394,11 @@ public class SenseRmController extends SenseController {
       }
 
       headers.setLastModified(newest);
+
+      for (ModelResource m : models) {
+        log.info("[SenseRmController] returning id = {}, creationTime = {}, new LastModfied = {}, queries If-Modified-Since = {}.", m.getId(), m.getCreationTime(), newest, lastModified);
+      }
+
       return new ResponseEntity<>(models, headers, HttpStatus.OK);
     } catch (InterruptedException | ExecutionException | IOException | IllegalArgumentException | DatatypeConfigurationException ex) {
       log.error("[SenseRmController] Exception caught", ex.getMessage());
@@ -596,8 +604,10 @@ public class SenseRmController extends SenseController {
         resource.setModel(m.getModel());
       }
 
-      log.info("[SenseRmController] returning matching resource {}", m.getId());
       headers.setLastModified(m.getCreationTime());
+
+      log.info("[SenseRmController] returning id = {}, creationTime = {}, queries If-Modified-Since = {}.", m.getId(), m.getCreationTime(), lastModified);
+
       return new ResponseEntity<>(resource, headers, HttpStatus.OK);
 
     } catch (InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {

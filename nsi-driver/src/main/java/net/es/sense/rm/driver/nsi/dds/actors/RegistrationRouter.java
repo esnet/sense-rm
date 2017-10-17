@@ -67,7 +67,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
   public void onReceive(Object msg) {
     // Check to see if we got the go ahead to start registering.
     if (msg instanceof StartMsg) {
-      log.info("[onReceive] Start event");
+      log.info("[RegistrationRouter] Start event");
 
       // Create a Register event to start us off.
       RegistrationEvent event = new RegistrationEvent();
@@ -80,19 +80,19 @@ public class RegistrationRouter extends UntypedAbstractActor {
       if (null != re.getEvent()) switch (re.getEvent()) {
         case Register:
           // This is our first time through after initialization.
-          log.debug("[onReceive] routeRegister");
+          log.debug("[RegistrationRouter] routeRegister");
           routeRegister();
           break;
 
         case Audit:
           // A regular audit event.
-          log.debug("[onReceive] routeAudit");
+          log.debug("[RegistrationRouter] routeAudit request.");
           routeAudit();
           break;
 
         case Delete:
           // We are shutting down so clean up.
-          log.debug("[onReceive] routeShutdown");
+          log.debug("[RegistrationRouter] routeShutdown");
           routeShutdown();
           break;
 
@@ -100,19 +100,21 @@ public class RegistrationRouter extends UntypedAbstractActor {
           break;
       }
     } else if (msg instanceof SubscriptionQuery) {
-      log.debug("[onReceive] Subscription query.");
+      log.info("[RegistrationRouter] Subscription query.");
       SubscriptionQuery query = (SubscriptionQuery) msg;
       SubscriptionQueryResult subscription = new SubscriptionQueryResult();
       subscription.setSubscription(getSubscription(query.getUrl()));
       getSender().tell(subscription, self());
+      return;
     } else if (msg instanceof Terminated) {
-      log.debug("[onReceive] Terminated event.");
+      log.debug("[RegistrationRouter] Terminated event.");
       router = router.removeRoutee(((Terminated) msg).actor());
       ActorRef r = getContext().actorOf(Props.create(RegistrationActor.class));
       getContext().watch(r);
       router = router.addRoutee(new ActorRefRoutee(r));
+      return;
     } else {
-      log.error("[onReceive] Unhandled event.");
+      log.error("[RegistrationRouter] Unhandled event.");
       unhandled(msg);
     }
 
@@ -145,7 +147,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
       Subscription sub = subscriptionService.get(url);
       if (sub == null) {
         // We have not seen this before.
-        log.debug("[onReceive] creating new registration for url={}.", url);
+        log.info("[RegistrationRouter] creating new registration for url={}.", url);
 
         RegistrationEvent regEvent = new RegistrationEvent();
         regEvent.setEvent(RegistrationEvent.Event.Register);
@@ -153,7 +155,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
         router.route(regEvent, this.getSelf());
       } else {
         // We have seen this URL before.
-        log.debug("[onReceive] auditing registration for url={}.", url);
+        log.info("[RegistrationRouter] auditing registration for url={}.", url);
         RegistrationEvent regEvent = new RegistrationEvent();
         regEvent.setEvent(RegistrationEvent.Event.Update);
         regEvent.setUrl(url);

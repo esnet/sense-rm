@@ -39,21 +39,43 @@ public class ModelServiceBean implements ModelService {
 
   @Override
   public Collection<Model> get(long lastModified, boolean current, String topologyId) {
+    Collection<Model> result = new ArrayList();
+
     if (current) {
-      Model result = modelRepository.findCurrentModelForTopologyId(topologyId);
-      return (result.getVersion() > lastModified) ? Lists.newArrayList(result) : new ArrayList<>();
+      Model findCurrentModelForTopologyId = modelRepository.findCurrentModelForTopologyId(topologyId);
+      if (findCurrentModelForTopologyId != null &&
+            findCurrentModelForTopologyId.getVersion() > lastModified) {
+          result.add(findCurrentModelForTopologyId);
+      }
+    }
+    else {
+      Iterable<Model> findByTopologyId = modelRepository.findTopologyIdNewerThanVersion(topologyId, lastModified);
+      findByTopologyId.forEach(m -> {
+        result.add(m);
+      });
     }
 
-    return Lists.newArrayList(modelRepository.findTopologyIdNewerThanVersion(topologyId, lastModified));
+    return result;
   }
 
   @Override
   public Collection<Model> get(boolean current, String topologyId) {
+    Collection<Model> result = new ArrayList();
+
     if (current) {
-      return Lists.newArrayList(modelRepository.findCurrentModelForTopologyId(topologyId));
+      Model findCurrentModelForTopologyId = modelRepository.findCurrentModelForTopologyId(topologyId);
+      if (findCurrentModelForTopologyId != null) {
+        result.add(findCurrentModelForTopologyId);
+      }
+    }
+    else {
+      Iterable<Model> findByTopologyId = modelRepository.findByTopologyId(topologyId);
+      findByTopologyId.forEach(m -> {
+        result.add(m);
+      });
     }
 
-    return Lists.newArrayList(modelRepository.findByTopologyId(topologyId));
+    return result;
   }
 
   @Override

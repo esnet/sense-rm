@@ -147,11 +147,6 @@ public class SwitchingSubnetModel {
 
           srcChildPort.setNmlLabels(src);
 
-          // Add to the parent port.
-          srcParent.getChildren().add(srcChildPort.getId());
-          nml.addPort(srcChildPort);
-
-          log.info("[SwitchingSubnetModel] adding src child port {}", srcChildPort.getId());
 
           // Create the destination port.
           SimpleStp dst = new SimpleStp(p2ps.getDestSTP());
@@ -177,18 +172,24 @@ public class SwitchingSubnetModel {
 
           dstChildPort.setNmlLabels(src);
 
-          // Add to the parent port.
-          dstParent.getChildren().add(dstChildPort.getId());
-          nml.addPort(dstChildPort);
-
-          log.info("[SwitchingSubnetModel] adding dst child port {}", dstChildPort.getId());
-
           // We can only build a SwitchingSubnet if this service contains two endpoints in the same network.
           if (!src.getNetworkId().equalsIgnoreCase(dst.getNetworkId())) {
             log.error("[SwitchingSubnetModel] Reservation using STP on two different networks src = {}, dst = {}",
                     src, dst);
             continue;
           }
+
+          // Add to the parent port.
+          srcParent.getChildren().add(srcChildPort.getId());
+          nml.addPort(srcChildPort);
+
+          log.info("[SwitchingSubnetModel] adding src child port {}", srcChildPort.getId());
+
+          // Add to the parent port.
+          dstParent.getChildren().add(dstChildPort.getId());
+          nml.addPort(dstChildPort);
+
+          log.info("[SwitchingSubnetModel] adding dst child port {}", dstChildPort.getId());
 
           // Now build the SwitchingSubnet.
           List<NmlSwitchingServiceType> srcSS = srcParent.getSwitchingServices();

@@ -3,6 +3,7 @@ package net.es.nsi.dds.lib.jaxb;
 import java.io.IOException;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import net.es.nsi.common.jaxb.JaxbParser;
 import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyType;
 import net.es.nsi.dds.lib.jaxb.nml.ObjectFactory;
 
@@ -13,7 +14,7 @@ import net.es.nsi.dds.lib.jaxb.nml.ObjectFactory;
  */
 public class NmlParser extends JaxbParser {
 
-  private static final String PACKAGES = "net.es.nsi.dds.lib.jaxb.nml, net.es.nsi.dds.lib.jaxb.nmwg";
+  private static final String PACKAGES = "net.es.nsi.dds.lib.jaxb.nml:net.es.nsi.dds.lib.jaxb.nmwg";
   private static final ObjectFactory factory = new ObjectFactory();
 
   private NmlParser() {

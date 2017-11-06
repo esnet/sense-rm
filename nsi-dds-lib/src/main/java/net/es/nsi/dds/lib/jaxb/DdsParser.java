@@ -13,6 +13,7 @@ import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
 import net.es.nsi.dds.lib.jaxb.dds.SubscriptionListType;
 import net.es.nsi.dds.lib.jaxb.dds.SubscriptionRequestType;
 import net.es.nsi.dds.lib.jaxb.dds.SubscriptionType;
+import net.es.nsi.common.jaxb.JaxbParser;
 
 /**
  * A singleton to load the very expensive NMWG JAXBContext once.

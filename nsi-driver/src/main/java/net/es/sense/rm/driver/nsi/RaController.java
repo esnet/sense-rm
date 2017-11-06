@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
+import net.es.sense.rm.driver.nsi.cs.CsProvider;
 import net.es.sense.rm.driver.nsi.db.ModelService;
 import net.es.sense.rm.driver.nsi.dds.DdsProvider;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
@@ -40,6 +41,9 @@ public class RaController {
 
   @Autowired
   private DdsProvider ddsProvider;
+
+  @Autowired
+  private CsProvider csProvider;
 
   @Autowired
   private ModelService modelService;
@@ -75,14 +79,14 @@ public class RaController {
     // Start the DDS controller.
     ddsProvider.start();
 
+    // Start the CS controller.
+    csProvider.start();
+
     log.info("[RaController] {} started using AKKA system {}.", nsiProperties.getNsaId(), nsiActorSystem.getActorSystem().name());
 
     // Start the model audit actor.
     ActorSystem actorSystem = nsiActorSystem.getActorSystem();
     modelAuditActor = actorSystem.actorOf(springExtension.props("modelAuditActor"), "ra-ModelAuditActor");
-
-    // Now we start a router for dispatching Model search and read events.
-    //modelRouter = actorSystem.actorOf(springExtension.props("modelRouter"), "ra-ModelRouter");
 
     log.info("[RaController] Completed RA system initialization.");
   }

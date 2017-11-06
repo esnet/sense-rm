@@ -16,10 +16,10 @@ import javax.persistence.Table;
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
+import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.jaxb.DdsParser;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentType;
 import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
-import net.es.nsi.dds.lib.util.XmlUtilities;
 import net.es.sense.rm.driver.nsi.dds.api.DiscoveryError;
 import net.es.sense.rm.driver.nsi.dds.api.Exceptions;
 

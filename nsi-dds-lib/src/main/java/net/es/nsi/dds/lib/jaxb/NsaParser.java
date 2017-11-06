@@ -5,6 +5,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import net.es.nsi.dds.lib.jaxb.nsa.NsaType;
 import net.es.nsi.dds.lib.jaxb.nsa.ObjectFactory;
+import net.es.nsi.common.jaxb.JaxbParser;
 
 /**
  * A singleton to load the very expensive NMWG JAXBContext once.
@@ -14,7 +15,7 @@ import net.es.nsi.dds.lib.jaxb.nsa.ObjectFactory;
 public class NsaParser extends JaxbParser {
 
   private static final String PACKAGES = "net.es.nsi.dds.lib.jaxb.nsa";
-  private static final ObjectFactory factory = new ObjectFactory();
+  private static final ObjectFactory FACTORY = new ObjectFactory();
 
   private NsaParser() {
     super(PACKAGES);
@@ -43,7 +44,7 @@ public class NsaParser extends JaxbParser {
 
   public void writeTopology(String file, NsaType nsa) throws JAXBException, IOException {
     // Parse the specified file.
-    JAXBElement<NsaType> element = factory.createNsa(nsa);
+    JAXBElement<NsaType> element = FACTORY.createNsa(nsa);
     this.writeFile(element, file);
   }
 }

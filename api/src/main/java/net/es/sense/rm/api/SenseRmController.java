@@ -41,7 +41,7 @@ import javax.annotation.PostConstruct;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import lombok.extern.slf4j.Slf4j;
-import net.es.nsi.dds.lib.util.XmlUtilities;
+import net.es.nsi.common.util.XmlUtilities;
 import net.es.sense.rm.api.common.Encoder;
 import net.es.sense.rm.api.common.Error;
 import net.es.sense.rm.api.common.HttpConstants;

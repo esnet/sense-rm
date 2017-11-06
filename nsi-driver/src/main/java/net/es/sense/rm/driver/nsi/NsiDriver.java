@@ -75,6 +75,8 @@ public class NsiDriver implements Driver {
   @Async
   public Future<Collection<Model>> getModels(boolean current, String modelType) throws ExecutionException {
     String networkId = nsiProperties.getNetworkId();
+    log.info("[getModels] getting model for network {}", networkId);
+
     if (Strings.isNullOrEmpty(networkId)) {
       log.error("[NsiDriver] no network specified in configuration.");
       throw new ExecutionException(new IllegalArgumentException("No network specified in configuration."));
@@ -90,6 +92,7 @@ public class NsiDriver implements Driver {
               .creationTime((m.getVersion() / 1000) * 1000)
               .model(m.getBase())
               .build()).forEachOrdered((model) -> {
+                log.info("[getModels] return modelId = {}, model = {}", model.getId(), model.getModel());
                 results.add(model);
       });
       return new AsyncResult<>(results);

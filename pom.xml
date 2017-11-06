@@ -25,6 +25,7 @@
   </properties>
 
   <modules>
+    <module>common</module>
     <module>nsi-dds-lib</module>
     <module>nsi-cs-lib</module>
     <module>driver</module>

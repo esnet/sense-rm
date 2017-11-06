@@ -1,5 +1,7 @@
 package net.es.nsi.dds.lib.jaxb;
 
+import net.es.nsi.common.jaxb.JaxbParser;
+
 /**
  * A singleton to load the very expensive NMWG JAXBContext once.
  *

@@ -50,7 +50,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
 
   @Override
   public void preStart() {
-    log.info("[preStart] Initializing registrationActors, debug= {}.", log.isDebugEnabled());
+    log.info("[RegistrationRouter] Initializing registrationActors, debug= {}.", log.isDebugEnabled());
 
     List<Routee> routees = new ArrayList<>();
     for (int i = 0; i < nsiProperties.getDdsPoolSize(); i++) {
@@ -60,7 +60,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
     }
     router = new Router(new RoundRobinRoutingLogic(), routees);
 
-    log.info("[preStart] Initialization completed.");
+    log.info("[RegistrationRouter] Initialization completed.");
   }
 
   @Override
@@ -80,19 +80,19 @@ public class RegistrationRouter extends UntypedAbstractActor {
       if (null != re.getEvent()) switch (re.getEvent()) {
         case Register:
           // This is our first time through after initialization.
-          log.debug("[RegistrationRouter] routeRegister");
+          log.info("[RegistrationRouter] routeRegister");
           routeRegister();
           break;
 
         case Audit:
           // A regular audit event.
-          log.debug("[RegistrationRouter] routeAudit request.");
+          log.info("[RegistrationRouter] routeAudit request.");
           routeAudit();
           break;
 
         case Delete:
           // We are shutting down so clean up.
-          log.debug("[RegistrationRouter] routeShutdown");
+          log.info("[RegistrationRouter] routeShutdown");
           routeShutdown();
           break;
 

@@ -1,6 +1,8 @@
 package net.es.sense.rm;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @EnableTransactionManagement
 public class Application {
+
   // Keep running while true.
   private static boolean keepRunning = true;
 
@@ -44,20 +47,30 @@ public class Application {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        log.info("[SENSE-N-RM] Shutting down NSI RA...");
-        log.info("[SENSE-N-RM] ...Shutdown complete.");
+        log.info("[SENSE-N-RM] Shutting down RM...");
         Application.setKeepRunning(false);
       }
     }
     );
 
     // Loop until we are told to shutdown.
+    MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
     while (keepRunning) {
-      Thread.sleep(1000);
+      log.info("[SENSE-N-RM] {}", memStats(memoryBean));
+      Thread.sleep(10000);
     }
 
     log.info("[SENSE-N-RM] Shutdown complete with uptime: " + mxBean.getUptime() + " ms");
     System.exit(0);
+  }
+
+  private static final int MEGABYTE = (1024 * 1024);
+
+  private static String memStats(MemoryMXBean memoryBean) {
+    MemoryUsage heapUsage = memoryBean.getHeapMemoryUsage();
+    long maxMemory = heapUsage.getMax() / MEGABYTE;
+    long usedMemory = heapUsage.getUsed() / MEGABYTE;
+    return "Memory use :" + usedMemory + "M/" + maxMemory + "M";
   }
 
   /**

@@ -1,5 +1,6 @@
 package net.es.nsi.dds.lib.util;
 
+import net.es.nsi.common.util.XmlUtilities;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;

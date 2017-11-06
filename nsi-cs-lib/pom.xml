@@ -14,6 +14,12 @@
 
   <dependencies>
     <dependency>
+      <groupId>net.es.sense</groupId>
+      <artifactId>common</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
@@ -177,6 +183,38 @@
           <compilerArgument>-Xlint:unchecked</compilerArgument>
           <compilerArgument>-Xlint:deprecation</compilerArgument>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jaxb2-maven-plugin</artifactId>
+        <version>1.6</version>
+        <dependencies>
+          <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.4.01</version>
+          </dependency>
+          <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.11.0</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>p2ps</id>
+            <goals>
+              <goal>xjc</goal>
+            </goals>
+            <configuration>
+              <schemaDirectory>${basedir}/src/main/wsdl</schemaDirectory>
+              <schemaFiles>ogf_nsi_services_p2p_v2_0.xsd</schemaFiles>
+              <sourceDestDir>${project.build.directory}/generated-sources/jaxws/</sourceDestDir>
+              <clearOutputDir>false</clearOutputDir>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>

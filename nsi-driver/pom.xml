@@ -25,6 +25,12 @@
 
     <dependency>
       <groupId>net.es.sense</groupId>
+      <artifactId>common</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.es.sense</groupId>
       <artifactId>nsi-dds-lib</artifactId>
       <version>0.1.0</version>
     </dependency>

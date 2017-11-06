@@ -2,6 +2,7 @@ package net.es.nsi.cs.lib;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
+import net.es.nsi.common.util.XmlDate;
 import org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationRequestCriteriaType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReserveType;
@@ -31,12 +32,12 @@ public class Reserve extends NsiOperation {
 
     ScheduleType sch = factory.createScheduleType();
     if (getStartTime() != 0) {
-      XMLGregorianCalendar start = Helper.longToXMLGregorianCalendar(getStartTime());
+      XMLGregorianCalendar start = XmlDate.longToXMLGregorianCalendar(getStartTime());
       sch.setStartTime(factory.createScheduleTypeStartTime(start));
     }
 
     if (getEndTime() != 0) {
-      XMLGregorianCalendar end = Helper.longToXMLGregorianCalendar(getEndTime());
+      XMLGregorianCalendar end = XmlDate.longToXMLGregorianCalendar(getEndTime());
       sch.setEndTime(factory.createScheduleTypeEndTime(end));
     }
 

@@ -19,6 +19,7 @@
  */
 package net.es.sense.rm.driver.nsi.db;
 
+import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -36,7 +37,7 @@ import javax.persistence.Table;
 @lombok.Data
 @Entity
 @Table(name = "model")
-public class Model {
+public class Model implements Serializable {
 
   @Id
   @GeneratedValue

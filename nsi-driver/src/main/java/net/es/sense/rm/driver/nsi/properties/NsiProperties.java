@@ -19,37 +19,36 @@ import org.springframework.validation.annotation.Validated;
 @JsonRootName(value = "nsi")
 public class NsiProperties {
   // The URL of the local container runtime.
-  //@Value ("${ddsUrl}")
   @NotNull
   private String ddsUrl;
   private String proxy;
 
   // The NSA identifier of this RA in URN format.
-  //@Value ("${nsaId}")
   @NotNull
   private String nsaId;
 
   // How often the we will audit out subscription to peer DDS servers.
-  //@Value ("${ddsAuditTimer}")
   private long ddsAuditTimer = 600;
 
   // How long do we maintain a document in our cache after it has expired.
   private long ddsExpiryInterval = 600;
 
-  // How long do we maintain a document in our cache after it has expired.
+  // How man actors do we instantiate for the dds audit pool.
   private int ddsPoolSize = 4;
 
   // The DDS servers we will connect to for discovery information.
-  //@Value ("${peers}")
   private List<String> peers;
 
+  // How often (in seconds) do we audit the NSI connection on our associated NSA?
+  private int connectionAuditTimer = 100;
+
   // The NSA identifier of the target aggregator for our connection requests.
-  //@Value ("${providerNsaId}")
   @NotNull
   private String providerNsaId;
+  private String providerConnectionURL = "http://localhost:9000/nsi-v2/ConnectionServiceProvider";
+  private String requesterConnectionURL = "http://localhost:8080/nsi-v2/ConnectionServiceRequester";
 
   // The identifier of the network to expose through the RA.
-  //@Value ("${networkId}")
   private String networkId;
 
   private String defaultServiceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE";

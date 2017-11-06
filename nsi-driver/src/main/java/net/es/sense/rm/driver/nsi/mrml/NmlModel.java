@@ -138,11 +138,22 @@ public class NmlModel {
     this.defaultGranularity = defaultGranularity;
   }
 
+  public NmlPort getPort(String id) {
+    if (ports.isEmpty()) {
+      load();
+    }
+    return ports.get(id);
+  }
+
   public Map<String, NmlPort> getPorts() {
     if (ports.isEmpty()) {
       load();
     }
     return ports;
+  }
+
+  public NmlPort addPort(NmlPort port) {
+    return ports.put(port.getId(), port);
   }
 
   public Map<String, NmlPort> getPorts(String topologyId) {
@@ -159,7 +170,7 @@ public class NmlModel {
       load();
     }
     return ports.values().stream()
-            .filter(p -> p.getTopologyId().equalsIgnoreCase(topologyId) && p.getOrientation() == orientation)
+            .filter(p -> p.getTopologyId().equalsIgnoreCase(topologyId) && p.getOrientation().compareTo(orientation) == 0)
             .collect(Collectors.toMap(p -> p.getId(), p -> p));
   }
 
@@ -213,9 +224,6 @@ public class NmlModel {
   }
 
   private NmlPort convertPortGroup(NmlPortGroupType portGroup, Orientation orientation, String topologyId) {
-
-    log.debug("[NmlModel] processing portGroup {}", portGroup.getId());
-
     // Extract the labels associated with this port.  We
     // currently expect a single labelType with a range of
     // values.  VLAN labels is all we currently know about.
@@ -269,9 +277,6 @@ public class NmlModel {
   }
 
   private NmlPort convertPort(NmlPortType port, Orientation orientation, String topologyId) {
-
-    log.debug("[NmlModel] processing port {}", port.getId());
-
     // Port relationship has isAlias connection information.
     String isAlias = null;
     int count = 0;
@@ -514,19 +519,20 @@ public class NmlModel {
    * @param topologyId
    * @return
    */
-  public Collection<ServiceDefinitionType> getServiceDefinitions(String topologyId) throws IllegalArgumentException {
+  public Map<String, ServiceDefinitionType> getServiceDefinitionsIndexed(String topologyId) throws IllegalArgumentException {
 
     NmlTopologyType topology = getTopology(topologyId)
             .orElseThrow(new IllegalArgumentExceptionSupplier(
                     "[getServiceDefinition] Could not find NML document for networkId = " + topologyId));
 
     // Pull out the ServiceDefinition elements which are stored in ANY.
-    Collection<ServiceDefinitionType> results = new ArrayList<>();
+    HashMap<String, ServiceDefinitionType> results = new HashMap<>();
     for (Object object : topology.getAny()) {
       if (object instanceof JAXBElement) {
         JAXBElement<?> jaxb = (JAXBElement) object;
         if (jaxb.getValue() instanceof ServiceDefinitionType) {
-          results.add(ServiceDefinitionType.class.cast(jaxb.getValue()));
+          ServiceDefinitionType cast = ServiceDefinitionType.class.cast(jaxb.getValue());
+          results.put(cast.getId(), cast);
         }
       }
     }
@@ -535,11 +541,15 @@ public class NmlModel {
     if (results.isEmpty()) {
       ServiceDefinitionType serviceDefinition = FACTORY.createServiceDefinitionType();
       serviceDefinition.setId(topology.getId() + ":ServiceDefinition:default");
-      serviceDefinition.setServiceType(defaultServiceType);
-      results.add(serviceDefinition);
+      serviceDefinition.setServiceType(defaultServiceType.trim());
+      results.put(serviceDefinition.getId(), serviceDefinition);
     }
 
     return results;
+  }
+
+  public Collection<ServiceDefinitionType> getServiceDefinitions(String topologyId) throws IllegalArgumentException {
+    return this.getServiceDefinitionsIndexed(topologyId).values();
   }
 
   private NmlSwitchingServiceType newNmlSwitchingService(String topologyId) throws IllegalArgumentException {
@@ -581,25 +591,36 @@ public class NmlModel {
     // Add a default service definition.
     ServiceDefinitionType serviceDefinition = FACTORY.createServiceDefinitionType();
     serviceDefinition.setId(topologyId + ":ServiceDefinition:default");
-    serviceDefinition.setServiceType(defaultServiceType);
+    serviceDefinition.setServiceType(defaultServiceType.trim());
     switchingService.getAny().add(FACTORY.createServiceDefinition(serviceDefinition));
     return switchingService;
   }
 
   public Collection<NmlSwitchingServiceType> getSwitchingServices(String topologyId) throws IllegalArgumentException {
+    return getSwitchingServicesIndexed(topologyId).values();
+  }
+
+  public Map<String, NmlSwitchingServiceType> getSwitchingServicesIndexed(String topologyId) throws IllegalArgumentException {
     NmlTopologyType topology = getTopology(topologyId)
             .orElseThrow(new IllegalArgumentExceptionSupplier(
                     "[getServiceDefinition] Could not find NML document for networkId = " + topologyId));
 
-    Collection<NmlSwitchingServiceType> newSwitchingServices = new ArrayList<>();
+    log.info("[getSwitchingServicesIndexed] entering.");
+
+
+    Map<String, NmlSwitchingServiceType> newSwitchingServices = new HashMap<>();
 
     // The SwitchingService is modelled as a "hasService" relation.
     for (NmlTopologyRelationType relation : topology.getRelation()) {
+      log.info("[getSwitchingServicesIndexed] relation = {}", relation.getType());
       if (relation.getType().equalsIgnoreCase(Relationships.HAS_SERVICE)) {
         for (NmlNetworkObject service : relation.getService()) {
           // We want the SwitchingService.
+          log.info("SwitchingService instance {}", service.getClass().getCanonicalName());
           if (service instanceof NmlSwitchingServiceType) {
-            newSwitchingServices.add((NmlSwitchingServiceType) service);
+            NmlSwitchingServiceType s = (NmlSwitchingServiceType) service;
+            log.info("found SwitchingService {}", service.getId());
+            newSwitchingServices.put(s.getId(), s);
           }
         }
       }
@@ -609,15 +630,18 @@ public class NmlModel {
     // defined, and if not, create the default one with all ports and
     // labelSwapping set to false.
     if (newSwitchingServices.isEmpty()) {
+      log.info("No SwitchingService found so creating a default, topologyId = {}", topologyId);
       NmlSwitchingServiceType switchingService = newNmlSwitchingService(topologyId);
-      newSwitchingServices.add(switchingService);
+      newSwitchingServices.put(switchingService.getId(), switchingService);
 
     } else {
+      log.info("SwitchingService found but no port members so adding matching, topologyId = {}", topologyId);
       // NML Default Behavior #2: If we have a SwitchingService with no port
       // members then we must add all ports of matching label and encoding
       // type.  We use a boolean here to tell us if the SwitchingService
       // held a port.
-      for (NmlSwitchingServiceType switchingService : newSwitchingServices) {
+      for (NmlSwitchingServiceType switchingService : newSwitchingServices.values()) {
+        log.info("Adding ports to SwitchingService = {}", switchingService.getId());
         boolean foundPort = false;
         for (NmlSwitchingServiceRelationType relation : switchingService.getRelation()) {
           if (Relationships.HAS_INBOUND_PORT.equalsIgnoreCase(relation.getType())) {
@@ -630,6 +654,7 @@ public class NmlModel {
         }
 
         if (!foundPort) {
+          log.info("[getSwitchingServicesIndexed] no ports defined so populating wildcard.");
           // Treat this as a wildcard SwitchingService buy adding all
           // unidirectional ports with maching attributes.
           populateWildcardSwitchingService(switchingService, topologyId);
@@ -684,7 +709,7 @@ public class NmlModel {
     if (ports.isEmpty()) {
       load();
     }
-    
+
     Set<String> inbound = new HashSet<>();
     Set<String> outbound = new HashSet<>();
 

@@ -1,11 +1,13 @@
 package net.es.sense.rm.driver.nsi.actors;
 
+import akka.actor.Cancellable;
 import akka.actor.UntypedAbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.db.Model;
 import net.es.sense.rm.driver.nsi.db.ModelService;
 import net.es.sense.rm.driver.nsi.dds.api.DocumentReader;
@@ -13,6 +15,7 @@ import net.es.sense.rm.driver.nsi.messages.AuditRequest;
 import net.es.sense.rm.driver.nsi.messages.TimerMsg;
 import net.es.sense.rm.driver.nsi.mrml.MrmlFactory;
 import net.es.sense.rm.driver.nsi.mrml.NmlModel;
+import net.es.sense.rm.driver.nsi.mrml.SwitchingSubnetModel;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.apache.jena.riot.Lang;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,15 +41,20 @@ public class ModelAuditActor extends UntypedAbstractActor {
   private DocumentReader documentReader;
 
   @Autowired
+  ReservationService reservationService;
+
+  @Autowired
   ModelService modelService;
 
   private final LoggingAdapter log = Logging.getLogger(getContext().system(), "ModelAuditActor");
+
+  private Cancellable scheduled;
 
   @Override
   public void preStart() {
     log.info("[ModelAuditActor] starting.");
     TimerMsg message = new TimerMsg();
-    nsiActorSystem.getActorSystem().scheduler().scheduleOnce(Duration.create(nsiProperties.getModelAuditTimer(),
+    scheduled = nsiActorSystem.getActorSystem().scheduler().scheduleOnce(Duration.create(nsiProperties.getModelAuditTimer() + 20,
             TimeUnit.SECONDS), this.getSelf(), message, nsiActorSystem.getActorSystem().dispatcher(), null);
   }
 
@@ -56,18 +64,18 @@ public class ModelAuditActor extends UntypedAbstractActor {
       // Kick of audit and schedule next update.
       try {
         audit();
-      } catch (IllegalArgumentException ex) {
-        log.error("[ModelAuditActor] audit failed.", ex);
+      } catch (Exception ex) {
+        log.error("[ModelAuditActor] audit failed, {}", ex);
       }
 
       TimerMsg message = (TimerMsg) msg;
-      nsiActorSystem.getActorSystem().scheduler().scheduleOnce(Duration.create(nsiProperties.getModelAuditTimer(),
+      scheduled = nsiActorSystem.getActorSystem().scheduler().scheduleOnce(Duration.create(nsiProperties.getModelAuditTimer(),
               TimeUnit.SECONDS), this.getSelf(), message, nsiActorSystem.getActorSystem().dispatcher(), null);
     } else if (msg instanceof AuditRequest) {
       try {
         audit(((AuditRequest) msg).getTopologyId());
-      } catch (IllegalArgumentException ex) {
-        log.error("[ModelAuditActor] audit failed.", ex);
+      } catch (Exception ex) {
+        log.error("[ModelAuditActor] audit failed, {}", ex);
       }
     } else {
       unhandled(msg);
@@ -81,7 +89,11 @@ public class ModelAuditActor extends UntypedAbstractActor {
     NmlModel nml = new NmlModel(documentReader);
 
     nml.getTopologyIds().forEach((topologyId) -> {
-      MrmlFactory mrml = new MrmlFactory(nml, topologyId);
+      log.info("[ModelAuditActor] processing topologyId = {}", topologyId);
+
+      SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, nml, topologyId);
+      MrmlFactory mrml = new MrmlFactory(nml, ssm, topologyId);
+
       // Check to see if this is a new version.
       if (modelService.isPresent(topologyId, mrml.getVersion())) {
         log.info("[ModelAuditActor] found matching model topologyId = {}, version = {}.", topologyId, mrml.getVersion());
@@ -111,7 +123,8 @@ public class ModelAuditActor extends UntypedAbstractActor {
 
     // Get the new document context.
     NmlModel nml = new NmlModel(documentReader);
-    MrmlFactory mrml = new MrmlFactory(nml, topologyId);
+    SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, nml, topologyId);
+    MrmlFactory mrml = new MrmlFactory(nml, ssm, topologyId);
 
     // Check to see if this is a new version.
     if (modelService.isPresent(topologyId, mrml.getVersion())) {

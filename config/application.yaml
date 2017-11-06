@@ -1,6 +1,7 @@
 server.address: 127.0.0.1
 server.port: 8080
 server.contextPath: /
+cxf.path: /nsi
 
 sense:
   root: http://localhost:8080/
@@ -24,7 +25,7 @@ spring:
   jpa:
     generate-ddl: true
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
   datasource:
     url: jdbc:postgresql://localhost:5432/sense-n-rm
     driver-class-name: org.postgresql.Driver
@@ -48,28 +49,61 @@ spring:
 #   password: bubbles
 
 nsi:
-  # DDS related configuration.
-  ddsUrl: http://localhost:8080/api/dds/v1
-  proxy:
+  # For NSI interactions we must have a designated NSA id.
   nsaId: urn:ogf:network:example.net:2013:nsa:application
+
+  #########################################
+  # DDS related configuration.            #
+  #########################################
+
+  # The DDS notification endpoint we will expose for callbacks.
+  ddsUrl: http://localhost:8080/api/dds/v1
+
+  # How often (in seconds) we query our remote subscription to see if it is still valid.
   ddsAuditTimer: 600
+
+  # How long (in seconds) we wait to delete a document after it has expired.
   ddsExpiryInterval: 600
+
+  # How many actors to instantiate in the DDS pool.
   ddsPoolSize: 4
+
+  # The DDS server endpoint we will connect to.
   peers:
     - http://localhost:8401/dds
 
-  # NSI CS related configuration - the NSA we are connected to.
-  providerNsaId: urn:ogf:network:es.net:2013:nsa:nsi-aggr-west
+  #########################################
+  # NSI Connection Service configuration. #
+  #########################################
 
-  # This is the list of topologies exposed through the SENSE-N-RM.
-  networkId: urn:ogf:network:network1:2015:topology
+  # The associated NSA we will connect to for connection services.
+  providerNsaId: urn:ogf:network:opennsa.net:2015:nsa:safnari
+  providerConnectionURL: "http://localhost:9000/nsi-v2/ConnectionServiceProvider"
 
+  # Our requester connection service endpoint.
+  requesterConnectionURL : "http://localhost:8080/nsi/nsi-v2/ConnectionServiceRequester"
+
+  # How often we audit our associated NSA for new connections.
+  connectionAuditTimer: 50 
+
+  #########################################
+  # NML/MRML generation configuration.    #
+  #########################################
+
+  # The topology exposed through the SENSE-N-RM.
+  networkId: urn:ogf:network:network4:2015:topology
+
+  # The default serviceDefinition if one is not specified.
   defaultServiceType: http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE
+
+  # The default bandwidth unit.
   defaultUnits: "bps"
+
+  # The default bandwidth granularity.
   defaultGranularity: 1
 
   # Control the polling of change within the network.
-  modelAuditTimer: 120
+  modelAuditTimer: 60 
 
   # This was for the DDS HTTP server configuation for incoming requests but now springboot handles this.  Will need
   # a specific springboot configuration section.

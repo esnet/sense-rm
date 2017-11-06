@@ -8,6 +8,8 @@ import net.es.nsi.dds.lib.jaxb.dds.ContentType;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentType;
 import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
 import net.es.nsi.dds.lib.signing.Validate;
+import net.es.nsi.common.util.Decoder;
+import net.es.nsi.common.util.Encoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;

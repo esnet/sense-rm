@@ -88,14 +88,16 @@ public class NsiDriver implements Driver {
       ModelService modelService = raController.getModelService();
       Collection<net.es.sense.rm.driver.nsi.db.Model> models = modelService.get(current, networkId);
       if (models != null) {
-        models.stream().map((m) -> Model.builder()
-                .id(m.getModelId())
-                .creationTime((m.getVersion() / 1000) * 1000)
-                .model(m.getBase())
-                .build()).forEachOrdered((model) -> {
-                  log.info("[getModels] return modelId = {}, model = {}", model.getId(), model.getModel());
-                  results.add(model);
-        });
+        for (net.es.sense.rm.driver.nsi.db.Model m : models) {
+          Model model = Model.builder()
+                  .id(m.getModelId())
+                  .creationTime((m.getVersion() / 1000) * 1000)
+                  .model(m.getBase())
+                  .build();
+
+          log.info("[getModels] return modelId = {}, model = {}", model.getId(), model.getModel());
+          results.add(model);
+        }
       }
       return new AsyncResult<>(results);
     } catch (IllegalArgumentException ex) {

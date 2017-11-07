@@ -1,8 +1,6 @@
 package net.es.sense.rm.driver.nsi.dds.actors;
 
 import akka.actor.UntypedAbstractActor;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,6 +11,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.UrlHelper;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.dds.lib.jaxb.DdsParser;
@@ -40,6 +39,7 @@ import org.springframework.stereotype.Component;
  *
  * @author hacksaw
  */
+@Slf4j
 @Component
 @Scope("prototype")
 public class RegistrationActor extends UntypedAbstractActor {
@@ -55,7 +55,6 @@ public class RegistrationActor extends UntypedAbstractActor {
   @Autowired
   private DdsClient ddsClient;
 
-  private final LoggingAdapter log = Logging.getLogger(getContext().system(), "RegistrationActor");
   private final ObjectFactory FACTORY = new ObjectFactory();
 
   @Override

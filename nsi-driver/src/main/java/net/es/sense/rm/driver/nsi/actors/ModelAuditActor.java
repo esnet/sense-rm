@@ -2,11 +2,10 @@ package net.es.sense.rm.driver.nsi.actors;
 
 import akka.actor.Cancellable;
 import akka.actor.UntypedAbstractActor;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.db.Model;
 import net.es.sense.rm.driver.nsi.db.ModelService;
@@ -27,6 +26,7 @@ import scala.concurrent.duration.Duration;
  *
  * @author hacksaw
  */
+@Slf4j
 @Component
 @Scope("prototype")
 public class ModelAuditActor extends UntypedAbstractActor {
@@ -45,8 +45,6 @@ public class ModelAuditActor extends UntypedAbstractActor {
 
   @Autowired
   ModelService modelService;
-
-  private final LoggingAdapter log = Logging.getLogger(getContext().system(), "ModelAuditActor");
 
   private Cancellable scheduled;
 
@@ -88,7 +86,9 @@ public class ModelAuditActor extends UntypedAbstractActor {
     // Get the new document context.
     NmlModel nml = new NmlModel(documentReader);
 
-    nml.getTopologyIds().forEach((topologyId) -> {
+    String topologyId = nsiProperties.getNetworkId();
+
+    //nml.getTopologyIds().forEach((topologyId) -> {
       log.info("[ModelAuditActor] processing topologyId = {}", topologyId);
 
       SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, nml, topologyId);
@@ -107,7 +107,7 @@ public class ModelAuditActor extends UntypedAbstractActor {
         model.setBase(mrml.getModelAsString(Lang.TURTLE));
         modelService.create(model);
       }
-    });
+    //});
 
     // TODO: Go through and delete any models for topologies no longer avalable.
     // TODO: Write an audit to clean up old model versions.

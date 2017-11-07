@@ -1,12 +1,11 @@
 package net.es.sense.rm.driver.nsi.cs.actors;
 
 import akka.actor.UntypedAbstractActor;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
+import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.jaxb.JaxbParser;
 import net.es.nsi.cs.lib.Helper;
 import net.es.nsi.cs.lib.NsiHeader;
@@ -30,6 +29,7 @@ import scala.concurrent.duration.Duration;
  *
  * @author hacksaw
  */
+@Slf4j
 @Component
 @Scope("prototype")
 public class ConnectionActor extends UntypedAbstractActor {
@@ -41,8 +41,6 @@ public class ConnectionActor extends UntypedAbstractActor {
 
   @Autowired
   private NsiProperties nsiProperties;
-
-  private final LoggingAdapter log = Logging.getLogger(getContext().system(), "ConnectionActor");
 
   private static final ObjectFactory FACTORY = new ObjectFactory();
 

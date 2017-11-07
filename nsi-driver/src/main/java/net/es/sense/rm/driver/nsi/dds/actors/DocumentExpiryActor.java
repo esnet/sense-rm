@@ -1,12 +1,11 @@
 package net.es.sense.rm.driver.nsi.dds.actors;
 
 import akka.actor.UntypedAbstractActor;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
 import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.dds.db.Document;
 import net.es.sense.rm.driver.nsi.dds.db.DocumentService;
@@ -22,6 +21,7 @@ import scala.concurrent.duration.Duration;
  *
  * @author hacksaw
  */
+@Slf4j
 @Component
 @Scope("prototype")
 public class DocumentExpiryActor extends UntypedAbstractActor {
@@ -34,8 +34,6 @@ public class DocumentExpiryActor extends UntypedAbstractActor {
 
   @Autowired
   private DocumentService documentService;
-
-  private final LoggingAdapter log = Logging.getLogger(getContext().system(), "DocumentExpiryActor");
 
   @Override
   public void preStart() {

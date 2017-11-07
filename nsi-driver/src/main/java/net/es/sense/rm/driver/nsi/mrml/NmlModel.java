@@ -28,6 +28,7 @@ import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyRelationType;
 import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyType;
 import net.es.nsi.dds.lib.jaxb.nml.ObjectFactory;
 import net.es.nsi.dds.lib.jaxb.nml.ServiceDefinitionType;
+import net.es.sense.rm.driver.api.mrml.BandwidthType;
 import net.es.sense.rm.driver.nsi.dds.api.DocumentReader;
 
 /**
@@ -40,7 +41,7 @@ public class NmlModel {
   private final static ObjectFactory FACTORY = new ObjectFactory();
   private final DocumentReader documentReader;
   private String defaultServiceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE";
-  private String defaultType = "guaranteedCapped";
+  private BandwidthType defaultType = BandwidthType.guaranteedCapped;
   private String defaultUnits = "bps";
   private long defaultGranularity = 1L;
   private final Map<String, NmlPort> ports = new HashMap<>();
@@ -91,14 +92,14 @@ public class NmlModel {
   /**
    * @return the defaultType
    */
-  public String getDefaultType() {
+  public BandwidthType getDefaultType() {
     return defaultType;
   }
 
   /**
    * @param defaultType the defaultType to set
    */
-  public void setDefaultType(String defaultType) {
+  public void setDefaultType(BandwidthType defaultType) {
     this.defaultType = defaultType;
   }
 
@@ -267,11 +268,14 @@ public class NmlModel {
             .encoding(Optional.ofNullable(portGroup.getEncoding()))
             .labels(labels)
             .isAlias(isAlias)
-            .capacity(params.getCapacity())
+            .type(defaultType)
             .granularity(params.getGranularity())
+            .maximumCapacity(params.getCapacity())
+            .minimumCapacity(params.getMinimumReservableCapacity())
+            .reservableCapacity(params.getCapacity())
+            .individualCapacity(params.getMaximumReservableCapacity())
+            .availableCapacity(params.getCapacity())
             .interfaceMTU(params.getInterfaceMTU())
-            .maximumReservableCapacity(params.getMaximumReservableCapacity())
-            .minimumReservableCapacity(params.getMinimumReservableCapacity())
             .port(Either.left(portGroup));
     return builder.build();
   }
@@ -314,11 +318,14 @@ public class NmlModel {
             .encoding(Optional.ofNullable(port.getEncoding()))
             .labels(labels)
             .isAlias(Optional.ofNullable(isAlias))
-            .capacity(params.getCapacity())
+            .type(defaultType)
             .granularity(params.getGranularity())
+            .maximumCapacity(params.getCapacity())
+            .minimumCapacity(params.getMinimumReservableCapacity())
+            .reservableCapacity(params.getCapacity())
+            .individualCapacity(params.getMaximumReservableCapacity())
+            .availableCapacity(params.getCapacity())
             .interfaceMTU(params.getInterfaceMTU())
-            .maximumReservableCapacity(params.getMaximumReservableCapacity())
-            .minimumReservableCapacity(params.getMinimumReservableCapacity())
             .port(Either.right(port));
 
     return builder.build();
@@ -437,11 +444,14 @@ public class NmlModel {
             .encoding(inbound.getEncoding())
             .orientation(Orientation.bidirectional)
             .labels(inLabels)
-            .capacity(outbound.getCapacity())
-            .granularity(outbound.getGranularity())
-            .interfaceMTU(outbound.getInterfaceMTU())
-            .maximumReservableCapacity(outbound.getMaximumReservableCapacity())
-            .minimumReservableCapacity(outbound.getMinimumReservableCapacity())
+            .type(defaultType)
+            .granularity(inbound.getGranularity())
+            .maximumCapacity(inbound.getMaximumCapacity())
+            .minimumCapacity(inbound.getMinimumCapacity())
+            .reservableCapacity(inbound.getReservableCapacity())
+            .individualCapacity(inbound.getIndividualCapacity())
+            .availableCapacity(inbound.getAvailableCapacity())
+            .interfaceMTU(inbound.getInterfaceMTU())
             .inboundPort(Optional.ofNullable(inbound.getId()))
             .outboundPort(Optional.ofNullable(outbound.getId()));
 

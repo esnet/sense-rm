@@ -238,24 +238,27 @@ public class MrmlFactory {
 
               // Make the bandwidth service - NSI supports guaranteedCapped only.
               Resource bw = createResource(model, p.getId() + ":BandwidthService", Mrs.BandwidthService);
+
               bi.addProperty(Nml.hasService, bw);
-              bw.addLiteral(Mrs.type, nml.getDefaultType());
+              bw.addLiteral(Mrs.type, p.getType().name());
               bw.addLiteral(Mrs.unit, nml.getDefaultUnits());
               bw.addLiteral(Mrs.granularity, p.getGranularity().orElse(nml.getDefaultGranularity()));
-              bw.addLiteral(Mrs.minimumCapacity, p.getMinimumReservableCapacity().orElse(1L));
-              if (p.getMaximumReservableCapacity().isPresent()) {
-                long c = p.getMaximumReservableCapacity().get();
-                bw.addLiteral(Mrs.maximumCapacity, c);
-                bw.addLiteral(Mrs.reservableCapacity, c);
-                bw.addLiteral(Mrs.individualCapacity, c);
+              p.getMaximumCapacity().ifPresent(c -> bw.addLiteral(Mrs.maximumCapacity, c));
+              bw.addLiteral(Mrs.minimumCapacity, p.getMinimumCapacity().orElse(1L));
+              p.getUsedCapacity().ifPresent(c -> bw.addLiteral(Mrs.usedCapacity, c));
+              p.getAvailableCapacity().ifPresent(c -> bw.addLiteral(Mrs.availableCapacity, c));
+              p.getReservableCapacity().ifPresent(c -> bw.addLiteral(Mrs.reservableCapacity, c));
+              p.getIndividualCapacity().ifPresent(c -> bw.addLiteral(Mrs.individualCapacity, c));
 
+              /*if (p.getMaximumReservableCapacity().isPresent()) {
+                long c = p.getMaximumReservableCapacity().get();
                 // Calculate used capacity.
                 // availableCapacity = reservableCapacity - usedCapacity;
                 long usedCapacity = 0;
                 for (String child : p.getChildren()) {
                   Optional<NmlPort> childPort = Optional.ofNullable(nml.getPort(child));
-                  if (childPort.isPresent() && childPort.get().getCapacity().isPresent()) {
-                    usedCapacity =  usedCapacity + childPort.get().getCapacity().get();
+                  if (childPort.isPresent() && childPort.get().getMaximumReservableCapacity().isPresent()) {
+                    usedCapacity =  usedCapacity + childPort.get().getMaximumReservableCapacity().get();
                   }
                   else {
                     log.error("[MrmlFactory] Capacity missing on child port {}", child);
@@ -263,7 +266,8 @@ public class MrmlFactory {
                 }
                 bw.addLiteral(Mrs.usedCapacity, usedCapacity);
                 bw.addLiteral(Mrs.availableCapacity, c - usedCapacity);
-              }
+              }*/
+
               bw.addProperty(Nml.belongsTo, bi);
               biPorts.put(p.getId(), bi);
             });
@@ -405,23 +409,15 @@ public class MrmlFactory {
               // Make the bandwidth service - NSI supports guaranteedCapped only.
               Resource bw = createResource(model, p.getId() + ":BandwidthService", Mrs.BandwidthService);
               bi.addProperty(Nml.hasService, bw);
-              bw.addLiteral(Mrs.type, nml.getDefaultType());
+              bw.addLiteral(Mrs.type, p.getType().name());
               bw.addLiteral(Mrs.unit, nml.getDefaultUnits());
               bw.addLiteral(Mrs.granularity, p.getGranularity().orElse(nml.getDefaultGranularity()));
-              bw.addLiteral(Mrs.minimumCapacity, p.getMinimumReservableCapacity().orElse(1L));
-
-              long usedCapacity = p.getCapacity().orElse(0L);
-              bw.addLiteral(Mrs.usedCapacity, usedCapacity);
-
-              if (p.getMaximumReservableCapacity().isPresent()) {
-                long c = p.getMaximumReservableCapacity().get();
-
-                bw.addLiteral(Mrs.maximumCapacity, c);
-                bw.addLiteral(Mrs.reservableCapacity, c);
-                bw.addLiteral(Mrs.availableCapacity, c - usedCapacity);
-                bw.addLiteral(Mrs.individualCapacity, c);
-
-              }
+              p.getMaximumCapacity().ifPresent(c -> bw.addLiteral(Mrs.maximumCapacity, c));
+              bw.addLiteral(Mrs.minimumCapacity, p.getMinimumCapacity().orElse(1L));
+              p.getUsedCapacity().ifPresent(c -> bw.addLiteral(Mrs.usedCapacity, c));
+              p.getAvailableCapacity().ifPresent(c -> bw.addLiteral(Mrs.availableCapacity, c));
+              p.getReservableCapacity().ifPresent(c -> bw.addLiteral(Mrs.reservableCapacity, c));
+              p.getIndividualCapacity().ifPresent(c -> bw.addLiteral(Mrs.individualCapacity, c));
 
               bw.addProperty(Nml.belongsTo, bi);
 
@@ -445,6 +441,9 @@ public class MrmlFactory {
       for (NmlSwitchingSubnet switchingSubnet : switchingSubnets) {
         // Create the NML switching service.
         Resource ssr = createResource(model, switchingSubnet.getId(), Mrs.SwitchingSubnet);
+
+        // Place the reservation identifier into the SwitchingSubnet for tracing.
+        ssr.addProperty(Mrs.tag, "serviceId=" + switchingSubnet.getServiceId());
 
         // This belongs to the parent topologyResource.
         ssr.addProperty(Nml.belongsTo, swResource);

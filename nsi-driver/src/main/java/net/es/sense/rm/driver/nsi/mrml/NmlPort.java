@@ -13,6 +13,7 @@ import net.es.nsi.dds.lib.jaxb.nml.NmlPortGroupType;
 import net.es.nsi.dds.lib.jaxb.nml.NmlPortType;
 import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
 import net.es.nsi.dds.lib.jaxb.nml.ObjectFactory;
+import net.es.sense.rm.driver.api.mrml.BandwidthType;
 
 /**
  *
@@ -42,8 +43,10 @@ public class NmlPort {
   // References to different ports.
   @lombok.Builder.Default
   private Optional<String> isAlias = Optional.empty();
+
   @lombok.Builder.Default
   private Optional<String> inboundPort = Optional.empty();
+
   @lombok.Builder.Default
   private Optional<String> outboundPort = Optional.empty();
 
@@ -55,19 +58,57 @@ public class NmlPort {
   @lombok.Builder.Default
   private List<String> children = new ArrayList<>();
 
-  // Ethernet port metrics.
+  /**
+   * OSCARS mapping:
+   *
+   * type - guaranteedCapped
+   *
+   * maximumReservableCapacity - the maximum amount of bandwidth that can be reserved by circuits in bps.  This is
+   * mapped to the MRML individualCapacity attribute.
+   *
+   * minimumReservableCapacity - the minimum amount of bandwidth that can be reserved by a circuit in bps.  This is
+   * mapped to the MRML minimumCapacity attribute.
+   *
+   * capacity - total bandwidth of the port in bps.  This maps to the MRML maximumCapacity attribute.
+   *
+   * granularity - the increments that bandwidth can be reserved by a circuit in bps.  This maps to the
+   * MRML granularity attribute.
+   */
+
   @lombok.Builder.Default
-  private Optional<Long> granularity = Optional.empty();
+  private BandwidthType type = BandwidthType.undefined;
+
+  // the increments that bandwidth can be reserved by a circuit in bps.
   @lombok.Builder.Default
-  private Optional<Long> maximumReservableCapacity = Optional.empty();
+  private Optional<Long> granularity = Optional.empty(); //granularity
+
+  // maximumCapacity - total port capacity (a guaranteed reservation could bust up to this capacity).
   @lombok.Builder.Default
-  private Optional<Long> minimumReservableCapacity = Optional.empty();
+  private Optional<Long> maximumCapacity = Optional.empty(); // capacity
+
+  // minimumCapacity - what is the smallest capacity reservation that could be requested?
   @lombok.Builder.Default
-  private Optional<Long> individualCapacity = Optional.empty();
+  private Optional<Long> minimumCapacity = Optional.empty(); //minimumReservableCapacity
+
+  // This is a temporal attribute identifying the amount of bandwidth consumed at a point in time.
+  @lombok.Builder.Default
+  private Optional<Long> usedCapacity = Optional.empty(); // Need multiple BandwidthService elements to model temporal values.
+
+  // availableCapacity - the reservable capacity remaining on the port. (calculation based on point in time)
+  // availableCapacity = reservableCapacity - usedCapacity; (for each time slot)
+  @lombok.Builder.Default
+  private Optional<Long> availableCapacity = Optional.empty(); // Need multiple BandwidthService elements to model temporal values.
+
+  // reservableCapacity - max capacity allocated to this queue.
+  @lombok.Builder.Default
+  private Optional<Long> reservableCapacity = Optional.empty(); // Use capacity for now.
+
+  // individualCapacity - per service maximum (a policy enforced maximum capacity per service request).
+  @lombok.Builder.Default
+  private Optional<Long> individualCapacity = Optional.empty(); // maximumReservableCapacity
+
   @lombok.Builder.Default
   private Optional<Integer> interfaceMTU = Optional.empty();
-  @lombok.Builder.Default
-  private Optional<Long> capacity = Optional.empty();
 
   @lombok.Builder.Default
   private Optional<Long> startTime = Optional.empty();

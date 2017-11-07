@@ -74,7 +74,7 @@ public class SwitchingSubnetModel {
       log.info("[SwitchingSubnetModel] processing SwitchingService {}", ss.getId());
 
       ss.getAny().stream().forEach(any -> {
-          log.info("[SwitchingSubnetModel] any = {}", any.getClass().getCanonicalName());
+        log.info("[SwitchingSubnetModel] any = {}", any.getClass().getCanonicalName());
       });
 
       ss.getAny().stream()
@@ -131,22 +131,25 @@ public class SwitchingSubnetModel {
           }
 
           NmlPort srcChildPort = NmlPort.builder()
-                  .id(src.getMrmlId() + ":cid:" + reservation.getConnectionId())
+                  .id(src.getMrmlId() + ":cid:" + ConnectionId.strip(reservation.getConnectionId()))
                   .topologyId(reservation.getTopologyId())
                   .name(Optional.of(reservation.getConnectionId()))
                   .orientation(Orientation.child)
                   .parentPort(Optional.of(srcParent.getId()))
                   .encoding(srcParent.getEncoding())
                   .interfaceMTU(srcParent.getInterfaceMTU())
+                  .type(srcParent.getType())
                   .granularity(srcParent.getGranularity())
-                  .maximumReservableCapacity(capacity)
-                  .minimumReservableCapacity(srcParent.getMinimumReservableCapacity())
+                  .maximumCapacity(capacity) // This would be maximumCapacity of parent for soft cap service.
+                  .minimumCapacity(srcParent.getMinimumCapacity()) //
+                  .reservableCapacity(capacity)
+                  .availableCapacity(capacity)
+                  .individualCapacity(srcParent.getIndividualCapacity())
                   .startTime(startTime)
                   .endTime(endTime)
                   .build();
 
           srcChildPort.setNmlLabels(src);
-
 
           // Create the destination port.
           SimpleStp dst = new SimpleStp(p2ps.getDestSTP());
@@ -156,16 +159,20 @@ public class SwitchingSubnetModel {
             continue;
           }
           NmlPort dstChildPort = NmlPort.builder()
-                  .id(dst.getMrmlId() + ":cid:" + reservation.getConnectionId())
+                  .id(dst.getMrmlId() + ":cid:" + ConnectionId.strip(reservation.getConnectionId()))
                   .topologyId(reservation.getTopologyId())
                   .name(Optional.of(reservation.getConnectionId()))
                   .orientation(Orientation.child)
                   .parentPort(Optional.of(dstParent.getId()))
                   .encoding(dstParent.getEncoding())
                   .interfaceMTU(dstParent.getInterfaceMTU())
-                  .granularity(dstParent.getGranularity())
-                  .maximumReservableCapacity(capacity)
-                  .minimumReservableCapacity(dstParent.getMinimumReservableCapacity())
+                  .type(srcParent.getType())
+                  .granularity(srcParent.getGranularity())
+                  .maximumCapacity(capacity) // This would be maximumCapacity of parent for soft cap service.
+                  .minimumCapacity(srcParent.getMinimumCapacity()) //
+                  .reservableCapacity(capacity)
+                  .availableCapacity(capacity)
+                  .individualCapacity(srcParent.getIndividualCapacity())
                   .startTime(startTime)
                   .endTime(endTime)
                   .build();
@@ -234,7 +241,7 @@ public class SwitchingSubnetModel {
           nss.setStartTime(startTime);
           nss.setEndTime(endTime);
           nss.setTopologyId(reservation.getTopologyId());
-          nss.setId(NmlSwitchingSubnet.id(reservation.getTopologyId(), reservation.getConnectionId()));
+          nss.setId(NmlSwitchingSubnet.id(reservation.getTopologyId(), ConnectionId.strip(reservation.getConnectionId())));
           nss.setDiscovered(reservation.getDiscovered());
           holder.getSwitchingSubnets().add(nss);
           log.info("[SwitchingSubnetModel] adding SwitchingSubnet = {}", nss.getId());

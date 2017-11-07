@@ -257,6 +257,9 @@ public class MrmlFactory {
                   if (childPort.isPresent() && childPort.get().getCapacity().isPresent()) {
                     usedCapacity =  usedCapacity + childPort.get().getCapacity().get();
                   }
+                  else {
+                    log.error("[MrmlFactory] Capacity missing on child port {}", child);
+                  }
                 }
                 bw.addLiteral(Mrs.usedCapacity, usedCapacity);
                 bw.addLiteral(Mrs.availableCapacity, c - usedCapacity);

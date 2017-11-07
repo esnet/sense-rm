@@ -170,7 +170,7 @@ public class SwitchingSubnetModel {
                   .endTime(endTime)
                   .build();
 
-          dstChildPort.setNmlLabels(src);
+          dstChildPort.setNmlLabels(dst);
 
           // We can only build a SwitchingSubnet if this service contains two endpoints in the same network.
           if (!src.getNetworkId().equalsIgnoreCase(dst.getNetworkId())) {

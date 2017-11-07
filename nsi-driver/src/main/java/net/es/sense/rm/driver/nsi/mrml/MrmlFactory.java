@@ -254,7 +254,7 @@ public class MrmlFactory {
                 long usedCapacity = 0;
                 for (String child : p.getChildren()) {
                   Optional<NmlPort> childPort = Optional.ofNullable(nml.getPort(child));
-                  if (childPort.isPresent()) {
+                  if (childPort.isPresent() && childPort.get().getCapacity().isPresent()) {
                     usedCapacity =  usedCapacity + childPort.get().getCapacity().get();
                   }
                 }

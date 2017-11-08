@@ -96,7 +96,7 @@ public class NsiDriver implements Driver {
                   .model(m.getBase())
                   .build();
 
-          log.info("[getModels] return modelId = {}, model = {}", model.getId(), model.getModel());
+          log.info("[getModels] return modelId = {}", model.getId());
           results.add(model);
         }
       }

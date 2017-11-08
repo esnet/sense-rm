@@ -1075,8 +1075,7 @@ public class SenseRmController extends SenseController {
                   + " followed by the model addition element.", required = true) DeltaRequest deltaRequest
   ) {
 
-    log.error("!!!!!! HERE I AM !!!!!!");
-    log.info("modelId = " + deltaRequest.getModelId());
+    log.info("propagateModelDelta: {}", deltaRequest);
 
     DeltaResource delta = new DeltaResource();
     delta.setId("922f4388-c8f6-4014-b6ce-5482289b0200");

@@ -67,4 +67,16 @@ public class DeltaRequest {
   public void setAddition(String addition) {
     this.addition = addition;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder("{ \n    modelId = ");
+    sb.append(modelId);
+    sb.append(",\n    addition = \"");
+    sb.append(addition);
+    sb.append("\",\n    reduction = \"");
+    sb.append(reduction);
+    sb.append("\"\n}\n");
+    return sb.toString();
+  }
 }

@@ -73,10 +73,6 @@ public class SwitchingSubnetModel {
     nml.getSwitchingServices(topologyId).forEach((ss) -> {
       log.info("[SwitchingSubnetModel] processing SwitchingService {}", ss.getId());
 
-      ss.getAny().stream().forEach(any -> {
-        log.info("[SwitchingSubnetModel] any = {}", any.getClass().getCanonicalName());
-      });
-
       ss.getAny().stream()
               .filter((object) -> (object instanceof JAXBElement))
               .map((object) -> (JAXBElement) object)

@@ -1,19 +1,16 @@
 package net.es.sense.rm.driver.nsi.cs.actors;
 
 import akka.actor.UntypedAbstractActor;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.jaxb.JaxbParser;
+import net.es.nsi.cs.lib.Client;
 import net.es.nsi.cs.lib.Helper;
 import net.es.nsi.cs.lib.NsiHeader;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.dds.messages.TimerMsg;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
-import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionProviderPort;
-import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionServiceProvider;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException;
 import org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory;
 import org.ogf.schemas.nsi._2013._12.connection.types.QueryType;
@@ -80,12 +77,7 @@ public class ConnectionActor extends UntypedAbstractActor {
    *
    */
   private void connectionSummaryAudit() throws ServiceException {
-    ConnectionServiceProvider provider = new ConnectionServiceProvider();
-    ConnectionProviderPort proxy = provider.getConnectionServiceProviderPort();
-    BindingProvider bp = (BindingProvider) proxy;
-    Map<String, Object> context = bp.getRequestContext();
-    context.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, nsiProperties.getProviderConnectionURL());
-    context.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+    Client nsiClient = new Client(nsiProperties.getProviderConnectionURL());
 
     CommonHeaderType requestHeader = NsiHeader.builder()
             .correlationId(Helper.getUUID())
@@ -101,7 +93,7 @@ public class ConnectionActor extends UntypedAbstractActor {
     QueryType query = FACTORY.createQueryType();
     try {
       log.info("[ConnectionActor] Sending querySummary: correlationId = {}", requestHeader.getCorrelationId());
-      proxy.querySummary(query, header);
+      nsiClient.getProxy().querySummary(query, header);
       log.info("[ConnectionActor] Ack recieved, providerNSA = {}, correlationId = {}", header.value.getProviderNSA(), header.value.getCorrelationId());
     } catch (org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException ex) {
       log.error("[ConnectionActor] querySummary exception - {} {}", ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
@@ -117,12 +109,7 @@ public class ConnectionActor extends UntypedAbstractActor {
    *
    */
   private void connectionRecursiveAudit() throws ServiceException {
-    ConnectionServiceProvider provider = new ConnectionServiceProvider();
-    ConnectionProviderPort proxy = provider.getConnectionServiceProviderPort();
-    BindingProvider bp = (BindingProvider) proxy;
-    Map<String, Object> context = bp.getRequestContext();
-    context.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, nsiProperties.getProviderConnectionURL());
-    context.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+    Client nsiClient = new Client(nsiProperties.getProviderConnectionURL());
 
     CommonHeaderType requestHeader = NsiHeader.builder()
             .correlationId(Helper.getUUID())
@@ -138,7 +125,7 @@ public class ConnectionActor extends UntypedAbstractActor {
     QueryType query = FACTORY.createQueryType();
     try {
       log.info("[ConnectionActor] Sending queryRecursive: correlationId = {}", requestHeader.getCorrelationId());
-      proxy.queryRecursive(query, header);
+      nsiClient.getProxy().queryRecursive(query, header);
       log.info("[ConnectionActor] Ack recieved, providerNSA = {}, correlationId = {}", header.value.getProviderNSA(), header.value.getCorrelationId());
     } catch (org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException ex) {
       log.error("[ConnectionActor] queryRecursive exception - {} {}", ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());

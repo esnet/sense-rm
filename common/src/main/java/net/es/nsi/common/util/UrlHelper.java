@@ -1,6 +1,9 @@
 package net.es.nsi.common.util;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -22,10 +25,16 @@ public class UrlHelper {
       if (u.isAbsolute()) {
         return true;
       }
-    } catch (Exception ex) {
+    } catch (URISyntaxException ex) {
       log.debug("isAbsolute: invalid URI " + uri);
     }
 
     return false;
+  }
+
+  public static String append(String base, String postfix) throws MalformedURLException {
+    URL baseURL = new URL(base);
+    URL result = new URL(baseURL.getProtocol(), baseURL.getHost(), baseURL.getPort(), baseURL.getFile() + postfix, null);
+    return result.toExternalForm();
   }
 }

@@ -17,12 +17,19 @@
  * publicly and display publicly, and to permit other to do so.
  *
  */
-package net.es.sense.rm.driver.api;
+package net.es.sense.rm.model;
+
+import io.swagger.annotations.ApiModel;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  *
  * @author hacksaw
  */
+@ApiModel(value="deltaState", description="The state of the delta resource.")
+@XmlType(name = "deltaState")
+@XmlEnum
 public enum DeltaState {
     Accepting, Accepted, Committing, Committed, Activating, Activated, Failed;
 

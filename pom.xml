@@ -28,6 +28,7 @@
     <module>common</module>
     <module>nsi-dds-lib</module>
     <module>nsi-cs-lib</module>
+    <module>model</module>
     <module>driver</module>
     <module>nsi-driver</module>
     <module>api</module>

@@ -1,4 +1,4 @@
-package net.es.sense.rm.api.model;
+package net.es.sense.rm.model;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

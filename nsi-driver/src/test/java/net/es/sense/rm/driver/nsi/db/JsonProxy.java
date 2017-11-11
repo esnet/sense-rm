@@ -19,8 +19,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -28,7 +26,6 @@ import org.slf4j.LoggerFactory;
  */
 @Slf4j
 public class JsonProxy {
-    private final Logger log = LoggerFactory.getLogger(getClass());
     private final Gson serializer;
 
     public JsonProxy() {

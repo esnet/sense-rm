@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 public final class SimpleStp {
   public static final String NSI_URN_SEPARATOR = ":";
   public static final String NSI_LABEL_SEPARATOR = "?";
+  public static final String MRS_LABEL_SEPARATOR = "+";
   public static final int NSI_NETWORK_LENGTH = 6;
 
   private String networkId;
@@ -27,8 +28,7 @@ public final class SimpleStp {
   private static Pattern colonPattern = Pattern.compile(NSI_URN_SEPARATOR);
 
   public SimpleStp() {
-    networkId = null;
-    localId = null;
+
   }
 
   public SimpleStp(String stpId, Set<SimpleLabel> labels) throws IllegalArgumentException {
@@ -38,6 +38,14 @@ public final class SimpleStp {
 
   public SimpleStp(String stpId, SimpleLabel label) throws IllegalArgumentException {
     parseId(stpId);
+    this.labels.add(label);
+  }
+
+  public SimpleStp(String stpId, String labelType, String labelValue) throws IllegalArgumentException {
+    parseId(stpId);
+    SimpleLabel label = new SimpleLabel();
+    label.setType(labelType);
+    label.setValue(labelValue);
     this.labels.add(label);
   }
 
@@ -190,7 +198,7 @@ public final class SimpleStp {
 
     labels.stream().findFirst().ifPresent(l -> {
         sb.append(l.getType());
-        sb.append(NSI_URN_SEPARATOR);
+        sb.append(MRS_LABEL_SEPARATOR);
         sb.append(l.getValue());
       });
 

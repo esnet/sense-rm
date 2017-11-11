@@ -30,7 +30,6 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -38,23 +37,24 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.PostConstruct;
+import javax.ws.rs.NotFoundException;
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
 import lombok.extern.slf4j.Slf4j;
+import net.es.nsi.common.util.UrlHelper;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.sense.rm.api.common.Encoder;
 import net.es.sense.rm.api.common.Error;
 import net.es.sense.rm.api.common.HttpConstants;
 import net.es.sense.rm.api.common.Resource;
 import net.es.sense.rm.api.common.ResourceAnnotation;
-import net.es.sense.rm.api.common.Utilities;
+import net.es.sense.rm.api.common.UrlTransform;
 import net.es.sense.rm.api.config.SenseProperties;
-import net.es.sense.rm.api.model.DeltaRequest;
-import net.es.sense.rm.api.model.DeltaResource;
-import net.es.sense.rm.api.model.ModelResource;
 import net.es.sense.rm.driver.api.Driver;
-import net.es.sense.rm.driver.api.Model;
+import net.es.sense.rm.model.DeltaRequest;
+import net.es.sense.rm.model.DeltaResource;
+import net.es.sense.rm.model.ModelResource;
 import org.apache.http.client.utils.DateUtils;
+import org.apache.jena.ext.com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
@@ -89,12 +89,12 @@ public class SenseRmController extends SenseController {
   @Autowired(required = true)
   SenseProperties config;
 
-  private Utilities utilities;
+  private UrlTransform utilities;
   private Driver driver;
 
   @PostConstruct
   public void init() throws Exception {
-    utilities = new Utilities(config.getProxy());
+    utilities = new UrlTransform(config.getProxy());
     Class<?> forName = Class.forName(config.getDriver());
     driver = context.getBean(forName.asSubclass(Driver.class));
   }
@@ -329,11 +329,12 @@ public class SenseRmController extends SenseController {
     long newest = 0;
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Content-Location", location.toASCIIString());
+
     try {
       List<ModelResource> models = new ArrayList<>();
-      Collection<Model> result = driver.getModels(current, model).get();
+      Collection<ModelResource> result = driver.getModels(current, model).get();
       if (current) {
-        Optional<Model> first = result.stream().reduce((e1, e2) -> {
+        Optional<ModelResource> first = result.stream().reduce((e1, e2) -> {
           throw new IllegalArgumentException("Multiple models returned for parameter current = " + current);
         });
 
@@ -342,51 +343,48 @@ public class SenseRmController extends SenseController {
           return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Model m = first.get();
-        log.info("[SenseRmController] id = {}, getCreationTime = {}, If-Modified-Since = {}", m.getId(),
-                DateUtils.formatDate(new Date(m.getCreationTime())), DateUtils.formatDate(lastModified));
+        ModelResource m = first.get();
+        log.info("[SenseRmController] model id = {}, creationTime = {}, If-Modified-Since = {}", m.getId(),
+                m.getCreationTime(), DateUtils.formatDate(lastModified));
 
-        if (m.getCreationTime() <= lastModified.getTime()) {
+        long creationTime = XmlUtilities.xmlGregorianCalendar(m.getCreationTime()).toGregorianCalendar().getTimeInMillis();
+
+        if (creationTime <= lastModified.getTime()) {
           log.info("[SenseRmController] resource not modified {}", m.getId());
-          headers.setLastModified(m.getCreationTime());
+          headers.setLastModified(creationTime);
           return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
         }
 
         log.info("[SenseRmController] returning matching resource {}", m.getId());
 
-        ModelResource resource = new ModelResource();
-        resource.setId(m.getId());
-        XMLGregorianCalendar cal = XmlUtilities.longToXMLGregorianCalendar(m.getCreationTime());
-        resource.setCreationTime(cal.toXMLFormat());
-        resource.setHref(buildURL(location.toASCIIString(), m.getId()));
+        m.setHref(UrlHelper.append(location.toASCIIString(), m.getId()));
         if (!summary) {
-          resource.setModel(m.getModel());
+          if (encode) {
+            m.setModel(Encoder.encode(m.getModel()));
+          }
         }
-        models.add(resource);
-        newest = m.getCreationTime();
+        models.add(m);
+        newest = creationTime;
       } else {
-        for (Model m : result) {
-          log.info("[SenseRmController] id = {}, getCreationTime = {}, If-Modified-Since = {}", m.getId(),
-                  DateUtils.formatDate(new Date(m.getCreationTime())), DateUtils.formatDate(lastModified));
-          if (m.getCreationTime() > newest) {
-            newest = m.getCreationTime();
+        for (ModelResource m : result) {
+          long creationTime = XmlUtilities.xmlGregorianCalendar(m.getCreationTime()).toGregorianCalendar().getTimeInMillis();
+
+          log.info("[SenseRmController] model id = {}, creationTime = {}, If-Modified-Since = {}", m.getId(),
+                m.getCreationTime(), DateUtils.formatDate(lastModified));
+
+          if (creationTime > newest) {
+            newest = creationTime;
           }
 
-          if (m.getCreationTime() > lastModified.getTime()) {
+          if (creationTime > lastModified.getTime()) {
             log.info("[SenseRmController] returning matching resource {}", m.getId());
-            ModelResource resource = new ModelResource();
-            resource.setId(m.getId());
-            XMLGregorianCalendar cal = XmlUtilities.longToXMLGregorianCalendar(m.getCreationTime());
-            resource.setCreationTime(cal.toXMLFormat());
-            resource.setHref(buildURL(location.toASCIIString(), m.getId()));
+            m.setHref(UrlHelper.append(location.toASCIIString(), m.getId()));
             if (!summary) {
               if (encode) {
-                resource.setModel(Encoder.encode(m.getModel()));
-              } else {
-                resource.setModel(m.getModel());
+                m.setModel(Encoder.encode(m.getModel()));
               }
             }
-            models.add(resource);
+            models.add(m);
           }
         }
       }
@@ -406,16 +404,6 @@ public class SenseRmController extends SenseController {
               .build();
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-  }
-
-  private String buildURL(String root, String leaf) throws MalformedURLException {
-    URL url;
-    if (!root.endsWith("/")) {
-      root = root + "/";
-    }
-    url = new URL(root);
-    url = new URL(url, leaf);
-    return url.toExternalForm();
   }
 
   /**
@@ -573,7 +561,7 @@ public class SenseRmController extends SenseController {
       lastModified = DateUtils.parseDate(HttpConstants.IF_MODIFIED_SINCE_DEFAULT);
     }
 
-    Model m;
+    ModelResource m;
     try {
       m = driver.getModel(model, id).get();
 
@@ -584,38 +572,43 @@ public class SenseRmController extends SenseController {
       final HttpHeaders headers = new HttpHeaders();
       headers.add("Content-Location", location.toASCIIString());
 
-      log.info("[SenseRmController] id = {}, getCreationTime = {}, If-Modified-Since = {}", m.getId(),
-              DateUtils.formatDate(new Date(m.getCreationTime())), DateUtils.formatDate(lastModified));
-      if (m.getCreationTime() <= lastModified.getTime()) {
+      log.info("[SenseRmController] model id = {}, getCreationTime = {}, If-Modified-Since = {}", m.getId(),
+              m.getCreationTime(), DateUtils.formatDate(lastModified));
+
+      long creationTime = XmlUtilities.xmlGregorianCalendar(m.getCreationTime()).toGregorianCalendar().getTimeInMillis();
+      if (creationTime <= lastModified.getTime()) {
         log.info("[SenseRmController] returning not modified {}", m.getId());
         return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
       }
 
-      ModelResource resource = new ModelResource();
-      resource.setId(m.getId());
-      resource.setHref(location.toASCIIString());
-      XMLGregorianCalendar cal = XmlUtilities.longToXMLGregorianCalendar(m.getCreationTime());
-      resource.setCreationTime(cal.toXMLFormat());
+      m.setHref(location.toASCIIString());
       if (encode) {
-        resource.setModel(Encoder.encode(m.getModel()));
-      } else {
-        resource.setModel(m.getModel());
+        m.setModel(Encoder.encode(m.getModel()));
       }
 
-      headers.setLastModified(m.getCreationTime());
+      headers.setLastModified(creationTime);
 
       log.info("[SenseRmController] returning id = {}, creationTime = {}, queried If-Modified-Since = {}.", m.getId(), m.getCreationTime(), DateUtils.formatDate(lastModified));
 
-      return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+      return new ResponseEntity<>(m, headers, HttpStatus.OK);
 
-    } catch (InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
-      log.error("pullModel failed, ex = {}", ex);
+    } catch (InterruptedException | IOException | ExecutionException | DatatypeConfigurationException ex) {
+      log.error("getModel failed, ex = {}", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
 
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (NotFoundException ex) {
+      log.error("getModel failed due unknown modelId = {}, ex = {}", id, ex);
+
+      Error error = Error.builder()
+              .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+              .error_description("modelId " + id + " not found")
+              .build();
+
+      return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -1409,9 +1402,11 @@ public class SenseRmController extends SenseController {
 
   /**
    * ***********************************************************************
-   * POST /api/sense/v1/deltas *********************************************************************** @param accept
+   * POST /api/sense/v1/deltas
    *
+   * @param accept
    * @param deltaRequest
+   * @param encode
    * @param model
    * @return
    * @throws java.net.URISyntaxException
@@ -1545,23 +1540,68 @@ public class SenseRmController extends SenseController {
                   value = HttpConstants.MODEL_NAME,
                   defaultValue = HttpConstants.MODEL_TURTLE)
           @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model,
+          @RequestParam(
+                  value = HttpConstants.ENCODE_NAME,
+                  defaultValue = "false")
+          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode,
           @RequestBody
           @ApiParam(value = "A JSON structure-containing the model reduction and/or addition "
                   + " elements. If provided, the model reduction element is applied first, "
                   + " followed by the model addition element.", required = true) DeltaRequest deltaRequest
   ) throws URISyntaxException {
 
-    log.info("propagateModelDelta: {}", deltaRequest);
+    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
 
-    DeltaResource delta = new DeltaResource();
-    delta.setId("922f4388-c8f6-4014-b6ce-5482289b0200");
-    delta.setHref("http://localhost:8080/sense/v1/deltas/922f4388-c8f6-4014-b6ce-5482289b0200");
-    delta.setLastModified("2016-07-26T13:45:21.001Z");
-    delta.setModelId("922f4388-c8f6-4014-b6ce-5482289b02ff");
-    delta.setResult("H4sIACKIo1cAA+1Y32/aMBB+56+I6NtUx0loVZEV1K6bpkm0m5Y+7NWNTbCa2JEdCP3vZydULYUEh0CnQXlC+O6+O/ u7X1ylgozp3BJ4LH3rcpJlqQ9hnud23rO5iKDnOA50XKgEgAwnJEEnQ8vuXC30eB5XqXnQuYDqfEl+LnGVvAv/3I6CVQiFv FbF7ff7UKF4Hiice2IZmgMml5RZ8sq/0n9p82hcWFCHCtjtQacHH5AkS5qJkNWa6rDUdD2Y8ZTHPHoqtDudy6lgvpLzGclyL h59zBNE2YBIW/0y7FhvPqjw8X5h5LS40TuUEPyDYTqjeIpi6/OKltZ5IDFnkbzn1gqmxMxO0DyiEUp5qoGfj4YVxiZIfqGYCh JmlDMU/+IiW7W7FIvPOCYDOWUMhOLcT5XG4AJ60PVjyh4HKPbk8NTIBmIxSIRXmpgT4EAXOqWVT4YmwgkNX9w4V wZeu1EddEDEjIZkE4YyktNMgbCoyhhTj2Z1vwVK3PoZ3Fz/DqyvN3ddTYoq49o3bd6mLCNCffFsgqeHwZH1sS04gxmQua 3fbI1I8YIkm5xDr3xCInXmVPPAAEqztAaqtwQFtHQ7vBzJiQmeeoAW5KxwxJisP57VrOuRF2xB1ZZ37M9ixIBALCLrSG9ct 0dI8fy74NN02CQ5Yq2WPaVkE5KqaQ5UIRRRnWinq+51huIpkVbXA2dO/6ztjTZhUUXRWEnYHVUPcwY2zaOafHh553fKz dcErXCLyuuYIlnpEBYo4quVVvtzezO6K2Fd0AMG/arMWuoBLQTcWnqZ9tcNOahhX679/8muNX27IrrgWWBRbZvESFjIsV LdXYhHOYcVVAlylKb6LrtjFEvStnY2Gi4ONAn2Mxh9dJr3mYi2bDjmRWHHXaYe7N+wZk0b2FTH2rHC+EJ28NL7Se9aVp Ry9ZwwyNTDa8Uf627LdXcfM8CWk/4BTQBblaMDjb92ND2C+Gun+yNsz6ZbcdPuLBSQfLvwJ1QggDPmF6Uo5IyVt+rnCq es+AaNt7cbsh/jaxtn//6GsWYDgAEdvHddkj8Wv/3/+bCDnW+rf2DW7Xx/ASQO0KQcHgAA");
-    URI deltaURI = new URI("http://localhost:8080/sense/v1/deltas/922f4388-c8f6-4014-b6ce-5482289b0200");
-    final HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(deltaURI);
-    return new ResponseEntity<>(delta, headers, HttpStatus.CREATED);
+    log.info("[SenseRmController] operation = {}, accept = {}, model = {}, deltaRequest = {}",
+            location, accept, model, deltaRequest);
+
+
+    try {
+      DeltaResource delta = driver.propagateDelta(model, deltaRequest).get();
+
+      if (delta == null) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+
+      String contentLocation = UrlHelper.append(location.toASCIIString(), delta.getId());
+
+      log.info("[SenseRmController] Delta id = {}, lastModified = {}, content-location = {}",
+              delta.getId(), delta.getLastModified(), contentLocation);
+
+      long lastModified = XmlUtilities.xmlGregorianCalendar(delta.getLastModified()).toGregorianCalendar().getTimeInMillis();
+
+      delta.setHref(location.toASCIIString());
+      if (encode) {
+        if (!Strings.isNullOrEmpty(delta.getAddition())) {
+          delta.setAddition(Encoder.encode(delta.getAddition()));
+        }
+
+        if (!Strings.isNullOrEmpty(delta.getReduction())) {
+          delta.setReduction(Encoder.encode(delta.getReduction()));
+        }
+
+        if (!Strings.isNullOrEmpty(delta.getResult())) {
+          delta.setResult(Encoder.encode(delta.getResult()));
+        }
+      }
+
+      final HttpHeaders headers = new HttpHeaders();
+      headers.add("Content-Location", contentLocation);
+      headers.setLastModified(lastModified);
+
+      log.info("[SenseRmController] Delta returning id = {}, creationTime = {}",
+              delta.getId(), delta.getLastModified());
+
+      return new ResponseEntity<>(delta, headers, HttpStatus.CREATED);
+
+    } catch (InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
+      log.error("pullModel failed, ex = {}", ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

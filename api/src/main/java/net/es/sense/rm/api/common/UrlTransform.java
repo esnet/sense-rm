@@ -30,7 +30,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  *
  * @author hacksaw
  */
-public class Utilities {
+public class UrlTransform {
 
   // Transform patterns.
   private static final Pattern PATTERN_FROM = Pattern.compile("\\(.*?\\|");
@@ -44,7 +44,7 @@ public class Utilities {
    *
    * @param uriTransform
    */
-  public Utilities(String uriTransform) {
+  public UrlTransform(String uriTransform) {
     this.uriTransform = uriTransform;
   }
 

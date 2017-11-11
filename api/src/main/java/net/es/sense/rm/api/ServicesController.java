@@ -38,7 +38,7 @@ import net.es.sense.rm.api.common.Error;
 import net.es.sense.rm.api.common.HttpConstants;
 import net.es.sense.rm.api.common.Resource;
 import net.es.sense.rm.api.common.ResourceAnnotation;
-import net.es.sense.rm.api.common.Utilities;
+import net.es.sense.rm.api.common.UrlTransform;
 import net.es.sense.rm.api.config.SenseProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -81,11 +81,11 @@ public class ServicesController extends SenseController {
   @Autowired(required = true)
   SenseProperties config;
 
-  private Utilities utilities;
+  private UrlTransform utilities;
 
   @PostConstruct
   public void init() throws Exception {
-    utilities = new Utilities(config.getProxy());
+    utilities = new UrlTransform(config.getProxy());
   }
 
   /**

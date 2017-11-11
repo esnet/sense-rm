@@ -17,7 +17,7 @@
  * publicly and display publicly, and to permit other to do so.
  *
  */
-package net.es.sense.rm.api.model;
+package net.es.sense.rm.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

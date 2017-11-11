@@ -19,6 +19,12 @@
   <dependencies>
     <dependency>
       <groupId>net.es.sense</groupId>
+      <artifactId>model</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.es.sense</groupId>
       <artifactId>driver</artifactId>
       <version>0.1.0</version>
     </dependency>

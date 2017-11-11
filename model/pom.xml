@@ -9,34 +9,10 @@
     <version>0.1.0</version>
   </parent>
 
-  <artifactId>api</artifactId>
+  <artifactId>model</artifactId>
   <packaging>jar</packaging>
 
   <dependencies>
-    <dependency>
-      <groupId>net.es.sense</groupId>
-      <artifactId>common</artifactId>
-      <version>0.1.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.es.sense</groupId>
-      <artifactId>model</artifactId>
-      <version>0.1.0</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>net.es.sense</groupId>
-      <artifactId>driver</artifactId>
-      <version>0.1.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.es.sense</groupId>
-      <artifactId>nsi-driver</artifactId>
-      <version>0.1.0</version>
-    </dependency>
-
     <dependency>
       <groupId>io.springfox</groupId>
       <artifactId>springfox-swagger2</artifactId>

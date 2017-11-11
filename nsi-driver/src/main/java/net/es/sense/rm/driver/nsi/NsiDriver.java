@@ -7,13 +7,17 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.ws.rs.NotFoundException;
+import javax.xml.datatype.DatatypeConfigurationException;
 import lombok.extern.slf4j.Slf4j;
-import net.es.sense.rm.driver.api.Delta;
-import net.es.sense.rm.driver.api.DeltaRequest;
+import net.es.nsi.common.util.XmlUtilities;
 import net.es.sense.rm.driver.api.Driver;
-import net.es.sense.rm.driver.api.Model;
+import net.es.sense.rm.driver.nsi.db.Model;
 import net.es.sense.rm.driver.nsi.db.ModelService;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
+import net.es.sense.rm.model.DeltaRequest;
+import net.es.sense.rm.model.DeltaResource;
+import net.es.sense.rm.model.ModelResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -45,7 +49,7 @@ public class NsiDriver implements Driver {
 
   @Override
   @Async
-  public Future<Model> getModel(String modelType, String id) throws ExecutionException {
+  public Future<ModelResource> getModel(String modelType, String id) throws ExecutionException {
     String networkId = nsiProperties.getNetworkId();
     if (Strings.isNullOrEmpty(networkId)) {
       log.error("[NsiDriver] no network specified in configuration.");
@@ -55,17 +59,17 @@ public class NsiDriver implements Driver {
     // Convert the internal model representation to the driver interface model.
     try {
       ModelService modelService = raController.getModelService();
-      net.es.sense.rm.driver.nsi.db.Model model = modelService.get(id);
+      Model model = modelService.get(id);
       if (model == null) {
         return new AsyncResult<>(null);
       }
-      Model result = Model.builder()
-              .id(model.getModelId())
-              .creationTime((model.getVersion() / 1000) * 1000)
-              .model(model.getBase())
-              .build();
+
+      ModelResource result = new ModelResource();
+      result.setId(model.getModelId());
+      result.setCreationTime(XmlUtilities.longToXMLGregorianCalendar((model.getVersion() / 1000) * 1000).toXMLFormat());
+      result.setModel(model.getBase());
       return new AsyncResult<>(result);
-    } catch (IllegalArgumentException ex) {
+    } catch (IllegalArgumentException | DatatypeConfigurationException ex) {
       log.error("[NsiDriver] ontology creation failed for networkId = {}.", networkId);
       throw new ExecutionException(ex);
     }
@@ -73,7 +77,7 @@ public class NsiDriver implements Driver {
 
   @Override
   @Async
-  public Future<Collection<Model>> getModels(boolean current, String modelType) throws ExecutionException {
+  public Future<Collection<ModelResource>> getModels(boolean current, String modelType) throws ExecutionException {
     String networkId = nsiProperties.getNetworkId();
     log.info("[getModels] getting model for network = {}", networkId);
 
@@ -84,17 +88,16 @@ public class NsiDriver implements Driver {
 
     // Convert the topologies NML topologies to MRML.
     try {
-      Collection<Model> results = new ArrayList<>();
+      Collection<ModelResource> results = new ArrayList<>();
       ModelService modelService = raController.getModelService();
-      Collection<net.es.sense.rm.driver.nsi.db.Model> models = modelService.get(current, networkId);
+      Collection<Model> models = modelService.get(current, networkId);
       if (models != null) {
-        for (net.es.sense.rm.driver.nsi.db.Model m : models) {
+        for (Model m : models) {
           log.info("[getModels] model = {}", m);
-          Model model = Model.builder()
-                  .id(m.getModelId())
-                  .creationTime((m.getVersion() / 1000) * 1000)
-                  .model(m.getBase())
-                  .build();
+          ModelResource model = new ModelResource();
+          model.setId(m.getModelId());
+          model.setCreationTime(XmlUtilities.longToXMLGregorianCalendar((m.getVersion() / 1000) * 1000).toXMLFormat());
+          model.setModel(m.getBase());
 
           log.info("[getModels] return modelId = {}", model.getId());
           results.add(model);
@@ -103,8 +106,9 @@ public class NsiDriver implements Driver {
       else {
         log.info("[getModels] could not fine any entries for network = {}", networkId);
       }
+
       return new AsyncResult<>(results);
-    } catch (IllegalArgumentException ex) {
+    } catch (IllegalArgumentException | DatatypeConfigurationException ex) {
       log.error("[NsiDriver] ontology creation failed for networkId = {}.", networkId);
       throw new ExecutionException(ex);
     }
@@ -112,25 +116,36 @@ public class NsiDriver implements Driver {
 
   @Override
   @Async
-  public Future<Delta> propagateDelta(DeltaRequest delta) throws ExecutionException {
+  public Future<DeltaResource> propagateDelta(String modelType, DeltaRequest delta) throws ExecutionException, NotFoundException {
+    log.info("[propagateDelta] processing delta for modelId {}", delta.getModelId());
+
+    // Make sure the referenced model has not expired.
+    ModelService modelService = raController.getModelService();
+    Model model = modelService.get(delta.getModelId());
+    if (model == null) {
+      log.error("[NsiDriver] specified model not found, modelId = {}.", delta.getModelId());
+      throw new NotFoundException("Specified model not found, modelId = " + delta.getModelId());
+    }
+
+    DeltaResource deltaResponse = new DeltaResource();
+    return new AsyncResult<>(deltaResponse);
+  }
+
+  @Override
+  @Async
+  public Future<DeltaResource> commitDelta(String id) throws ExecutionException {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
   @Async
-  public Future<Delta> commitDelta(String id) throws ExecutionException {
+  public Future<DeltaResource> getDelta(long lastModified, String id) throws ExecutionException {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
   @Async
-  public Future<Delta> getDelta(long lastModified, String id) throws ExecutionException {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  @Async
-  public Future<Collection<Delta>> getDeltas(long lastModified, String modelType) throws ExecutionException {
+  public Future<Collection<DeltaResource>> getDeltas(long lastModified, String modelType) throws ExecutionException {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 }

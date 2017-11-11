@@ -15,9 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.api.common.HttpConstants;
 import net.es.sense.rm.api.common.Resource;
 import net.es.sense.rm.api.common.ResourceAnnotation;
-import net.es.sense.rm.api.common.Utilities;
+import net.es.sense.rm.api.common.UrlTransform;
 import net.es.sense.rm.api.config.SenseProperties;
-import net.es.sense.rm.api.model.DeltaResource;
+import net.es.sense.rm.model.DeltaResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,11 +41,11 @@ public class SenseAdminController extends SenseController {
   @Autowired(required = true)
   SenseProperties config;
 
-  private Utilities utilities;
+  private UrlTransform utilities;
 
   @PostConstruct
   public void init() throws Exception {
-    utilities = new Utilities(config.getProxy());
+    utilities = new UrlTransform(config.getProxy());
   }
 
   /*************************************************************************

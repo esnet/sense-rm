@@ -78,6 +78,15 @@ public class SimpleLabel {
         return type + "=" + value;
     }
 
+    public static String strip(String label) {
+      int lastIndexOf = label.lastIndexOf(HASH);
+      if (lastIndexOf < 0) {
+        return label;
+      }
+
+      return label.substring(lastIndexOf + 1);
+    }
+
     @Override
     public boolean equals(Object object){
         if (object == this) {

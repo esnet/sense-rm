@@ -2,8 +2,14 @@ package net.es.sense.rm.driver.api.mrml;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import net.es.sense.rm.driver.schema.Nml;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.*;
 
 /**
@@ -139,5 +145,70 @@ public class ModelUtil {
       }
     }
     return odd;
+  }
+
+  public static boolean isResourceOfType(Model model, Resource res, Resource resType) {
+    String sparql = String.format("SELECT $s WHERE {$s a $t. FILTER($s = <%s> && $t = <%s>)}", res, resType);
+    ResultSet r = ModelUtil.sparqlQuery(model, sparql);
+    return r.hasNext();
+  }
+
+  public static ResultSet getResourcesOfType(Model model, Resource resType) {
+    String sparql = String.format("SELECT ?resource WHERE { ?resource a <%s> }", resType);
+    ResultSet r = ModelUtil.sparqlQuery(model, sparql);
+    return r;
+  }
+
+  public static Resource getResourceOfType(Model model, Resource res, Resource resType) {
+    String sparql = String.format("SELECT ?resource WHERE {?resource a ?type. FILTER($resource = <%s> && $type = <%s>)}", res, resType);
+    ResultSet r = ModelUtil.sparqlQuery(model, sparql);
+
+    if (r.hasNext()) {
+      return r.next().get("resource").asResource();
+    } else {
+      return null;
+    }
+  }
+
+  public static Resource getParentBidirectionalPort(Model model, Resource res) {
+    String sparql = String.format("SELECT ?resource WHERE { ?resource a <" + Nml.BidirectionalPort + ">. ?resource <" + Nml.hasBidirectionalPort + "> <%s> }", res);
+    ResultSet r = ModelUtil.sparqlQuery(model, sparql);
+
+    if (r.hasNext()) {
+      return r.next().get("resource").asResource();
+    } else {
+      return null;
+    }
+  }
+
+  public static ResultSet sparqlQuery(Model model, String sparqlStringWithoutPrefix) {
+    String sparqlString
+            = "prefix sd:    <http://schemas.ogf.org/nsi/2013/12/services/definition#>\n"
+            + "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
+            + "prefix owl:   <http://www.w3.org/2002/07/owl#>\n"
+            + "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n"
+            + "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
+            + "prefix nml:   <http://schemas.ogf.org/nml/2013/03/base#>\n"
+            + "prefix mrs:   <http://schemas.ogf.org/mrs/2013/12/topology#>\n"
+            + sparqlStringWithoutPrefix;
+
+    Query query = QueryFactory.create(sparqlString);
+    QueryExecution qexec = QueryExecutionFactory.create(query, model);
+    ResultSet rs = (ResultSet) qexec.execSelect();
+    return rs;
+  }
+
+  public static Model applyDeltaAddition(Model original, Model addition) {
+    if (original == null) {
+      throw new IllegalArgumentException("applyDeltaAddition encountered null original model");
+    }
+
+    if (addition == null) {
+      throw new IllegalArgumentException("applyDeltaAddition encountered null addition model");
+    }
+
+    original.add(addition);
+
+    return original;
   }
 }

@@ -28,7 +28,6 @@ import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyRelationType;
 import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyType;
 import net.es.nsi.dds.lib.jaxb.nml.ObjectFactory;
 import net.es.nsi.dds.lib.jaxb.nml.ServiceDefinitionType;
-import net.es.sense.rm.driver.api.mrml.BandwidthType;
 import net.es.sense.rm.driver.nsi.dds.api.DocumentReader;
 
 /**
@@ -41,7 +40,7 @@ public class NmlModel {
   private final static ObjectFactory FACTORY = new ObjectFactory();
   private final DocumentReader documentReader;
   private String defaultServiceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE";
-  private BandwidthType defaultType = BandwidthType.guaranteedCapped;
+  private MrsBandwidthType defaultType = MrsBandwidthType.guaranteedCapped;
   private String defaultUnits = "bps";
   private long defaultGranularity = 1L;
   private final Map<String, NmlPort> ports = new HashMap<>();
@@ -92,14 +91,14 @@ public class NmlModel {
   /**
    * @return the defaultType
    */
-  public BandwidthType getDefaultType() {
+  public MrsBandwidthType getDefaultType() {
     return defaultType;
   }
 
   /**
    * @param defaultType the defaultType to set
    */
-  public void setDefaultType(BandwidthType defaultType) {
+  public void setDefaultType(MrsBandwidthType defaultType) {
     this.defaultType = defaultType;
   }
 
@@ -332,9 +331,6 @@ public class NmlModel {
   }
 
   private Optional<NmlPort> convertBidirectionalPort(NmlBidirectionalPortType port, String topologyId, Map<String, NmlPort> portMap) {
-
-    log.debug("[NmlModel] processing bidirectional port {}", port.getId());
-
     // Process port groups containing the unidirectional references.
     NmlPort inbound = null;
     NmlPort outbound = null;

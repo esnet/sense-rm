@@ -1,6 +1,10 @@
 package net.es.nsi.cs.lib;
 
+import java.util.Map;
+import javax.xml.ws.BindingProvider;
 import lombok.extern.slf4j.Slf4j;
+import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionProviderPort;
+import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionServiceProvider;
 
 /**
  *
@@ -8,6 +12,22 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class Client {
+
+  private final ConnectionProviderPort proxy;
+
+  public Client(String providerUrl) {
+    ConnectionServiceProvider provider = new ConnectionServiceProvider();
+    proxy = provider.getConnectionServiceProviderPort();
+    BindingProvider bp = (BindingProvider) proxy;
+    Map<String, Object> context = bp.getRequestContext();
+    context.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, providerUrl);
+    context.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+  }
+
+  public ConnectionProviderPort getProxy() {
+    return proxy;
+  }
+
 /**
   public void reserve(Configuration config) {
        // Build a test reservation.

@@ -13,7 +13,6 @@ import net.es.nsi.dds.lib.jaxb.nml.NmlPortGroupType;
 import net.es.nsi.dds.lib.jaxb.nml.NmlPortType;
 import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
 import net.es.nsi.dds.lib.jaxb.nml.ObjectFactory;
-import net.es.sense.rm.driver.api.mrml.BandwidthType;
 
 /**
  *
@@ -76,7 +75,7 @@ public class NmlPort {
    */
 
   @lombok.Builder.Default
-  private BandwidthType type = BandwidthType.undefined;
+  private MrsBandwidthType type = MrsBandwidthType.undefined;
 
   // the increments that bandwidth can be reserved by a circuit in bps.
   @lombok.Builder.Default

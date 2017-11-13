@@ -211,4 +211,18 @@ public class ModelUtil {
 
     return original;
   }
+
+  public static Model applyDeltaReduction(Model original, Model reduction) {
+    if (original == null) {
+      throw new IllegalArgumentException("applyDeltaAddition encountered null original model");
+    }
+
+    if (reduction == null) {
+      throw new IllegalArgumentException("applyDeltaAddition encountered null addition model");
+    }
+
+    original.remove(reduction);
+
+    return original;
+  }
 }

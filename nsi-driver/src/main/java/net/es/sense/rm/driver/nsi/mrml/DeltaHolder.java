@@ -4,24 +4,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.es.sense.rm.model.DeltaRequest;
 
 /**
  *
  * @author hacksaw
  */
 public class DeltaHolder {
-  private final DeltaRequest request;
+  private final String deltaId;
   private final Map<String, String> nsi2mrs = new HashMap<>();
   private final Map<String, String> mrs2nsi = new HashMap<>();
   private final List<ReserveHolder> reserveList = new ArrayList<>();
 
-  public DeltaHolder(DeltaRequest request) {
-    this.request = request;
+  public DeltaHolder(String deltaId) {
+    this.deltaId = deltaId;
   }
 
-  public DeltaRequest getRequest() {
-    return request;
+  public String getDeltaId() {
+    return deltaId;
   }
 
   public void addMapping(String nsi, String mrs) {

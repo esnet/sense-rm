@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.es.nsi.cs.lib;
 
 import java.util.Calendar;
@@ -17,12 +13,6 @@ public class Helper {
 
   public static String getUUID() {
     return URN_UUID + UUID.randomUUID().toString();
-  }
-
-  private final static String URN_SERVICE = "urn:ogf:network:service:";
-
-  public static String getGlobalReservationId() {
-    return URN_SERVICE + UUID.randomUUID().toString();
   }
 
   /**

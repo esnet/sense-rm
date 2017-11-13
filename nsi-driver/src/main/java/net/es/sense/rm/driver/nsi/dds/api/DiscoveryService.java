@@ -7,8 +7,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
-import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.common.constants.Nsi;
+import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.jaxb.DdsParser;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentListType;
 import net.es.nsi.dds.lib.jaxb.dds.ErrorType;
@@ -112,15 +112,7 @@ public class DiscoveryService {
     // Parse the XML into JAXB objects.
     NotificationListType notifications;
     try {
-      Object object = XmlUtilities.xmlToJaxb(NotificationListType.class, request);
-      if (object instanceof NotificationListType) {
-        notifications = (NotificationListType) object;
-      } else {
-        log.error("[notifications] Unable to parse incoming subscription: {}, {}.", source, encoding);
-        WebApplicationException invalidXmlException = Exceptions.invalidXmlException("notifications", "Expected NotificationListType but found " + object.getClass().getCanonicalName());
-        log.error("[notifications] Failed to parse incoming notifications.", invalidXmlException);
-        throw invalidXmlException;
-      }
+      notifications = XmlUtilities.xmlToJaxb(NotificationListType.class, request);
     } catch (JAXBException | IOException ex) {
       log.error("[notifications] Unable to parse incoming subscription: {}, {}.", source, encoding);
       WebApplicationException invalidXmlException = Exceptions.invalidXmlException("notifications", "Unable to process XML " + ex.getMessage());
@@ -138,7 +130,8 @@ public class DiscoveryService {
 
     log.debug("[notifications] provider={}, subscriptionId={}, href={}", notifications.getProviderId(), notifications.getId(), notifications.getHref());
     for (NotificationType notification : notifications.getNotification()) {
-      log.debug("[notifications] processing notification event=" + notification.getEvent() + ", documentId=" + notification.getDocument().getId());
+      log.debug("[notifications] processing notification event= {}, documentId = {}, documentType = {}",
+              notification.getEvent(), notification.getDocument().getId(), notification.getDocument().getType());
       try {
         ddsProvider.processNotification(notification);
       } catch (WebApplicationException ex) {

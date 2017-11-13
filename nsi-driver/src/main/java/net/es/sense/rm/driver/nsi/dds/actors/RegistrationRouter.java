@@ -92,10 +92,10 @@ public class RegistrationRouter extends UntypedAbstractActor {
           // We are shutting down so clean up.
           log.info("[RegistrationRouter] routeShutdown");
           routeShutdown();
-          break;
+          return;
 
         default:
-          break;
+          return;
       }
     } else if (msg instanceof SubscriptionQuery) {
       log.info("[RegistrationRouter] Subscription query.");
@@ -114,6 +114,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
     } else {
       log.error("[RegistrationRouter] Unhandled event.");
       unhandled(msg);
+      return;
     }
 
     RegistrationEvent event = new RegistrationEvent();

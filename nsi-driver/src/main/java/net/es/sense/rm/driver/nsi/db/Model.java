@@ -41,19 +41,18 @@ public class Model implements Serializable {
 
   @Id
   @GeneratedValue
-  long id;
-
+  private long id;
 
   @Basic(optional=false)
-  String topologyId;
+  private String topologyId;
 
   @Basic(optional=false)
   String modelId;
 
-  long version;
+  private long version;
 
   @Lob
   @Basic(fetch=FetchType.LAZY, optional=true)
-  String base;
+  private String base;
 
 }

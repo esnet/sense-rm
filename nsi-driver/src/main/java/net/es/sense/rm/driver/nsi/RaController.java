@@ -11,6 +11,7 @@ import javax.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.cs.CsProvider;
+import net.es.sense.rm.driver.nsi.db.DeltaService;
 import net.es.sense.rm.driver.nsi.db.ModelService;
 import net.es.sense.rm.driver.nsi.dds.DdsProvider;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
@@ -44,6 +45,9 @@ public class RaController {
 
   @Autowired
   private CsProvider csProvider;
+
+  @Autowired
+  private DeltaService deltaService;
 
   @Autowired
   private ModelService modelService;
@@ -134,5 +138,9 @@ public class RaController {
 
   public ModelService getModelService() {
     return modelService;
+  }
+
+  public DeltaService getDeltaService() {
+    return deltaService;
   }
 }

@@ -12,8 +12,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
-import net.es.nsi.common.util.UrlHelper;
 import net.es.nsi.common.constants.Nsi;
+import net.es.nsi.common.util.UrlHelper;
 import net.es.nsi.dds.lib.jaxb.DdsParser;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentEventType;
 import net.es.nsi.dds.lib.jaxb.dds.ErrorType;
@@ -359,7 +359,7 @@ public class RegistrationActor extends UntypedAbstractActor {
       }
 
     } catch (Exception ex) {
-      log.error("[RegistrationActor] Subscription deleted FAILED, url={}, ex = {}", absoluteURL, ex);
+      log.error("[RegistrationActor] Subscription deleted FAILED, url={}", absoluteURL, ex);
       result = false;
     } finally {
       if (response != null) {

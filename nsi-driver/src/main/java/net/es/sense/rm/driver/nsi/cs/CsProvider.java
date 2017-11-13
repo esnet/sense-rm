@@ -2,19 +2,22 @@ package net.es.sense.rm.driver.nsi.cs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.util.XmlUtilities;
-import net.es.nsi.cs.lib.Client;
+import net.es.nsi.cs.lib.ClientUtil;
 import net.es.nsi.cs.lib.Helper;
 import net.es.nsi.cs.lib.NsiHeader;
 import net.es.nsi.cs.lib.SimpleLabel;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.sense.rm.driver.api.mrml.ModelUtil;
 import net.es.sense.rm.driver.nsi.cs.db.Operation;
-import net.es.sense.rm.driver.nsi.cs.db.OperationService;
-import net.es.sense.rm.driver.nsi.cs.db.OperationType;
+import net.es.sense.rm.driver.nsi.cs.db.OperationMap;
+import net.es.sense.rm.driver.nsi.cs.db.StateType;
 import net.es.sense.rm.driver.nsi.db.ModelService;
 import net.es.sense.rm.driver.nsi.mrml.DeltaHolder;
 import net.es.sense.rm.driver.nsi.mrml.MrsBandwidthService;
@@ -26,9 +29,6 @@ import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.schema.Mrs;
 import net.es.sense.rm.driver.schema.Nml;
 import net.es.sense.rm.driver.schema.Sd;
-import net.es.sense.rm.model.DeltaRequest;
-import net.es.sense.rm.model.DeltaResource;
-import org.apache.jena.ext.com.google.common.base.Strings;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
@@ -36,6 +36,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException;
+import org.ogf.schemas.nsi._2013._12.connection.types.GenericRequestType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationRequestCriteriaType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReserveResponseType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReserveType;
@@ -53,7 +54,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class CsProvider {
-    // Runtime properties.
+  // Runtime properties.
+
   @Autowired
   private NsiProperties nsiProperties;
 
@@ -65,18 +67,15 @@ public class CsProvider {
   private ModelService modelService;
 
   @Autowired
-  private OperationService operationService;
+  private OperationMap operationMap;
 
   private static final org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory CS_FACTORY
           = new org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory();
   private static final org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory P2PS_FACTORY
           = new org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory();
 
-  private Client nsiClient;
-
   public void init() {
     log.debug("[CsProvider] Initializing CS provider with database contents:");
-    nsiClient = new Client(nsiProperties.getProviderConnectionURL());
   }
 
   public void start() {
@@ -85,73 +84,103 @@ public class CsProvider {
     log.info("[CsProvider] start complete.");
   }
 
-  public DeltaResource processDelta(DeltaRequest request) throws Exception {
-    net.es.sense.rm.driver.nsi.db.Model model = modelService.get(request.getModelId());
+  public List<String> processDelta(
+          net.es.sense.rm.driver.nsi.db.Model model,
+          String deltaId,
+          Optional<Model> reduction,
+          Optional<Model> addition) throws Exception {
+
+    List<String> connectionIds = new ArrayList<>();
+
+    // We process the reduction first, then the addition.
+    // TODO: process reduction.
+    if (reduction.isPresent()) {
+
+    }
 
     // Parse the addition operation.
-    if (!Strings.isNullOrEmpty(request.getAddition())) {
-      DeltaHolder dh = processDeltaAddition(model, request);
+    if (addition.isPresent()) {
+      // We store our outstanding operations here.
+      List<String> correlationIds = new ArrayList<>();
+
+      DeltaHolder dh = processDeltaAddition(model, deltaId, addition.get());
 
       // If we have some changes apply them into the network.
       for (ReserveHolder rh : dh.getReserveList()) {
         CommonHeaderType requestHeader = NsiHeader.builder()
-            .correlationId(Helper.getUUID())
-            .providerNSA(nsiProperties.getProviderNsaId())
-            .requesterNSA(nsiProperties.getNsaId())
-            .replyTo(nsiProperties.getRequesterConnectionURL())
-            .build()
-            .getRequestHeaderType();
+                .correlationId(Helper.getUUID())
+                .providerNSA(nsiProperties.getProviderNsaId())
+                .requesterNSA(nsiProperties.getNsaId())
+                .replyTo(nsiProperties.getRequesterConnectionURL())
+                .build()
+                .getRequestHeaderType();
 
         Holder<CommonHeaderType> header = new Holder<>();
         header.value = requestHeader;
 
         ReserveType reserve = rh.getReserve();
 
-        // Add this to the operation database to track progress.
+        // Add this to the operation map to track progress.
         Operation op = new Operation();
-        op.setOp(OperationType.reserve);
-        op.setGlobalReservationId(reserve.getGlobalReservationId());
+        op.setState(StateType.reserving);
         op.setCorrelationId(requestHeader.getCorrelationId());
-        op = operationService.store(op);
+        operationMap.put(requestHeader.getCorrelationId(), op);
+        correlationIds.add(requestHeader.getCorrelationId());
 
         try {
+          ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
           ReserveResponseType response = nsiClient.getProxy().reserve(reserve, header);
 
-          op = operationService.getByCorrelationId(op.getCorrelationId());
-          op.setConnectionId(response.getConnectionId());
-          op = operationService.store(op);
-          log.debug("[processDelta] issued reserve operation correlationId = {}, globalReservationId = {}, connectionId = {}",
-                  op.getCorrelationId(), op.getGlobalReservationId(), op.getConnectionId());
+          // Update the operation map with the new connectionId.
+          connectionIds.add(response.getConnectionId());
+
+          log.debug("[processDelta] issued reserve operation correlationId = {}, connectionId = {}",
+                  op.getCorrelationId(), response.getConnectionId());
         } catch (ServiceException ex) {
+          //TODO: Consider whether we should unwrap any NSI reservations that were successful.
+          // For now just delete the correlationId we added.
+          operationMap.removeAll(correlationIds);
+
           log.error("Failed to send NSI CS reserve message, correlationId = {}, errorId = {}, text = {}",
                   requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
           throw ex;
-
         }
       }
 
-      //TODO: Johnny is here.
+      // We have to wait for reserve operation perfomed.
+      for (String id : correlationIds) {
+        log.info("[CsProvider] waiting for completion of correlationId = {}", id);
+        if (operationMap.wait(id)) {
+          log.info("[CsProvider] operation completed, correlationId = {}", id);
+          Operation op = operationMap.remove(id);
+          if (op.getState() != StateType.reserved) {
+            log.error("[CsProvider] operation failed to reserve, correlationId = {}, state = {}",
+                    id, op.getState(), op.getException());
+            operationMap.removeAll(correlationIds);
+            if (op.getException() != null) {
+              throw new ServiceException("Operation failed to reserve", op.getException());
+            }
 
-      // We need to store the id mapping information.
-
-      // Now we formulate a deltaResponse.
-
+            throw new IllegalArgumentException("Operation failed to reserve, correlationId = "
+                    + id + ", state = " + op.getState());
+          }
+        } else {
+          log.info("[CsProvider] timeout, failed to get response for correlationId = {}", id);
+          operationMap.removeAll(correlationIds);
+          throw new TimeoutException("Failed to get response for correlationId = " + id);
+        }
+      }
     }
 
-    return new DeltaResource();
+    return connectionIds;
   }
 
-  public DeltaHolder processDeltaAddition(net.es.sense.rm.driver.nsi.db.Model m, DeltaRequest request) throws Exception {
+  public DeltaHolder processDeltaAddition(net.es.sense.rm.driver.nsi.db.Model m, String deltaId, Model addition) throws Exception {
     // Get the associated model.
-
-
     Model model = ModelUtil.unmarshalModel(m.getBase());
 
-    // Parse the delta addition.
-    Model addition = ModelUtil.unmarshalModel(request.getAddition());
-
     // Populate the delta context holder.
-    DeltaHolder holder = new DeltaHolder(request);
+    DeltaHolder holder = new DeltaHolder(deltaId);
 
     // Apply the delta to our reference model so we can search with proposed changes.
     ModelUtil.applyDeltaAddition(model, addition);
@@ -261,7 +290,10 @@ public class CsProvider {
         p2ps.setDestSTP(dst.getStp().getStpId());
 
         ScheduleType sch = CS_FACTORY.createScheduleType();
-        sch.setStartTime(CS_FACTORY.createScheduleTypeStartTime(XmlUtilities.xmlGregorianCalendar()));
+        //sch.setStartTime(CS_FACTORY.createScheduleTypeStartTime(XmlUtilities.xmlGregorianCalendar()));
+        XMLGregorianCalendar endTime = XmlUtilities.xmlGregorianCalendar();
+        endTime.setYear(endTime.getYear() + 1);
+        sch.setEndTime(CS_FACTORY.createScheduleTypeEndTime(endTime));
 
         ReservationRequestCriteriaType rrc = CS_FACTORY.createReservationRequestCriteriaType();
         rrc.setVersion(0);
@@ -288,5 +320,136 @@ public class CsProvider {
     }
 
     return holder;
+  }
+
+  public List<String> commitDelta(String deltaId, List<String> connectionId) throws ServiceException, IllegalArgumentException, TimeoutException {
+    // We store our outstanding operations here.
+    List<String> correlationIds = new ArrayList<>();
+
+    for (String cid : connectionId) {
+      CommonHeaderType requestHeader = NsiHeader.builder()
+              .correlationId(Helper.getUUID())
+              .providerNSA(nsiProperties.getProviderNsaId())
+              .requesterNSA(nsiProperties.getNsaId())
+              .replyTo(nsiProperties.getRequesterConnectionURL())
+              .build()
+              .getRequestHeaderType();
+      Holder<CommonHeaderType> header = new Holder<>();
+      header.value = requestHeader;
+      GenericRequestType commitBody = CS_FACTORY.createGenericRequestType();
+      commitBody.setConnectionId(cid);
+
+      // Add this to the operation map to track progress.
+      Operation op = new Operation();
+      op.setState(StateType.committing);
+      op.setCorrelationId(requestHeader.getCorrelationId());
+      operationMap.put(requestHeader.getCorrelationId(), op);
+      correlationIds.add(requestHeader.getCorrelationId());
+
+      try {
+        ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
+        nsiClient.getProxy().reserveCommit(commitBody, header);
+
+        log.debug("[csProvider] issued commitDelta operation correlationId = {}, connectionId = {}",
+                op.getCorrelationId(), cid);
+      } catch (ServiceException ex) {
+        //TODO: Consider whether we should unwrap any NSI reservations that were successful.
+        // For now just delete the correlationId we added.
+        operationMap.removeAll(correlationIds);
+
+        log.error("Failed to send NSI CS reserveCommit message, correlationId = {}, errorId = {}, text = {}",
+                requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+        throw ex;
+      }
+    }
+
+    // We have to wait for reserve operation perfomed.
+    for (String id : correlationIds) {
+      log.info("[CsProvider] reserveCommit waiting for completion of correlationId = {}", id);
+      if (operationMap.wait(id)) {
+        log.info("[CsProvider] reserveCommit operation completed, correlationId = {}", id);
+        Operation op = operationMap.remove(id);
+        if (op.getState() != StateType.committed) {
+          log.error("[CsProvider] operation failed to reserveCommit, correlationId = {}, state = {}",
+                  id, op.getState(), op.getException());
+          operationMap.removeAll(correlationIds);
+          if (op.getException() != null) {
+            throw new ServiceException("Operation failed to reserveCommit", op.getException());
+          }
+
+          throw new IllegalArgumentException("Operation failed to reserveCommit, correlationId = "
+                  + id + ", state = " + op.getState());
+        }
+      } else {
+        log.info("[CsProvider] timeout, failed to get response for correlationId = {}", id);
+        operationMap.removeAll(correlationIds);
+        throw new TimeoutException("Failed to get response for correlationId = " + id);
+      }
+    }
+
+    // Now we go through and provision each of these connectionIds.
+    correlationIds.clear();
+    for (String cid : connectionId) {
+      CommonHeaderType requestHeader = NsiHeader.builder()
+              .correlationId(Helper.getUUID())
+              .providerNSA(nsiProperties.getProviderNsaId())
+              .requesterNSA(nsiProperties.getNsaId())
+              .replyTo(nsiProperties.getRequesterConnectionURL())
+              .build()
+              .getRequestHeaderType();
+      Holder<CommonHeaderType> header = new Holder<>();
+      header.value = requestHeader;
+      GenericRequestType commitBody = CS_FACTORY.createGenericRequestType();
+      commitBody.setConnectionId(cid);
+
+      // Add this to the operation map to track progress.
+      Operation op = new Operation();
+      op.setState(StateType.provisioning);
+      op.setCorrelationId(requestHeader.getCorrelationId());
+      operationMap.put(requestHeader.getCorrelationId(), op);
+      correlationIds.add(requestHeader.getCorrelationId());
+
+      try {
+        ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
+        nsiClient.getProxy().provision(commitBody, header);
+
+        log.debug("[csProvider] issued provision operation correlationId = {}, connectionId = {}",
+                op.getCorrelationId(), cid);
+      } catch (ServiceException ex) {
+        //TODO: Consider whether we should unwrap any NSI reservations that were successful.
+        // For now just delete the correlationId we added.
+        operationMap.removeAll(correlationIds);
+
+        log.error("Failed to send NSI CS provision message, correlationId = {}, errorId = {}, text = {}",
+                requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+        throw ex;
+      }
+    }
+
+    // We have to wait for reserve operation perfomed.
+    for (String id : correlationIds) {
+      log.info("[CsProvider] provision waiting for completion of correlationId = {}", id);
+      if (operationMap.wait(id)) {
+        log.info("[CsProvider] provision operation completed, correlationId = {}", id);
+        Operation op = operationMap.remove(id);
+        if (op.getState() != StateType.provisioned) {
+          log.error("[CsProvider] operation failed to provision, correlationId = {}, state = {}",
+                  id, op.getState(), op.getException());
+          operationMap.removeAll(correlationIds);
+          if (op.getException() != null) {
+            throw new ServiceException("Operation failed to provision", op.getException());
+          }
+
+          throw new IllegalArgumentException("Operation failed to provision, correlationId = "
+                  + id + ", state = " + op.getState());
+        }
+      } else {
+        log.info("[CsProvider] timeout, failed to get provision response for correlationId = {}", id);
+        operationMap.removeAll(correlationIds);
+        throw new TimeoutException("Failed to get provision response for correlationId = " + id);
+      }
+    }
+
+    return connectionId;
   }
 }

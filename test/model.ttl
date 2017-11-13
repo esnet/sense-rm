@@ -1,0 +1,351 @@
+@prefix sd:    <http://schemas.ogf.org/nsi/2013/12/services/definition#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix nml:   <http://schemas.ogf.org/nml/2013/03/base#> .
+@prefix mrs:   <http://schemas.ogf.org/mrs/2013/12/topology#> .
+
+<urn:ogf:network:network4:2015:topology:ps:vlan+1782:cid:NE-dde72de089:label>
+        a              nml:Label ;
+        nml:belongsTo  <urn:ogf:network:network4:2015:topology:ps:vlan+1782:cid:NE-dde72de089> ;
+        nml:labeltype  <vlan> ;
+        nml:value      "1782" .
+
+<urn:ogf:network:network4:2015:topology:ps:vlan+1786:cid:NE-f25f618462>
+        a                 nml:BidirectionalPort ;
+        nml:belongsTo     <urn:ogf:network:network4:2015:topology:ps> ;
+        nml:existsDuring  [ a          nml:Lifetime ;
+                            nml:end    "2020-11-05T21:34:00.000-07:00" ;
+                            nml:start  "2019-11-05T21:19:00.000-07:00"
+                          ] ;
+        nml:hasLabel      <urn:ogf:network:network4:2015:topology:ps:vlan+1786:cid:NE-f25f618462:label> ;
+        nml:hasService    <urn:ogf:network:network4:2015:topology:ps:vlan+1786:cid:NE-f25f618462:BandwidthService> ;
+        nml:name          "NE-f25f618462" .
+
+<urn:ogf:network:network4:2015:topology:switch:EVTS.A-GOLE>
+        a                         nml:SwitchingService ;
+        mrs:providesSubnet        <urn:ogf:network:network4:2015:topology:switchingSubnet:NE-dde72de089> , <urn:ogf:network:network4:2015:topology:switchingSubnet:NE-f25f618462> , <urn:ogf:network:network4:2015:topology:switchingSubnet:NE-84301b71a5> , <urn:ogf:network:network4:2015:topology:switchingSubnet:NE-e1b9da71fe> ;
+        nml:belongsTo             <urn:ogf:network:network4:2015:topology> ;
+        nml:hasBidirectionalPort  <urn:ogf:network:network4:2015:topology:port3> , <urn:ogf:network:network4:2015:topology:ps> ;
+        nml:labelSwapping         false ;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        sd:hasServiceDefinition   <urn:ogf:network:network4:2015:topology:sd:EVTS.A-GOLE> .
+
+<urn:ogf:network:network4:2015:topology:port3:vlan+1784:cid:NE-e1b9da71fe:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000"^^xsd:long ;
+        mrs:granularity         "1"^^xsd:long ;
+        mrs:maximumCapacity     "100000000"^^xsd:long ;
+        mrs:minimumCapacity     "1"^^xsd:long ;
+        mrs:reservableCapacity  "100000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        nml:belongsTo           <urn:ogf:network:network4:2015:topology:port3:vlan+1784:cid:NE-e1b9da71fe> .
+
+<urn:ogf:network:network4:2015:topology:port3:vlan+1784:cid:NE-e1b9da71fe:label>
+        a              nml:Label ;
+        nml:belongsTo  <urn:ogf:network:network4:2015:topology:port3:vlan+1784:cid:NE-e1b9da71fe> ;
+        nml:labeltype  <vlan> ;
+        nml:value      "1784" .
+
+<urn:ogf:network:network4:2015:topology:port3:vlan+1785:cid:NE-84301b71a5:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000"^^xsd:long ;
+        mrs:granularity         "1"^^xsd:long ;
+        mrs:maximumCapacity     "100000000"^^xsd:long ;
+        mrs:minimumCapacity     "1"^^xsd:long ;
+        mrs:reservableCapacity  "100000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        nml:belongsTo           <urn:ogf:network:network4:2015:topology:port3:vlan+1785:cid:NE-84301b71a5> .
+
+<urn:ogf:network:network4:2015:topology:sd:EVTS.A-GOLE>
+        a               sd:ServiceDefinition ;
+        nml:belongsTo   <urn:ogf:network:network4:2015:topology> ;
+        nml:name        "GLIF Automated GOLE Ethernet VLAN Transfer Service" ;
+        sd:serviceType  "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE" .
+
+<urn:ogf:network:network4:2015:topology:ps:vlan+1782:cid:NE-dde72de089:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000"^^xsd:long ;
+        mrs:granularity         "1"^^xsd:long ;
+        mrs:maximumCapacity     "100000000"^^xsd:long ;
+        mrs:minimumCapacity     "1"^^xsd:long ;
+        mrs:reservableCapacity  "100000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        nml:belongsTo           <urn:ogf:network:network4:2015:topology:ps:vlan+1782:cid:NE-dde72de089> .
+
+<urn:ogf:network:network4:2015:topology:port3:vlan+1784:cid:NE-e1b9da71fe>
+        a                 nml:BidirectionalPort ;
+        nml:belongsTo     <urn:ogf:network:network4:2015:topology:port3> ;
+        nml:existsDuring  [ a          nml:Lifetime ;
+                            nml:end    "2017-11-22T16:03:00.000-07:00" ;
+                            nml:start  "2017-10-31T15:48:00.000-06:00"
+                          ] ;
+        nml:hasLabel      <urn:ogf:network:network4:2015:topology:port3:vlan+1784:cid:NE-e1b9da71fe:label> ;
+        nml:hasService    <urn:ogf:network:network4:2015:topology:port3:vlan+1784:cid:NE-e1b9da71fe:BandwidthService> ;
+        nml:name          "NE-e1b9da71fe" .
+
+<urn:ogf:network:network4:2015:topology:port3:vlan+1785:cid:NE-84301b71a5>
+        a                 nml:BidirectionalPort ;
+        nml:belongsTo     <urn:ogf:network:network4:2015:topology:port3> ;
+        nml:existsDuring  [ a          nml:Lifetime ;
+                            nml:end    "2021-11-01T21:51:00.000-06:00" ;
+                            nml:start  "2017-11-01T21:36:00.000-06:00"
+                          ] ;
+        nml:hasLabel      <urn:ogf:network:network4:2015:topology:port3:vlan+1785:cid:NE-84301b71a5:label> ;
+        nml:hasService    <urn:ogf:network:network4:2015:topology:port3:vlan+1785:cid:NE-84301b71a5:BandwidthService> ;
+        nml:name          "NE-84301b71a5" .
+
+<urn:ogf:network:network4:2015:topology:port3:vlan+1785:cid:NE-84301b71a5:label>
+        a              nml:Label ;
+        nml:belongsTo  <urn:ogf:network:network4:2015:topology:port3:vlan+1785:cid:NE-84301b71a5> ;
+        nml:labeltype  <vlan> ;
+        nml:value      "1785" .
+
+<urn:ogf:network:network4:2015:topology:switchingSubnet:NE-e1b9da71fe>
+        a                         mrs:SwitchingSubnet ;
+        mrs:tag                   "serviceId=NE-e1b9da71fe" ;
+        nml:belongsTo             <urn:ogf:network:network4:2015:topology:switch:EVTS.A-GOLE> ;
+        nml:existsDuring          [ a          nml:Lifetime ;
+                                    nml:end    "2017-11-22T16:03:00.000-07:00" ;
+                                    nml:start  "2017-10-31T15:48:00.000-06:00"
+                                  ] ;
+        nml:hasBidirectionalPort  <urn:ogf:network:network4:2015:topology:port3:vlan+1784:cid:NE-e1b9da71fe> , <urn:ogf:network:network4:2015:topology:ps:vlan+1784:cid:NE-e1b9da71fe> ;
+        nml:labelSwapping         false ;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:network4:2015:topology:ps:vlan+1784:cid:NE-e1b9da71fe>
+        a                 nml:BidirectionalPort ;
+        nml:belongsTo     <urn:ogf:network:network4:2015:topology:ps> ;
+        nml:existsDuring  [ a          nml:Lifetime ;
+                            nml:end    "2017-11-22T16:03:00.000-07:00" ;
+                            nml:start  "2017-10-31T15:48:00.000-06:00"
+                          ] ;
+        nml:hasLabel      <urn:ogf:network:network4:2015:topology:ps:vlan+1784:cid:NE-e1b9da71fe:label> ;
+        nml:hasService    <urn:ogf:network:network4:2015:topology:ps:vlan+1784:cid:NE-e1b9da71fe:BandwidthService> ;
+        nml:name          "NE-e1b9da71fe" .
+
+<urn:ogf:network:network4:2015:topology:ps:vlan+1785:cid:NE-84301b71a5>
+        a                 nml:BidirectionalPort ;
+        nml:belongsTo     <urn:ogf:network:network4:2015:topology:ps> ;
+        nml:existsDuring  [ a          nml:Lifetime ;
+                            nml:end    "2021-11-01T21:51:00.000-06:00" ;
+                            nml:start  "2017-11-01T21:36:00.000-06:00"
+                          ] ;
+        nml:hasLabel      <urn:ogf:network:network4:2015:topology:ps:vlan+1785:cid:NE-84301b71a5:label> ;
+        nml:hasService    <urn:ogf:network:network4:2015:topology:ps:vlan+1785:cid:NE-84301b71a5:BandwidthService> ;
+        nml:name          "NE-84301b71a5" .
+
+<urn:ogf:network:network4:2015:topology:switchingSubnet:NE-dde72de089>
+        a                         mrs:SwitchingSubnet ;
+        mrs:tag                   "serviceId=NE-dde72de089" ;
+        nml:belongsTo             <urn:ogf:network:network4:2015:topology:switch:EVTS.A-GOLE> ;
+        nml:existsDuring          [ a          nml:Lifetime ;
+                                    nml:end    "2019-11-03T20:17:00.000-07:00" ;
+                                    nml:start  "2017-11-03T20:02:00.000-06:00"
+                                  ] ;
+        nml:hasBidirectionalPort  <urn:ogf:network:network4:2015:topology:port3:vlan+1782:cid:NE-dde72de089> , <urn:ogf:network:network4:2015:topology:ps:vlan+1782:cid:NE-dde72de089> ;
+        nml:labelSwapping         false ;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:network4:2015:topology:port3:vlan+1782:cid:NE-dde72de089:label>
+        a              nml:Label ;
+        nml:belongsTo  <urn:ogf:network:network4:2015:topology:port3:vlan+1782:cid:NE-dde72de089> ;
+        nml:labeltype  <vlan> ;
+        nml:value      "1782" .
+
+<urn:ogf:network:network4:2015:topology:port3:vlan+1786:cid:NE-f25f618462:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000"^^xsd:long ;
+        mrs:granularity         "1"^^xsd:long ;
+        mrs:maximumCapacity     "100000000"^^xsd:long ;
+        mrs:minimumCapacity     "1"^^xsd:long ;
+        mrs:reservableCapacity  "100000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        nml:belongsTo           <urn:ogf:network:network4:2015:topology:port3:vlan+1786:cid:NE-f25f618462> .
+
+<urn:ogf:network:network4:2015:topology:port3:vlan+1786:cid:NE-f25f618462>
+        a                 nml:BidirectionalPort ;
+        nml:belongsTo     <urn:ogf:network:network4:2015:topology:port3> ;
+        nml:existsDuring  [ a          nml:Lifetime ;
+                            nml:end    "2020-11-05T21:34:00.000-07:00" ;
+                            nml:start  "2019-11-05T21:19:00.000-07:00"
+                          ] ;
+        nml:hasLabel      <urn:ogf:network:network4:2015:topology:port3:vlan+1786:cid:NE-f25f618462:label> ;
+        nml:hasService    <urn:ogf:network:network4:2015:topology:port3:vlan+1786:cid:NE-f25f618462:BandwidthService> ;
+        nml:name          "NE-f25f618462" .
+
+<urn:ogf:network:network4:2015:topology:port3:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:network4:2015:topology:port3> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "1782-1797" .
+
+<urn:ogf:network:network4:2015:topology:switchingSubnet:NE-84301b71a5>
+        a                         mrs:SwitchingSubnet ;
+        mrs:tag                   "serviceId=NE-84301b71a5" ;
+        nml:belongsTo             <urn:ogf:network:network4:2015:topology:switch:EVTS.A-GOLE> ;
+        nml:existsDuring          [ a          nml:Lifetime ;
+                                    nml:end    "2021-11-01T21:51:00.000-06:00" ;
+                                    nml:start  "2017-11-01T21:36:00.000-06:00"
+                                  ] ;
+        nml:hasBidirectionalPort  <urn:ogf:network:network4:2015:topology:ps:vlan+1785:cid:NE-84301b71a5> , <urn:ogf:network:network4:2015:topology:port3:vlan+1785:cid:NE-84301b71a5> ;
+        nml:labelSwapping         false ;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:network4:2015:topology:port3>
+        a                         nml:BidirectionalPort ;
+        nml:belongsTo             <urn:ogf:network:network4:2015:topology> ;
+        nml:hasBidirectionalPort  <urn:ogf:network:network4:2015:topology:port3:vlan+1786:cid:NE-f25f618462> , <urn:ogf:network:network4:2015:topology:port3:vlan+1782:cid:NE-dde72de089> , <urn:ogf:network:network4:2015:topology:port3:vlan+1785:cid:NE-84301b71a5> , <urn:ogf:network:network4:2015:topology:port3:vlan+1784:cid:NE-e1b9da71fe> ;
+        nml:hasLabelGroup         <urn:ogf:network:network4:2015:topology:port3:vlan> ;
+        nml:hasService            <urn:ogf:network:network4:2015:topology:port3:BandwidthService> ;
+        nml:isAlias               <urn:ogf:network:network3:2015:topology:port4> ;
+        nml:name                  "port3" .
+
+<urn:ogf:network:network4:2015:topology:ps:vlan>
+        a              nml:LabelGroup ;
+        nml:belongsTo  <urn:ogf:network:network4:2015:topology:ps> ;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        nml:values     "1780-1797" .
+
+<urn:ogf:network:network4:2015:topology:ps:vlan+1786:cid:NE-f25f618462:label>
+        a              nml:Label ;
+        nml:belongsTo  <urn:ogf:network:network4:2015:topology:ps:vlan+1786:cid:NE-f25f618462> ;
+        nml:labeltype  <vlan> ;
+        nml:value      "1786" .
+
+<urn:ogf:network:network4:2015:topology:port3:vlan+1782:cid:NE-dde72de089:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000"^^xsd:long ;
+        mrs:granularity         "1"^^xsd:long ;
+        mrs:maximumCapacity     "100000000"^^xsd:long ;
+        mrs:minimumCapacity     "1"^^xsd:long ;
+        mrs:reservableCapacity  "100000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        nml:belongsTo           <urn:ogf:network:network4:2015:topology:port3:vlan+1782:cid:NE-dde72de089> .
+
+<urn:ogf:network:network4:2015:topology:ps:BandwidthService>
+        a                    mrs:BandwidthService ;
+        mrs:granularity      "1"^^xsd:long ;
+        mrs:minimumCapacity  "1"^^xsd:long ;
+        mrs:type             "guaranteedCapped" ;
+        mrs:unit             "bps" ;
+        nml:belongsTo        <urn:ogf:network:network4:2015:topology:ps> .
+
+<urn:ogf:network:network4:2015:topology:ps:vlan+1782:cid:NE-dde72de089>
+        a                 nml:BidirectionalPort ;
+        nml:belongsTo     <urn:ogf:network:network4:2015:topology:ps> ;
+        nml:existsDuring  [ a          nml:Lifetime ;
+                            nml:end    "2019-11-03T20:17:00.000-07:00" ;
+                            nml:start  "2017-11-03T20:02:00.000-06:00"
+                          ] ;
+        nml:hasLabel      <urn:ogf:network:network4:2015:topology:ps:vlan+1782:cid:NE-dde72de089:label> ;
+        nml:hasService    <urn:ogf:network:network4:2015:topology:ps:vlan+1782:cid:NE-dde72de089:BandwidthService> ;
+        nml:name          "NE-dde72de089" .
+
+<urn:ogf:network:network4:2015:topology:ps>
+        a                         nml:BidirectionalPort ;
+        nml:belongsTo             <urn:ogf:network:network4:2015:topology> ;
+        nml:hasBidirectionalPort  <urn:ogf:network:network4:2015:topology:ps:vlan+1784:cid:NE-e1b9da71fe> , <urn:ogf:network:network4:2015:topology:ps:vlan+1786:cid:NE-f25f618462> , <urn:ogf:network:network4:2015:topology:ps:vlan+1785:cid:NE-84301b71a5> , <urn:ogf:network:network4:2015:topology:ps:vlan+1782:cid:NE-dde72de089> ;
+        nml:hasLabelGroup         <urn:ogf:network:network4:2015:topology:ps:vlan> ;
+        nml:hasService            <urn:ogf:network:network4:2015:topology:ps:BandwidthService> ;
+        nml:name                  "ps" .
+
+<urn:ogf:network:network4:2015:topology:ps:vlan+1786:cid:NE-f25f618462:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000"^^xsd:long ;
+        mrs:granularity         "1"^^xsd:long ;
+        mrs:maximumCapacity     "100000000"^^xsd:long ;
+        mrs:minimumCapacity     "1"^^xsd:long ;
+        mrs:reservableCapacity  "100000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        nml:belongsTo           <urn:ogf:network:network4:2015:topology:ps:vlan+1786:cid:NE-f25f618462> .
+
+<urn:ogf:network:network4:2015:topology:switchingSubnet:NE-f25f618462>
+        a                         mrs:SwitchingSubnet ;
+        mrs:tag                   "serviceId=NE-f25f618462" ;
+        nml:belongsTo             <urn:ogf:network:network4:2015:topology:switch:EVTS.A-GOLE> ;
+        nml:existsDuring          [ a          nml:Lifetime ;
+                                    nml:end    "2020-11-05T21:34:00.000-07:00" ;
+                                    nml:start  "2019-11-05T21:19:00.000-07:00"
+                                  ] ;
+        nml:hasBidirectionalPort  <urn:ogf:network:network4:2015:topology:port3:vlan+1786:cid:NE-f25f618462> , <urn:ogf:network:network4:2015:topology:ps:vlan+1786:cid:NE-f25f618462> ;
+        nml:labelSwapping         false ;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:network4:2015:topology:ps:vlan+1784:cid:NE-e1b9da71fe:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000"^^xsd:long ;
+        mrs:granularity         "1"^^xsd:long ;
+        mrs:maximumCapacity     "100000000"^^xsd:long ;
+        mrs:minimumCapacity     "1"^^xsd:long ;
+        mrs:reservableCapacity  "100000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        nml:belongsTo           <urn:ogf:network:network4:2015:topology:ps:vlan+1784:cid:NE-e1b9da71fe> .
+
+<urn:ogf:network:network4:2015:topology:ps:vlan+1785:cid:NE-84301b71a5:BandwidthService>
+        a                       mrs:BandwidthService ;
+        mrs:availableCapacity   "100000000"^^xsd:long ;
+        mrs:granularity         "1"^^xsd:long ;
+        mrs:maximumCapacity     "100000000"^^xsd:long ;
+        mrs:minimumCapacity     "1"^^xsd:long ;
+        mrs:reservableCapacity  "100000000"^^xsd:long ;
+        mrs:type                "guaranteedCapped" ;
+        mrs:unit                "bps" ;
+        nml:belongsTo           <urn:ogf:network:network4:2015:topology:ps:vlan+1785:cid:NE-84301b71a5> .
+
+<urn:ogf:network:network4:2015:topology:port3:BandwidthService>
+        a                    mrs:BandwidthService ;
+        mrs:granularity      "1"^^xsd:long ;
+        mrs:minimumCapacity  "1"^^xsd:long ;
+        mrs:type             "guaranteedCapped" ;
+        mrs:unit             "bps" ;
+        nml:belongsTo        <urn:ogf:network:network4:2015:topology:port3> .
+
+<urn:ogf:network:network4:2015:topology:ps:vlan+1784:cid:NE-e1b9da71fe:label>
+        a              nml:Label ;
+        nml:belongsTo  <urn:ogf:network:network4:2015:topology:ps:vlan+1784:cid:NE-e1b9da71fe> ;
+        nml:labeltype  <vlan> ;
+        nml:value      "1784" .
+
+<urn:ogf:network:network4:2015:topology:port3:vlan+1782:cid:NE-dde72de089>
+        a                 nml:BidirectionalPort ;
+        nml:belongsTo     <urn:ogf:network:network4:2015:topology:port3> ;
+        nml:existsDuring  [ a          nml:Lifetime ;
+                            nml:end    "2019-11-03T20:17:00.000-07:00" ;
+                            nml:start  "2017-11-03T20:02:00.000-06:00"
+                          ] ;
+        nml:hasLabel      <urn:ogf:network:network4:2015:topology:port3:vlan+1782:cid:NE-dde72de089:label> ;
+        nml:hasService    <urn:ogf:network:network4:2015:topology:port3:vlan+1782:cid:NE-dde72de089:BandwidthService> ;
+        nml:name          "NE-dde72de089" .
+
+<urn:ogf:network:network4:2015:topology>
+        a                         nml:Topology ;
+        nml:existsDuring          [ a          nml:Lifetime ;
+                                    nml:end    "2018-11-13T06:51:55.195-07:00" ;
+                                    nml:start  "2017-11-13T13:51:37.000Z"
+                                  ] ;
+        nml:hasBidirectionalPort  <urn:ogf:network:network4:2015:topology:port3> , <urn:ogf:network:network4:2015:topology:ps> ;
+        nml:hasService            <urn:ogf:network:network4:2015:topology:switch:EVTS.A-GOLE> ;
+        nml:name                  "network4:2015" ;
+        nml:version               "2017-11-13T13:51:37.000Z" ;
+        sd:hasServiceDefinition   <urn:ogf:network:network4:2015:topology:sd:EVTS.A-GOLE> .
+
+<urn:ogf:network:network4:2015:topology:ps:vlan+1785:cid:NE-84301b71a5:label>
+        a              nml:Label ;
+        nml:belongsTo  <urn:ogf:network:network4:2015:topology:ps:vlan+1785:cid:NE-84301b71a5> ;
+        nml:labeltype  <vlan> ;
+        nml:value      "1785" .
+
+<urn:ogf:network:network4:2015:topology:port3:vlan+1786:cid:NE-f25f618462:label>
+        a              nml:Label ;
+        nml:belongsTo  <urn:ogf:network:network4:2015:topology:port3:vlan+1786:cid:NE-f25f618462> ;
+        nml:labeltype  <vlan> ;
+        nml:value      "1786" .

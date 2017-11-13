@@ -78,7 +78,6 @@ public class ModelServiceBean implements ModelService {
     else {
       Iterable<Model> findByTopologyId = modelRepository.findByTopologyId(topologyId);
       findByTopologyId.forEach(m -> {
-        log.info("findByTopologyId: {}", m);
         result.add(m);
       });
     }

@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
+import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.util.Decoder;
 import net.es.nsi.common.util.XmlUtilities;
-import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.dds.lib.jaxb.dds.ContentType;
 import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyType;
 import net.es.nsi.dds.lib.jaxb.nsa.NsaType;
@@ -52,7 +52,7 @@ public class DocumentReader {
                 content.getValue());
         list.add(XmlUtilities.xmlToJaxb(xmlClass, is));
       } catch (IOException | JAXBException ex) {
-        log.error("[DocumentReader] could not decode document id = {}, ex = {}", doc.getId(), ex);
+        log.error("[DocumentReader] could not decode document id = {}", doc.getId(), ex);
       }
     }
 

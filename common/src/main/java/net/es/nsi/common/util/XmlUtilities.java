@@ -122,7 +122,7 @@ public class XmlUtilities {
     JAXBContext jaxbContext = JAXBContext.newInstance(xmlClass);
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
     JAXBElement<?> element = (JAXBElement<?>) unmarshaller.unmarshal(is);
-    is.close();
+    //is.close();
 
     return xmlClass.cast(element.getValue());
   }

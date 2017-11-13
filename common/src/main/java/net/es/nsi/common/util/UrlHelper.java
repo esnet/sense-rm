@@ -34,7 +34,7 @@ public class UrlHelper {
 
   public static String append(String base, String postfix) throws MalformedURLException {
     URL baseURL = new URL(base);
-    URL result = new URL(baseURL.getProtocol(), baseURL.getHost(), baseURL.getPort(), baseURL.getFile() + postfix, null);
+    URL result = new URL(baseURL.getProtocol(), baseURL.getHost(), baseURL.getPort(), baseURL.getFile() +"/"+ postfix, null);
     return result.toExternalForm();
   }
 }

@@ -1,37 +1,67 @@
 package net.es.sense.rm.driver.nsi.cs.db;
 
 import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.util.concurrent.Semaphore;
+import lombok.Synchronized;
+import org.ogf.schemas.nsi._2013._12.framework.types.ServiceExceptionType;
 
 /**
  *
  * @author hacksaw
  */
-@lombok.NoArgsConstructor
-@lombok.AllArgsConstructor
-@lombok.Data
-@Entity
-@Table(name = "operations")
 public class Operation implements Serializable {
-  @Id
-  @GeneratedValue
-  long id;
+  private final Semaphore completed = new Semaphore(0);
+  private String correlationId;
+  private StateType state;
+  private ServiceExceptionType exception;
 
-  @Basic(optional=false)
-  String correlationId;
+  public Semaphore getCompleted() {
+    return completed;
+  }
 
-  // Global reservation identifier we use to uniquely identify our reservation.
-  @Basic(optional=false)
-  String globalReservationId;
+  /**
+   * @return the correlationId
+   */
+  @Synchronized
+  public String getCorrelationId() {
+    return correlationId;
+  }
 
-  // Connection identifier returned by the PA.
-  @Basic(optional=true)
-  String connectionId;
+  /**
+   * @param correlationId the correlationId to set
+   */
+  @Synchronized
+  public void setCorrelationId(String correlationId) {
+    this.correlationId = correlationId;
+  }
 
-  @Basic(optional=false)
-  OperationType op;
+  /**
+   * @return the state
+   */
+  @Synchronized
+  public StateType getState() {
+    return state;
+  }
+
+  /**
+   * @param state the state to set
+   */
+  @Synchronized
+  public void setState(StateType state) {
+    this.state = state;
+  }
+
+  /**
+   * @return the exception
+   */
+  public ServiceExceptionType getException() {
+    return exception;
+  }
+
+  /**
+   * @param exception the exception to set
+   */
+  public void setException(ServiceExceptionType exception) {
+    this.exception = exception;
+  }
 }

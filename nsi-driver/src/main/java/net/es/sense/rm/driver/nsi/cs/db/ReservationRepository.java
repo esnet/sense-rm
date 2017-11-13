@@ -11,9 +11,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReservationRepository extends CrudRepository<Reservation, Long> {
 
-  public Iterable<Reservation> findByConnectionId(String connectionId);
+  public Iterable<Reservation> findByConnectionId(@Param("connectionId") String connectionId);
 
-  public Iterable<Reservation> findByTopologyId(String topologyId);
+  public Iterable<Reservation> findByTopologyId(@Param ("topologyId") String topologyId);
 
   public Reservation findByProviderNsaAndConnectionId(
           @Param ("providerNSA") String providerNsa,

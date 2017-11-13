@@ -36,10 +36,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import javax.annotation.PostConstruct;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import lombok.extern.slf4j.Slf4j;
+import net.es.nsi.common.util.Decoder;
 import net.es.nsi.common.util.UrlHelper;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.sense.rm.api.common.Encoder;
@@ -896,7 +899,7 @@ public class SenseRmController extends SenseController {
           method = RequestMethod.GET,
           produces = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseBody
-  public DeltaResource getModelDelta(
+  public ResponseEntity<?> getModelDelta(
           @RequestHeader(
                   value = HttpConstants.ACCEPT_NAME,
                   defaultValue = MediaType.APPLICATION_JSON_VALUE)
@@ -909,18 +912,73 @@ public class SenseRmController extends SenseController {
                   value = HttpConstants.MODEL_NAME,
                   defaultValue = HttpConstants.MODEL_TURTLE)
           @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model,
+          @RequestParam(
+                  value = HttpConstants.ENCODE_NAME,
+                  defaultValue = "false")
+          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode,
           @PathVariable(HttpConstants.ID_NAME)
           @ApiParam(value = HttpConstants.ID_MSG, required = true) String id,
           @PathVariable(HttpConstants.DELTAID_NAME)
           @ApiParam(value = HttpConstants.DELTAID_MSG, required = true) String deltaId) {
 
-    DeltaResource delta = new DeltaResource();
-    delta.setId("922f4388-c8f6-4014-b6ce-5482289b0200");
-    delta.setHref("http://localhost:8080/sense/v1/deltas/922f4388-c8f6-4014-b6ce-5482289b0200");
-    delta.setLastModified("2016-07-26T13:45:21.001Z");
-    delta.setModelId("922f4388-c8f6-4014-b6ce-5482289b02ff");
-    delta.setResult("H4sIACKIo1cAA+1Y32/aMBB+56+I6NtUx0loVZEV1K6bpkm0m5Y+7NWNTbCa2JEdCP3vZydULYUEh0CnQXlC+O6+O/ u7X1ylgozp3BJ4LH3rcpJlqQ9hnud23rO5iKDnOA50XKgEgAwnJEEnQ8vuXC30eB5XqXnQuYDqfEl+LnGVvAv/3I6CVQiFv FbF7ff7UKF4Hiice2IZmgMml5RZ8sq/0n9p82hcWFCHCtjtQacHH5AkS5qJkNWa6rDUdD2Y8ZTHPHoqtDudy6lgvpLzGclyL h59zBNE2YBIW/0y7FhvPqjw8X5h5LS40TuUEPyDYTqjeIpi6/OKltZ5IDFnkbzn1gqmxMxO0DyiEUp5qoGfj4YVxiZIfqGYCh JmlDMU/+IiW7W7FIvPOCYDOWUMhOLcT5XG4AJ60PVjyh4HKPbk8NTIBmIxSIRXmpgT4EAXOqWVT4YmwgkNX9w4V wZeu1EddEDEjIZkE4YyktNMgbCoyhhTj2Z1vwVK3PoZ3Fz/DqyvN3ddTYoq49o3bd6mLCNCffFsgqeHwZH1sS04gxmQua 3fbI1I8YIkm5xDr3xCInXmVPPAAEqztAaqtwQFtHQ7vBzJiQmeeoAW5KxwxJisP57VrOuRF2xB1ZZ37M9ixIBALCLrSG9ct 0dI8fy74NN02CQ5Yq2WPaVkE5KqaQ5UIRRRnWinq+51huIpkVbXA2dO/6ztjTZhUUXRWEnYHVUPcwY2zaOafHh553fKz dcErXCLyuuYIlnpEBYo4quVVvtzezO6K2Fd0AMG/arMWuoBLQTcWnqZ9tcNOahhX679/8muNX27IrrgWWBRbZvESFjIsV LdXYhHOYcVVAlylKb6LrtjFEvStnY2Gi4ONAn2Mxh9dJr3mYi2bDjmRWHHXaYe7N+wZk0b2FTH2rHC+EJ28NL7Se9aVp Ry9ZwwyNTDa8Uf627LdXcfM8CWk/4BTQBblaMDjb92ND2C+Gun+yNsz6ZbcdPuLBSQfLvwJ1QggDPmF6Uo5IyVt+rnCq es+AaNt7cbsh/jaxtn//6GsWYDgAEdvHddkj8Wv/3/+bCDnW+rf2DW7Xx/ASQO0KQcHgAA");
-    return delta;
+
+    // Get the requested resource URL.
+    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+
+    log.info("[SenseRmController] operation = {}, id = {}, deltaId = {}, accept = {}, ifModifiedSince = {}, model = {}",
+            location, id, deltaId, accept, ifModifiedSince, model);
+
+    Date ifnms = DateUtils.parseDate(ifModifiedSince);
+    if (ifnms == null) {
+      log.error("[SenseRmController] invalid header {}, value = {}.", HttpConstants.IF_MODIFIED_SINCE_NAME,
+              ifModifiedSince);
+      ifnms = DateUtils.parseDate(HttpConstants.IF_MODIFIED_SINCE_DEFAULT);
+    }
+
+    try {
+      DeltaResource d = driver.getDelta(deltaId, ifnms.getTime(), model).get();
+
+      // We have an exception to report NOT_FOUND so null is NOT_MODIFIED.
+      if (d == null) {
+        return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+      }
+
+      final HttpHeaders headers = new HttpHeaders();
+      headers.add("Content-Location", location.toASCIIString());
+
+      log.info("[SenseRmController] deltaId = {}, lastModified = {}, If-Modified-Since = {}", d.getId(),
+              d.getLastModified(), DateUtils.formatDate(ifnms));
+
+      long lastModified = XmlUtilities.xmlGregorianCalendar(d.getLastModified()).toGregorianCalendar().getTimeInMillis();
+
+      d.setHref(location.toASCIIString());
+      if (encode) {
+        d.setAddition(Encoder.encode(d.getAddition()));
+        d.setReduction(Encoder.encode(d.getReduction()));
+        d.setResult(Encoder.encode(d.getResult()));
+      }
+
+      headers.setLastModified(lastModified);
+
+      log.info("[SenseRmController] getDelta returning id = {}, creationTime = {}, queried If-Modified-Since = {}.",
+              d.getId(), d.getLastModified(), DateUtils.formatDate(ifnms));
+
+      return new ResponseEntity<>(d, headers, HttpStatus.OK);
+
+    } catch (NotFoundException ex) {
+      log.error("getDelta could not find delta, deltaId = {}, ex = {}", deltaId, ex);
+      final HttpHeaders headers = new HttpHeaders();
+      headers.add("Content-Location", location.toASCIIString());
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } catch (InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
+      log.error("getDelta failed, ex = {}", ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**
@@ -1263,6 +1321,7 @@ public class SenseRmController extends SenseController {
    * supported response encoding.
    * @param ifModifiedSince The HTTP request may contain the If-Modified-Since header requesting all models with
    * creationTime after the specified date. The date must be specified in RFC 1123 format.
+   * @param encode
    * @param model This version’s detailed topology model in the requested format (TURTLE, etc.). To optimize transfer
    * the contents of this model element should be gzipped (contentType="application/x-gzip") and base64 encoded
    * (contentTransferEncoding="base64"). This will reduce the transfer size and encapsulate the original model contents.
@@ -1374,7 +1433,7 @@ public class SenseRmController extends SenseController {
           method = RequestMethod.GET,
           produces = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseBody
-  public DeltaResource getDelta(
+  public ResponseEntity<?> getDelta(
           @RequestHeader(
                   value = HttpConstants.ACCEPT_NAME,
                   defaultValue = MediaType.APPLICATION_JSON_VALUE)
@@ -1387,17 +1446,72 @@ public class SenseRmController extends SenseController {
                   value = HttpConstants.MODEL_NAME,
                   defaultValue = HttpConstants.MODEL_TURTLE)
           @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model,
+          @RequestParam(
+                  value = HttpConstants.ENCODE_NAME,
+                  defaultValue = "false")
+          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode,
           @PathVariable(HttpConstants.DELTAID_NAME)
           @ApiParam(value = HttpConstants.DELTAID_MSG, required = true) String deltaId
   ) {
 
-    DeltaResource delta = new DeltaResource();
-    delta.setId("922f4388-c8f6-4014-b6ce-5482289b0200");
-    delta.setHref("http://localhost:8080/sense/v1/deltas/922f4388-c8f6-4014-b6ce-5482289b0200");
-    delta.setLastModified("2016-07-26T13:45:21.001Z");
-    delta.setModelId("922f4388-c8f6-4014-b6ce-5482289b02ff");
-    delta.setResult("H4sIACKIo1cAA+1Y32/aMBB+56+I6NtUx0loVZEV1K6bpkm0m5Y+7NWNTbCa2JEdCP3vZydULYUEh0CnQXlC+O6+O/ u7X1ylgozp3BJ4LH3rcpJlqQ9hnud23rO5iKDnOA50XKgEgAwnJEEnQ8vuXC30eB5XqXnQuYDqfEl+LnGVvAv/3I6CVQiFv FbF7ff7UKF4Hiice2IZmgMml5RZ8sq/0n9p82hcWFCHCtjtQacHH5AkS5qJkNWa6rDUdD2Y8ZTHPHoqtDudy6lgvpLzGclyL h59zBNE2YBIW/0y7FhvPqjw8X5h5LS40TuUEPyDYTqjeIpi6/OKltZ5IDFnkbzn1gqmxMxO0DyiEUp5qoGfj4YVxiZIfqGYCh JmlDMU/+IiW7W7FIvPOCYDOWUMhOLcT5XG4AJ60PVjyh4HKPbk8NTIBmIxSIRXmpgT4EAXOqWVT4YmwgkNX9w4V wZeu1EddEDEjIZkE4YyktNMgbCoyhhTj2Z1vwVK3PoZ3Fz/DqyvN3ddTYoq49o3bd6mLCNCffFsgqeHwZH1sS04gxmQua 3fbI1I8YIkm5xDr3xCInXmVPPAAEqztAaqtwQFtHQ7vBzJiQmeeoAW5KxwxJisP57VrOuRF2xB1ZZ37M9ixIBALCLrSG9ct 0dI8fy74NN02CQ5Yq2WPaVkE5KqaQ5UIRRRnWinq+51huIpkVbXA2dO/6ztjTZhUUXRWEnYHVUPcwY2zaOafHh553fKz dcErXCLyuuYIlnpEBYo4quVVvtzezO6K2Fd0AMG/arMWuoBLQTcWnqZ9tcNOahhX679/8muNX27IrrgWWBRbZvESFjIsV LdXYhHOYcVVAlylKb6LrtjFEvStnY2Gi4ONAn2Mxh9dJr3mYi2bDjmRWHHXaYe7N+wZk0b2FTH2rHC+EJ28NL7Se9aVp Ry9ZwwyNTDa8Uf627LdXcfM8CWk/4BTQBblaMDjb92ND2C+Gun+yNsz6ZbcdPuLBSQfLvwJ1QggDPmF6Uo5IyVt+rnCq es+AaNt7cbsh/jaxtn//6GsWYDgAEdvHddkj8Wv/3/+bCDnW+rf2DW7Xx/ASQO0KQcHgAA");
-    return delta;
+    // Get the requested resource URL.
+    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+
+    log.info("[SenseRmController] operation = {}, id = {}, accept = {}, ifModifiedSince = {}, model = {}",
+            location, deltaId, accept, ifModifiedSince, model);
+
+    Date ifnms = DateUtils.parseDate(ifModifiedSince);
+    if (ifnms == null) {
+      log.error("[SenseRmController] invalid header {}, value = {}.", HttpConstants.IF_MODIFIED_SINCE_NAME,
+              ifModifiedSince);
+      ifnms = DateUtils.parseDate(HttpConstants.IF_MODIFIED_SINCE_DEFAULT);
+    }
+
+    DeltaResource d;
+    try {
+      d = driver.getDelta(deltaId, ifnms.getTime(), model).get();
+
+      // We have an exception to report NOT_FOUND so null is NOT_MODIFIED.
+      if (d == null) {
+        return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+      }
+
+      final HttpHeaders headers = new HttpHeaders();
+      headers.add("Content-Location", location.toASCIIString());
+
+      log.info("[SenseRmController] deltaId = {}, lastModified = {}, If-Modified-Since = {}", d.getId(),
+              d.getLastModified(), DateUtils.formatDate(ifnms));
+
+      long lastModified = XmlUtilities.xmlGregorianCalendar(d.getLastModified()).toGregorianCalendar().getTimeInMillis();
+
+      d.setHref(location.toASCIIString());
+      if (encode) {
+        d.setAddition(Encoder.encode(d.getAddition()));
+        d.setReduction(Encoder.encode(d.getReduction()));
+        d.setResult(Encoder.encode(d.getResult()));
+      }
+
+      headers.setLastModified(lastModified);
+
+      log.info("[SenseRmController] getDelta returning id = {}, creationTime = {}, queried If-Modified-Since = {}.",
+              d.getId(), d.getLastModified(), DateUtils.formatDate(ifnms));
+
+      return new ResponseEntity<>(d, headers, HttpStatus.OK);
+
+    } catch (NotFoundException ex) {
+      log.error("getDelta could not find delta, deltaId = {}, ex = {}", deltaId, ex);
+      final HttpHeaders headers = new HttpHeaders();
+      headers.add("Content-Location", location.toASCIIString());
+      return new ResponseEntity<>(headers, HttpStatus.NOT_FOUND);
+    } catch (InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
+      log.error("getDelta failed, ex = {}", ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**
@@ -1555,9 +1669,18 @@ public class SenseRmController extends SenseController {
     log.info("[SenseRmController] operation = {}, accept = {}, model = {}, deltaRequest = {}",
             location, accept, model, deltaRequest);
 
-
     try {
-      DeltaResource delta = driver.propagateDelta(model, deltaRequest).get();
+      if (encode) {
+        if (!Strings.isNullOrEmpty(deltaRequest.getAddition())) {
+          deltaRequest.setAddition(Decoder.decode(deltaRequest.getAddition()));
+        }
+
+        if (!Strings.isNullOrEmpty(deltaRequest.getReduction())) {
+          deltaRequest.setReduction(Decoder.decode(deltaRequest.getReduction()));
+        }
+      }
+
+      DeltaResource delta = driver.propagateDelta(deltaRequest, model).get();
 
       if (delta == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -1570,7 +1693,7 @@ public class SenseRmController extends SenseController {
 
       long lastModified = XmlUtilities.xmlGregorianCalendar(delta.getLastModified()).toGregorianCalendar().getTimeInMillis();
 
-      delta.setHref(location.toASCIIString());
+      delta.setHref(contentLocation);
       if (encode) {
         if (!Strings.isNullOrEmpty(delta.getAddition())) {
           delta.setAddition(Encoder.encode(delta.getAddition()));
@@ -1594,8 +1717,61 @@ public class SenseRmController extends SenseController {
 
       return new ResponseEntity<>(delta, headers, HttpStatus.CREATED);
 
-    } catch (InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
-      log.error("pullModel failed, ex = {}", ex);
+    } catch (NotFoundException nfe) {
+      Error error = Error.builder()
+              .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+              .error_description(nfe.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+    catch (InternalServerErrorException | InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
+      log.error("pullModel failed", ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @RequestMapping(
+          value = "/deltas/{" + HttpConstants.DELTAID_NAME + "}/actions/commit",
+          method = RequestMethod.PUT,
+          produces = {MediaType.APPLICATION_JSON_VALUE})
+  @ResponseBody
+  public ResponseEntity<?> commitDelta(
+          @PathVariable(HttpConstants.DELTAID_NAME)
+          @ApiParam(value = HttpConstants.DELTAID_MSG, required = true) String deltaId
+  ) {
+
+    // Get the requested resource URL.
+    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+
+    log.info("[SenseRmController] operation = {}, deltaId = {}", location, deltaId);
+
+    DeltaResource d;
+    try {
+      d = driver.commitDelta(deltaId).get();
+
+      // We have an exception to report NOT_FOUND so null is NOT_MODIFIED.
+      if (d == null) {
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
+      }
+
+      final HttpHeaders headers = new HttpHeaders();
+      headers.add("Content-Location", location.toASCIIString());
+
+      log.info("[SenseRmController] commitDelta deltaId = {}, lastModified = {}", d.getId(), d.getLastModified());
+      return new ResponseEntity<>(headers, HttpStatus.NO_CONTENT);
+
+    } catch (NotFoundException ex) {
+      log.error("getDelta could not find delta, deltaId = {}, ex = {}", deltaId, ex);
+      final HttpHeaders headers = new HttpHeaders();
+      headers.add("Content-Location", location.toASCIIString());
+      return new ResponseEntity<>(headers, HttpStatus.NOT_FOUND);
+    } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+      log.error("getDelta failed, ex = {}", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())

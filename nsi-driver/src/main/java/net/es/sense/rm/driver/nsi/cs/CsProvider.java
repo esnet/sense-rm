@@ -328,10 +328,10 @@ public class CsProvider {
         cm.setSwitchingSubnetId(switchingSubnet.getURI());
         cm.setTag(description);
         StpMapping smSrc = new StpMapping(src.getStp().getStpId(), src.getMrsPortId(),
-                src.getBw().getId(), src.getmrsLabelId());
+                src.getmrsLabelId(), src.getBw().getId());
         cm.getMap().add(smSrc);
         StpMapping smDst = new StpMapping(dst.getStp().getStpId(), dst.getMrsPortId(),
-                dst.getBw().getId(), dst.getmrsLabelId());
+                dst.getmrsLabelId(), dst.getBw().getId());
         cm.getMap().add(smDst);
         connectionMapService.store(cm);
       } else {

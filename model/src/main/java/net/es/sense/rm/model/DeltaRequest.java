@@ -16,17 +16,34 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DeltaRequest {
 
+  @XmlElement(required = true)
+  private String id;                 // The UUID identifying the delta being pushed into the RM.
+  @XmlElement(required = true)
+  private String modelId;            // The UUID identifying the topology model resource this delta request is targetting.
   @XmlElement(required = false)
-  private String modelId;                 // The UUID identifying the topology model resource this delta request is targetting.
+  private String reduction;          // The gzipped and base64 encoded delta reduction for topology model resource specified by modelId.
   @XmlElement(required = false)
-  private String reduction;               // The gzipped and base64 encoded delta reduction for topology model resource specified by modelId.
-  @XmlElement(required = false)
-  private String addition;                // The gzipped and base64 encoded delta addition for topology model resource specified by modelId.
+  private String addition;           // The gzipped and base64 encoded delta addition for topology model resource specified by modelId.
 
   /**
    * @return the modelId
    */
-  @ApiModelProperty(value = "The UUID of the root model version to which this delta will be applied.", required = false)
+  @ApiModelProperty(value = "The UUID identifying the delta being pushed into the RM.", required = true)
+  public String getId() {
+    return id;
+  }
+
+  /**
+   * @param id the modelId to set
+   */
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  /**
+   * @return the modelId
+   */
+  @ApiModelProperty(value = "The UUID of the root model version to which this delta will be applied.", required = true)
   public String getModelId() {
     return modelId;
   }

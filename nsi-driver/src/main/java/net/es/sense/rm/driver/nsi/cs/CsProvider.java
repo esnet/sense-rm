@@ -127,6 +127,11 @@ public class CsProvider {
         operationMap.put(requestHeader.getCorrelationId(), op);
         correlationIds.add(requestHeader.getCorrelationId());
 
+        // Add our NSI to MRML identifier mappings.  We will need some trickery
+        // for the SwitchingSubnet as we will need to the input name to the
+        // child connectionId which we do not yet know.
+
+
         try {
           ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
           ReserveResponseType response = nsiClient.getProxy().reserve(reserve, header);

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
@@ -165,7 +164,8 @@ public class NsiDriver implements Driver {
       // Create and store a delta object representing this request.
       DeltaService deltaService = raController.getDeltaService();
       Delta delta = new Delta();
-      delta.setDeltaId(UUID.randomUUID().toString());
+      //delta.setDeltaId(UUID.randomUUID().toString());
+      delta.setDeltaId(deltaRequest.getId());
       delta.setModelId(deltaRequest.getModelId());
       delta.setLastModified(System.currentTimeMillis());
       delta.setState(DeltaState.Accepting);
@@ -173,7 +173,7 @@ public class NsiDriver implements Driver {
       delta.setReduction(deltaRequest.getReduction());
       delta.setResult(ModelUtil.marshalModel(baseModel));
 
-      log.info("[NsiDriver] storing delta: {}", delta);
+      log.info("[NsiDriver] storing deltaId: {}", delta.getDeltaId());
 
       long id = deltaService.store(delta).getId();
 

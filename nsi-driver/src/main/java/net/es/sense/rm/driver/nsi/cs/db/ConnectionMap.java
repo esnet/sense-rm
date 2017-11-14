@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.persistence.Basic;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -36,7 +37,7 @@ public class ConnectionMap implements Serializable {
   @Basic(optional=true)
   String tag;
 
-  @ElementCollection(targetClass=StpMapping.class)
+  @ElementCollection(fetch=FetchType.EAGER, targetClass=StpMapping.class)
   List<StpMapping> map = new ArrayList<>();
 
   public Optional<StpMapping> findMapping(String stpId) {

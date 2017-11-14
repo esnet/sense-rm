@@ -36,7 +36,6 @@ public class ConnectionMap implements Serializable {
   @Basic(optional=true)
   String tag;
 
-  @Basic(optional = false)
   @ElementCollection(targetClass=StpMapping.class)
   List<StpMapping> map = new ArrayList<>();
 

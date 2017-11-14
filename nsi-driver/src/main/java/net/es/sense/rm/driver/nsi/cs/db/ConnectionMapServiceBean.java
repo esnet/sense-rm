@@ -48,6 +48,12 @@ public class ConnectionMapServiceBean implements ConnectionMapService {
             || Strings.isNullOrEmpty(connectionMap.getSwitchingSubnetId())) {
       return null;
     }
+
+    ConnectionMap conn = connectionMapRepository.findByGlobalReservationId(connectionMap.globalReservationId);
+    if (conn != null) {
+      connectionMap.setId(conn.getId());
+    }
+
     return connectionMapRepository.save(connectionMap);
   }
 

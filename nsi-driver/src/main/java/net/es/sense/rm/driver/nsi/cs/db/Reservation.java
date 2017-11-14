@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 
 /**
@@ -56,6 +57,9 @@ public class Reservation implements Serializable {
 
   @Basic(optional=false)
   ReservationStateEnumType reservationState;
+
+  @Basic(optional=false)
+  LifecycleStateEnumType lifecycleState;
 
   boolean dataPlaneActive = false;
 

@@ -232,6 +232,7 @@ public class NsiDriver implements Driver {
     }
 
     // Make sure we are in the correct state.
+    log.info("[NsiDriver] delta state, id = {}, state = {}.", id, delta.getState().name());
     if (delta.getState().compareTo(DeltaState.Accepted) != 0) {
       log.info("[NsiDriver] requested delta not in Accepted state, id = {}, state = {}.",
               id, delta.getState().name());
@@ -252,8 +253,10 @@ public class NsiDriver implements Driver {
     // Read the delta again then update if needed.  The orchestrator should
     // not have a reference yet but just in case.
     delta = deltaService.get(id);
+    log.info("[NsiDriver] delta state, id = {}, state = {}.", id, delta.getState().name());
     if (delta.getState() == DeltaState.Committing) {
       delta.setState(DeltaState.Committed);
+      log.info("[NsiDriver] delta state transition to id = {}, state = {}.", id, delta.getState().name());
     }
 
     delta.setLastModified(System.currentTimeMillis());
@@ -309,6 +312,7 @@ public class NsiDriver implements Driver {
       response.setId(delta.getDeltaId());
       response.setModelId(delta.getModelId());
       response.setLastModified(XmlUtilities.longToXMLGregorianCalendar(delta.getLastModified()).toXMLFormat());
+      response.setState(delta.getState());
       response.setResult(delta.getResult());
       response.setReduction(delta.getReduction());
       response.setAddition(delta.getAddition());
@@ -338,6 +342,7 @@ public class NsiDriver implements Driver {
           response.setId(delta.getDeltaId());
           response.setModelId(delta.getModelId());
           response.setLastModified(XmlUtilities.longToXMLGregorianCalendar(delta.getLastModified()).toXMLFormat());
+          response.setState(delta.getState());
           response.setResult(delta.getResult());
           response.setReduction(delta.getReduction());
           response.setAddition(delta.getAddition());

@@ -27,17 +27,19 @@ import javax.xml.bind.annotation.XmlType;
  *
  * @author hacksaw
  */
-@ApiModel(value="deltaState", description="The state of the delta resource.")
-@XmlType(name = "deltaState")
+@ApiModel(value="state", description="The state of the delta resource.")
+@XmlType(name = "state")
 @XmlEnum
 public enum DeltaState {
-    Accepting, Accepted, Committing, Committed, Activating, Activated, Failed;
+    Accepting(0), Accepted(1), Committing(2), Committed(3), Failed(4);
 
-    public String value() {
-        return name();
-    }
+  private final long value;
 
-    public static DeltaState fromValue(String v) {
-        return valueOf(v);
-    }
+  DeltaState(long value) {
+    this.value = value;
+  }
+
+  public long value() {
+    return value;
+  }
 }

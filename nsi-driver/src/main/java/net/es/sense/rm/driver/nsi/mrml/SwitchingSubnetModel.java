@@ -14,6 +14,7 @@ import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
 import net.es.nsi.dds.lib.jaxb.nml.ServiceDefinitionType;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
+import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 
 /**
@@ -104,6 +105,19 @@ public class SwitchingSubnetModel {
     // ports associated with the parent bidirectional port.
     for (Reservation reservation : reservationService.getByTopologyId(topologyId)) {
       log.info("[SwitchingSubnetModel] processing reservation cid = {}", reservation.getConnectionId());
+
+      switch (reservation.getReservationState()) {
+        case RESERVE_FAILED:
+        case RESERVE_ABORTING:
+        case RESERVE_TIMEOUT:
+              continue;
+        default:
+          break;
+      }
+
+      if (reservation.getLifecycleState().compareTo(LifecycleStateEnumType.CREATED) != 0) {
+        continue;
+      }
 
       // We only know about the EVTS service at this point.
       if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(reservation.getServiceType().trim())) {

@@ -25,6 +25,7 @@ import org.ogf.schemas.nsi._2013._12.connection.types.GenericAcknowledgmentType;
 import org.ogf.schemas.nsi._2013._12.connection.types.GenericConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.GenericErrorType;
 import org.ogf.schemas.nsi._2013._12.connection.types.GenericFailedType;
+import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.MessageDeliveryTimeoutRequestType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory;
 import org.ogf.schemas.nsi._2013._12.connection.types.QueryNotificationConfirmedType;
@@ -68,7 +69,6 @@ public class ConnectionService {
             value.getCorrelationId(), reserveConfirmed.getConnectionId());
 
     ReservationConfirmCriteriaType criteria = reserveConfirmed.getCriteria();
-
     DataPlaneStatusType dataPlaneStatus = FACTORY.createDataPlaneStatusType();
     dataPlaneStatus.setVersion(criteria.getVersion());
     dataPlaneStatus.setActive(false);
@@ -80,6 +80,7 @@ public class ConnectionService {
             reserveConfirmed.getDescription(),
             reserveConfirmed.getConnectionId(),
             ReservationStateEnumType.RESERVE_HELD,
+            LifecycleStateEnumType.CREATED,
             dataPlaneStatus,
             criteria);
 
@@ -101,6 +102,7 @@ public class ConnectionService {
           String description,
           String cid,
           ReservationStateEnumType reservationState,
+          LifecycleStateEnumType lifecycleState,
           DataPlaneStatusType dataPlaneStatus,
           ReservationConfirmCriteriaType criteria) {
 
@@ -110,8 +112,10 @@ public class ConnectionService {
     if (reservation != null && reservation.getVersion() >= criteria.getVersion()) {
       // We have already stored this so update only if state has changed.
       if (reservationState.compareTo(reservation.getReservationState()) != 0
+              || lifecycleState.compareTo(reservation.getLifecycleState()) != 0
               || dataPlaneStatus.isActive() != reservation.isDataPlaneActive()) {
         reservation.setReservationState(reservationState);
+        reservation.setLifecycleState(lifecycleState);
         reservation.setDataPlaneActive(dataPlaneStatus.isActive());
         reservation.setDiscovered(System.currentTimeMillis());
 
@@ -128,6 +132,7 @@ public class ConnectionService {
     reservation.setProviderNsa(providerNsa);
     reservation.setConnectionId(cid);
     reservation.setReservationState(reservationState);
+    reservation.setLifecycleState(lifecycleState);
     reservation.setDataPlaneActive(dataPlaneStatus.isActive());
     reservation.setVersion(criteria.getVersion());
     reservation.setServiceType(criteria.getServiceType().trim());
@@ -243,9 +248,11 @@ public class ConnectionService {
     for (QuerySummaryResultType reservation : reservations) {
       // Get the parent reservation information to apply to child connections.
       ReservationStateEnumType reservationState = reservation.getConnectionStates().getReservationState();
+      LifecycleStateEnumType lifecycleState = reservation.getConnectionStates().getLifecycleState();
       DataPlaneStatusType dataPlaneStatus = reservation.getConnectionStates().getDataPlaneStatus();
-      log.info("[ConnectionService] querySummaryConfirmed: cid = {}, gid = {}, state = {}", reservation.getConnectionId(),
-              reservation.getGlobalReservationId(), reservationState);
+
+      log.info("[ConnectionService] querySummaryConfirmed: cid = {}, gid = {}, rstate = {}, lstate = {}",
+              reservation.getConnectionId(), reservation.getGlobalReservationId(), reservationState, lifecycleState);
 
       // If this reservation is in the process of being created, or failed
       // creation, then there will be no associated criteria.
@@ -256,6 +263,7 @@ public class ConnectionService {
                 reservation.getDescription(),
                 reservation.getConnectionId(),
                 reservationState,
+                lifecycleState,
                 dataPlaneStatus);
       } else {
         processSummaryCriteria(
@@ -264,6 +272,7 @@ public class ConnectionService {
                 reservation.getDescription(),
                 reservation.getConnectionId(),
                 reservationState,
+                lifecycleState,
                 dataPlaneStatus,
                 reservation.getCriteria());
       }
@@ -278,6 +287,7 @@ public class ConnectionService {
           String description,
           String cid,
           ReservationStateEnumType reservationState,
+          LifecycleStateEnumType lifecycleState,
           DataPlaneStatusType dataPlaneStatus) {
     log.info("[ConnectionService] processReservationNoCriteria: connectionId = {}", cid);
 
@@ -285,26 +295,25 @@ public class ConnectionService {
     if (reservation != null) {
       // We have already stored this so update only if state has changed.
       if (reservationState.compareTo(reservation.getReservationState()) == 0
+              && lifecycleState.compareTo(reservation.getLifecycleState()) == 0
               && dataPlaneStatus.isActive() == reservation.isDataPlaneActive()) {
         // No changes so no work to do.
         return;
       }
-
-      // We have had a state change so update the reservation.
-      reservation.setReservationState(reservationState);
-      reservation.setDataPlaneActive(dataPlaneStatus.isActive());
-      reservation.setDiscovered(System.currentTimeMillis());
     } else {
       reservation = new Reservation();
       reservation.setGlobalReservationId(gid);
       reservation.setDescription(description);
-      reservation.setDiscovered(System.currentTimeMillis());
       reservation.setProviderNsa(providerNsa);
       reservation.setConnectionId(cid);
-      reservation.setReservationState(reservationState);
-      reservation.setDataPlaneActive(dataPlaneStatus.isActive());
       reservation.setVersion(0);
     }
+
+    // We have had a state change so update the reservation.
+    reservation.setReservationState(reservationState);
+    reservation.setLifecycleState(lifecycleState);
+    reservation.setDataPlaneActive(dataPlaneStatus.isActive());
+    reservation.setDiscovered(System.currentTimeMillis());
 
     log.info("[ConnectionService] processReservationNoCriteria: storing reservation = {}", reservation);
     reservationService.store(reservation);
@@ -316,6 +325,7 @@ public class ConnectionService {
           String description,
           String cid,
           ReservationStateEnumType reservationState,
+          LifecycleStateEnumType lifecycleState,
           DataPlaneStatusType dataPlaneStatus,
           List<QuerySummaryResultCriteriaType> criteriaList) {
 
@@ -335,8 +345,10 @@ public class ConnectionService {
         if (reservation != null && reservation.getVersion() >= criteria.getVersion()) {
           // We have already stored this so update only if state has changed.
           if (reservationState.compareTo(reservation.getReservationState()) != 0
+                  || lifecycleState.compareTo(reservation.getLifecycleState()) != 0
                   || dataPlaneStatus.isActive() != reservation.isDataPlaneActive()) {
             reservation.setReservationState(reservationState);
+            reservation.setLifecycleState(lifecycleState);
             reservation.setDataPlaneActive(dataPlaneStatus.isActive());
             reservation.setDiscovered(System.currentTimeMillis());
 
@@ -353,6 +365,7 @@ public class ConnectionService {
         reservation.setProviderNsa(providerNsa);
         reservation.setConnectionId(cid);
         reservation.setReservationState(reservationState);
+        reservation.setLifecycleState(lifecycleState);
         reservation.setDataPlaneActive(dataPlaneStatus.isActive());
         reservation.setVersion(criteria.getVersion());
         reservation.setServiceType(criteria.getServiceType().trim());
@@ -377,8 +390,10 @@ public class ConnectionService {
           if (reservation != null && reservation.getVersion() >= criteria.getVersion()) {
             // We have already stored this so update only if state has changed.
             if (reservationState.compareTo(reservation.getReservationState()) != 0
+                    || lifecycleState.compareTo(reservation.getLifecycleState()) != 0
                     || dataPlaneStatus.isActive() != reservation.isDataPlaneActive()) {
               reservation.setReservationState(reservationState);
+              reservation.setLifecycleState(lifecycleState);
               reservation.setDataPlaneActive(dataPlaneStatus.isActive());
               reservation.setDiscovered(System.currentTimeMillis());
               reservationService.store(reservation);
@@ -394,6 +409,7 @@ public class ConnectionService {
           reservation.setVersion(criteria.getVersion());
           reservation.setServiceType(child.getServiceType().trim());
           reservation.setReservationState(reservationState);
+          reservation.setLifecycleState(lifecycleState);
           reservation.setDataPlaneActive(dataPlaneStatus.isActive());
           reservation.setStartTime(getStartTime(criteria.getSchedule().getStartTime()));
           reservation.setEndTime(getEndTime(criteria.getSchedule().getEndTime()));

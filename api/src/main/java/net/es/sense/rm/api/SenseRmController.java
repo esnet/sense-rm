@@ -1443,6 +1443,10 @@ public class SenseRmController extends SenseController {
                   defaultValue = HttpConstants.IF_MODIFIED_SINCE_DEFAULT)
           @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
           @RequestParam(
+                  value = HttpConstants.SUMMARY_NAME,
+                  defaultValue = "false")
+          @ApiParam(value = HttpConstants.SUMMARY_MSG, required = false) boolean summary,
+          @RequestParam(
                   value = HttpConstants.MODEL_NAME,
                   defaultValue = HttpConstants.MODEL_TURTLE)
           @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model,
@@ -1485,7 +1489,11 @@ public class SenseRmController extends SenseController {
       long lastModified = XmlUtilities.xmlGregorianCalendar(d.getLastModified()).toGregorianCalendar().getTimeInMillis();
 
       d.setHref(location.toASCIIString());
-      if (encode) {
+      if (summary) {
+        d.setAddition(null);
+        d.setReduction(null);
+        d.setResult(null);
+      } else if (encode) {
         d.setAddition(Encoder.encode(d.getAddition()));
         d.setReduction(Encoder.encode(d.getReduction()));
         d.setResult(Encoder.encode(d.getResult()));
@@ -1496,6 +1504,9 @@ public class SenseRmController extends SenseController {
       log.info("[SenseRmController] getDelta returning id = {}, creationTime = {}, queried If-Modified-Since = {}.",
               d.getId(), d.getLastModified(), DateUtils.formatDate(ifnms));
 
+      //List<DeltaResource> result = new ArrayList<>();
+      //result.add(d);
+      //return new ResponseEntity<>(result, headers, HttpStatus.OK);
       return new ResponseEntity<>(d, headers, HttpStatus.OK);
 
     } catch (NotFoundException ex) {

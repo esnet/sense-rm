@@ -275,18 +275,24 @@ public class NsiDriver implements Driver {
     deltaResponse.setResult(delta.getResult());
 
     return new AsyncResult<>(deltaResponse);
+
     } catch (ServiceException se) {
-      log.error("NSI CS failed {}", se.getFaultInfo());
-      throw new InternalServerErrorException("NSI CS failed, errorId = " + se.getFaultInfo().getErrorId() + "message = " + se.getFaultInfo().getText(), se);
-    } catch (TimeoutException te) {
-      log.error("NSI CS failed with timeout", te);
-      throw te;
-    } catch (DatatypeConfigurationException dc) {
-      throw new InternalServerErrorException("XML formatters failed", dc);
-    } finally {
       delta = deltaService.get(id);
       delta.setState(DeltaState.Failed);
       deltaService.store(delta);
+      log.error("NSI CS failed {}", se.getFaultInfo());
+      throw new InternalServerErrorException("NSI CS failed, errorId = " + se.getFaultInfo().getErrorId() + "message = " + se.getFaultInfo().getText(), se);
+    } catch (TimeoutException te) {
+      delta = deltaService.get(id);
+      delta.setState(DeltaState.Failed);
+      deltaService.store(delta);
+      log.error("NSI CS failed with timeout", te);
+      throw te;
+    } catch (DatatypeConfigurationException dc) {
+      delta = deltaService.get(id);
+      delta.setState(DeltaState.Failed);
+      deltaService.store(delta);
+      throw new InternalServerErrorException("XML formatters failed", dc);
     }
   }
 

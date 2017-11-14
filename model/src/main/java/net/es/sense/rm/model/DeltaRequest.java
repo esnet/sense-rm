@@ -1,5 +1,6 @@
 package net.es.sense.rm.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,6 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @ApiModel(value = "deltaRequest", description = "This is a propagate request for creation of a topology model delta resource.")
 @XmlRootElement(name = "deltaRequest")
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeltaRequest {
 
   @XmlElement(required = true)

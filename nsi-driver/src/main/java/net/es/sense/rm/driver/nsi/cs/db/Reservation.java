@@ -26,6 +26,7 @@ public class Reservation implements Serializable {
   long id;
 
   // The time I first discovered this version of the connection.
+  @Basic(optional=false)
   long discovered;
 
   // The providerNSA hosting this conenction.

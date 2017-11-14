@@ -9,6 +9,7 @@ import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyType;
+import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.dds.api.DocumentReader;
 import org.apache.jena.ext.com.google.common.collect.Lists;
@@ -17,6 +18,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Test;
+import static org.mockito.Matchers.anyString;
 import org.mockito.Mockito;
 
 /**
@@ -51,13 +53,16 @@ public class MrmlFactoryTest {
     Mockito.when(drMock.getNmlTopologyAll()).thenReturn(Lists.newArrayList(nml));
     Mockito.when(drMock.getTopologyById(NEWORK_ID)).thenReturn(Lists.newArrayList(nml));
 
+    ConnectionMapService cmMock = Mockito.mock(ConnectionMapService.class);
+    Mockito.when(cmMock.getByGlobalReservationId(anyString())).thenReturn(null);
+
     log.info("[testCreateOntologyModel] building NML model");
     NmlModel model = new NmlModel(drMock);
     model.setDefaultServiceType("http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE");
 
     log.info("[testCreateOntologyModel] building SwitchingSubnet");
     ReservationService rsMock = Mockito.mock(ReservationService.class);
-    SwitchingSubnetModel ssm = new SwitchingSubnetModel(rsMock, model, NEWORK_ID);
+    SwitchingSubnetModel ssm = new SwitchingSubnetModel(rsMock, cmMock, model, NEWORK_ID);
 
     log.info("[testCreateOntologyModel] building MRML model");
     MrmlFactory mrmlFactory = new MrmlFactory(model, ssm, NEWORK_ID);
@@ -72,12 +77,15 @@ public class MrmlFactoryTest {
     Mockito.when(drMock.getNmlTopologyAll()).thenReturn(Lists.newArrayList(nml));
     Mockito.when(drMock.getTopologyById(NEWORK_ID)).thenReturn(Lists.newArrayList(nml));
 
+    ConnectionMapService cmMock = Mockito.mock(ConnectionMapService.class);
+    Mockito.when(cmMock.getByGlobalReservationId(anyString())).thenReturn(null);
+
     log.info("[testWidlcardSwitchingService] building NML model");
     NmlModel model = new NmlModel(drMock);
 
     log.info("[testCreateOntologyModel] building SwitchingSubnet");
     ReservationService rsMock = Mockito.mock(ReservationService.class);
-    SwitchingSubnetModel ssm = new SwitchingSubnetModel(rsMock, model, NEWORK_ID);
+    SwitchingSubnetModel ssm = new SwitchingSubnetModel(rsMock, cmMock, model, NEWORK_ID);
 
     log.info("[testWidlcardSwitchingService] building MRML model");
     MrmlFactory mrmlFactory = new MrmlFactory(model, ssm, NEWORK_ID);
@@ -94,12 +102,15 @@ public class MrmlFactoryTest {
     Mockito.when(drMock.getNmlTopologyAll()).thenReturn(Lists.newArrayList(nml));
     Mockito.when(drMock.getTopologyById(NEWORK_ID)).thenReturn(Lists.newArrayList(nml));
 
+    ConnectionMapService cmMock = Mockito.mock(ConnectionMapService.class);
+    Mockito.when(cmMock.getByGlobalReservationId(anyString())).thenReturn(null);
+
     log.info("[testLargeTopology] building NML model");
     NmlModel model = new NmlModel(drMock);
 
     log.info("[testCreateOntologyModel] building SwitchingSubnet");
     ReservationService rsMock = Mockito.mock(ReservationService.class);
-    SwitchingSubnetModel ssm = new SwitchingSubnetModel(rsMock, model, NEWORK_ID);
+    SwitchingSubnetModel ssm = new SwitchingSubnetModel(rsMock, cmMock, model, NEWORK_ID);
 
     log.info("[testLargeTopology] building MRML model");
     MrmlFactory mrmlFactory = new MrmlFactory(model, ssm, NEWORK_ID);

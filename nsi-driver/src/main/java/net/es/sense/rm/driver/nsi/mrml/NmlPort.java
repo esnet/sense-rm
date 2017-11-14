@@ -29,6 +29,12 @@ public class NmlPort {
   private Optional<String> name;
   private Orientation orientation;
 
+  // MRML id mapping information;
+  @lombok.Builder.Default
+  private Optional<String> mrsLabelId = Optional.empty();
+  @lombok.Builder.Default
+  private Optional<String> mrsBandwidthId = Optional.empty();
+
   @lombok.Builder.Default
   private Optional<String> tag = Optional.empty();
 

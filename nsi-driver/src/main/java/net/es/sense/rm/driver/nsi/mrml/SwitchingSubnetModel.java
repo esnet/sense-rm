@@ -12,8 +12,12 @@ import net.es.nsi.cs.lib.CsParser;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
 import net.es.nsi.dds.lib.jaxb.nml.ServiceDefinitionType;
+import net.es.sense.rm.driver.nsi.cs.db.ConnectionMap;
+import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
+import net.es.sense.rm.driver.nsi.cs.db.StpMapping;
+import org.apache.jena.ext.com.google.common.base.Strings;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 
@@ -25,6 +29,7 @@ import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 public class SwitchingSubnetModel {
 
   private final ReservationService reservationService;
+  private final ConnectionMapService connectionMapService;
   private final NmlModel nml;
   private final String topologyId;
   private final Map<String, ServiceDefinitionType> serviceDefinitions;
@@ -34,8 +39,11 @@ public class SwitchingSubnetModel {
 
   private long version = 0;
 
-  public SwitchingSubnetModel(ReservationService reservationService, NmlModel nml, String topologyId) throws IllegalArgumentException {
+  public SwitchingSubnetModel(ReservationService reservationService,
+          ConnectionMapService connectionMapService, NmlModel nml,
+          String topologyId) throws IllegalArgumentException {
     this.reservationService = reservationService;
+    this.connectionMapService = connectionMapService;
     this.nml = nml;
     this.topologyId = topologyId;
     this.serviceDefinitions = nml.getServiceDefinitionsIndexed(topologyId);
@@ -104,19 +112,25 @@ public class SwitchingSubnetModel {
     // Process NSI connections adding SwitchingSubnets and associated child
     // ports associated with the parent bidirectional port.
     for (Reservation reservation : reservationService.getByTopologyId(topologyId)) {
-      log.info("[SwitchingSubnetModel] processing reservation cid = {}", reservation.getConnectionId());
+      log.info("[SwitchingSubnetModel] processing reservation cid = {}, gid = {}",
+              reservation.getConnectionId(), reservation.getGlobalReservationId());
 
       switch (reservation.getReservationState()) {
         case RESERVE_FAILED:
         case RESERVE_ABORTING:
         case RESERVE_TIMEOUT:
-              continue;
+          continue;
         default:
           break;
       }
 
       if (reservation.getLifecycleState().compareTo(LifecycleStateEnumType.CREATED) != 0) {
         continue;
+      }
+
+      Optional<ConnectionMap> connMap = Optional.empty();
+      if (!Strings.isNullOrEmpty(reservation.getGlobalReservationId())) {
+        connMap = Optional.ofNullable(connectionMapService.getByGlobalReservationId(reservation.getGlobalReservationId()));
       }
 
       // We only know about the EVTS service at this point.
@@ -140,9 +154,28 @@ public class SwitchingSubnetModel {
             continue;
           }
 
+          // If we have a specific MRML mapping stored then we need to use its naming scheme.
+          Optional<StpMapping> srcMapping = Optional.empty();
+          if (connMap.isPresent()) {
+            srcMapping = connMap.get().findMapping(src.getStpId());
+          }
+
+          String srcChildPortId;
+          Optional<String> srcChildPortBwId = Optional.empty();
+          Optional<String> srcChildPortLabelId = Optional.empty();
+          if (srcMapping.isPresent()) {
+            srcChildPortId = srcMapping.get().getMrsPortId();
+            srcChildPortBwId = Optional.ofNullable(srcMapping.get().getMrsBandwidthId());
+            srcChildPortLabelId = Optional.ofNullable(srcMapping.get().getMrsLabelId());
+          } else {
+            srcChildPortId = src.getMrmlId() + ":cid+" + ConnectionId.strip(reservation.getConnectionId());
+          }
+
           NmlPort srcChildPort = NmlPort.builder()
-                  .id(src.getMrmlId() + ":cid:" + ConnectionId.strip(reservation.getConnectionId()))
+                  .id(srcChildPortId)
                   .topologyId(reservation.getTopologyId())
+                  .mrsBandwidthId(srcChildPortBwId)
+                  .mrsLabelId(srcChildPortLabelId)
                   .name(Optional.of(reservation.getConnectionId()))
                   .orientation(Orientation.child)
                   .parentPort(Optional.of(srcParent.getId()))
@@ -168,9 +201,29 @@ public class SwitchingSubnetModel {
             log.error("[SwitchingSubnetModel] Could not find parent port for STP {}", p2ps.getDestSTP());
             continue;
           }
+
+          // If we have a specific MRML mapping stored then we need to use its naming scheme.
+          Optional<StpMapping> dstMapping = Optional.empty();
+          if (connMap.isPresent()) {
+            dstMapping = connMap.get().findMapping(dst.getStpId());
+          }
+
+          String dstChildPortId;
+          Optional<String> dstChildPortBwId = Optional.empty();
+          Optional<String> dstChildPortLabelId = Optional.empty();
+          if (srcMapping.isPresent()) {
+            dstChildPortId = dstMapping.get().getMrsPortId();
+            dstChildPortBwId = Optional.ofNullable(dstMapping.get().getMrsBandwidthId());
+            dstChildPortLabelId = Optional.ofNullable(dstMapping.get().getMrsLabelId());
+          } else {
+            dstChildPortId = dst.getMrmlId() + ":cid+" + ConnectionId.strip(reservation.getConnectionId());
+          }
+
           NmlPort dstChildPort = NmlPort.builder()
-                  .id(dst.getMrmlId() + ":cid:" + ConnectionId.strip(reservation.getConnectionId()))
+                  .id(dstChildPortId)
                   .topologyId(reservation.getTopologyId())
+                  .mrsBandwidthId(dstChildPortBwId)
+                  .mrsLabelId(dstChildPortLabelId)
                   .name(Optional.of(reservation.getConnectionId()))
                   .orientation(Orientation.child)
                   .parentPort(Optional.of(dstParent.getId()))
@@ -243,6 +296,15 @@ public class SwitchingSubnetModel {
 
           ServiceHolder holder = serviceHolder.get(srcSSid.get());
 
+          // If this is a SwtichingSubnet created by an MRML delta request
+          // we will have a specific mapping name for this.
+          String nssId;
+          if (connMap.isPresent()) {
+            nssId = connMap.get().getSwitchingSubnetId();
+          } else {
+            nssId = NmlSwitchingSubnet.id(reservation.getTopologyId(), ConnectionId.strip(reservation.getConnectionId()));
+          }
+
           NmlSwitchingSubnet nss = new NmlSwitchingSubnet();
           nss.setSwitchingService(holder.getSwitchingService());
           nss.getPorts().add(srcChildPort);
@@ -251,8 +313,9 @@ public class SwitchingSubnetModel {
           nss.setStartTime(startTime);
           nss.setEndTime(endTime);
           nss.setTopologyId(reservation.getTopologyId());
-          nss.setId(NmlSwitchingSubnet.id(reservation.getTopologyId(), ConnectionId.strip(reservation.getConnectionId())));
+          nss.setId(nssId);
           nss.setDiscovered(reservation.getDiscovered());
+          nss.setTag(Optional.ofNullable(reservation.getDescription()));
           holder.getSwitchingSubnets().add(nss);
           log.info("[SwitchingSubnetModel] adding SwitchingSubnet = {}", nss.getId());
 
@@ -261,7 +324,7 @@ public class SwitchingSubnetModel {
           }
 
         } catch (JAXBException ex) {
-          log.error("Could not parse P2PS structure for conenctionId = {}", reservation.getConnectionId());
+          log.error("Could not parse P2PS structure for conenctionId = {}", reservation.getConnectionId(), ex);
         }
       } else {
         log.error("Unknown serviceType for conenctionId = {}, serviceType = {}", reservation.getConnectionId(),

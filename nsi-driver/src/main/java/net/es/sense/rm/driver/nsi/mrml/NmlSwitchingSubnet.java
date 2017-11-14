@@ -22,9 +22,11 @@ public class NmlSwitchingSubnet {
 
   private Optional<Long> endTime = Optional.empty();
 
+  private Optional<String> tag = Optional.empty();
+
   private NmlSwitchingServiceType switchingService;
 
   public static String id(String topology, String localId) {
-    return topology + ":switchingSubnet:" + localId;
+    return topology + ":switchingSubnet+" + localId;
   }
 }

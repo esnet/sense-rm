@@ -19,6 +19,7 @@
  */
 package net.es.sense.rm.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Calendar;
@@ -34,6 +35,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @ApiModel(value="delta", description="This is a topology model delta resource.")
 @XmlRootElement(name="delta")
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeltaResource {
     @XmlElement(required=true)
     private String id;                      // A UUID uniquely identifying the topology model delta resource.

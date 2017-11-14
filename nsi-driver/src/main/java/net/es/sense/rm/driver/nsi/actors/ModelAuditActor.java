@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.db.Model;
 import net.es.sense.rm.driver.nsi.db.ModelService;
@@ -42,6 +43,9 @@ public class ModelAuditActor extends UntypedAbstractActor {
 
   @Autowired
   ReservationService reservationService;
+
+  @Autowired
+  ConnectionMapService connectionMapService;
 
   @Autowired
   ModelService modelService;
@@ -91,7 +95,7 @@ public class ModelAuditActor extends UntypedAbstractActor {
     //nml.getTopologyIds().forEach((topologyId) -> {
       log.info("[ModelAuditActor] processing topologyId = {}", topologyId);
 
-      SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, nml, topologyId);
+      SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, connectionMapService, nml, topologyId);
       MrmlFactory mrml = new MrmlFactory(nml, ssm, topologyId);
 
       // Check to see if this is a new version.
@@ -123,7 +127,7 @@ public class ModelAuditActor extends UntypedAbstractActor {
 
     // Get the new document context.
     NmlModel nml = new NmlModel(documentReader);
-    SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, nml, topologyId);
+    SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, connectionMapService, nml, topologyId);
     MrmlFactory mrml = new MrmlFactory(nml, ssm, topologyId);
 
     // Check to see if this is a new version.

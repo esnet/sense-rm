@@ -52,16 +52,15 @@ public class MrmlFactory {
                     "[MrmlFactory] Could not find NML document for topologyId = " + topologyId));
   }
 
-
   public long getVersion() {
     XMLGregorianCalendar version = topology.getVersion();
     GregorianCalendar cal = version.toGregorianCalendar();
-    return cal.getTimeInMillis() > ssm.getVersion() ? cal.getTimeInMillis() : ssm.getVersion() ;
+    return cal.getTimeInMillis() > ssm.getVersion() ? cal.getTimeInMillis() : ssm.getVersion();
   }
 
   public String getModelAsString(String modelType) {
     Lang encoding;
-    switch(modelType.toLowerCase()) {
+    switch (modelType.toLowerCase()) {
       case "jasonld":
         encoding = Lang.JSONLD;
         break;
@@ -214,7 +213,7 @@ public class MrmlFactory {
               p.getEncoding().ifPresent(e -> {
                 Resource encoding = model.createResource(e);
                 bi.addProperty(Nml.encoding, encoding);
-                      });
+              });
               p.getIsAlias().ifPresent(i -> {
                 Resource res = model.createResource(i);
                 bi.addProperty(Nml.isAlias, res);
@@ -267,7 +266,6 @@ public class MrmlFactory {
                 bw.addLiteral(Mrs.usedCapacity, usedCapacity);
                 bw.addLiteral(Mrs.availableCapacity, c - usedCapacity);
               }*/
-
               bw.addProperty(Nml.belongsTo, bi);
               biPorts.put(p.getId(), bi);
             });
@@ -346,7 +344,7 @@ public class MrmlFactory {
               .forEachOrdered((sd) -> {
                 ssr.addProperty(Sd.hasServiceDefinition, model.getResource(sd.getId()));
               }
-      );
+              );
 
       // Add all the bidirectional port identifiers associated with the
       // unidirectional ports.
@@ -381,7 +379,7 @@ public class MrmlFactory {
               p.getEncoding().ifPresent(e -> {
                 Resource encoding = model.createResource(e);
                 bi.addProperty(Nml.encoding, encoding);
-                      });
+              });
 
               p.getIsAlias().ifPresent(i -> {
                 Resource res = model.createResource(i);
@@ -398,7 +396,14 @@ public class MrmlFactory {
 
               // Make a label relationship.
               p.getLabels().stream().forEach(l -> {
-                Resource label = createResource(model, p.getId() + ":label", Nml.Label);
+                String labelId;
+                if (p.getMrsLabelId().isPresent()) {
+                  labelId = p.getMrsLabelId().get();
+                } else {
+                  labelId = p.getId() + ":label";
+                }
+
+                Resource label = createResource(model, labelId, Nml.Label);
                 Resource labelType = model.createResource(l.getLabeltype());
                 label.addProperty(Nml.labeltype, labelType);
                 label.addLiteral(Nml.value, l.getValue());
@@ -407,7 +412,13 @@ public class MrmlFactory {
               });
 
               // Make the bandwidth service - NSI supports guaranteedCapped only.
-              Resource bw = createResource(model, p.getId() + ":BandwidthService", Mrs.BandwidthService);
+              String bwId;
+              if (p.getMrsBandwidthId().isPresent()) {
+                bwId = p.getMrsBandwidthId().get();
+              } else {
+                bwId = p.getId() + ":BandwidthService";
+              }
+              Resource bw = createResource(model, bwId, Mrs.BandwidthService);
               bi.addProperty(Nml.hasService, bw);
               bw.addLiteral(Mrs.type, p.getType().name());
               bw.addLiteral(Mrs.unit, nml.getDefaultUnits());
@@ -444,6 +455,7 @@ public class MrmlFactory {
 
         // Place the reservation identifier into the SwitchingSubnet for tracing.
         ssr.addProperty(Mrs.tag, "serviceId=" + switchingSubnet.getServiceId());
+        switchingSubnet.getTag().ifPresent(tag -> ssr.addProperty(Mrs.tag, tag));
 
         // This belongs to the parent topologyResource.
         ssr.addProperty(Nml.belongsTo, swResource);

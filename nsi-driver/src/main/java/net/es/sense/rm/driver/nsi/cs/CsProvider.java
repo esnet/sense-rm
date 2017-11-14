@@ -15,10 +15,12 @@ import net.es.nsi.cs.lib.NsiHeader;
 import net.es.nsi.cs.lib.SimpleLabel;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.sense.rm.driver.api.mrml.ModelUtil;
+import net.es.sense.rm.driver.nsi.cs.db.ConnectionMap;
+import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
 import net.es.sense.rm.driver.nsi.cs.db.Operation;
 import net.es.sense.rm.driver.nsi.cs.db.OperationMap;
 import net.es.sense.rm.driver.nsi.cs.db.StateType;
-import net.es.sense.rm.driver.nsi.db.ModelService;
+import net.es.sense.rm.driver.nsi.cs.db.StpMapping;
 import net.es.sense.rm.driver.nsi.mrml.DeltaHolder;
 import net.es.sense.rm.driver.nsi.mrml.MrsBandwidthService;
 import net.es.sense.rm.driver.nsi.mrml.MrsUnits;
@@ -64,7 +66,7 @@ public class CsProvider {
   private CsController csController;
 
   @Autowired
-  private ModelService modelService;
+  private ConnectionMapService connectionMapService;
 
   @Autowired
   private OperationMap operationMap;
@@ -180,7 +182,8 @@ public class CsProvider {
     return connectionIds;
   }
 
-  public DeltaHolder processDeltaAddition(net.es.sense.rm.driver.nsi.db.Model m, String deltaId, Model addition) throws Exception {
+  public DeltaHolder processDeltaAddition(net.es.sense.rm.driver.nsi.db.Model m, String deltaId, Model addition)
+          throws Exception {
     // Get the associated model.
     Model model = ModelUtil.unmarshalModel(m.getBase());
 
@@ -270,7 +273,7 @@ public class CsProvider {
           SimpleStp stp = new SimpleStp(parentBi.getURI(), simpleLabel);
           log.debug("stpId: {}", stp.getStpId());
 
-          stps.add(new StpHolder(biChild.getURI(), stp, bws));
+          stps.add(new StpHolder(biChild.getURI(), stp, bws, label.getURI()));
         }
 
         // We need exactly two ports for our point-to-point connection.
@@ -307,7 +310,7 @@ public class CsProvider {
         rrc.getAny().add(P2PS_FACTORY.createP2Ps(p2ps));
 
         ReserveType r = CS_FACTORY.createReserveType();
-        r.setGlobalReservationId(Helper.getUUID());
+        r.setGlobalReservationId(switchingSubnet.getURI());
         r.setDescription(description);
         r.setCriteria(rrc);
 
@@ -318,6 +321,19 @@ public class CsProvider {
         rh.getPorts().put(dst.getMrsPortId(), dst);
 
         holder.addReserve(rh);
+
+        // Now store the mapping for this SwitchingSubnet.
+        ConnectionMap cm = new ConnectionMap();
+        cm.setGlobalReservationId(switchingSubnet.getURI());
+        cm.setSwitchingSubnetId(switchingSubnet.getURI());
+        cm.setTag(description);
+        StpMapping smSrc = new StpMapping(src.getStp().getStpId(), src.getMrsPortId(),
+                src.getBw().getId(), src.getmrsLabelId());
+        cm.getMap().add(smSrc);
+        StpMapping smDst = new StpMapping(dst.getStp().getStpId(), dst.getMrsPortId(),
+                dst.getBw().getId(), dst.getmrsLabelId());
+        cm.getMap().add(smDst);
+        connectionMapService.store(cm);
       } else {
         log.error("serviceType not supported {}", serviceTypeRef.getString());
         throw new IllegalArgumentException("serviceType not supported " + serviceTypeRef.getString());

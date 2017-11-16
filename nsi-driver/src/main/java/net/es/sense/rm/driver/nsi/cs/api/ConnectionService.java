@@ -75,7 +75,7 @@ public class ConnectionService {
     dataPlaneStatus.setActive(false);
     dataPlaneStatus.setVersionConsistent(true);
 
-    processConfirmedCriteria(
+    Reservation reservation = processConfirmedCriteria(
             header.value.getProviderNSA(),
             reserveConfirmed.getGlobalReservationId(),
             reserveConfirmed.getDescription(),
@@ -84,6 +84,25 @@ public class ConnectionService {
             LifecycleStateEnumType.CREATED,
             dataPlaneStatus,
             criteria);
+
+    if (reservation != null) {
+      Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
+      if (r == null) {
+        // We have not seen this reservation before so store it.
+        log.info("[ConnectionService] reserveConfirmed: storing new reservation, cid = {}",
+                reservation.getId());
+        reservationService.store(reservation);
+      } else if (r.diff(reservation)) {
+        // We have to determine if the stored reservation needs to be updated.
+        log.info("[ConnectionService] reserveConfirmed: storing reservation update, cid = {}",
+                reservation.getId());
+        reservation.setId(r.getId());
+        reservationService.store(reservation);
+      } else {
+        log.info("[ConnectionService] reserveConfirmed: reservation no change, cid = {}",
+                reservation.getId());
+      }
+    }
 
     Operation op = operationMap.get(value.getCorrelationId());
     if (op == null) {
@@ -97,7 +116,7 @@ public class ConnectionService {
     return FACTORY.createGenericAcknowledgmentType();
   }
 
-  private void processConfirmedCriteria(
+  private Reservation processConfirmedCriteria(
           String providerNsa,
           String gid,
           String description,
@@ -109,24 +128,7 @@ public class ConnectionService {
 
     log.info("[ConnectionService] processConfirmedCriteria: connectionId = {}", cid);
 
-    Reservation reservation = reservationService.get(providerNsa, cid);
-    if (reservation != null && reservation.getVersion() >= criteria.getVersion()) {
-      // We have already stored this so update only if state has changed.
-      if (reservationState.compareTo(reservation.getReservationState()) != 0
-              || lifecycleState.compareTo(reservation.getLifecycleState()) != 0
-              || dataPlaneStatus.isActive() != reservation.isDataPlaneActive()) {
-        reservation.setReservationState(reservationState);
-        reservation.setLifecycleState(lifecycleState);
-        reservation.setDataPlaneActive(dataPlaneStatus.isActive());
-        reservation.setDiscovered(System.currentTimeMillis());
-
-        log.info("[ConnectionService] processConfirmedCriteria: updating resvervation = {}", reservation);
-        reservationService.store(reservation);
-      }
-      return;
-    }
-
-    reservation = new Reservation();
+    Reservation reservation = new Reservation();
     reservation.setGlobalReservationId(gid);
     reservation.setDescription(description);
     reservation.setDiscovered(System.currentTimeMillis());
@@ -143,13 +145,11 @@ public class ConnectionService {
     // Now we need to determine the network based on the STP used in the service.
     try {
       serializeP2PS(criteria.getServiceType(), criteria.getAny(), reservation);
-
-      // Replace the existing entry with this new criteria if we already have one.
-      log.info("[ConnectionService] processConfirmedCriteria: store resvervation = {}", reservation);
-      reservationService.store(reservation);
+      return reservation;
     } catch (JAXBException ex) {
       log.error("[ConnectionService] processReservation failed for connectionId = {}",
               reservation.getConnectionId(), ex);
+      return null;
     }
   }
 

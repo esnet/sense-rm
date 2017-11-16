@@ -137,7 +137,11 @@ public class NmlPort {
     Set<SimpleLabel> simpleLabels = stp.getLabels();
     simpleLabels.stream().forEach(label -> {
       NmlLabelGroupType lgt = FACTORY.createNmlLabelGroupType();
-      lgt.setLabeltype(label.getType());
+      if ("vlan".equalsIgnoreCase(label.getType())) {
+        lgt.setLabeltype("http://schemas.ogf.org/nml/2012/10/ethernet#vlan");
+      } else {
+        lgt.setLabeltype(label.getType());
+      }
       lgt.setValue(label.getValue());
       labels.add(lgt);
     });

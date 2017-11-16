@@ -112,8 +112,8 @@ public class SwitchingSubnetModel {
     // Process NSI connections adding SwitchingSubnets and associated child
     // ports associated with the parent bidirectional port.
     for (Reservation reservation : reservationService.getByTopologyId(topologyId)) {
-      log.info("[SwitchingSubnetModel] processing reservation cid = {}, gid = {}",
-              reservation.getConnectionId(), reservation.getGlobalReservationId());
+      log.info("[SwitchingSubnetModel] processing reservation cid = {}, gid = {}, description={}",
+              reservation.getConnectionId(), reservation.getGlobalReservationId(), reservation.getDescription());
 
       if (version < reservation.getDiscovered()) {
         version = reservation.getDiscovered();
@@ -329,14 +329,9 @@ public class SwitchingSubnetModel {
           nss.setTopologyId(reservation.getTopologyId());
           nss.setId(nssId);
           nss.setDiscovered(reservation.getDiscovered());
-          nss.setTag("connectionId=" + reservation.getProviderNsa() + ":cid+" + reservation.getConnectionId());
+          nss.setTag("connectionId=" + topologyId + ":cid+" + ConnectionId.strip(reservation.getConnectionId()));
           holder.getSwitchingSubnets().add(nss);
           log.info("[SwitchingSubnetModel] adding SwitchingSubnet = {}", nss.getId());
-
-          if (version < reservation.getDiscovered()) {
-            version = reservation.getDiscovered();
-          }
-
         } catch (JAXBException ex) {
           log.error("Could not parse P2PS structure for conenctionId = {}", reservation.getConnectionId(), ex);
         }

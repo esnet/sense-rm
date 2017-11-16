@@ -54,7 +54,8 @@ public class ConnectionMapServiceBean implements ConnectionMapService {
       return null;
     }
 
-    ConnectionMap conn = connectionMapRepository.findByGlobalReservationId(connectionMap.globalReservationId);
+    ConnectionMap conn = connectionMapRepository.findByGlobalReservationIdAndSwitchingSubnetId(
+            connectionMap.globalReservationId, connectionMap.switchingSubnetId);
     if (conn != null) {
       connectionMap.setId(conn.getId());
     }

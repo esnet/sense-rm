@@ -146,6 +146,10 @@ public class SwitchingSubnetModel {
           log.info(m.toString());
         }
       }
+
+      log.info("Testing for stored connection, gid = {}, decription = {}",
+              reservation.getGlobalReservationId(), reservation.getDescription());
+
       Optional<ConnectionMap> connMap = Optional.empty();
       if (!Strings.isNullOrEmpty(reservation.getGlobalReservationId())
               && !Strings.isNullOrEmpty(reservation.getDescription())) {

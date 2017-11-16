@@ -292,7 +292,7 @@ public class ConnectionService {
       } else if (r.diff(reservation)) {
         // We have to determine if the stored reservation needs to be updated.
         log.info("[ConnectionService] querySummaryConfirmed: storing reservation update, cid = {}",
-                reservation.getId());
+                reservation.getConnectionId());
         reservation.setId(r.getId());
         reservationService.store(reservation);
       } else {
@@ -383,6 +383,7 @@ public class ConnectionService {
           Reservation reservation = new Reservation();
           reservation.setDiscovered(System.currentTimeMillis());
           reservation.setGlobalReservationId(gid);
+          reservation.setDescription(description);
           reservation.setProviderNsa(child.getProviderNSA());
           reservation.setConnectionId(child.getConnectionId());
           reservation.setVersion(criteria.getVersion());

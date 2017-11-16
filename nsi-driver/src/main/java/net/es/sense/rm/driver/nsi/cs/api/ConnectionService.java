@@ -297,7 +297,7 @@ public class ConnectionService {
         reservationService.store(reservation);
       } else {
         log.info("[ConnectionService] querySummaryConfirmed: reservation no change, cid = {}",
-                reservation.getId());
+                reservation.getConnectionId());
       }
     }
 

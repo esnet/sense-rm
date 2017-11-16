@@ -1,5 +1,6 @@
 package net.es.sense.rm.driver.nsi.mrml;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,14 +138,26 @@ public class SwitchingSubnetModel {
         continue;
       }
 
+      Collection<ConnectionMap> get = connectionMapService.get();
+      log.info ("connectionMapService contents:...");
+      for (ConnectionMap c : get) {
+        log.info ("{}, {}", c.getGlobalReservationId(), c.getSwitchingSubnetId());
+        for (StpMapping m : c.getMap()) {
+          log.info(m.toString());
+        }
+      }
       Optional<ConnectionMap> connMap = Optional.empty();
       if (!Strings.isNullOrEmpty(reservation.getGlobalReservationId())
               && !Strings.isNullOrEmpty(reservation.getDescription())) {
+        log.info("Looking up connmap");
+        Collection<ConnectionMap> byGlobalReservationId = connectionMapService.getByGlobalReservationId(reservation.getGlobalReservationId());
+        log.debug("Found: {}", byGlobalReservationId);
         connMap = Optional.ofNullable(
                 connectionMapService.getByGlobalReservationIdAndSwitchingSubnetId(
                         reservation.getGlobalReservationId(),
                         reservation.getDescription())
         );
+
       }
 
       log.info("[SwitchingSubnetModel] connMap = {}", connMap);

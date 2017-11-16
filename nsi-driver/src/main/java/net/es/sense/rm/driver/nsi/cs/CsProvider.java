@@ -204,9 +204,9 @@ public class CsProvider {
       Resource switchingSubnet = querySolution.get("resource").asResource();
       log.debug("SwitchingSubnet: " + switchingSubnet.getURI());
 
-      Statement tag = switchingSubnet.getProperty(Mrs.tag);
-      String description = tag.getString();
-      log.debug("description: " + description);
+      //Statement tag = switchingSubnet.getProperty(Mrs.tag);
+      //String description = tag.getString();
+      //log.debug("description: " + description);
 
       // We need the associated parent SwitchingService resource to determine
       // the ServiceDefinition that holds the serviceType.
@@ -310,8 +310,8 @@ public class CsProvider {
         rrc.getAny().add(P2PS_FACTORY.createP2Ps(p2ps));
 
         ReserveType r = CS_FACTORY.createReserveType();
-        r.setGlobalReservationId(switchingSubnet.getURI());
-        r.setDescription(description);
+        r.setGlobalReservationId("deltaId+"+  deltaId);
+        r.setDescription(switchingSubnet.getURI());
         r.setCriteria(rrc);
 
         ReserveHolder rh = new ReserveHolder();
@@ -324,9 +324,8 @@ public class CsProvider {
 
         // Now store the mapping for this SwitchingSubnet.
         ConnectionMap cm = new ConnectionMap();
-        cm.setGlobalReservationId(switchingSubnet.getURI());
+        cm.setGlobalReservationId("deltaId+"+  deltaId);
         cm.setSwitchingSubnetId(switchingSubnet.getURI());
-        cm.setTag(description);
         StpMapping smSrc = new StpMapping(src.getStp().getStpId(), src.getMrsPortId(),
                 src.getmrsLabelId(), src.getBw().getId());
         cm.getMap().add(smSrc);

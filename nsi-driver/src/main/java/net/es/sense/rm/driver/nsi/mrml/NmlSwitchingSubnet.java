@@ -13,7 +13,7 @@ import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
 public class NmlSwitchingSubnet {
   private String id;
   private String topologyId;
-  private String serviceId;
+  private String connectionId;
   private long discovered;
 
   private List<NmlPort> ports = new ArrayList<>();
@@ -22,7 +22,7 @@ public class NmlSwitchingSubnet {
 
   private Optional<Long> endTime = Optional.empty();
 
-  private Optional<String> tag = Optional.empty();
+  private String tag;
 
   private NmlSwitchingServiceType switchingService;
 

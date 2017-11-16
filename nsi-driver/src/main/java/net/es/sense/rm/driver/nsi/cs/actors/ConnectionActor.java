@@ -9,6 +9,7 @@ import net.es.nsi.cs.lib.Client;
 import net.es.nsi.cs.lib.Helper;
 import net.es.nsi.cs.lib.NsiHeader;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
+import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.dds.messages.TimerMsg;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException;
@@ -38,6 +39,9 @@ public class ConnectionActor extends UntypedAbstractActor {
 
   @Autowired
   private NsiProperties nsiProperties;
+
+  @Autowired
+  private ReservationService reservationService;
 
   private static final ObjectFactory FACTORY = new ObjectFactory();
 

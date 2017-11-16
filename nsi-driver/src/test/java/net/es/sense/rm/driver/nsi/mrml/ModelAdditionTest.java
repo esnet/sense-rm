@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 public class ModelAdditionTest {
 
   private static final String MODEL_FILE = "src/test/resources/model-1.ttl";
-  private static final String ADDITION_FILE = "src/test/resources/delta-1.ttl";
+  private static final String ADDITION_FILE = "src/test/resources/addition-1.ttl";
   private static final String MODEL_ID = "urn:uuid:c87c0ac1-e02b-484c-b595-e58d807a7661";
 
   private final ModelService modelService = Mockito.mock(ModelService.class);

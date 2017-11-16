@@ -251,8 +251,9 @@ public class ConnectionService {
       LifecycleStateEnumType lifecycleState = reservation.getConnectionStates().getLifecycleState();
       DataPlaneStatusType dataPlaneStatus = reservation.getConnectionStates().getDataPlaneStatus();
 
-      log.info("[ConnectionService] querySummaryConfirmed: cid = {}, gid = {}, rstate = {}, lstate = {}",
-              reservation.getConnectionId(), reservation.getGlobalReservationId(), reservationState, lifecycleState);
+      log.info("[ConnectionService] querySummaryConfirmed: cid = {}, gid = {}, decription = {}, rstate = {}, lstate = {}",
+              reservation.getConnectionId(), reservation.getGlobalReservationId(), reservation.getDescription(),
+              reservationState, lifecycleState);
 
       // If this reservation is in the process of being created, or failed
       // creation, then there will be no associated criteria.
@@ -298,6 +299,7 @@ public class ConnectionService {
               && lifecycleState.compareTo(reservation.getLifecycleState()) == 0
               && dataPlaneStatus.isActive() == reservation.isDataPlaneActive()) {
         // No changes so no work to do.
+        log.debug("[ConnectionService] processReservationNoCriteria: no change to reservation, cid = {}", cid);
         return;
       }
     } else {
@@ -347,12 +349,11 @@ public class ConnectionService {
           if (reservationState.compareTo(reservation.getReservationState()) != 0
                   || lifecycleState.compareTo(reservation.getLifecycleState()) != 0
                   || dataPlaneStatus.isActive() != reservation.isDataPlaneActive()) {
+            log.info("[ConnectionService] processReservation: updating resvervation = {}", reservation);
             reservation.setReservationState(reservationState);
             reservation.setLifecycleState(lifecycleState);
             reservation.setDataPlaneActive(dataPlaneStatus.isActive());
             reservation.setDiscovered(System.currentTimeMillis());
-
-            log.info("[ConnectionService] processReservation: updating resvervation = {}", reservation);
             reservationService.store(reservation);
           }
           continue;
@@ -377,21 +378,25 @@ public class ConnectionService {
           serializeP2PS(criteria.getServiceType(), criteria.getAny(), reservation);
 
           // Replace the existing entry with this new criteria if we already have one.
-          log.info("[ConnectionService] processReservation: store resvervation = {}", reservation);
+          log.info("[ConnectionService] processReservation: store cid = {}", cid);
           reservationService.store(reservation);
         } catch (JAXBException ex) {
-          log.error("[ConnectionService] processReservation failed for connectionId = {}",
-                  reservation.getConnectionId());
+          log.error("[ConnectionService] processReservation failed for cid = {}", cid);
         }
       } else {
         // We still have children so this must be an aggregator.
         for (ChildSummaryType child : children.getChild()) {
+          log.info("[ConnectionService] querySummaryConfirmed: child cid = {}, gid = {}, decription = {}, rstate = {}, lstate = {}",
+              child.getConnectionId(), gid, description, reservationState, lifecycleState);
+
           Reservation reservation = reservationService.get(child.getProviderNSA(), child.getConnectionId());
           if (reservation != null && reservation.getVersion() >= criteria.getVersion()) {
             // We have already stored this so update only if state has changed.
             if (reservationState.compareTo(reservation.getReservationState()) != 0
                     || lifecycleState.compareTo(reservation.getLifecycleState()) != 0
                     || dataPlaneStatus.isActive() != reservation.isDataPlaneActive()) {
+              log.debug("[ConnectionService] processSummaryCriteria: reservation changed, cid = {}",
+                      child.getConnectionId());
               reservation.setReservationState(reservationState);
               reservation.setLifecycleState(lifecycleState);
               reservation.setDataPlaneActive(dataPlaneStatus.isActive());
@@ -578,12 +583,20 @@ public class ConnectionService {
   public GenericAcknowledgmentType dataPlaneStateChange(DataPlaneStateChangeRequestType dataPlaneStateChange, Holder<CommonHeaderType> header) throws ServiceException {
     log.error("[ConnectionService] dataPlaneStateChange for connectionId = {}, active = {}",
             dataPlaneStateChange.getConnectionId(), dataPlaneStateChange.getDataPlaneStatus().isActive());
+
+    // This state change is in the context of the local providerNSA and not
+    // the child connection, so we need to look up the connectionId associated
+    // with the provider which may not be the connectionId stored in the DB.
     return FACTORY.createGenericAcknowledgmentType();
   }
 
   public GenericAcknowledgmentType reserveTimeout(ReserveTimeoutRequestType reserveTimeout, Holder<CommonHeaderType> header) throws ServiceException {
     log.error("[ConnectionService] reserveTimeout for correlationId = {}, connectionId = {}",
             header.value.getCorrelationId(), reserveTimeout.getConnectionId());
+
+    // We can fail the delta request based on this.  We do not have an outstanding
+    // operation (or may have one just starting) so no operation to correltate to.
+
     return FACTORY.createGenericAcknowledgmentType();
   }
 

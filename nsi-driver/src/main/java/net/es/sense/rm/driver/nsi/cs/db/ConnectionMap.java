@@ -34,9 +34,6 @@ public class ConnectionMap implements Serializable {
   @Basic(optional=false)
   String switchingSubnetId;
 
-  @Basic(optional=true)
-  String tag;
-
   @ElementCollection(fetch=FetchType.EAGER, targetClass=StpMapping.class)
   List<StpMapping> map = new ArrayList<>();
 

@@ -13,5 +13,8 @@ public interface ConnectionMapRepository extends CrudRepository<ConnectionMap, L
 
   public ConnectionMap findByGlobalReservationId(@Param("globalReservationId") String globalReservationId);
   public ConnectionMap findBySwitchingSubnetId(@Param("switchingSubnetId") String switchingSubnetId);
+  public ConnectionMap findByGlobalReservationIdAndSwitchingSubnetId(
+          @Param("globalReservationId") String globalReservationId,
+          @Param("switchingSubnetId") String switchingSubnetId);
 
 }

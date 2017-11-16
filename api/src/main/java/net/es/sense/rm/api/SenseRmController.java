@@ -1677,8 +1677,8 @@ public class SenseRmController extends SenseController {
 
     final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
 
-    log.info("[SenseRmController] operation = {}, accept = {}, model = {}, deltaRequest = {}",
-            location, accept, model, deltaRequest);
+    log.info("[SenseRmController] operation = {}, accept = {}, deltaId, modelid = {}, deltaRequest = {}",
+            location, accept, deltaRequest.getId(), model, deltaRequest);
 
     try {
       if (encode) {

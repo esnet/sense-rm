@@ -55,6 +55,8 @@ public class MrmlFactory {
   public long getVersion() {
     XMLGregorianCalendar version = topology.getVersion();
     GregorianCalendar cal = version.toGregorianCalendar();
+    log.debug("[MrmlFactory] version query nml version = {}, connection version = {}",
+            cal.getTimeInMillis(), ssm.getVersion());
     return cal.getTimeInMillis() > ssm.getVersion() ? cal.getTimeInMillis() : ssm.getVersion();
   }
 
@@ -454,8 +456,7 @@ public class MrmlFactory {
         Resource ssr = createResource(model, switchingSubnet.getId(), Mrs.SwitchingSubnet);
 
         // Place the reservation identifier into the SwitchingSubnet for tracing.
-        ssr.addProperty(Mrs.tag, "serviceId=" + switchingSubnet.getServiceId());
-        switchingSubnet.getTag().ifPresent(tag -> ssr.addProperty(Mrs.tag, tag));
+        ssr.addProperty(Mrs.tag, switchingSubnet.getTag());
 
         // This belongs to the parent topologyResource.
         ssr.addProperty(Nml.belongsTo, swResource);

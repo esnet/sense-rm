@@ -115,22 +115,36 @@ public class SwitchingSubnetModel {
       log.info("[SwitchingSubnetModel] processing reservation cid = {}, gid = {}",
               reservation.getConnectionId(), reservation.getGlobalReservationId());
 
+      if (version < reservation.getDiscovered()) {
+        version = reservation.getDiscovered();
+      }
+
+      // Skip generating model for reservation if it is expired.
       switch (reservation.getReservationState()) {
         case RESERVE_FAILED:
         case RESERVE_ABORTING:
         case RESERVE_TIMEOUT:
+          log.info("[SwitchingSubnetModel] skipping reservation cid = {}, reservationState = {}",
+                  reservation.getConnectionId(), reservation.getReservationState());
           continue;
         default:
           break;
       }
 
-      if (reservation.getLifecycleState().compareTo(LifecycleStateEnumType.CREATED) != 0) {
+      if (reservation.getLifecycleState() != LifecycleStateEnumType.CREATED) {
+        log.info("[SwitchingSubnetModel] skipping reservation cid = {}, lifecycleState = {}",
+                reservation.getConnectionId(), reservation.getLifecycleState());
         continue;
       }
 
       Optional<ConnectionMap> connMap = Optional.empty();
-      if (!Strings.isNullOrEmpty(reservation.getGlobalReservationId())) {
-        connMap = Optional.ofNullable(connectionMapService.getByGlobalReservationId(reservation.getGlobalReservationId()));
+      if (!Strings.isNullOrEmpty(reservation.getGlobalReservationId())
+              && !Strings.isNullOrEmpty(reservation.getDescription())) {
+        connMap = Optional.ofNullable(
+                connectionMapService.getByGlobalReservationIdAndSwitchingSubnetId(
+                        reservation.getGlobalReservationId(),
+                        reservation.getDescription())
+        );
       }
 
       // We only know about the EVTS service at this point.
@@ -309,13 +323,13 @@ public class SwitchingSubnetModel {
           nss.setSwitchingService(holder.getSwitchingService());
           nss.getPorts().add(srcChildPort);
           nss.getPorts().add(dstChildPort);
-          nss.setServiceId(reservation.getConnectionId());
+          nss.setConnectionId(reservation.getConnectionId());
           nss.setStartTime(startTime);
           nss.setEndTime(endTime);
           nss.setTopologyId(reservation.getTopologyId());
           nss.setId(nssId);
           nss.setDiscovered(reservation.getDiscovered());
-          nss.setTag(Optional.ofNullable(reservation.getDescription()));
+          nss.setTag("connectionId=" + reservation.getProviderNsa() + ":cid+" + reservation.getConnectionId());
           holder.getSwitchingSubnets().add(nss);
           log.info("[SwitchingSubnetModel] adding SwitchingSubnet = {}", nss.getId());
 

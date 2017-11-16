@@ -32,13 +32,18 @@ public class ConnectionMapServiceBean implements ConnectionMapService {
   }
 
   @Override
-  public ConnectionMap getByGlobalReservationId(String globalReservationId) {
-    return connectionMapRepository.findByGlobalReservationId(globalReservationId);
+  public Collection<ConnectionMap> getByGlobalReservationId(String globalReservationId) {
+    return Lists.newArrayList(connectionMapRepository.findByGlobalReservationId(globalReservationId));
   }
 
   @Override
-  public ConnectionMap getSwitchingSubnetId(String switchingSubnetId){
+  public ConnectionMap getBySwitchingSubnetId(String switchingSubnetId){
     return connectionMapRepository.findBySwitchingSubnetId(switchingSubnetId);
+  }
+
+  @Override
+  public ConnectionMap getByGlobalReservationIdAndSwitchingSubnetId(String globalReservationId, String switchingSubnetId) {
+    return connectionMapRepository.findByGlobalReservationIdAndSwitchingSubnetId(globalReservationId, switchingSubnetId);
   }
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)

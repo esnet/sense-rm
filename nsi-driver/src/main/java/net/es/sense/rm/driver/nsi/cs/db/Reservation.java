@@ -21,45 +21,46 @@ import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 @Entity
 @Table(name = "reservations")
 public class Reservation implements Serializable {
+
   @Id
   @GeneratedValue
   long id;
 
   // The time I first discovered this version of the connection.
-  @Basic(optional=false)
+  @Basic(optional = false)
   long discovered;
 
   // The providerNSA hosting this conenction.
-  @Basic(optional=false)
+  @Basic(optional = false)
   String providerNsa;
 
   // Optional global reservation identifier.
-  @Basic(optional=true)
+  @Basic(optional = true)
   String globalReservationId;
 
-  @Basic(optional=true)
+  @Basic(optional = true)
   String description;
 
   // Connection identifier of this connection on the uPA.
-  @Basic(optional=false)
+  @Basic(optional = false)
   String connectionId;
 
   // The network hosting this connection.
-  @Basic(optional=true)
+  @Basic(optional = true)
   String topologyId;
 
   // The serviceType of the connection.
-  @Basic(optional=true)
+  @Basic(optional = true)
   String serviceType;
 
   // The schedule parameters for this reservation.
   long startTime;
   long endTime;
 
-  @Basic(optional=false)
+  @Basic(optional = false)
   ReservationStateEnumType reservationState;
 
-  @Basic(optional=false)
+  @Basic(optional = false)
   LifecycleStateEnumType lifecycleState;
 
   boolean dataPlaneActive = false;
@@ -69,31 +70,36 @@ public class Reservation implements Serializable {
 
   // The service element encoded in a string.
   @Lob
-  @Basic(fetch=FetchType.LAZY, optional=true)
+  @Basic(fetch = FetchType.LAZY, optional = true)
   String service;
 
   public boolean diff(Reservation r) {
-    if (!providerNsa.equals(r.getProviderNsa())) {
+    if (providerNsa != null && r.getProviderNsa() != null && !providerNsa.equals(r.getProviderNsa())) {
       return true;
     }
 
-    if (!globalReservationId.equals(r.getGlobalReservationId())) {
+    if (globalReservationId != null && r.getGlobalReservationId() != null
+            && !globalReservationId.equals(r.getGlobalReservationId())) {
       return true;
     }
 
-    if (!description.equals(r.getDescription())) {
+    if (description != null && r.getDescription() != null
+            && !description.equals(r.getDescription())) {
       return true;
     }
 
-    if (!connectionId.equals(r.getConnectionId())) {
+    if (connectionId != null && r.getConnectionId() != null
+            && !connectionId.equals(r.getConnectionId())) {
       return true;
     }
 
-    if (!topologyId.equals(r.getTopologyId())) {
+    if (topologyId != null && r.getTopologyId() != null
+            && !topologyId.equals(r.getTopologyId())) {
       return true;
     }
 
-    if (!serviceType.equals(r.getServiceType())) {
+    if (serviceType != null && r.getServiceType() != null
+            && !serviceType.equals(r.getServiceType())) {
       return true;
     }
 

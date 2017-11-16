@@ -147,6 +147,8 @@ public class SwitchingSubnetModel {
         );
       }
 
+      log.info("[SwitchingSubnetModel] connMap = {}", connMap);
+
       // We only know about the EVTS service at this point.
       if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(reservation.getServiceType().trim())) {
         log.info("[SwitchingSubnetModel] processing EVTS service");

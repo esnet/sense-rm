@@ -71,4 +71,46 @@ public class Reservation implements Serializable {
   @Lob
   @Basic(fetch=FetchType.LAZY, optional=true)
   String service;
+
+  public boolean diff(Reservation r) {
+    if (!providerNsa.equals(r.getProviderNsa())) {
+      return true;
+    }
+
+    if (!globalReservationId.equals(r.getGlobalReservationId())) {
+      return true;
+    }
+
+    if (!description.equals(r.getDescription())) {
+      return true;
+    }
+
+    if (!connectionId.equals(r.getConnectionId())) {
+      return true;
+    }
+
+    if (!topologyId.equals(r.getTopologyId())) {
+      return true;
+    }
+
+    if (!serviceType.equals(r.getServiceType())) {
+      return true;
+    }
+
+    if (startTime != r.getStartTime() || endTime != r.getEndTime()) {
+      return true;
+    }
+
+    if (reservationState != r.getReservationState()
+            || lifecycleState != r.getLifecycleState()
+            || dataPlaneActive != r.isDataPlaneActive()) {
+      return true;
+    }
+
+    if (version != r.getVersion()) {
+      return true;
+    }
+
+    return false;
+  }
 }

@@ -1,5 +1,6 @@
 package net.es.sense.rm.driver.nsi.cs.api;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.jws.WebService;
 import javax.xml.bind.JAXBElement;
@@ -245,6 +246,7 @@ public class ConnectionService {
             providerNsa, reservations.size());
 
     // Process each reservation returned.
+    List<Reservation> results = new ArrayList<>();
     for (QuerySummaryResultType reservation : reservations) {
       // Get the parent reservation information to apply to child connections.
       ReservationStateEnumType reservationState = reservation.getConnectionStates().getReservationState();
@@ -258,16 +260,16 @@ public class ConnectionService {
       // If this reservation is in the process of being created, or failed
       // creation, then there will be no associated criteria.
       if (reservation.getCriteria().isEmpty()) {
-        processReservationNoCriteria(
+        results.add(processReservationNoCriteria(
                 providerNsa,
                 reservation.getGlobalReservationId(),
                 reservation.getDescription(),
                 reservation.getConnectionId(),
                 reservationState,
                 lifecycleState,
-                dataPlaneStatus);
+                dataPlaneStatus));
       } else {
-        processSummaryCriteria(
+        results.addAll(processSummaryCriteria(
                 providerNsa,
                 reservation.getGlobalReservationId(),
                 reservation.getDescription(),
@@ -275,14 +277,34 @@ public class ConnectionService {
                 reservationState,
                 lifecycleState,
                 dataPlaneStatus,
-                reservation.getCriteria());
+                reservation.getCriteria()));
+      }
+    }
+
+    // Determine if we need to update each reservation in the database.
+    for (Reservation reservation : results) {
+      Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
+      if (r == null) {
+        // We have not seen this reservation before so store it.
+        log.info("[ConnectionService] querySummaryConfirmed: storing new reservation, cid = {}",
+                reservation.getId());
+        reservationService.store(reservation);
+      } else if (r.diff(reservation)) {
+        // We have to determine if the stored reservation needs to be updated.
+        log.info("[ConnectionService] querySummaryConfirmed: storing reservation update, cid = {}",
+                reservation.getId());
+        reservation.setId(r.getId());
+        reservationService.store(reservation);
+      } else {
+        log.info("[ConnectionService] querySummaryConfirmed: reservation no change, cid = {}",
+                reservation.getId());
       }
     }
 
     return FACTORY.createGenericAcknowledgmentType();
   }
 
-  private void processReservationNoCriteria(
+  private Reservation processReservationNoCriteria(
           String providerNsa,
           String gid,
           String description,
@@ -290,38 +312,23 @@ public class ConnectionService {
           ReservationStateEnumType reservationState,
           LifecycleStateEnumType lifecycleState,
           DataPlaneStatusType dataPlaneStatus) {
-    log.info("[ConnectionService] processReservationNoCriteria: connectionId = {}", cid);
-
-    Reservation reservation = reservationService.get(providerNsa, cid);
-    if (reservation != null) {
-      // We have already stored this so update only if state has changed.
-      if (reservationState.compareTo(reservation.getReservationState()) == 0
-              && lifecycleState.compareTo(reservation.getLifecycleState()) == 0
-              && dataPlaneStatus.isActive() == reservation.isDataPlaneActive()) {
-        // No changes so no work to do.
-        log.debug("[ConnectionService] processReservationNoCriteria: no change to reservation, cid = {}", cid);
-        return;
-      }
-    } else {
-      reservation = new Reservation();
-      reservation.setGlobalReservationId(gid);
-      reservation.setDescription(description);
-      reservation.setProviderNsa(providerNsa);
-      reservation.setConnectionId(cid);
-      reservation.setVersion(0);
-    }
 
     // We have had a state change so update the reservation.
+    Reservation reservation = new Reservation();
+    reservation.setGlobalReservationId(gid);
+    reservation.setDescription(description);
+    reservation.setProviderNsa(providerNsa);
+    reservation.setConnectionId(cid);
+    reservation.setVersion(0);
     reservation.setReservationState(reservationState);
     reservation.setLifecycleState(lifecycleState);
     reservation.setDataPlaneActive(dataPlaneStatus.isActive());
     reservation.setDiscovered(System.currentTimeMillis());
 
-    log.info("[ConnectionService] processReservationNoCriteria: storing reservation = {}", reservation);
-    reservationService.store(reservation);
+    return reservation;
   }
 
-  private void processSummaryCriteria(
+  private List<Reservation> processSummaryCriteria(
           String providerNsa,
           String gid,
           String description,
@@ -333,33 +340,18 @@ public class ConnectionService {
 
     log.info("[ConnectionService] processSummaryCriteria: connectionId = {}", cid);
 
+    List<Reservation> results = new ArrayList<>();
+
     // There will be one criteria for each version of this reservation. We
     // will check to see if there are any new versions than what is already
     // stored.
     for (QuerySummaryResultCriteriaType criteria : criteriaList) {
       log.info("[ConnectionService] processCriteria: cid = {}, version = {}, serviceType = {}",
               cid, criteria.getVersion(), criteria.getServiceType());
-
       ChildSummaryListType children = criteria.getChildren();
       if (children == null || children.getChild().isEmpty()) {
         // We are at a leaf child so check to see if we need to store this reservation information.
-        Reservation reservation = reservationService.get(providerNsa, cid);
-        if (reservation != null && reservation.getVersion() >= criteria.getVersion()) {
-          // We have already stored this so update only if state has changed.
-          if (reservationState.compareTo(reservation.getReservationState()) != 0
-                  || lifecycleState.compareTo(reservation.getLifecycleState()) != 0
-                  || dataPlaneStatus.isActive() != reservation.isDataPlaneActive()) {
-            log.info("[ConnectionService] processReservation: updating resvervation = {}", reservation);
-            reservation.setReservationState(reservationState);
-            reservation.setLifecycleState(lifecycleState);
-            reservation.setDataPlaneActive(dataPlaneStatus.isActive());
-            reservation.setDiscovered(System.currentTimeMillis());
-            reservationService.store(reservation);
-          }
-          continue;
-        }
-
-        reservation = new Reservation();
+        Reservation reservation = new Reservation();
         reservation.setGlobalReservationId(gid);
         reservation.setDescription(description);
         reservation.setDiscovered(System.currentTimeMillis());
@@ -376,37 +368,19 @@ public class ConnectionService {
         // Now we need to determine the network based on the STP used in the service.
         try {
           serializeP2PS(criteria.getServiceType(), criteria.getAny(), reservation);
-
-          // Replace the existing entry with this new criteria if we already have one.
-          log.info("[ConnectionService] processReservation: store cid = {}", cid);
-          reservationService.store(reservation);
         } catch (JAXBException ex) {
-          log.error("[ConnectionService] processReservation failed for cid = {}", cid);
+          log.error("[ConnectionService] processReservation failed for cid = {}", cid, ex);
+          continue;
         }
+
+        results.add(reservation);
       } else {
         // We still have children so this must be an aggregator.
         for (ChildSummaryType child : children.getChild()) {
           log.info("[ConnectionService] querySummaryConfirmed: child cid = {}, gid = {}, decription = {}, rstate = {}, lstate = {}",
-              child.getConnectionId(), gid, description, reservationState, lifecycleState);
+                  child.getConnectionId(), gid, description, reservationState, lifecycleState);
 
-          Reservation reservation = reservationService.get(child.getProviderNSA(), child.getConnectionId());
-          if (reservation != null && reservation.getVersion() >= criteria.getVersion()) {
-            // We have already stored this so update only if state has changed.
-            if (reservationState.compareTo(reservation.getReservationState()) != 0
-                    || lifecycleState.compareTo(reservation.getLifecycleState()) != 0
-                    || dataPlaneStatus.isActive() != reservation.isDataPlaneActive()) {
-              log.debug("[ConnectionService] processSummaryCriteria: reservation changed, cid = {}",
-                      child.getConnectionId());
-              reservation.setReservationState(reservationState);
-              reservation.setLifecycleState(lifecycleState);
-              reservation.setDataPlaneActive(dataPlaneStatus.isActive());
-              reservation.setDiscovered(System.currentTimeMillis());
-              reservationService.store(reservation);
-            }
-            continue;
-          }
-
-          reservation = new Reservation();
+          Reservation reservation = new Reservation();
           reservation.setDiscovered(System.currentTimeMillis());
           reservation.setGlobalReservationId(gid);
           reservation.setProviderNsa(child.getProviderNSA());
@@ -422,17 +396,18 @@ public class ConnectionService {
           // Now we need to determine the network based on the STP used in the service.
           try {
             serializeP2PS(child.getServiceType(), child.getAny(), reservation);
-
-            // Replace the existing entry with this new criteria if we already have one.
-            log.info("[ConnectionService] processReservation: store resvervation = {}", reservation);
-            reservationService.store(reservation);
           } catch (JAXBException ex) {
             log.error("[ConnectionService] processReservation failed for connectionId = {}",
-                    reservation.getConnectionId());
+                    reservation.getConnectionId(), ex);
+            continue;
           }
+
+          results.add(reservation);
         }
       }
     }
+
+    return results;
   }
 
   private void serializeP2PS(String serviceType, List<Object> any, Reservation reservation) throws JAXBException {
@@ -596,7 +571,6 @@ public class ConnectionService {
 
     // We can fail the delta request based on this.  We do not have an outstanding
     // operation (or may have one just starting) so no operation to correltate to.
-
     return FACTORY.createGenericAcknowledgmentType();
   }
 

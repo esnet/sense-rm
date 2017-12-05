@@ -32,6 +32,11 @@ public class ReservationServiceBean implements ReservationService {
   }
 
   @Override
+  public Collection<Reservation> getByGlobalReservationId(String globalReservationId) {
+    return Lists.newArrayList(reservationRepository.findByGlobalReservationId(globalReservationId));
+  }
+
+  @Override
   public Reservation get(long id) {
     return reservationRepository.findOne(id);
   }

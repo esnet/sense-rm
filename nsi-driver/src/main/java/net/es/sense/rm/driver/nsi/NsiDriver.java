@@ -65,7 +65,7 @@ public class NsiDriver implements Driver {
       throw new ExecutionException(new IllegalArgumentException("No network specified in configuration."));
     }
 
-    // Convert the internal model representation to the driver interface model.
+    // Convert the internal referencedModel representation to the driver interface referencedModel.
     try {
       ModelService modelService = raController.getModelService();
       Model model = modelService.get(id);
@@ -124,41 +124,42 @@ public class NsiDriver implements Driver {
   @Override
   @Async
   public Future<DeltaResource> propagateDelta(DeltaRequest deltaRequest, String modelType) throws ExecutionException, NotFoundException, InternalServerErrorException {
-    log.info("[propagateDelta] processing delta for modelId {}", deltaRequest.getModelId());
+    log.info("[propagateDelta] processing deltaId = {}, modelId = {}",
+            deltaRequest.getId(), deltaRequest.getModelId());
 
-    // Make sure the referenced model has not expired.
+    // Make sure the referenced referencedModel has not expired.
     ModelService modelService = raController.getModelService();
-    Model model = modelService.get(deltaRequest.getModelId());
-    if (model == null) {
+    Model referencedModel = modelService.get(deltaRequest.getModelId());
+    if (referencedModel == null) {
       log.error("[NsiDriver] specified model not found, modelId = {}.", deltaRequest.getModelId());
       throw new NotFoundException("Specified model not found, modelId = " + deltaRequest.getModelId());
     }
 
-    // We need to apply the reduction and addition to the current model so we
+    // We need to apply the reduction and addition to the current referencedModel so we
     // can getNewer the result of this delta for storage.
-    Collection<Model> modelResult = modelService.get(true, nsiProperties.getNetworkId());
-    if (modelResult == null || modelResult.isEmpty()) {
+    Collection<Model> currentModel = modelService.get(true, nsiProperties.getNetworkId());
+    if (currentModel == null || currentModel.isEmpty()) {
       throw new InternalServerErrorException("Could not find current model");
     }
 
     try {
-      // Get the model on which we apply the changes.
-      Model currentModel = modelResult.stream().findFirst().get();
-      org.apache.jena.rdf.model.Model baseModel
-              = ModelUtil.unmarshalModel(currentModel.getBase());
+      // Get the referencedModel on which we apply the changes.
+      Model baseModel = currentModel.stream().findFirst().get();
+      org.apache.jena.rdf.model.Model rdfModel
+              = ModelUtil.unmarshalModel(baseModel.getBase());
 
       // Apply the delta reduction.
       Optional<org.apache.jena.rdf.model.Model> reduction = Optional.empty();
       if (!Strings.isNullOrEmpty(deltaRequest.getReduction())) {
         reduction = Optional.ofNullable(ModelUtil.unmarshalModel(deltaRequest.getReduction()));
-        reduction.ifPresent(r -> ModelUtil.applyDeltaReduction(baseModel, r));
+        reduction.ifPresent(r -> ModelUtil.applyDeltaReduction(rdfModel, r));
       }
 
       // Apply the delta addition.
       Optional<org.apache.jena.rdf.model.Model> addition = Optional.empty();
       if (!Strings.isNullOrEmpty(deltaRequest.getAddition())) {
         addition = Optional.ofNullable(ModelUtil.unmarshalModel(deltaRequest.getAddition()));
-        addition.ifPresent(a -> ModelUtil.applyDeltaAddition(baseModel, a));
+        addition.ifPresent(a -> ModelUtil.applyDeltaAddition(rdfModel, a));
       }
 
       // Create and store a delta object representing this request.
@@ -171,17 +172,18 @@ public class NsiDriver implements Driver {
       delta.setState(DeltaState.Accepting);
       delta.setAddition(deltaRequest.getAddition());
       delta.setReduction(deltaRequest.getReduction());
-      delta.setResult(ModelUtil.marshalModel(baseModel));
-
-      log.info("[NsiDriver] storing deltaId: {}", delta.getDeltaId());
-
+      delta.setResult(ModelUtil.marshalModel(rdfModel));
       long id = deltaService.store(delta).getId();
 
+      log.info("[NsiDriver] stored deltaId: {}", delta.getDeltaId());
+
       // Now process the delta which may result in an asynchronous
-      // modification to the delta.
-      List<String> connectionIds;
+      // modification to the delta.  Keep track of the connectionId
+      // so that we can commit connections associated with this
+      // delta.
       try {
-        connectionIds = raController.getCsProvider().processDelta(model, delta.getDeltaId(), reduction, addition);
+        raController.getCsProvider().processDelta(
+                referencedModel, delta.getDeltaId(), reduction, addition);
       } catch (Exception ex) {
         delta = deltaService.get(id);
         delta.setState(DeltaState.Failed);
@@ -197,7 +199,6 @@ public class NsiDriver implements Driver {
       }
 
       delta.setLastModified(System.currentTimeMillis());
-      delta.getConnectionId().addAll(connectionIds);
       deltaService.store(delta);
 
       // Sent back the delta created to the orchestrator.
@@ -205,7 +206,7 @@ public class NsiDriver implements Driver {
       deltaResponse.setId(delta.getDeltaId());
       deltaResponse.setState(delta.getState());
       deltaResponse.setLastModified(XmlUtilities.longToXMLGregorianCalendar(delta.getLastModified()).toXMLFormat());
-      deltaResponse.setModelId(currentModel.getModelId());
+      deltaResponse.setModelId(baseModel.getModelId());
       deltaResponse.setReduction(delta.getReduction());
       deltaResponse.setAddition(delta.getAddition());
       deltaResponse.setResult(delta.getResult());
@@ -247,34 +248,31 @@ public class NsiDriver implements Driver {
     // Now send the NSI CS commit requests.
     List<String> connectionIds;
     try {
-      connectionIds = raController.getCsProvider().commitDelta(delta.getDeltaId(), delta.getConnectionId());
+      raController.getCsProvider().commitDelta(delta.getDeltaId());
 
+      // Read the delta again then update if needed.  The orchestrator should
+      // not have a reference yet but just in case.
+      delta = deltaService.get(id);
+      log.info("[NsiDriver] delta state, id = {}, state = {}.", id, delta.getState().name());
+      if (delta.getState() == DeltaState.Committing) {
+        delta.setState(DeltaState.Committed);
+        log.info("[NsiDriver] delta state transition to id = {}, state = {}.", id, delta.getState().name());
+      }
 
-    // Read the delta again then update if needed.  The orchestrator should
-    // not have a reference yet but just in case.
-    delta = deltaService.get(id);
-    log.info("[NsiDriver] delta state, id = {}, state = {}.", id, delta.getState().name());
-    if (delta.getState() == DeltaState.Committing) {
-      delta.setState(DeltaState.Committed);
-      log.info("[NsiDriver] delta state transition to id = {}, state = {}.", id, delta.getState().name());
-    }
+      delta.setLastModified(System.currentTimeMillis());
+      deltaService.store(delta);
 
-    delta.setLastModified(System.currentTimeMillis());
-    delta.getConnectionId().clear();
-    delta.getConnectionId().addAll(connectionIds);
-    deltaService.store(delta);
+      // Sent back the delta created to the orchestrator.
+      DeltaResource deltaResponse = new DeltaResource();
+      deltaResponse.setId(delta.getDeltaId());
+      deltaResponse.setState(delta.getState());
+      deltaResponse.setLastModified(XmlUtilities.longToXMLGregorianCalendar(delta.getLastModified()).toXMLFormat());
+      deltaResponse.setModelId(delta.getModelId());
+      deltaResponse.setReduction(delta.getReduction());
+      deltaResponse.setAddition(delta.getAddition());
+      deltaResponse.setResult(delta.getResult());
 
-    // Sent back the delta created to the orchestrator.
-    DeltaResource deltaResponse = new DeltaResource();
-    deltaResponse.setId(delta.getDeltaId());
-    deltaResponse.setState(delta.getState());
-    deltaResponse.setLastModified(XmlUtilities.longToXMLGregorianCalendar(delta.getLastModified()).toXMLFormat());
-    deltaResponse.setModelId(delta.getModelId());
-    deltaResponse.setReduction(delta.getReduction());
-    deltaResponse.setAddition(delta.getAddition());
-    deltaResponse.setResult(delta.getResult());
-
-    return new AsyncResult<>(deltaResponse);
+      return new AsyncResult<>(deltaResponse);
 
     } catch (ServiceException se) {
       delta = deltaService.get(id);
@@ -336,7 +334,7 @@ public class NsiDriver implements Driver {
 
     Collection<DeltaResource> results = new ArrayList<>();
 
-    // Make sure the referenced model has not expired.
+    // Make sure the referenced referencedModel has not expired.
     DeltaService deltaService = raController.getDeltaService();
     Collection<Delta> deltas = deltaService.getNewer(lastModified);
     if (deltas == null || deltas.isEmpty()) {

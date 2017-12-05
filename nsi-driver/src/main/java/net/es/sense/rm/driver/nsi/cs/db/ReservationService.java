@@ -20,6 +20,8 @@ public interface ReservationService {
 
   public Collection<Reservation> getByTopologyId(String topologyId);
 
+  public Collection<Reservation> getByGlobalReservationId(String globalReservationId);
+
   public Reservation get(long id);
 
   public Collection<Reservation> get(String connectionId);

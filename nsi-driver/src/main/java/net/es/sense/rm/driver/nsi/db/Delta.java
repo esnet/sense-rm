@@ -20,10 +20,7 @@
 package net.es.sense.rm.driver.nsi.db;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.Basic;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -70,8 +67,4 @@ public class Delta implements Serializable {
   @Lob
   @Basic(fetch=FetchType.LAZY, optional=true)
   private String result;            // resulting topology model that will be created by this delta resource.
-
-  @Basic(optional = true)
-  @ElementCollection
-  List<String> connectionId = new ArrayList<>();
 }

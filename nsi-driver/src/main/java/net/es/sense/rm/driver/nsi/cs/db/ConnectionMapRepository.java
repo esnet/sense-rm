@@ -11,10 +11,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ConnectionMapRepository extends CrudRepository<ConnectionMap, Long> {
 
-  public ConnectionMap findByGlobalReservationId(@Param("globalReservationId") String globalReservationId);
-  public ConnectionMap findBySwitchingSubnetId(@Param("switchingSubnetId") String switchingSubnetId);
-  public ConnectionMap findByGlobalReservationIdAndSwitchingSubnetId(
-          @Param("globalReservationId") String globalReservationId,
+  public ConnectionMap findByDescription(@Param("description") String description);
+  public Iterable<ConnectionMap> findByDeltaId(@Param("deltaId") String deltaId);
+  public Iterable<ConnectionMap> findBySwitchingSubnetId(@Param("switchingSubnetId") String switchingSubnetId);
+  public Iterable<ConnectionMap> findByDeltaIdAndSwitchingSubnetId(
+          @Param("deltaId") String deltaId,
           @Param("switchingSubnetId") String switchingSubnetId);
 
 }

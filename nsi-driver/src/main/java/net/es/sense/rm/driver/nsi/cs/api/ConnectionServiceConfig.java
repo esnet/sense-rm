@@ -3,7 +3,7 @@ package net.es.sense.rm.driver.nsi.cs.api;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.ws.Endpoint;
-import net.es.sense.rm.driver.nsi.cs.db.OperationMap;
+import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -21,7 +21,7 @@ public class ConnectionServiceConfig {
   private ReservationService reservationService;
 
   @Autowired
-  private OperationMap operationMap;
+  private OperationMapRepository operationMap;
 
   @Bean
   public Endpoint endpoint() {

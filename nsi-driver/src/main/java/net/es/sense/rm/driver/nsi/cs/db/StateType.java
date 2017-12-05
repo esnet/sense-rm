@@ -1,7 +1,8 @@
 package net.es.sense.rm.driver.nsi.cs.db;
 
 /**
- *
+ * Models the NSI reservation states.
+ * 
  * @author hacksaw
  */
 public enum StateType {

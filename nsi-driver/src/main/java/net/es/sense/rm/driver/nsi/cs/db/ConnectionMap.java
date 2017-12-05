@@ -29,7 +29,10 @@ public class ConnectionMap implements Serializable {
   long lastAudit = 0;
 
   @Basic(optional=false)
-  String globalReservationId;
+  String description;
+
+  @Basic(optional=false)
+  String deltaId;
 
   @Basic(optional=false)
   String switchingSubnetId;

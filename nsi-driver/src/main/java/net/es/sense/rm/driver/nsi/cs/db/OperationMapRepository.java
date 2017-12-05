@@ -5,38 +5,44 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 /**
+ * Manages NSI operation progress between the Delta processing threads and
+ * the NSI ConnectionService callback thread through the use of a semaphore.
+ *
+ * This uses in-memory storage and assumes a restart of the SENSE-N-RM will
+ * clear the outstanding operations since both delta and NSI requests will
+ * time out across the restart.
  *
  * @author hacksaw
  */
 @Slf4j
-@Component
-public class OperationMap {
+@Repository
+public class OperationMapRepository {
 
   private final Map<String, Operation> map = new ConcurrentHashMap<>();
 
-  public Operation put(String correlationId, Operation operation) {
-    return map.put(correlationId, operation);
+  public Operation store(Operation operation) {
+    return map.put(operation.getCorrelationId(), operation);
   }
 
   public Operation get(String correlationId) {
     return map.get(correlationId);
   }
 
-  public Operation remove(String correlationId) {
+  public Operation delete(String correlationId) {
     return map.remove(correlationId);
   }
 
-  public void removeAll(List<String> correlationIds) {
+  public void delete(List<String> correlationIds) {
     correlationIds.forEach((correlationId) -> {
       map.remove(correlationId);
     });
   }
 
   public boolean wait(String correlationId) {
-    Operation op = map.get(correlationId);
+    Operation op = get(correlationId);
 
     if (op == null) {
       return false;
@@ -45,15 +51,15 @@ public class OperationMap {
     try {
       return op.getCompleted().tryAcquire(60, TimeUnit.SECONDS);
     } catch (InterruptedException ex) {
-      log.error("[OperationMap] Interupted so giving up", ex);
+      log.error("[OperationMapRepository] Interupted so giving up", ex);
       return false;
     }
   }
 
   public boolean acknowledge(String correlationId, StateType state) {
-    Operation op = map.get(correlationId);
+    Operation op = get(correlationId);
     if (op == null) {
-      log.error("[OperationMap] acknowledge failed!  Could not find correlationId = {}", correlationId);
+      log.error("[OperationMapRepository] acknowledge failed!  Could not find correlationId = {}", correlationId);
       return false;
     }
 

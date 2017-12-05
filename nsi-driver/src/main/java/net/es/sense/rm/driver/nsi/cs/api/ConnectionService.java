@@ -12,7 +12,7 @@ import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.cs.lib.CsParser;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.sense.rm.driver.nsi.cs.db.Operation;
-import net.es.sense.rm.driver.nsi.cs.db.OperationMap;
+import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.cs.db.StateType;
@@ -55,11 +55,11 @@ import org.w3c.dom.Node;
 public class ConnectionService {
 
   private final ReservationService reservationService;
-  private final OperationMap operationMap;
+  private final OperationMapRepository operationMap;
 
   private final static ObjectFactory FACTORY = new ObjectFactory();
 
-  public ConnectionService(ReservationService reservationService, OperationMap operationMap) {
+  public ConnectionService(ReservationService reservationService, OperationMapRepository operationMap) {
     this.reservationService = reservationService;
     this.operationMap = operationMap;
   }
@@ -287,7 +287,7 @@ public class ConnectionService {
       if (r == null) {
         // We have not seen this reservation before so store it.
         log.info("[ConnectionService] querySummaryConfirmed: storing new reservation, cid = {}",
-                reservation.getId());
+                reservation.getConnectionId());
         reservationService.store(reservation);
       } else if (r.diff(reservation)) {
         // We have to determine if the stored reservation needs to be updated.
@@ -415,15 +415,9 @@ public class ConnectionService {
     if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType)
             || Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(serviceType)) {
       reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
-      log.info("[ConnectionService] serializeP2PS: serviceType = {}", serviceType);
       for (Object object : any) {
-        log.info("[ConnectionService] serializeP2PS: object = {}", object.getClass().getCanonicalName());
-
         if (object instanceof JAXBElement) {
           JAXBElement jaxb = (JAXBElement) object;
-          log.info("[ConnectionService] serializeP2PS: JAXBElement getDeclaredType = {}, getName = {}",
-                  jaxb.getDeclaredType(), jaxb.getName());
-
           if (jaxb.getValue() instanceof P2PServiceBaseType) {
             P2PServiceBaseType p2ps = (P2PServiceBaseType) jaxb.getValue();
             SimpleStp stp = new SimpleStp(p2ps.getSourceSTP());
@@ -434,8 +428,6 @@ public class ConnectionService {
           }
         } else if (object instanceof org.apache.xerces.dom.ElementNSImpl) {
           org.apache.xerces.dom.ElementNSImpl element = (org.apache.xerces.dom.ElementNSImpl) object;
-          log.info("[ConnectionService] serializeP2PS: getBaseURI = {}, localName = {}", element.getBaseURI(), element.getLocalName());
-
           if ("p2ps".equalsIgnoreCase(element.getLocalName())) {
             P2PServiceBaseType p2p = CsParser.getInstance().node2p2ps((Node) element);
             SimpleStp stp = new SimpleStp(p2p.getSourceSTP());

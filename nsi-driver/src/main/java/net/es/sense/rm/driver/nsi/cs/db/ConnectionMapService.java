@@ -20,10 +20,12 @@ public interface ConnectionMapService {
 
   public ConnectionMap get(long id);
 
-  public Collection<ConnectionMap> getByGlobalReservationId(String globalReservationId);
+  public ConnectionMap getByDescription(String description);
 
-  public ConnectionMap getBySwitchingSubnetId(String switchingSubnetId);
+  public Collection<ConnectionMap> getByDeltaId(String deltaId);
 
-  public ConnectionMap getByGlobalReservationIdAndSwitchingSubnetId(String globalReservationId, String switchingSubnetId);
+  public Collection<ConnectionMap> getBySwitchingSubnetId(String switchingSubnetId);
+
+  public Collection<ConnectionMap> getByDeltaIdAndSwitchingSubnetId(String deltaId, String switchingSubnetId);
 
 }

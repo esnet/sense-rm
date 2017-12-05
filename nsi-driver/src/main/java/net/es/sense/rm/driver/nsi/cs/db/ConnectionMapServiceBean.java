@@ -32,30 +32,35 @@ public class ConnectionMapServiceBean implements ConnectionMapService {
   }
 
   @Override
-  public Collection<ConnectionMap> getByGlobalReservationId(String globalReservationId) {
-    return Lists.newArrayList(connectionMapRepository.findByGlobalReservationId(globalReservationId));
+  public ConnectionMap getByDescription(String description) {
+    return connectionMapRepository.findByDescription(description);
   }
 
   @Override
-  public ConnectionMap getBySwitchingSubnetId(String switchingSubnetId){
-    return connectionMapRepository.findBySwitchingSubnetId(switchingSubnetId);
+  public Collection<ConnectionMap> getByDeltaId(String deltaId) {
+    return Lists.newArrayList(connectionMapRepository.findByDeltaId(deltaId));
   }
 
   @Override
-  public ConnectionMap getByGlobalReservationIdAndSwitchingSubnetId(String globalReservationId, String switchingSubnetId) {
-    return connectionMapRepository.findByGlobalReservationIdAndSwitchingSubnetId(globalReservationId, switchingSubnetId);
+  public Collection<ConnectionMap> getBySwitchingSubnetId(String switchingSubnetId){
+    return Lists.newArrayList(connectionMapRepository.findBySwitchingSubnetId(switchingSubnetId));
+  }
+
+  @Override
+  public Collection<ConnectionMap> getByDeltaIdAndSwitchingSubnetId(String deltaId, String switchingSubnetId) {
+    return Lists.newArrayList(connectionMapRepository.findByDeltaIdAndSwitchingSubnetId(deltaId, switchingSubnetId));
   }
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
   public ConnectionMap store(ConnectionMap connectionMap) {
-    if (Strings.isNullOrEmpty(connectionMap.getGlobalReservationId())
+    if (Strings.isNullOrEmpty(connectionMap.getDescription())
+            || Strings.isNullOrEmpty(connectionMap.getDeltaId())
             || Strings.isNullOrEmpty(connectionMap.getSwitchingSubnetId())) {
       return null;
     }
 
-    ConnectionMap conn = connectionMapRepository.findByGlobalReservationIdAndSwitchingSubnetId(
-            connectionMap.globalReservationId, connectionMap.switchingSubnetId);
+    ConnectionMap conn = connectionMapRepository.findByDescription(connectionMap.description);
     if (conn != null) {
       connectionMap.setId(conn.getId());
     }

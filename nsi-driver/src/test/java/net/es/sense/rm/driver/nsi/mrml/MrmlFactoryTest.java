@@ -54,7 +54,7 @@ public class MrmlFactoryTest {
     Mockito.when(drMock.getTopologyById(NEWORK_ID)).thenReturn(Lists.newArrayList(nml));
 
     ConnectionMapService cmMock = Mockito.mock(ConnectionMapService.class);
-    Mockito.when(cmMock.getByGlobalReservationId(anyString())).thenReturn(null);
+    Mockito.when(cmMock.getByDeltaId(anyString())).thenReturn(null);
 
     log.info("[testCreateOntologyModel] building NML model");
     NmlModel model = new NmlModel(drMock);
@@ -78,7 +78,7 @@ public class MrmlFactoryTest {
     Mockito.when(drMock.getTopologyById(NEWORK_ID)).thenReturn(Lists.newArrayList(nml));
 
     ConnectionMapService cmMock = Mockito.mock(ConnectionMapService.class);
-    Mockito.when(cmMock.getByGlobalReservationId(anyString())).thenReturn(null);
+    Mockito.when(cmMock.getByDeltaId(anyString())).thenReturn(null);
 
     log.info("[testWidlcardSwitchingService] building NML model");
     NmlModel model = new NmlModel(drMock);
@@ -103,7 +103,7 @@ public class MrmlFactoryTest {
     Mockito.when(drMock.getTopologyById(NEWORK_ID)).thenReturn(Lists.newArrayList(nml));
 
     ConnectionMapService cmMock = Mockito.mock(ConnectionMapService.class);
-    Mockito.when(cmMock.getByGlobalReservationId(anyString())).thenReturn(null);
+    Mockito.when(cmMock.getByDeltaId(anyString())).thenReturn(null);
 
     log.info("[testLargeTopology] building NML model");
     NmlModel model = new NmlModel(drMock);

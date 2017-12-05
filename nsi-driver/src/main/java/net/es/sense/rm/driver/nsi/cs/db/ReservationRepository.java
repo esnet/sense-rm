@@ -15,6 +15,8 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
 
   public Iterable<Reservation> findByTopologyId(@Param ("topologyId") String topologyId);
 
+  public Iterable<Reservation> findByGlobalReservationId(@Param ("globalReservationId") String globalReservationId);
+
   public Reservation findByProviderNsaAndConnectionId(
           @Param ("providerNSA") String providerNsa,
           @Param("connectionId") String connectionId);

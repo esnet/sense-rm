@@ -6,17 +6,42 @@ import lombok.Synchronized;
 import org.ogf.schemas.nsi._2013._12.framework.types.ServiceExceptionType;
 
 /**
+ * This class is used to track the status of an individual NSI operation,
+ * providing a blocking semaphore allowing the delta request thread
+ * initiating an NSI request to block on a result returned via an NSI
+ * ConnectionService callback API thread.
+ *
+ * If an error is encountered within the NSI ConnectionService callback API
+ * thread the state will be set to "failed" and the service exception will
+ * be provided describing the error.
  *
  * @author hacksaw
  */
 public class Operation implements Serializable {
   private final Semaphore completed = new Semaphore(0);
   private String correlationId;
+  private OperationType operation;
   private StateType state;
   private ServiceExceptionType exception;
 
   public Semaphore getCompleted() {
     return completed;
+  }
+
+  /**
+   * @return the operation
+   */
+  @Synchronized
+  public OperationType getOperation() {
+    return operation;
+  }
+
+  /**
+   * @param operation the operation to set
+   */
+  @Synchronized
+  public void setOperation(OperationType operation) {
+    this.operation = operation;
   }
 
   /**

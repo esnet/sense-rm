@@ -116,6 +116,7 @@ public class SwitchingSubnetModel {
       log.info("[SwitchingSubnetModel] processing reservation cid = {}, gid = {}, description={}",
               reservation.getConnectionId(), reservation.getGlobalReservationId(), reservation.getDescription());
 
+      // If we had a model change then make sure to update our version.
       if (version < reservation.getDiscovered()) {
         version = reservation.getDiscovered();
       }
@@ -132,41 +133,38 @@ public class SwitchingSubnetModel {
           break;
       }
 
+      // We only need to model those reservations in the "created" state.
       if (reservation.getLifecycleState() != LifecycleStateEnumType.CREATED) {
         log.info("[SwitchingSubnetModel] skipping reservation cid = {}, lifecycleState = {}",
                 reservation.getConnectionId(), reservation.getLifecycleState());
         continue;
       }
 
+      // We will need to map any reservations made by SENSE back into the original  naming scheme.
       Collection<ConnectionMap> get = connectionMapService.get();
-      log.info ("connectionMapService contents:...");
+      log.info("connectionMapService contents:...");
       for (ConnectionMap c : get) {
-        log.info ("{}, {}", c.getGlobalReservationId(), c.getSwitchingSubnetId());
+        log.info("{}, {}, {}", c.getDescription(), c.getDeltaId(), c.getSwitchingSubnetId());
         for (StpMapping m : c.getMap()) {
           log.info(m.toString());
         }
       }
 
+      // The GlobalReservationId hold the original SwitchingSubnet name, while
+      // the description holds a unique identifier for the connection created by
+      // us before the connectionId is assigned by the PA.
       log.info("Testing for stored connection, gid = {}, decription = {}",
               reservation.getGlobalReservationId(), reservation.getDescription());
 
       Optional<ConnectionMap> connMap = Optional.empty();
-      if (!Strings.isNullOrEmpty(reservation.getGlobalReservationId())
-              && !Strings.isNullOrEmpty(reservation.getDescription())) {
-        log.info("Looking up connmap");
-        Collection<ConnectionMap> byGlobalReservationId = connectionMapService.getByGlobalReservationId(reservation.getGlobalReservationId());
-        log.debug("Found: {}", byGlobalReservationId);
-        connMap = Optional.ofNullable(
-                connectionMapService.getByGlobalReservationIdAndSwitchingSubnetId(
-                        reservation.getGlobalReservationId(),
-                        reservation.getDescription())
-        );
-
+      if (!Strings.isNullOrEmpty(reservation.getDescription())) {
+        connMap = Optional.ofNullable(connectionMapService.getByDescription(reservation.getDescription()));
       }
 
       log.info("[SwitchingSubnetModel] connMap = {}", connMap);
 
-      // We only know about the EVTS service at this point.
+      // We only know about the EVTS service at this point so ignore anything
+      // else.
       if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(reservation.getServiceType().trim())) {
         log.info("[SwitchingSubnetModel] processing EVTS service");
         try {
@@ -179,151 +177,57 @@ public class SwitchingSubnetModel {
           Optional<Long> endTime = reservation.getEndTime() == Long.MAX_VALUE ? Optional.empty() : Optional.of(reservation.getEndTime());
           Optional<Long> capacity = Optional.of(p2ps.getCapacity() * 1000000);
 
-          // Create the source port.
-          SimpleStp src = new SimpleStp(p2ps.getSourceSTP());
-          NmlPort srcParent = nml.getPort(src.getId());
-          if (srcParent == null) {
+          Optional<NmlPort> srcChildPort = createChildPort(
+                  reservation.getTopologyId(),
+                  reservation.getConnectionId(),
+                  p2ps.getSourceSTP(),
+                  connMap,
+                  startTime,
+                  endTime,
+                  capacity
+          );
+
+          // No nml port if consolidation with parent port is not possible.
+          if (!srcChildPort.isPresent()) {
             log.error("[SwitchingSubnetModel] Could not find parent port for STP {}", p2ps.getSourceSTP());
             continue;
           }
 
-          // If we have a specific MRML mapping stored then we need to use its naming scheme.
-          Optional<StpMapping> srcMapping = Optional.empty();
-          if (connMap.isPresent()) {
-            srcMapping = connMap.get().findMapping(src.getStpId());
-          }
+          Optional<NmlPort> dstChildPort = createChildPort(
+                  reservation.getTopologyId(),
+                  reservation.getConnectionId(),
+                  p2ps.getDestSTP(),
+                  connMap,
+                  startTime,
+                  endTime,
+                  capacity
+          );
 
-          String srcChildPortId;
-          Optional<String> srcChildPortBwId = Optional.empty();
-          Optional<String> srcChildPortLabelId = Optional.empty();
-          if (srcMapping.isPresent()) {
-            srcChildPortId = srcMapping.get().getMrsPortId();
-            srcChildPortBwId = Optional.ofNullable(srcMapping.get().getMrsBandwidthId());
-            srcChildPortLabelId = Optional.ofNullable(srcMapping.get().getMrsLabelId());
-          } else {
-            srcChildPortId = src.getMrmlId() + ":cid+" + ConnectionId.strip(reservation.getConnectionId());
-          }
-
-          NmlPort srcChildPort = NmlPort.builder()
-                  .id(srcChildPortId)
-                  .topologyId(reservation.getTopologyId())
-                  .mrsBandwidthId(srcChildPortBwId)
-                  .mrsLabelId(srcChildPortLabelId)
-                  .name(Optional.of(reservation.getConnectionId()))
-                  .orientation(Orientation.child)
-                  .parentPort(Optional.of(srcParent.getId()))
-                  .encoding(srcParent.getEncoding())
-                  .interfaceMTU(srcParent.getInterfaceMTU())
-                  .type(srcParent.getType())
-                  .granularity(srcParent.getGranularity())
-                  .maximumCapacity(capacity) // This would be maximumCapacity of parent for soft cap service.
-                  .minimumCapacity(srcParent.getMinimumCapacity()) //
-                  .reservableCapacity(capacity)
-                  .availableCapacity(capacity)
-                  .individualCapacity(srcParent.getIndividualCapacity())
-                  .startTime(startTime)
-                  .endTime(endTime)
-                  .build();
-
-          srcChildPort.setNmlLabels(src);
-
-          // Create the destination port.
-          SimpleStp dst = new SimpleStp(p2ps.getDestSTP());
-          NmlPort dstParent = nml.getPort(dst.getId());
-          if (dstParent == null) {
+          // No nml port if consolidation with parent port is not possible.
+          if (!dstChildPort.isPresent()) {
             log.error("[SwitchingSubnetModel] Could not find parent port for STP {}", p2ps.getDestSTP());
             continue;
           }
 
-          // If we have a specific MRML mapping stored then we need to use its naming scheme.
-          Optional<StpMapping> dstMapping = Optional.empty();
-          if (connMap.isPresent()) {
-            dstMapping = connMap.get().findMapping(dst.getStpId());
-          }
-
-          String dstChildPortId;
-          Optional<String> dstChildPortBwId = Optional.empty();
-          Optional<String> dstChildPortLabelId = Optional.empty();
-          if (srcMapping.isPresent()) {
-            dstChildPortId = dstMapping.get().getMrsPortId();
-            dstChildPortBwId = Optional.ofNullable(dstMapping.get().getMrsBandwidthId());
-            dstChildPortLabelId = Optional.ofNullable(dstMapping.get().getMrsLabelId());
-          } else {
-            dstChildPortId = dst.getMrmlId() + ":cid+" + ConnectionId.strip(reservation.getConnectionId());
-          }
-
-          NmlPort dstChildPort = NmlPort.builder()
-                  .id(dstChildPortId)
-                  .topologyId(reservation.getTopologyId())
-                  .mrsBandwidthId(dstChildPortBwId)
-                  .mrsLabelId(dstChildPortLabelId)
-                  .name(Optional.of(reservation.getConnectionId()))
-                  .orientation(Orientation.child)
-                  .parentPort(Optional.of(dstParent.getId()))
-                  .encoding(dstParent.getEncoding())
-                  .interfaceMTU(dstParent.getInterfaceMTU())
-                  .type(srcParent.getType())
-                  .granularity(srcParent.getGranularity())
-                  .maximumCapacity(capacity) // This would be maximumCapacity of parent for soft cap service.
-                  .minimumCapacity(srcParent.getMinimumCapacity()) //
-                  .reservableCapacity(capacity)
-                  .availableCapacity(capacity)
-                  .individualCapacity(srcParent.getIndividualCapacity())
-                  .startTime(startTime)
-                  .endTime(endTime)
-                  .build();
-
-          dstChildPort.setNmlLabels(dst);
-
           // We can only build a SwitchingSubnet if this service contains two endpoints in the same network.
-          if (!src.getNetworkId().equalsIgnoreCase(dst.getNetworkId())) {
+          if (!srcChildPort.get().getTopologyId().equalsIgnoreCase(dstChildPort.get().getTopologyId())) {
             log.error("[SwitchingSubnetModel] Reservation using STP on two different networks src = {}, dst = {}",
-                    src, dst);
+                    srcChildPort, dstChildPort);
             continue;
           }
 
-          // Add to the parent port.
-          srcParent.getChildren().add(srcChildPort.getId());
-          nml.addPort(srcChildPort);
-
-          log.info("[SwitchingSubnetModel] adding src child port {}", srcChildPort.getId());
-
-          // Add to the parent port.
-          dstParent.getChildren().add(dstChildPort.getId());
-          nml.addPort(dstChildPort);
-
-          log.info("[SwitchingSubnetModel] adding dst child port {}", dstChildPort.getId());
-
           // Now build the SwitchingSubnet.
-          List<NmlSwitchingServiceType> srcSS = srcParent.getSwitchingServices();
-          Optional<String> srcSSid = Optional.empty();
-          for (NmlSwitchingServiceType t : srcSS) {
-            log.info("[SwitchingSubnetModel] checking source SwitchingService {}", t.getId());
-            ServiceHolder sh = serviceHolder.get(t.getId());
-            if (reservation.getServiceType().equalsIgnoreCase(sh.getServiceType())) {
-              // We found the SwitchingService we were looking for.
-              srcSSid = Optional.ofNullable(t.getId());
-              log.info("[SwitchingSubnetModel] Matched source SwitchingService {}", t.getId());
-            }
-          }
+          Optional<String> srcSSid = createSwitchingSubnet(srcChildPort.get().getParentPort().get(),
+                  reservation.getServiceType());
 
-          List<NmlSwitchingServiceType> dstSS = dstParent.getSwitchingServices();
-          Optional<String> dstSSid = Optional.empty();
-          for (NmlSwitchingServiceType t : dstSS) {
-            log.info("[SwitchingSubnetModel] checking destination SwitchingService {}", t.getId());
-            ServiceHolder sh = serviceHolder.get(t.getId());
-            if (reservation.getServiceType().compareToIgnoreCase(sh.getServiceType()) == 0) {
-              // We found the SwitchingService we were looking for.
-              dstSSid = Optional.ofNullable(t.getId());
-              log.info("Matched dest SwitchingService {}", t.getId());
-            }
-          }
+          Optional<String> dstSSid = createSwitchingSubnet(dstChildPort.get().getParentPort().get(),
+                  reservation.getServiceType());
 
           log.info("[SwitchingSubnetModel] srcSSid = {}, dstSSid = {}", srcSSid, dstSSid);
 
           if (!srcSSid.orElse("srcSSid").equalsIgnoreCase(dstSSid.orElse("dstSSid"))) {
             log.error("[SwitchingSubnetModel] Reservation using STP from two different SwitchingService src = {}, dst = {}",
-                    src, dst);
+                    p2ps.getSourceSTP(), p2ps.getDestSTP());
             continue;
           }
 
@@ -340,8 +244,8 @@ public class SwitchingSubnetModel {
 
           NmlSwitchingSubnet nss = new NmlSwitchingSubnet();
           nss.setSwitchingService(holder.getSwitchingService());
-          nss.getPorts().add(srcChildPort);
-          nss.getPorts().add(dstChildPort);
+          nss.getPorts().add(srcChildPort.get());
+          nss.getPorts().add(dstChildPort.get());
           nss.setConnectionId(reservation.getConnectionId());
           nss.setStartTime(startTime);
           nss.setEndTime(endTime);
@@ -359,5 +263,92 @@ public class SwitchingSubnetModel {
                 reservation.getServiceType());
       }
     }
+  }
+
+  private Optional<NmlPort> createChildPort(
+          String topologyId,
+          String connectionId,
+          String stp,
+          Optional<ConnectionMap> connMap,
+          Optional<Long> startTime,
+          Optional<Long> endTime,
+          Optional<Long> capacity) {
+
+    // Create the source port.
+    SimpleStp simpleStp = new SimpleStp(stp);
+    NmlPort stpParent = nml.getPort(simpleStp.getId());
+    if (stpParent == null) {
+      log.error("[SwitchingSubnetModel] Could not find parent port for STP {}", stp);
+      return Optional.empty();
+    }
+
+    // If we have a specific MRML mapping stored then we need to use its
+    // naming scheme.
+    Optional<StpMapping> stpMapping = Optional.empty();
+    if (connMap.isPresent()) {
+      stpMapping = connMap.get().findMapping(simpleStp.getStpId());
+    }
+
+    // We will name our port based on the stored mapping, otherwise we
+    // make one up based on the NSI connectionId.
+    String childPortId;
+    Optional<String> childPortBwId = Optional.empty();
+    Optional<String> childPortLabelId = Optional.empty();
+    if (stpMapping.isPresent()) {
+      childPortId = stpMapping.get().getMrsPortId();
+      childPortBwId = Optional.ofNullable(stpMapping.get().getMrsBandwidthId());
+      childPortLabelId = Optional.ofNullable(stpMapping.get().getMrsLabelId());
+    } else {
+      childPortId = simpleStp.getMrmlId() + ":cid+" + ConnectionId.strip(connectionId);
+    }
+
+    NmlPort childPort = NmlPort.builder()
+            .id(childPortId)
+            .topologyId(topologyId)
+            .mrsBandwidthId(childPortBwId)
+            .mrsLabelId(childPortLabelId)
+            .name(Optional.of(connectionId))
+            .orientation(Orientation.child)
+            .parentPort(Optional.of(stpParent.getId()))
+            .encoding(stpParent.getEncoding())
+            .interfaceMTU(stpParent.getInterfaceMTU())
+            .type(stpParent.getType())
+            .granularity(stpParent.getGranularity())
+            .maximumCapacity(capacity) // This would be maximumCapacity of parent for soft cap service.
+            .minimumCapacity(stpParent.getMinimumCapacity()) //
+            .reservableCapacity(capacity)
+            .availableCapacity(capacity)
+            .individualCapacity(stpParent.getIndividualCapacity())
+            .startTime(startTime)
+            .endTime(endTime)
+            .build();
+
+    childPort.setNmlLabels(simpleStp);
+
+    // Add to the parent port.
+    stpParent.getChildren().add(childPort.getId());
+    nml.addPort(childPort);
+
+    return Optional.of(childPort);
+  }
+
+  private Optional<String> createSwitchingSubnet(String portId, String serviceType) {
+    // Now build the SwitchingSubnet.
+    Optional<String> ssId = Optional.empty();
+
+    NmlPort parent = nml.getPort(portId);
+    List<NmlSwitchingServiceType> ss = parent.getSwitchingServices();
+
+    for (NmlSwitchingServiceType t : ss) {
+      log.info("[SwitchingSubnetModel] checking source SwitchingService {}", t.getId());
+      ServiceHolder sh = serviceHolder.get(t.getId());
+      if (serviceType.equalsIgnoreCase(sh.getServiceType())) {
+        // We found the SwitchingService we were looking for.
+        ssId = Optional.ofNullable(t.getId());
+        log.info("[SwitchingSubnetModel] Matched source SwitchingService {}", t.getId());
+      }
+    }
+
+    return ssId;
   }
 }

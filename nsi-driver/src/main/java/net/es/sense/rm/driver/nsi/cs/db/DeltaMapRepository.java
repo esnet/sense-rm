@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.ext.com.google.common.base.Strings;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -18,6 +19,9 @@ public class DeltaMapRepository {
   private final Map<String, DeltaConnection> map = new ConcurrentHashMap<>();
 
   public DeltaConnection store(DeltaConnection delta) {
+    if (delta == null || Strings.isNullOrEmpty(delta.getDeltaId())) {
+      throw new IllegalArgumentException("deltaId required but null");
+    }
     return map.put(delta.getDeltaId(), delta);
   }
 

@@ -249,6 +249,7 @@ public class CsProvider {
     // This is a list of connectionId associated with reservations created
     // as part of the delta.
     DeltaConnection connectionIds = new DeltaConnection();
+    connectionIds.setDeltaId(deltaId);
 
     // CorrelationId from NSI these reservation requests go in here.
     List<String> correlationIds = new ArrayList<>();

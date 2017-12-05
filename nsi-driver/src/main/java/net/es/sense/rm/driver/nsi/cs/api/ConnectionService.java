@@ -64,7 +64,8 @@ public class ConnectionService {
     this.operationMap = operationMap;
   }
 
-  public GenericAcknowledgmentType reserveConfirmed(ReserveConfirmedType reserveConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
+  public GenericAcknowledgmentType reserveConfirmed(
+          ReserveConfirmedType reserveConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
     log.info("[ConnectionService] reserveConfirmed recieved for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), reserveConfirmed.getConnectionId());
@@ -90,17 +91,17 @@ public class ConnectionService {
       if (r == null) {
         // We have not seen this reservation before so store it.
         log.info("[ConnectionService] reserveConfirmed: storing new reservation, cid = {}",
-                reservation.getId());
+                reservation.getConnectionId());
         reservationService.store(reservation);
       } else if (r.diff(reservation)) {
         // We have to determine if the stored reservation needs to be updated.
         log.info("[ConnectionService] reserveConfirmed: storing reservation update, cid = {}",
-                reservation.getId());
+                reservation.getConnectionId());
         reservation.setId(r.getId());
         reservationService.store(reservation);
       } else {
         log.info("[ConnectionService] reserveConfirmed: reservation no change, cid = {}",
-                reservation.getId());
+                reservation.getConnectionId());
       }
     }
 

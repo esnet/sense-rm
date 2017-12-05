@@ -174,7 +174,7 @@ public class RegistrationActor extends UntypedAbstractActor {
                   remoteDdsURL, response.getStatusInfo().getReasonPhrase());
         }
       }
-    } catch (JAXBException | IOException ex) {
+    } catch (JAXBException | IOException | IllegalStateException ex) {
       log.error("[RegistrationActor] error on endpoint {}", remoteDdsURL, ex);
     } finally {
       if (response != null) {

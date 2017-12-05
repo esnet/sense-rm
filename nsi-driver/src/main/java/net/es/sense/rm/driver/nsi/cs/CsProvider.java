@@ -436,7 +436,7 @@ public class CsProvider {
       }
     }
 
-    if (connectionIds.getConnections().isEmpty()) {
+    if (!connectionIds.getConnections().isEmpty()) {
       deltaMap.store(connectionIds);
     }
 

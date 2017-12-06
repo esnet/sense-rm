@@ -415,25 +415,31 @@ public class ConnectionService {
   private void serializeP2PS(String serviceType, List<Object> any, Reservation reservation) throws JAXBException {
     if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType)
             || Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(serviceType)) {
+      log.info("[serializeP2PS] EVTS found");
       reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
       for (Object object : any) {
         if (object instanceof JAXBElement) {
           JAXBElement jaxb = (JAXBElement) object;
           if (jaxb.getValue() instanceof P2PServiceBaseType) {
+            log.info("[serializeP2PS] P2PServiceBaseType found");
             P2PServiceBaseType p2ps = (P2PServiceBaseType) jaxb.getValue();
+            log.info("[serializeP2PS] sourceStp = {}", p2ps.getSourceSTP());
             SimpleStp stp = new SimpleStp(p2ps.getSourceSTP());
+            log.info("[serializeP2PS] networkId = {}", stp.getNetworkId());
             reservation.setTopologyId(stp.getNetworkId());
             reservation.setService(CsParser.getInstance().p2ps2xml(p2ps));
             break;
-
           }
         } else if (object instanceof org.apache.xerces.dom.ElementNSImpl) {
           org.apache.xerces.dom.ElementNSImpl element = (org.apache.xerces.dom.ElementNSImpl) object;
           if ("p2ps".equalsIgnoreCase(element.getLocalName())) {
-            P2PServiceBaseType p2p = CsParser.getInstance().node2p2ps((Node) element);
-            SimpleStp stp = new SimpleStp(p2p.getSourceSTP());
+            log.info("[serializeP2PS] DOM P2PServiceBaseType found");
+            P2PServiceBaseType p2ps = CsParser.getInstance().node2p2ps((Node) element);
+            log.info("[serializeP2PS] sourceStp = {}", p2ps.getSourceSTP());
+            SimpleStp stp = new SimpleStp(p2ps.getSourceSTP());
+            log.info("[serializeP2PS] networkId = {}", stp.getNetworkId());
             reservation.setTopologyId(stp.getNetworkId());
-            reservation.setService(CsParser.getInstance().p2ps2xml(p2p));
+            reservation.setService(CsParser.getInstance().p2ps2xml(p2ps));
             break;
           }
         }

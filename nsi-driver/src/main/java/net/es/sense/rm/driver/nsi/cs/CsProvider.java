@@ -391,7 +391,9 @@ public class CsProvider {
         StpMapping smDst = new StpMapping(dst.getStp().getStpId(), dst.getMrsPortId(),
                 dst.getmrsLabelId(), dst.getBw().getId());
         cm.getMap().add(smDst);
-        connectionMapService.store(cm);
+        ConnectionMap stored = connectionMapService.store(cm);
+
+        log.debug("[SwitchingSubnet] storing connectionMap = {}", stored);
 
         CommonHeaderType requestHeader = NsiHeader.builder()
                 .correlationId(Helper.getUUID())

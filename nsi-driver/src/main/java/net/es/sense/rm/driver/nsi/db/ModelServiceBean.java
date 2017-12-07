@@ -62,7 +62,7 @@ public class ModelServiceBean implements ModelService {
   public Collection<Model> get(boolean current, String topologyId) {
     Collection<Model> result = new ArrayList();
 
-    log.info("[ModelServiceBean] current {}, topologyId {}", current, topologyId);
+    log.info("[ModelServiceBean] current = {}, topologyId = {}", current, topologyId);
 
     if (current) {
       Model currentModel = modelRepository.findCurrentModelForTopologyId(topologyId);

@@ -116,7 +116,7 @@ public class NsiDriver implements Driver {
 
       return new AsyncResult<>(results);
     } catch (IllegalArgumentException | DatatypeConfigurationException ex) {
-      log.error("[NsiDriver] ontology creation failed for networkId = {}.", networkId);
+      log.error("[NsiDriver] ontology creation failed for networkId = {}.", networkId, ex);
       throw new ExecutionException(ex);
     }
   }

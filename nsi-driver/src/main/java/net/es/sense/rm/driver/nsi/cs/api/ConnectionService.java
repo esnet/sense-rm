@@ -255,9 +255,9 @@ public class ConnectionService {
       DataPlaneStatusType dataPlaneStatus = reservation.getConnectionStates().getDataPlaneStatus();
 
       log.info("[ConnectionService] querySummaryConfirmed: cid = {}, gid = {}, decription = {}, " +
-              "rstate = {}, lstate = {}, dstate = {}",
+              "rstate = {}, lstate = {}, active = {}",
               reservation.getConnectionId(), reservation.getGlobalReservationId(), reservation.getDescription(),
-              reservationState, lifecycleState, dataPlaneStatus);
+              reservationState, lifecycleState, dataPlaneStatus.isActive());
 
       // If this reservation is in the process of being created, or failed
       // creation, then there will be no associated criteria.
@@ -582,7 +582,6 @@ public class ConnectionService {
     if (reservation == null) {
       log.error("[ConnectionService] dataPlaneStateChange could not find connectionId = {}", connectionId);
     } else {
-      reservation.setVersion(dataPlaneStatus.getVersion());
       reservation.setDataPlaneActive(dataPlaneStatus.isActive());
       reservation.setDiscovered(System.currentTimeMillis());
       reservationService.store(reservation);

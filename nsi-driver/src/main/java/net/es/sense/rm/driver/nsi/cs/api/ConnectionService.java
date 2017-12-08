@@ -254,9 +254,10 @@ public class ConnectionService {
       LifecycleStateEnumType lifecycleState = reservation.getConnectionStates().getLifecycleState();
       DataPlaneStatusType dataPlaneStatus = reservation.getConnectionStates().getDataPlaneStatus();
 
-      log.info("[ConnectionService] querySummaryConfirmed: cid = {}, gid = {}, decription = {}, rstate = {}, lstate = {}",
+      log.info("[ConnectionService] querySummaryConfirmed: cid = {}, gid = {}, decription = {}, " +
+              "rstate = {}, lstate = {}, dstate = {}",
               reservation.getConnectionId(), reservation.getGlobalReservationId(), reservation.getDescription(),
-              reservationState, lifecycleState);
+              reservationState, lifecycleState, dataPlaneStatus);
 
       // If this reservation is in the process of being created, or failed
       // creation, then there will be no associated criteria.
@@ -555,13 +556,37 @@ public class ConnectionService {
     throw new UnsupportedOperationException("Not implemented yet.");
   }
 
-  public GenericAcknowledgmentType dataPlaneStateChange(DataPlaneStateChangeRequestType dataPlaneStateChange, Holder<CommonHeaderType> header) throws ServiceException {
-    log.error("[ConnectionService] dataPlaneStateChange for connectionId = {}, active = {}",
-            dataPlaneStateChange.getConnectionId(), dataPlaneStateChange.getDataPlaneStatus().isActive());
+  public GenericAcknowledgmentType dataPlaneStateChange(
+          DataPlaneStateChangeRequestType dataPlaneStateChange,
+          Holder<CommonHeaderType> header) throws ServiceException {
 
-    // This state change is in the context of the local providerNSA and not
-    // the child connection, so we need to look up the connectionId associated
-    // with the provider which may not be the connectionId stored in the DB.
+    String connectionId = dataPlaneStateChange.getConnectionId();
+    DataPlaneStatusType dataPlaneStatus = dataPlaneStateChange.getDataPlaneStatus();
+
+    log.info("[ConnectionService] dataPlaneStateChange for connectionId = {}, notificationId = {}, " +
+            "active = {}, consistent = {}, time = {}",
+            connectionId,
+            dataPlaneStateChange.getNotificationId(),
+            dataPlaneStatus.isActive(),
+            dataPlaneStatus.isVersionConsistent(),
+            dataPlaneStateChange.getTimeStamp());
+
+    // This state change is in the context of the local providerNSA so we must
+    // assume we are directly connect to a uPA in order for us to map this
+    // incoming event to the associated connection.  If we are connected to an
+    // aggregator then the connectionId we want is actually a child connection.
+
+
+    // Find the associated connection.
+    Reservation reservation = reservationService.get(header.value.getProviderNSA(), connectionId);
+    if (reservation == null) {
+      log.error("[ConnectionService] dataPlaneStateChange could not find connectionId = {}", connectionId);
+    } else {
+      reservation.setVersion(dataPlaneStatus.getVersion());
+      reservation.setDataPlaneActive(dataPlaneStatus.isActive());
+      reservation.setDiscovered(System.currentTimeMillis());
+      reservationService.store(reservation);
+    }
     return FACTORY.createGenericAcknowledgmentType();
   }
 

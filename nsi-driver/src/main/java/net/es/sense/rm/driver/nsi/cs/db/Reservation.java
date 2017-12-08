@@ -57,12 +57,9 @@ public class Reservation implements Serializable {
   long startTime;
   long endTime;
 
-  @Basic(optional = false)
+  // Reservation state information.
   ReservationStateEnumType reservationState;
-
-  @Basic(optional = false)
   LifecycleStateEnumType lifecycleState;
-
   boolean dataPlaneActive = false;
 
   // Version of the reservation on the uPA.

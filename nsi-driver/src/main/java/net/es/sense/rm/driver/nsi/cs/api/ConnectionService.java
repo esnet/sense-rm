@@ -198,7 +198,7 @@ public class ConnectionService {
 
     // Now we need to determine the network based on the STP used in the service.
     try {
-      serializeP2PS(criteria.getServiceType(), criteria.getAny(), reservation);
+      serializeP2PS(criteria.getServiceType().trim(), criteria.getAny(), reservation);
       return reservation;
     } catch (JAXBException ex) {
       log.error("[ConnectionService] processReservation failed for connectionId = {}",
@@ -539,7 +539,7 @@ public class ConnectionService {
 
           // Now we need to determine the network based on the STP used in the service.
           try {
-            serializeP2PS(child.getServiceType(), child.getAny(), reservation);
+            serializeP2PS(child.getServiceType().trim(), child.getAny(), reservation);
           } catch (JAXBException ex) {
             log.error("[ConnectionService] processReservation failed for connectionId = {}",
                     reservation.getConnectionId(), ex);
@@ -555,6 +555,7 @@ public class ConnectionService {
   }
 
   private void serializeP2PS(String serviceType, List<Object> any, Reservation reservation) throws JAXBException {
+    log.info("[serializeP2PS] serviceType = {}", serviceType);
     if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType)
             || Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(serviceType)) {
       log.info("[serializeP2PS] EVTS found");

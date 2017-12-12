@@ -557,6 +557,7 @@ public class ConnectionService {
   private void serializeP2PS(String serviceType, List<Object> any, Reservation reservation) throws JAXBException {
     log.info("[serializeP2PS] serviceType = {}", serviceType);
     if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType)
+            || Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(serviceType)
             || Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(serviceType)) {
       log.info("[serializeP2PS] EVTS found");
       reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);

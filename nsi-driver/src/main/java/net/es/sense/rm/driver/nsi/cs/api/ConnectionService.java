@@ -1,3 +1,22 @@
+/*
+ * SENSE Resource Manager (SENSE-RM) Copyright (c) 2016, The Regents
+ * of the University of California, through Lawrence Berkeley National
+ * Laboratory (subject to receipt of any required approvals from the
+ * U.S. Dept. of Energy).  All rights reserved.
+ *
+ * If you have questions about your rights to use or distribute this
+ * software, please contact Berkeley Lab's Innovation & Partnerships
+ * Office at IPO@lbl.gov.
+ *
+ * NOTICE.  This Software was developed under funding from the
+ * U.S. Department of Energy and the U.S. Government consequently retains
+ * certain rights. As such, the U.S. Government has been granted for
+ * itself and others acting on its behalf a paid-up, nonexclusive,
+ * irrevocable, worldwide license in the Software to reproduce,
+ * distribute copies to the public, prepare derivative works, and perform
+ * publicly and display publicly, and to permit other to do so.
+ *
+ */
 package net.es.sense.rm.driver.nsi.cs.api;
 
 import java.util.ArrayList;
@@ -29,6 +48,7 @@ import org.ogf.schemas.nsi._2013._12.connection.types.GenericFailedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.MessageDeliveryTimeoutRequestType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory;
+import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QueryNotificationConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QueryRecursiveConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QueryResultConfirmedType;
@@ -46,24 +66,54 @@ import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
+ * This is the NSI CS 2.1 web service requester endpoint used to receive
+ * responses from our associated uPA.  Communication between the requester
+ * thread and this requester response endpoint is controlled using a semaphore
+ * allowing the request thread to block on the returned response.  Reservation
+ * state us updated through the ReservationService which maintains reservations
+ * in the database.
  *
  * @author hacksaw
  */
 @Slf4j
 @Component
-@WebService(serviceName = "ConnectionServiceRequester", portName = "ConnectionServiceRequesterPort", endpointInterface = "org.ogf.schemas.nsi._2013._12.connection.requester.ConnectionRequesterPort", targetNamespace = "http://schemas.ogf.org/nsi/2013/12/connection/requester", wsdlLocation = "")
+@WebService(
+        serviceName = "ConnectionServiceRequester",
+        portName = "ConnectionServiceRequesterPort",
+        endpointInterface = "org.ogf.schemas.nsi._2013._12.connection.requester.ConnectionRequesterPort",
+        targetNamespace = "http://schemas.ogf.org/nsi/2013/12/connection/requester",
+        wsdlLocation = "")
 public class ConnectionService {
 
+  // We store reservations using the reservation service.
   private final ReservationService reservationService;
+
+  // We synchronize with the requester thread using the operationMap that holds a semaphore.
   private final OperationMapRepository operationMap;
 
+  // Our NSI CS object factory for creating protocol objects.
   private final static ObjectFactory FACTORY = new ObjectFactory();
 
+  /**
+   * We initialize the ConnectionService component with the needed references
+   * since this component does not support autowiring.
+   *
+   * @param reservationService We store reservations using the reservation service.
+   * @param operationMap We synchronize with the requester thread using the operationMap that holds a semaphore.
+   */
   public ConnectionService(ReservationService reservationService, OperationMapRepository operationMap) {
     this.reservationService = reservationService;
     this.operationMap = operationMap;
   }
 
+  /**
+   * Endpoint receiving the NSI CS reserveConfirmed response message.
+   *
+   * @param reserveConfirmed
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
   public GenericAcknowledgmentType reserveConfirmed(
           ReserveConfirmedType reserveConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
@@ -82,6 +132,7 @@ public class ConnectionService {
             reserveConfirmed.getDescription(),
             reserveConfirmed.getConnectionId(),
             ReservationStateEnumType.RESERVE_HELD,
+            ProvisionStateEnumType.RELEASED,
             LifecycleStateEnumType.CREATED,
             dataPlaneStatus,
             criteria);
@@ -123,6 +174,7 @@ public class ConnectionService {
           String description,
           String cid,
           ReservationStateEnumType reservationState,
+          ProvisionStateEnumType provisionState,
           LifecycleStateEnumType lifecycleState,
           DataPlaneStatusType dataPlaneStatus,
           ReservationConfirmCriteriaType criteria) {
@@ -136,6 +188,7 @@ public class ConnectionService {
     reservation.setProviderNsa(providerNsa);
     reservation.setConnectionId(cid);
     reservation.setReservationState(reservationState);
+    reservation.setProvisionState(provisionState);
     reservation.setLifecycleState(lifecycleState);
     reservation.setDataPlaneActive(dataPlaneStatus.isActive());
     reservation.setVersion(criteria.getVersion());
@@ -215,6 +268,20 @@ public class ConnectionService {
     log.info("[ConnectionService] provisionConfirmed recieved for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), provisionConfirmed.getConnectionId());
 
+    // First we update the corresponding reservation in the datbase.
+    Reservation r = reservationService.get(value.getProviderNSA(), provisionConfirmed.getConnectionId());
+    if (r == null) {
+      // We have not seen this reservation before so ignore it.
+      log.info("[ConnectionService] provisionConfirmed: no reference to reservation, cid = {}",
+              provisionConfirmed.getConnectionId());
+    } else {
+      // We have to determine if the stored reservation needs to be updated.
+      log.info("[ConnectionService] reserveConfirmed: storing reservation update, cid = {}",
+              provisionConfirmed.getConnectionId());
+      r.setProvisionState(ProvisionStateEnumType.PROVISIONED);
+      reservationService.store(r);
+    }
+
     Operation op = operationMap.get(value.getCorrelationId());
     if (op == null) {
       log.error("[ConnectionService] provisionConfirmed can't find outstanding operation for correlationId = {}",
@@ -228,13 +295,65 @@ public class ConnectionService {
   }
 
   public GenericAcknowledgmentType releaseConfirmed(GenericConfirmedType releaseConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
-    //TODO implement this method
-    throw new UnsupportedOperationException("Not implemented yet.");
+    CommonHeaderType value = header.value;
+    log.info("[ConnectionService] releaseConfirmed received for correlationId = {}, connectionId: {}",
+            value.getCorrelationId(), releaseConfirmed.getConnectionId());
+
+    // First we update the corresponding reservation in the datbase.
+    Reservation r = reservationService.get(header.value.getProviderNSA(), releaseConfirmed.getConnectionId());
+    if (r == null) {
+      // We have not seen this reservation before so ignore it.
+      log.info("[ConnectionService] releaseConfirmed: no reference to reservation, cid = {}",
+              releaseConfirmed.getConnectionId());
+    } else {
+      // We have to determine if the stored reservation needs to be updated.
+      log.info("[ConnectionService] releaseConfirmed: storing reservation update, cid = {}",
+              releaseConfirmed.getConnectionId());
+      r.setProvisionState(ProvisionStateEnumType.RELEASED);
+      reservationService.store(r);
+    }
+
+    Operation op = operationMap.get(value.getCorrelationId());
+    if (op == null) {
+      log.error("[ConnectionService] releaseConfirmed can't find outstanding operation for correlationId = {}",
+              value.getCorrelationId());
+    } else {
+      op.setState(StateType.released);
+      op.getCompleted().release();
+    }
+
+    return FACTORY.createGenericAcknowledgmentType();
   }
 
-  public GenericAcknowledgmentType terminateConfirmed(GenericConfirmedType parameters, Holder<CommonHeaderType> header) throws ServiceException {
-    //TODO implement this method
-    throw new UnsupportedOperationException("Not implemented yet.");
+  public GenericAcknowledgmentType terminateConfirmed(GenericConfirmedType terminateConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
+    CommonHeaderType value = header.value;
+    log.info("[ConnectionService] terminateConfirmed received for correlationId = {}, connectionId: {}",
+            value.getCorrelationId(), terminateConfirmed.getConnectionId());
+
+    // First we update the corresponding reservation in the datbase.
+    Reservation r = reservationService.get(header.value.getProviderNSA(), terminateConfirmed.getConnectionId());
+    if (r == null) {
+      // We have not seen this reservation before so ignore it.
+      log.info("[ConnectionService] terminateConfirmed: no reference to reservation, cid = {}",
+              terminateConfirmed.getConnectionId());
+    } else {
+      // We have to determine if the stored reservation needs to be updated.
+      log.info("[ConnectionService] terminateConfirmed: storing reservation update, cid = {}",
+              terminateConfirmed.getConnectionId());
+      r.setLifecycleState(LifecycleStateEnumType.TERMINATED);
+      reservationService.store(r);
+    }
+
+    Operation op = operationMap.get(value.getCorrelationId());
+    if (op == null) {
+      log.error("[ConnectionService] terminateConfirmed can't find outstanding operation for correlationId = {}",
+              value.getCorrelationId());
+    } else {
+      op.setState(StateType.terminated);
+      op.getCompleted().release();
+    }
+
+    return FACTORY.createGenericAcknowledgmentType();
   }
 
   public GenericAcknowledgmentType querySummaryConfirmed(QuerySummaryConfirmedType querySummaryConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
@@ -251,13 +370,26 @@ public class ConnectionService {
     for (QuerySummaryResultType reservation : reservations) {
       // Get the parent reservation information to apply to child connections.
       ReservationStateEnumType reservationState = reservation.getConnectionStates().getReservationState();
+      ProvisionStateEnumType provisionState = reservation.getConnectionStates().getProvisionState();
       LifecycleStateEnumType lifecycleState = reservation.getConnectionStates().getLifecycleState();
       DataPlaneStatusType dataPlaneStatus = reservation.getConnectionStates().getDataPlaneStatus();
 
-      log.info("[ConnectionService] querySummaryConfirmed: cid = {}, gid = {}, decription = {}, " +
-              "rstate = {}, lstate = {}, active = {}",
+      log.info("[ConnectionService] querySummaryConfirmed: cid = {}, gid = {}, decription = {}, "
+              + "rstate = {}, pstate = {}, lstate = {}, active = {}, providerNSA = {}",
               reservation.getConnectionId(), reservation.getGlobalReservationId(), reservation.getDescription(),
-              reservationState, lifecycleState, dataPlaneStatus.isActive());
+              reservationState, provisionState, lifecycleState, dataPlaneStatus.isActive(), providerNsa);
+
+      if (reservationState == null) {
+        reservationState = ReservationStateEnumType.RESERVE_CHECKING;
+      }
+
+      if (provisionState == null) {
+        provisionState = ProvisionStateEnumType.RELEASED;
+      }
+
+      if (lifecycleState == null) {
+        lifecycleState = LifecycleStateEnumType.INITIAL;
+      }
 
       // If this reservation is in the process of being created, or failed
       // creation, then there will be no associated criteria.
@@ -268,6 +400,7 @@ public class ConnectionService {
                 reservation.getDescription(),
                 reservation.getConnectionId(),
                 reservationState,
+                provisionState,
                 lifecycleState,
                 dataPlaneStatus));
       } else {
@@ -277,6 +410,7 @@ public class ConnectionService {
                 reservation.getDescription(),
                 reservation.getConnectionId(),
                 reservationState,
+                provisionState,
                 lifecycleState,
                 dataPlaneStatus,
                 reservation.getCriteria()));
@@ -312,8 +446,11 @@ public class ConnectionService {
           String description,
           String cid,
           ReservationStateEnumType reservationState,
+          ProvisionStateEnumType provisionState,
           LifecycleStateEnumType lifecycleState,
           DataPlaneStatusType dataPlaneStatus) {
+
+    log.debug("[ConnectionService] processReservationNoCriteria: cid = {}, providerNSA = {}", cid, providerNsa);
 
     // We have had a state change so update the reservation.
     Reservation reservation = new Reservation();
@@ -323,6 +460,7 @@ public class ConnectionService {
     reservation.setConnectionId(cid);
     reservation.setVersion(0);
     reservation.setReservationState(reservationState);
+    reservation.setProvisionState(provisionState);
     reservation.setLifecycleState(lifecycleState);
     reservation.setDataPlaneActive(dataPlaneStatus.isActive());
     reservation.setDiscovered(System.currentTimeMillis());
@@ -336,11 +474,12 @@ public class ConnectionService {
           String description,
           String cid,
           ReservationStateEnumType reservationState,
+          ProvisionStateEnumType provisionState,
           LifecycleStateEnumType lifecycleState,
           DataPlaneStatusType dataPlaneStatus,
           List<QuerySummaryResultCriteriaType> criteriaList) {
 
-    log.info("[ConnectionService] processSummaryCriteria: connectionId = {}", cid);
+    log.info("[ConnectionService] processSummaryCriteria: connectionId = {}, providerNsa = {}", cid, providerNsa);
 
     List<Reservation> results = new ArrayList<>();
 
@@ -360,6 +499,7 @@ public class ConnectionService {
         reservation.setProviderNsa(providerNsa);
         reservation.setConnectionId(cid);
         reservation.setReservationState(reservationState);
+        reservation.setProvisionState(provisionState);
         reservation.setLifecycleState(lifecycleState);
         reservation.setDataPlaneActive(dataPlaneStatus.isActive());
         reservation.setVersion(criteria.getVersion());
@@ -391,6 +531,7 @@ public class ConnectionService {
           reservation.setVersion(criteria.getVersion());
           reservation.setServiceType(child.getServiceType().trim());
           reservation.setReservationState(reservationState);
+          reservation.setProvisionState(provisionState);
           reservation.setLifecycleState(lifecycleState);
           reservation.setDataPlaneActive(dataPlaneStatus.isActive());
           reservation.setStartTime(getStartTime(criteria.getSchedule().getStartTime()));
@@ -547,8 +688,24 @@ public class ConnectionService {
   }
 
   public GenericAcknowledgmentType error(GenericErrorType error, Holder<CommonHeaderType> header) throws ServiceException {
-    //TODO implement this method
-    throw new UnsupportedOperationException("Not implemented yet.");
+    CommonHeaderType value = header.value;
+    String connectionId = error.getServiceException().getConnectionId();
+
+    log.info("[ConnectionService] error received for correlationId = {}, connectionId: {}",
+            value.getCorrelationId(), connectionId);
+
+    // We need to inform the requesting thread of the error.
+    Operation op = operationMap.get(value.getCorrelationId());
+    if (op == null) {
+      log.error("[ConnectionService] error can't find outstanding operation for correlationId = {}",
+              value.getCorrelationId());
+    } else {
+      op.setState(StateType.failed);
+      op.setException(error.getServiceException());
+      op.getCompleted().release();
+    }
+
+    return FACTORY.createGenericAcknowledgmentType();
   }
 
   public GenericAcknowledgmentType errorEvent(ErrorEventType errorEvent, Holder<CommonHeaderType> header) throws ServiceException {
@@ -563,8 +720,8 @@ public class ConnectionService {
     String connectionId = dataPlaneStateChange.getConnectionId();
     DataPlaneStatusType dataPlaneStatus = dataPlaneStateChange.getDataPlaneStatus();
 
-    log.info("[ConnectionService] dataPlaneStateChange for connectionId = {}, notificationId = {}, " +
-            "active = {}, consistent = {}, time = {}",
+    log.info("[ConnectionService] dataPlaneStateChange for connectionId = {}, notificationId = {}, "
+            + "active = {}, consistent = {}, time = {}",
             connectionId,
             dataPlaneStateChange.getNotificationId(),
             dataPlaneStatus.isActive(),
@@ -575,8 +732,6 @@ public class ConnectionService {
     // assume we are directly connect to a uPA in order for us to map this
     // incoming event to the associated connection.  If we are connected to an
     // aggregator then the connectionId we want is actually a child connection.
-
-
     // Find the associated connection.
     Reservation reservation = reservationService.get(header.value.getProviderNSA(), connectionId);
     if (reservation == null) {

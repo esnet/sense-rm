@@ -1,16 +1,16 @@
 package net.es.sense.rm.driver.nsi.dds;
 
 import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBException;
@@ -22,13 +22,16 @@ import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentType;
 import net.es.nsi.dds.lib.jaxb.dds.FilterType;
 import net.es.nsi.dds.lib.jaxb.dds.NotificationType;
+import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.dds.api.DiscoveryError;
 import net.es.sense.rm.driver.nsi.dds.api.Exceptions;
 import net.es.sense.rm.driver.nsi.dds.db.Document;
 import net.es.sense.rm.driver.nsi.dds.db.DocumentService;
+import net.es.sense.rm.driver.nsi.dds.messages.StartMsg;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQuery;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQueryResult;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
+import net.es.sense.rm.driver.nsi.spring.SpringExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import scala.concurrent.Await;
@@ -50,26 +53,56 @@ public class DdsProvider implements DdsProviderI {
   @Autowired
   private DocumentService documentService;
 
-  // The actor system used to send notifications.
   @Autowired
-  private DdsController ddsController;
+  private SpringExtension springExtension;
 
-  public void init() {
-    log.debug("[DdsProvider] Initializing DDS provider with database contents:");
-    for (Document document : documentService.get()) {
-      try {
-        log.debug("[DdsProvider] id=" + URLDecoder.decode(document.getId(), "UTF-8"));
-      } catch (UnsupportedEncodingException ex) {
-        log.error("[DdsProvider] invalid id=" + document.getId());
-      }
-    }
-  }
+  @Autowired
+  private NsiActorSystem nsiActorSystem;
+
+  private ActorRef localDocumentActor;
+  private ActorRef documentExpiryActor;
+  private ActorRef registrationRouter;
 
   public void start() {
-    log.info("[DdsProvider] starting...");
-    ddsController.start();
-    log.info("[DdsProvider] start complete.");
+    // Initialize the actors.
+    log.info("[DdsProvider] Starting DDS system initialization...");
+    ActorSystem actorSystem = nsiActorSystem.getActorSystem();
+
+    try {
+      localDocumentActor = actorSystem.actorOf(springExtension.props("localDocumentActor"), "dds-localDocumentActor");
+      documentExpiryActor = actorSystem.actorOf(springExtension.props("documentExpiryActor"), "dds-documentExpiryActor");
+      registrationRouter = actorSystem.actorOf(springExtension.props("registrationRouter"), "dds-registrationRouter");
+    } catch (Exception ex) {
+      log.error("[DdsProvider] Failed to initialize actor", ex);
+    }
+
+    // Kick off those that need to be started.
+    StartMsg msg = new StartMsg();
+    nsiActorSystem.getActorSystem().scheduler().scheduleOnce(Duration.create(60, TimeUnit.SECONDS),
+            registrationRouter, msg, nsiActorSystem.getActorSystem().dispatcher(), null);
+
+    log.info("[DdsProvider] Completed DDS system initialization.");
   }
+
+  public ActorRef GetLocalDocumentActor() {
+    return localDocumentActor;
+  }
+
+  public ActorRef GetDocumentExpiryActor() {
+    return documentExpiryActor;
+  }
+
+  public ActorRef GetRegistrationRouter() {
+    return registrationRouter;
+  }
+
+  public void terminate() {
+    // We need to kill each of our actors but not touch the actorSystem.
+    nsiActorSystem.shutdown(localDocumentActor);
+    nsiActorSystem.shutdown(documentExpiryActor);
+    nsiActorSystem.shutdown(registrationRouter);
+  }
+
 
   @Override
   public void processNotification(NotificationType notification) throws WebApplicationException {
@@ -514,11 +547,10 @@ public class DdsProvider implements DdsProviderI {
 
   public boolean isSubscription(String url) {
     log.debug("[DdsProvider] isSubscription test for url = {}", url);
-    ActorRef ref = ddsController.GetRegistrationRouter();
     SubscriptionQuery query = new SubscriptionQuery();
     query.setUrl(url);
     Timeout timeout = new Timeout(Duration.create(5, "seconds"));
-    Future<Object> future = Patterns.ask(ref, query, timeout);
+    Future<Object> future = Patterns.ask(registrationRouter, query, timeout);
     try {
       SubscriptionQueryResult result = (SubscriptionQueryResult) Await.result(future, timeout.duration());
       log.debug("[DdsProvider] isSubscription result for url = {}, value = {}", url, result.getSubscription());
@@ -541,9 +573,6 @@ public class DdsProvider implements DdsProviderI {
     return getSubscriptions();
   }*/
 
-  public void terminate() {
-    ddsController.terminate();
-  }
 /**
     @Override
     public Subscription addSubscription(SubscriptionRequestType request, String encoding) {

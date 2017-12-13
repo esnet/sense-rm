@@ -22,7 +22,6 @@ package net.es.sense.rm.driver.nsi;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -32,6 +31,7 @@ import javax.annotation.PreDestroy;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.ws.soap.SOAPFaultException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.sense.rm.driver.api.Driver;
@@ -265,7 +265,6 @@ public class NsiDriver implements Driver {
     deltaService.store(delta);
 
     // Now send the NSI CS commit requests.
-    List<String> connectionIds;
     try {
       raController.getCsProvider().commitDelta(delta.getDeltaId());
 
@@ -310,6 +309,16 @@ public class NsiDriver implements Driver {
       delta.setState(DeltaState.Failed);
       deltaService.store(delta);
       throw new InternalServerErrorException("XML formatters failed", dc);
+    } catch (IllegalArgumentException ia) {
+      delta = deltaService.get(id);
+      delta.setState(DeltaState.Failed);
+      deltaService.store(delta);
+      throw new InternalServerErrorException("Illegal argument encountered", ia);
+    } catch (SOAPFaultException ex) {
+      delta = deltaService.get(id);
+      delta.setState(DeltaState.Failed);
+      deltaService.store(delta);
+      throw new InternalServerErrorException("Unexpected SOAPFault encountered", ex);
     }
   }
 

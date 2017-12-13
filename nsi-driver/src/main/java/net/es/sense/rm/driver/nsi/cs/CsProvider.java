@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
+import javax.xml.ws.soap.SOAPFaultException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.util.XmlUtilities;
@@ -446,7 +447,8 @@ public class CsProvider {
     return correlationIds;
   }
 
-  public void commitDelta(String deltaId) throws ServiceException, IllegalArgumentException, TimeoutException {
+  public void commitDelta(String deltaId) throws ServiceException, IllegalArgumentException, TimeoutException,
+          SOAPFaultException {
     // We store our outstanding operations here.
     List<String> correlationIds = new ArrayList<>();
 
@@ -488,8 +490,14 @@ public class CsProvider {
         // For now just delete the correlationId we added.
         operationMap.delete(correlationIds);
 
-        log.error("Failed to send NSI CS reserveCommit message, correlationId = {}, errorId = {}, text = {}",
+        log.error("[csProvider] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}, errorId = {}, text = {}",
                 requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+        throw ex;
+      } catch (SOAPFaultException soap) {
+        log.error("[csProvider] commitDelta encountered a SOAP Fault", soap);
+        throw soap;
+      } catch (Exception ex) {
+        log.error("[csProvider] commitDelta encountered unexpected error = {}", ex);
         throw ex;
       }
     }

@@ -66,12 +66,10 @@ import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
- * This is the NSI CS 2.1 web service requester endpoint used to receive
- * responses from our associated uPA.  Communication between the requester
- * thread and this requester response endpoint is controlled using a semaphore
- * allowing the request thread to block on the returned response.  Reservation
- * state us updated through the ReservationService which maintains reservations
- * in the database.
+ * This is the NSI CS 2.1 web service requester endpoint used to receive responses from our associated uPA.
+ * Communication between the requester thread and this requester response endpoint is controlled using a semaphore
+ * allowing the request thread to block on the returned response. Reservation state us updated through the
+ * ReservationService which maintains reservations in the database.
  *
  * @author hacksaw
  */
@@ -95,8 +93,8 @@ public class ConnectionService {
   private final static ObjectFactory FACTORY = new ObjectFactory();
 
   /**
-   * We initialize the ConnectionService component with the needed references
-   * since this component does not support autowiring.
+   * We initialize the ConnectionService component with the needed references since this component does not support
+   * autowiring.
    *
    * @param reservationService We store reservations using the reservation service.
    * @param operationMap We synchronize with the requester thread using the operationMap that holds a semaphore.
@@ -192,13 +190,13 @@ public class ConnectionService {
     reservation.setLifecycleState(lifecycleState);
     reservation.setDataPlaneActive(dataPlaneStatus.isActive());
     reservation.setVersion(criteria.getVersion());
-    reservation.setServiceType(criteria.getServiceType().trim());
+    reservation.setServiceType(criteria.getServiceType());
     reservation.setStartTime(getStartTime(criteria.getSchedule().getStartTime()));
     reservation.setEndTime(getEndTime(criteria.getSchedule().getEndTime()));
 
     // Now we need to determine the network based on the STP used in the service.
     try {
-      serializeP2PS(criteria.getServiceType().trim(), criteria.getAny(), reservation);
+      serializeP2PS(criteria.getServiceType(), criteria.getAny(), reservation);
       return reservation;
     } catch (JAXBException ex) {
       log.error("[ConnectionService] processReservation failed for connectionId = {}",
@@ -503,7 +501,7 @@ public class ConnectionService {
         reservation.setLifecycleState(lifecycleState);
         reservation.setDataPlaneActive(dataPlaneStatus.isActive());
         reservation.setVersion(criteria.getVersion());
-        reservation.setServiceType(criteria.getServiceType().trim());
+        reservation.setServiceType(criteria.getServiceType());
         reservation.setStartTime(getStartTime(criteria.getSchedule().getStartTime()));
         reservation.setEndTime(getEndTime(criteria.getSchedule().getEndTime()));
 
@@ -529,7 +527,7 @@ public class ConnectionService {
           reservation.setProviderNsa(child.getProviderNSA());
           reservation.setConnectionId(child.getConnectionId());
           reservation.setVersion(criteria.getVersion());
-          reservation.setServiceType(child.getServiceType().trim());
+          reservation.setServiceType(child.getServiceType());
           reservation.setReservationState(reservationState);
           reservation.setProvisionState(provisionState);
           reservation.setLifecycleState(lifecycleState);
@@ -539,7 +537,7 @@ public class ConnectionService {
 
           // Now we need to determine the network based on the STP used in the service.
           try {
-            serializeP2PS(child.getServiceType().trim(), child.getAny(), reservation);
+            serializeP2PS(child.getServiceType(), child.getAny(), reservation);
           } catch (JAXBException ex) {
             log.error("[ConnectionService] processReservation failed for connectionId = {}",
                     reservation.getConnectionId(), ex);
@@ -735,23 +733,39 @@ public class ConnectionService {
     // incoming event to the associated connection.  If we are connected to an
     // aggregator then the connectionId we want is actually a child connection.
     // Find the associated connection.
-    Reservation reservation = reservationService.get(header.value.getProviderNSA(), connectionId);
-    if (reservation == null) {
+    Reservation r = reservationService.get(header.value.getProviderNSA(), connectionId);
+    if (r == null) {
       log.error("[ConnectionService] dataPlaneStateChange could not find connectionId = {}", connectionId);
     } else {
-      reservation.setDataPlaneActive(dataPlaneStatus.isActive());
-      reservation.setDiscovered(System.currentTimeMillis());
-      reservationService.store(reservation);
+      r.setDataPlaneActive(dataPlaneStatus.isActive());
+      r.setDiscovered(System.currentTimeMillis());
+      reservationService.store(r);
     }
     return FACTORY.createGenericAcknowledgmentType();
   }
 
   public GenericAcknowledgmentType reserveTimeout(ReserveTimeoutRequestType reserveTimeout, Holder<CommonHeaderType> header) throws ServiceException {
-    log.error("[ConnectionService] reserveTimeout for correlationId = {}, connectionId = {}",
-            header.value.getCorrelationId(), reserveTimeout.getConnectionId());
+    String connectionId = reserveTimeout.getConnectionId();
+    String providerNSA = header.value.getProviderNSA();
+
+    log.error("[ConnectionService] reserveTimeout for correlationId = {}, connectionId = {}, providerNSA = {}",
+            header.value.getCorrelationId(), connectionId);
+
+    log.error("[ConnectionService] reserveTimeout from originatingNSA = {}, originatingConnectionId = {}, timeoutValue = {}",
+            reserveTimeout.getOriginatingNSA(), reserveTimeout.getOriginatingConnectionId(),
+            reserveTimeout.getTimeoutValue());
 
     // We can fail the delta request based on this.  We do not have an outstanding
     // operation (or may have one just starting) so no operation to correltate to.
+    Reservation r = reservationService.get(providerNSA, connectionId);
+    if (r == null) {
+      log.error("[ConnectionService] reserveTimeout could not find connectionId = {}", connectionId);
+    } else {
+      r.setReservationState(ReservationStateEnumType.RESERVE_TIMEOUT);
+      r.setLifecycleState(LifecycleStateEnumType.FAILED);
+      r.setDiscovered(System.currentTimeMillis());
+      reservationService.store(r);
+    }
     return FACTORY.createGenericAcknowledgmentType();
   }
 

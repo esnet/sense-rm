@@ -1,5 +1,7 @@
 package net.es.sense.rm.driver.nsi.cs;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -18,6 +20,7 @@ import net.es.nsi.cs.lib.NsiHeader;
 import net.es.nsi.cs.lib.SimpleLabel;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.sense.rm.driver.api.mrml.ModelUtil;
+import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.cs.db.ConnectionMap;
 import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
 import net.es.sense.rm.driver.nsi.cs.db.DeltaConnection;
@@ -34,6 +37,7 @@ import net.es.sense.rm.driver.nsi.mrml.MrsUnits;
 import net.es.sense.rm.driver.nsi.mrml.NmlLabel;
 import net.es.sense.rm.driver.nsi.mrml.StpHolder;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
+import net.es.sense.rm.driver.nsi.spring.SpringExtension;
 import net.es.sense.rm.driver.schema.Mrs;
 import net.es.sense.rm.driver.schema.Nml;
 import net.es.sense.rm.driver.schema.Sd;
@@ -62,15 +66,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class CsProvider {
-  // Runtime properties.
 
   @Autowired
   private NsiProperties nsiProperties;
-
-  // The actor system used to send notifications.
-  @Autowired
-  private CsController csController;
-
+  
   @Autowired
   private ConnectionMapService connectionMapService;
 
@@ -83,6 +82,14 @@ public class CsProvider {
   @Autowired
   private ReservationService reservationService;
 
+  @Autowired
+  private SpringExtension springExtension;
+
+  @Autowired
+  private NsiActorSystem nsiActorSystem;
+
+  private ActorRef connectionActor;
+
   private static final org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory CS_FACTORY
           = new org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory();
   private static final org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory P2PS_FACTORY
@@ -90,14 +97,26 @@ public class CsProvider {
   private static final org.ogf.schemas.nsi._2013._12.framework.types.ObjectFactory FWK_FACTORY
           = new org.ogf.schemas.nsi._2013._12.framework.types.ObjectFactory();
 
-  public void init() {
-    log.debug("[CsProvider] Initializing CS provider with database contents:");
+  public void start() {
+    // Initialize the actors.
+    log.info("[CsProvider] Starting NSI CS system initialization...");
+    ActorSystem actorSystem = nsiActorSystem.getActorSystem();
+
+    try {
+      connectionActor = actorSystem.actorOf(springExtension.props("connectionActor"), "nsi-connectionActor");
+    } catch (Exception ex) {
+      log.error("[CsProvider] Failed to initialize actor", ex);
+    }
+
+    log.info("[CsProvider] Completed NSI CS system initialization.");
   }
 
-  public void start() {
-    log.info("[CsProvider] starting...");
-    csController.start();
-    log.info("[CsProvider] start complete.");
+  public ActorRef GetConnectionActor() {
+    return connectionActor;
+  }
+
+  public void terminate() {
+    nsiActorSystem.shutdown(connectionActor);
   }
 
   public void processDelta(

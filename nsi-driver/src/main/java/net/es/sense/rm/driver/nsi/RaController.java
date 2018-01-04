@@ -52,6 +52,9 @@ public class RaController {
   @Autowired
   private ModelService modelService;
 
+  @Autowired
+  private AuditServiceBean auditService;
+
   // The AKKA actors we start in the RA.
   private ActorRef modelAuditActor;
 
@@ -66,8 +69,7 @@ public class RaController {
   }
 
   /**
-   * Start the RaController's participation in an NSI network. If an AKKA system was not provided during construction
-   * then we created one.
+   * Start the RaController's participation in an NSI network.
    */
   public void start() throws IllegalArgumentException {
     log.info("[RaController] Starting RA...");
@@ -86,13 +88,14 @@ public class RaController {
     // Start the CS controller.
     csProvider.start();
 
-    log.info("[RaController] {} started using AKKA system {}.", nsiProperties.getNsaId(), nsiActorSystem.getActorSystem().name());
+    // Perform a model audit to consolitate the loaded DDS and CS information.
+    auditService.audit();
 
     // Start the model audit actor.
     ActorSystem actorSystem = nsiActorSystem.getActorSystem();
     modelAuditActor = actorSystem.actorOf(springExtension.props("modelAuditActor"), "ra-ModelAuditActor");
 
-    log.info("[RaController] Completed RA system initialization.");
+    log.info("[RaController] {} started using AKKA system {}.", nsiProperties.getNsaId(), nsiActorSystem.getActorSystem().name());
   }
 
   /**

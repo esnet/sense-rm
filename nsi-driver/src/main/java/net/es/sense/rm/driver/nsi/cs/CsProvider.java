@@ -14,6 +14,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.util.XmlUtilities;
+import net.es.nsi.cs.lib.Client;
 import net.es.nsi.cs.lib.ClientUtil;
 import net.es.nsi.cs.lib.Helper;
 import net.es.nsi.cs.lib.NsiHeader;
@@ -21,6 +22,7 @@ import net.es.nsi.cs.lib.SimpleLabel;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.sense.rm.driver.api.mrml.ModelUtil;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
+import net.es.sense.rm.driver.nsi.cs.api.QuerySummary;
 import net.es.sense.rm.driver.nsi.cs.db.ConnectionMap;
 import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
 import net.es.sense.rm.driver.nsi.cs.db.DeltaConnection;
@@ -47,8 +49,11 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.ogf.schemas.nsi._2013._12.connection.provider.Error;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException;
 import org.ogf.schemas.nsi._2013._12.connection.types.GenericRequestType;
+import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
+import org.ogf.schemas.nsi._2013._12.connection.types.QueryType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationRequestCriteriaType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReserveResponseType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReserveType;
@@ -69,7 +74,7 @@ public class CsProvider {
 
   @Autowired
   private NsiProperties nsiProperties;
-  
+
   @Autowired
   private ConnectionMapService connectionMapService;
 
@@ -108,6 +113,11 @@ public class CsProvider {
       log.error("[CsProvider] Failed to initialize actor", ex);
     }
 
+    // Do a one time load of connections from remote NSA since the web
+    // server may not yet be servicing requests.  From this point on it is
+    // controlled through the asynchronous process.
+    load();
+
     log.info("[CsProvider] Completed NSI CS system initialization.");
   }
 
@@ -117,6 +127,42 @@ public class CsProvider {
 
   public void terminate() {
     nsiActorSystem.shutdown(connectionActor);
+  }
+
+  public void load() {
+    Client nsiClient = new Client(nsiProperties.getProviderConnectionURL());
+
+    CommonHeaderType requestHeader = NsiHeader.builder()
+            .correlationId(Helper.getUUID())
+            .providerNSA(nsiProperties.getProviderNsaId())
+            .requesterNSA(nsiProperties.getNsaId())
+            .replyTo(nsiProperties.getRequesterConnectionURL())
+            .build()
+            .getRequestHeaderType();
+
+    Holder<CommonHeaderType> header = new Holder<>();
+    header.value = requestHeader;
+
+    QueryType query = CS_FACTORY.createQueryType();
+    try {
+      log.info("[CsProvider] Sending querySummarySync: providerNSA = {}, correlationId = {}",
+              header.value.getProviderNSA(), header.value.getCorrelationId());
+      QuerySummaryConfirmedType querySummarySync = nsiClient.getProxy().querySummarySync(query, header);
+      log.info("[CsProvider] QuerySummaryConfirmed recieved, providerNSA = {}, correlationId = {}",
+              header.value.getProviderNSA(), header.value.getCorrelationId());
+
+      QuerySummary q = new QuerySummary(reservationService);
+      q.process(querySummarySync, header);
+
+    } catch (Error ex) {
+      log.error("[CsProvider] querySummarySync exception on operation - {} {}",
+              ex.getFaultInfo().getServiceException().getErrorId(),
+              ex.getFaultInfo().getServiceException().getText());
+    } catch (org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException ex) {
+      log.error("[CsProvider] querySummarySync exception processing results - {} {}",
+              ex.getFaultInfo().getErrorId(),
+              ex.getFaultInfo().getText());
+    }
   }
 
   public void processDelta(

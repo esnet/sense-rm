@@ -9,7 +9,11 @@ import org.springframework.context.annotation.Configuration;
  * @author hacksaw
  */
 @Configuration
-@ComponentScan({"net.es.sense.rm.driver.nsi.actors", "net.es.sense.rm.driver.nsi.configuration", "net.es.sense.rm.driver.nsi.properties", "net.es.sense.rm.driver.nsi.spring"})
+@ComponentScan({
+  "net.es.sense.rm.driver.nsi.actors",
+  "net.es.sense.rm.driver.nsi.configuration",
+  "net.es.sense.rm.driver.nsi.properties",
+  "net.es.sense.rm.driver.nsi.spring"})
 @EnableAutoConfiguration
 public class ActorUnitTestConfiguration {
 

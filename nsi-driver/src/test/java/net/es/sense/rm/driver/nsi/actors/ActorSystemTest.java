@@ -24,7 +24,12 @@ import scala.concurrent.duration.Duration;
  */
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { ApplicationContext.class, SpringExtension.class, NsiProperties.class, NsiActorSystem.class, ActorUnitTestConfiguration.class })
+@SpringBootTest(classes = {
+  ApplicationContext.class,
+  SpringExtension.class,
+  NsiProperties.class,
+  NsiActorSystem.class,
+  ActorUnitTestConfiguration.class })
 @ActiveProfiles("test")
 public class ActorSystemTest {
 

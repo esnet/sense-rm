@@ -10,7 +10,6 @@ import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBException;
@@ -19,6 +18,8 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
+import net.es.nsi.dds.lib.client.DdsClient;
+import net.es.nsi.dds.lib.client.DocumentsResult;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentType;
 import net.es.nsi.dds.lib.jaxb.dds.FilterType;
 import net.es.nsi.dds.lib.jaxb.dds.NotificationType;
@@ -27,7 +28,6 @@ import net.es.sense.rm.driver.nsi.dds.api.DiscoveryError;
 import net.es.sense.rm.driver.nsi.dds.api.Exceptions;
 import net.es.sense.rm.driver.nsi.dds.db.Document;
 import net.es.sense.rm.driver.nsi.dds.db.DocumentService;
-import net.es.sense.rm.driver.nsi.dds.messages.StartMsg;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQuery;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQueryResult;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
@@ -59,6 +59,9 @@ public class DdsProvider implements DdsProviderI {
   @Autowired
   private NsiActorSystem nsiActorSystem;
 
+  @Autowired
+  private DdsClientProvider ddsClientProvider;
+
   private ActorRef localDocumentActor;
   private ActorRef documentExpiryActor;
   private ActorRef registrationRouter;
@@ -76,10 +79,10 @@ public class DdsProvider implements DdsProviderI {
       log.error("[DdsProvider] Failed to initialize actor", ex);
     }
 
-    // Kick off those that need to be started.
-    StartMsg msg = new StartMsg();
-    nsiActorSystem.getActorSystem().scheduler().scheduleOnce(Duration.create(60, TimeUnit.SECONDS),
-            registrationRouter, msg, nsiActorSystem.getActorSystem().dispatcher(), null);
+    // Do a one time load of documents from remote DDS service since the web
+    // server may not yet be servicing requests.  From this point on it is
+    // controlled through the notification process.
+    load();
 
     log.info("[DdsProvider] Completed DDS system initialization.");
   }
@@ -103,6 +106,34 @@ public class DdsProvider implements DdsProviderI {
     nsiActorSystem.shutdown(registrationRouter);
   }
 
+  public void load() {
+    final DdsClient client = ddsClientProvider.get();
+    nsiProperties.getPeers().forEach((url) -> {
+      log.debug("[load] registering url={}", url);
+      DocumentsResult documents = client.getDocuments(url);
+      documents.getDocuments().stream().filter(d -> d != null).forEach(d -> {
+        String documentId = Document.documentId(d);
+
+        Document entry = documentService.get(documentId);
+        if (entry == null) {
+          // This must be the first time we have seen the document so add it
+          // into our cache.
+          log.debug("[load] new documentId = {}", documentId);
+          addDocument(d, Source.REMOTE);
+        } else {
+          // We have seen the document before.
+          log.debug("[load] update documentId = {}", documentId);
+          try {
+            updateDocument(d, Source.REMOTE);
+          } catch (InvalidVersionException ex) {
+            // This is an old document version so discard.
+            log.debug("[load] old document version documentId = {}", documentId);
+          }
+        }
+      });
+    });
+
+  }
 
   @Override
   public void processNotification(NotificationType notification) throws WebApplicationException {
@@ -246,7 +277,6 @@ public class DdsProvider implements DdsProviderI {
     // See if we have a document under this id.
     Document document = documentService.get(documentId);
     if (document == null) {
-      String error = DiscoveryError.getErrorString(DiscoveryError.DOCUMENT_DOES_NOT_EXIST, "document", documentId);
       throw Exceptions.doesNotExistException(DiscoveryError.NOT_FOUND, "document", documentId);
     }
 

@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.dds.lib.client.DdsClient;
 import net.es.nsi.dds.lib.client.SubscriptionResult;
 import net.es.nsi.dds.lib.client.SubscriptionsResult;
-import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
 import net.es.nsi.dds.lib.jaxb.dds.SubscriptionType;
 import net.es.sense.rm.driver.nsi.dds.DdsClientProvider;
 import net.es.sense.rm.driver.nsi.dds.db.Subscription;
@@ -41,8 +40,6 @@ public class RegistrationActor extends UntypedAbstractActor {
 
   @Autowired
   private DdsClientProvider ddsClientProvider;
-
-  private final ObjectFactory FACTORY = new ObjectFactory();
 
   @Override
   public void preStart() {

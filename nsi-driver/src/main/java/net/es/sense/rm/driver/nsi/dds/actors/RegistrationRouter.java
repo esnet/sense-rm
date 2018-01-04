@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.dds.db.Subscription;
 import net.es.sense.rm.driver.nsi.dds.db.SubscriptionService;
 import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent;
@@ -42,6 +43,9 @@ public class RegistrationRouter extends UntypedAbstractActor {
   private NsiProperties nsiProperties;
 
   @Autowired
+  private NsiActorSystem nsiActorSystem;
+
+  @Autowired
   private SubscriptionService subscriptionService;
 
   private Router router;
@@ -57,6 +61,10 @@ public class RegistrationRouter extends UntypedAbstractActor {
       routees.add(new ActorRefRoutee(r));
     }
     router = new Router(new RoundRobinRoutingLogic(), routees);
+
+    // Kick off those that need to be started.
+    nsiActorSystem.getActorSystem().scheduler().scheduleOnce(Duration.create(60, TimeUnit.SECONDS),
+            this.getSelf(), new StartMsg(), nsiActorSystem.getActorSystem().dispatcher(), null);
 
     log.info("[RegistrationRouter] Initialization completed.");
   }

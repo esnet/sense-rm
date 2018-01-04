@@ -16,6 +16,7 @@ import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.util.UrlHelper;
 import net.es.nsi.dds.lib.jaxb.DdsParser;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentEventType;
+import net.es.nsi.dds.lib.jaxb.dds.DocumentListType;
 import net.es.nsi.dds.lib.jaxb.dds.ErrorType;
 import net.es.nsi.dds.lib.jaxb.dds.FilterCriteriaType;
 import net.es.nsi.dds.lib.jaxb.dds.FilterType;
@@ -34,6 +35,43 @@ import org.apache.http.client.utils.DateUtils;
 public class DdsClient extends RestClient {
 
   private final ObjectFactory FACTORY = new ObjectFactory();
+
+  public DocumentsResult getDocuments(String baseURL) {
+    DocumentsResult result = new DocumentsResult();
+    result.setStatus(Status.BAD_REQUEST);
+
+    WebTarget webTarget = this.get().target(baseURL).path("documents");
+
+    Optional<Response> optional = Optional.empty();
+    try {
+      optional = Optional.of(webTarget.request(Nsi.NSI_DDS_V1_XML).get());
+
+      Response response = optional.get();
+      result.setStatus(Status.fromStatusCode(response.getStatus()));
+      if (response.getStatus() == Status.OK.getStatusCode()) {
+        result.setLastModified(response.getLastModified() == null ?
+                (System.currentTimeMillis() / 1000) * 1000 : response.getLastModified().getTime());
+        result.setDocuments(response.readEntity(DocumentListType.class)
+                .getDocument()
+                .stream()
+                .collect(Collectors.toList()));
+      } else {
+        log.error("DdsClient] Failed to retrieve list of documents = {}, result = {}",
+                webTarget.getUri().toASCIIString(), response.getStatusInfo().getReasonPhrase());
+        Optional<ErrorType> error = Optional.ofNullable(response.readEntity(ErrorType.class));
+        if (error.isPresent()) {
+          log.error("[DdsClient] Subscription get failed, href={}, error={}.", webTarget.getUri().toASCIIString(), error.get().getId());
+        }
+      }
+    } catch (Exception ex) {
+      log.error("[DdsClient] GET failed for href={}, ex={}", webTarget.getUri().toASCIIString(), ex);
+      result.setStatus(Status.INTERNAL_SERVER_ERROR);
+    } finally {
+      optional.ifPresent(r -> r.close());
+    }
+
+    return result;
+  }
 
   /**
    * Get a list of subscriptions registered on the remote DDS server.

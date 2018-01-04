@@ -19,25 +19,18 @@
  */
 package net.es.sense.rm.driver.nsi.cs.api;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.jws.WebService;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
-import net.es.nsi.common.constants.Nsi;
-import net.es.nsi.cs.lib.CsParser;
-import net.es.nsi.cs.lib.SimpleStp;
 import net.es.sense.rm.driver.nsi.cs.db.Operation;
 import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.cs.db.StateType;
 import org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException;
-import org.ogf.schemas.nsi._2013._12.connection.types.ChildSummaryListType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ChildSummaryType;
 import org.ogf.schemas.nsi._2013._12.connection.types.DataPlaneStateChangeRequestType;
 import org.ogf.schemas.nsi._2013._12.connection.types.DataPlaneStatusType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ErrorEventType;
@@ -53,17 +46,13 @@ import org.ogf.schemas.nsi._2013._12.connection.types.QueryNotificationConfirmed
 import org.ogf.schemas.nsi._2013._12.connection.types.QueryRecursiveConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QueryResultConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
-import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryResultCriteriaType;
-import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryResultType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationConfirmCriteriaType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReserveConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReserveTimeoutRequestType;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 import org.ogf.schemas.nsi._2013._12.framework.types.ServiceExceptionType;
-import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Node;
 
 /**
  * This is the NSI CS 2.1 web service requester endpoint used to receive responses from our associated uPA.
@@ -196,7 +185,7 @@ public class ConnectionService {
 
     // Now we need to determine the network based on the STP used in the service.
     try {
-      serializeP2PS(criteria.getServiceType(), criteria.getAny(), reservation);
+      CsUtils.serializeP2PS(criteria.getServiceType(), criteria.getAny(), reservation);
       return reservation;
     } catch (JAXBException ex) {
       log.error("[ConnectionService] processReservation failed for connectionId = {}",
@@ -355,238 +344,9 @@ public class ConnectionService {
   }
 
   public GenericAcknowledgmentType querySummaryConfirmed(QuerySummaryConfirmedType querySummaryConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
-    // Get the providerNSA identifier.
-    String providerNsa = header.value.getProviderNSA();
-
-    // Extract the uPA connection segments associated with individual networks.
-    List<QuerySummaryResultType> reservations = querySummaryConfirmed.getReservation();
-    log.info("[ConnectionService] querySummaryConfirmed: providerNSA = {}, # of reservations = {}",
-            providerNsa, reservations.size());
-
-    // Process each reservation returned.
-    List<Reservation> results = new ArrayList<>();
-    for (QuerySummaryResultType reservation : reservations) {
-      // Get the parent reservation information to apply to child connections.
-      ReservationStateEnumType reservationState = reservation.getConnectionStates().getReservationState();
-      ProvisionStateEnumType provisionState = reservation.getConnectionStates().getProvisionState();
-      LifecycleStateEnumType lifecycleState = reservation.getConnectionStates().getLifecycleState();
-      DataPlaneStatusType dataPlaneStatus = reservation.getConnectionStates().getDataPlaneStatus();
-
-      log.info("[ConnectionService] querySummaryConfirmed: cid = {}, gid = {}, decription = {}, "
-              + "rstate = {}, pstate = {}, lstate = {}, active = {}, providerNSA = {}",
-              reservation.getConnectionId(), reservation.getGlobalReservationId(), reservation.getDescription(),
-              reservationState, provisionState, lifecycleState, dataPlaneStatus.isActive(), providerNsa);
-
-      if (reservationState == null) {
-        reservationState = ReservationStateEnumType.RESERVE_CHECKING;
-      }
-
-      if (provisionState == null) {
-        provisionState = ProvisionStateEnumType.RELEASED;
-      }
-
-      if (lifecycleState == null) {
-        lifecycleState = LifecycleStateEnumType.INITIAL;
-      }
-
-      // If this reservation is in the process of being created, or failed
-      // creation, then there will be no associated criteria.
-      if (reservation.getCriteria().isEmpty()) {
-        results.add(processReservationNoCriteria(
-                providerNsa,
-                reservation.getGlobalReservationId(),
-                reservation.getDescription(),
-                reservation.getConnectionId(),
-                reservationState,
-                provisionState,
-                lifecycleState,
-                dataPlaneStatus));
-      } else {
-        results.addAll(processSummaryCriteria(
-                providerNsa,
-                reservation.getGlobalReservationId(),
-                reservation.getDescription(),
-                reservation.getConnectionId(),
-                reservationState,
-                provisionState,
-                lifecycleState,
-                dataPlaneStatus,
-                reservation.getCriteria()));
-      }
-    }
-
-    // Determine if we need to update each reservation in the database.
-    for (Reservation reservation : results) {
-      Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
-      if (r == null) {
-        // We have not seen this reservation before so store it.
-        log.info("[ConnectionService] querySummaryConfirmed: storing new reservation, cid = {}",
-                reservation.getConnectionId());
-        reservationService.store(reservation);
-      } else if (r.diff(reservation)) {
-        // We have to determine if the stored reservation needs to be updated.
-        log.info("[ConnectionService] querySummaryConfirmed: storing reservation update, cid = {}",
-                reservation.getConnectionId());
-        reservation.setId(r.getId());
-        reservationService.store(reservation);
-      } else {
-        log.info("[ConnectionService] querySummaryConfirmed: reservation no change, cid = {}",
-                reservation.getConnectionId());
-      }
-    }
-
+    QuerySummary q = new QuerySummary(reservationService);
+    q.process(querySummaryConfirmed, header);
     return FACTORY.createGenericAcknowledgmentType();
-  }
-
-  private Reservation processReservationNoCriteria(
-          String providerNsa,
-          String gid,
-          String description,
-          String cid,
-          ReservationStateEnumType reservationState,
-          ProvisionStateEnumType provisionState,
-          LifecycleStateEnumType lifecycleState,
-          DataPlaneStatusType dataPlaneStatus) {
-
-    log.debug("[ConnectionService] processReservationNoCriteria: cid = {}, providerNSA = {}", cid, providerNsa);
-
-    // We have had a state change so update the reservation.
-    Reservation reservation = new Reservation();
-    reservation.setGlobalReservationId(gid);
-    reservation.setDescription(description);
-    reservation.setProviderNsa(providerNsa);
-    reservation.setConnectionId(cid);
-    reservation.setVersion(0);
-    reservation.setReservationState(reservationState);
-    reservation.setProvisionState(provisionState);
-    reservation.setLifecycleState(lifecycleState);
-    reservation.setDataPlaneActive(dataPlaneStatus.isActive());
-    reservation.setDiscovered(System.currentTimeMillis());
-
-    return reservation;
-  }
-
-  private List<Reservation> processSummaryCriteria(
-          String providerNsa,
-          String gid,
-          String description,
-          String cid,
-          ReservationStateEnumType reservationState,
-          ProvisionStateEnumType provisionState,
-          LifecycleStateEnumType lifecycleState,
-          DataPlaneStatusType dataPlaneStatus,
-          List<QuerySummaryResultCriteriaType> criteriaList) {
-
-    log.info("[ConnectionService] processSummaryCriteria: connectionId = {}, providerNsa = {}", cid, providerNsa);
-
-    List<Reservation> results = new ArrayList<>();
-
-    // There will be one criteria for each version of this reservation. We
-    // will check to see if there are any new versions than what is already
-    // stored.
-    for (QuerySummaryResultCriteriaType criteria : criteriaList) {
-      log.info("[ConnectionService] processCriteria: cid = {}, version = {}, serviceType = {}",
-              cid, criteria.getVersion(), criteria.getServiceType());
-      ChildSummaryListType children = criteria.getChildren();
-      if (children == null || children.getChild().isEmpty()) {
-        // We are at a leaf child so check to see if we need to store this reservation information.
-        Reservation reservation = new Reservation();
-        reservation.setGlobalReservationId(gid);
-        reservation.setDescription(description);
-        reservation.setDiscovered(System.currentTimeMillis());
-        reservation.setProviderNsa(providerNsa);
-        reservation.setConnectionId(cid);
-        reservation.setReservationState(reservationState);
-        reservation.setProvisionState(provisionState);
-        reservation.setLifecycleState(lifecycleState);
-        reservation.setDataPlaneActive(dataPlaneStatus.isActive());
-        reservation.setVersion(criteria.getVersion());
-        reservation.setServiceType(criteria.getServiceType());
-        reservation.setStartTime(getStartTime(criteria.getSchedule().getStartTime()));
-        reservation.setEndTime(getEndTime(criteria.getSchedule().getEndTime()));
-
-        // Now we need to determine the network based on the STP used in the service.
-        try {
-          serializeP2PS(criteria.getServiceType(), criteria.getAny(), reservation);
-        } catch (JAXBException ex) {
-          log.error("[ConnectionService] processReservation failed for cid = {}", cid, ex);
-          continue;
-        }
-
-        results.add(reservation);
-      } else {
-        // We still have children so this must be an aggregator.
-        for (ChildSummaryType child : children.getChild()) {
-          log.info("[ConnectionService] querySummaryConfirmed: child cid = {}, gid = {}, decription = {}, rstate = {}, lstate = {}",
-                  child.getConnectionId(), gid, description, reservationState, lifecycleState);
-
-          Reservation reservation = new Reservation();
-          reservation.setDiscovered(System.currentTimeMillis());
-          reservation.setGlobalReservationId(gid);
-          reservation.setDescription(description);
-          reservation.setProviderNsa(child.getProviderNSA());
-          reservation.setConnectionId(child.getConnectionId());
-          reservation.setVersion(criteria.getVersion());
-          reservation.setServiceType(child.getServiceType());
-          reservation.setReservationState(reservationState);
-          reservation.setProvisionState(provisionState);
-          reservation.setLifecycleState(lifecycleState);
-          reservation.setDataPlaneActive(dataPlaneStatus.isActive());
-          reservation.setStartTime(getStartTime(criteria.getSchedule().getStartTime()));
-          reservation.setEndTime(getEndTime(criteria.getSchedule().getEndTime()));
-
-          // Now we need to determine the network based on the STP used in the service.
-          try {
-            serializeP2PS(child.getServiceType(), child.getAny(), reservation);
-          } catch (JAXBException ex) {
-            log.error("[ConnectionService] processReservation failed for connectionId = {}",
-                    reservation.getConnectionId(), ex);
-            continue;
-          }
-
-          results.add(reservation);
-        }
-      }
-    }
-
-    return results;
-  }
-
-  private void serializeP2PS(String serviceType, List<Object> any, Reservation reservation) throws JAXBException {
-    log.info("[serializeP2PS] serviceType = {}", serviceType);
-    if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType)
-            || Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(serviceType)
-            || Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(serviceType)) {
-      log.info("[serializeP2PS] EVTS found");
-      reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
-      for (Object object : any) {
-        if (object instanceof JAXBElement) {
-          JAXBElement jaxb = (JAXBElement) object;
-          if (jaxb.getValue() instanceof P2PServiceBaseType) {
-            log.info("[serializeP2PS] P2PServiceBaseType found");
-            P2PServiceBaseType p2ps = (P2PServiceBaseType) jaxb.getValue();
-            log.info("[serializeP2PS] sourceStp = {}", p2ps.getSourceSTP());
-            SimpleStp stp = new SimpleStp(p2ps.getSourceSTP());
-            log.info("[serializeP2PS] networkId = {}", stp.getNetworkId());
-            reservation.setTopologyId(stp.getNetworkId());
-            reservation.setService(CsParser.getInstance().p2ps2xml(p2ps));
-            break;
-          }
-        } else if (object instanceof org.apache.xerces.dom.ElementNSImpl) {
-          org.apache.xerces.dom.ElementNSImpl element = (org.apache.xerces.dom.ElementNSImpl) object;
-          if ("p2ps".equalsIgnoreCase(element.getLocalName())) {
-            log.info("[serializeP2PS] DOM P2PServiceBaseType found");
-            P2PServiceBaseType p2ps = CsParser.getInstance().node2p2ps((Node) element);
-            log.info("[serializeP2PS] sourceStp = {}", p2ps.getSourceSTP());
-            SimpleStp stp = new SimpleStp(p2ps.getSourceSTP());
-            log.info("[serializeP2PS] networkId = {}", stp.getNetworkId());
-            reservation.setTopologyId(stp.getNetworkId());
-            reservation.setService(CsParser.getInstance().p2ps2xml(p2ps));
-            break;
-          }
-        }
-      }
-    }
   }
 
   public GenericAcknowledgmentType queryRecursiveConfirmed(QueryRecursiveConfirmedType queryRecursiveConfirmed,

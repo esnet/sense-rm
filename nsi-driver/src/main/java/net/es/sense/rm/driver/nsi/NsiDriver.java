@@ -28,8 +28,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.BadRequestException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.ws.soap.SOAPFaultException;
 import lombok.extern.slf4j.Slf4j;
@@ -103,40 +104,66 @@ public class NsiDriver implements Driver {
     }
   }
 
+  /**
+   * Get a list of MRML models matching the specified query parameters.
+   * 
+   * @param current If <b>true</b> only the current model will be returned (if one exists).
+   * 
+   * @param modelType Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
+   * 
+   * @return A Future promise to return a Collection of ModelResource matching query.  The
+   *    returned collection may be empty if no models match the requested criteria.
+   * 
+   * @throws InternalServerErrorException An internal error caused a failure to process request.
+   * 
+   * @throws BadRequestException The query contains invalid parameters that halted processing.
+   */
   @Override
   @Async
-  public Future<Collection<ModelResource>> getModels(boolean current, String modelType) throws NotFoundException, ExecutionException {
+  public Future<Collection<ModelResource>> getModels(boolean current, String modelType) 
+          throws BadRequestException, InternalServerErrorException  {
+    // Get the NSI network identifier we are modelling in MRML.
     String networkId = nsiProperties.getNetworkId();
-    log.info("[getModels] getting model for network = {}", networkId);
+    log.info("[NsiDriver] getting model for network = {}", networkId);
 
     if (Strings.isNullOrEmpty(networkId)) {
       log.error("[NsiDriver] no network specified in configuration.");
-      throw new ExecutionException(new IllegalArgumentException("No network specified in configuration."));
+      throw new InternalServerErrorException("No network specified in configuration.");
     }
 
-    // Convert the topologies NML topologies to MRML.
+    // A valid model type must be provided.
+    if (!ModelUtil.isSupported(modelType)) {
+      log.error("[NsiDriver] specified model type = {} not supported.", modelType);
+      throw new BadRequestException("Specified model type = " + modelType + " not supported.");      
+    }
+
+    // The RA Controller maintains a database of MRML models created from NML and NSI connections.
     try {
       Collection<ModelResource> results = new ArrayList<>();
       ModelService modelService = raController.getModelService();
       Collection<Model> models = modelService.get(current, networkId);
+      
+      // If we did get a set of results we need to map them into a ModelResource to return.
       if (models != null) {
         for (Model m : models) {
           ModelResource model = new ModelResource();
           model.setId(m.getModelId());
-          model.setCreationTime(XmlUtilities.longToXMLGregorianCalendar((m.getVersion() / 1000) * 1000).toXMLFormat());
+          model.setCreationTime(XmlUtilities
+                  .longToXMLGregorianCalendar((m.getVersion() / 1000) * 1000).toXMLFormat());
           model.setModel(m.getBase());
 
-          log.info("[getModels] return modelId = {}", model.getId());
+          log.info("[NsiDriver] found matching modelId = {}", model.getId());
           results.add(model);
         }
       } else {
-        log.info("[getModels] could not fine any entries for network = {}", networkId);
+        log.info("[NsiDriver] no matching model entries returned for network = {}", networkId);
       }
 
       return new AsyncResult<>(results);
     } catch (IllegalArgumentException | DatatypeConfigurationException ex) {
       log.error("[NsiDriver] ontology creation failed for networkId = {}.", networkId, ex);
-      throw new ExecutionException(ex);
+      throw new InternalServerErrorException("Could not generate model for networkId = " 
+              + networkId);
     }
   }
 

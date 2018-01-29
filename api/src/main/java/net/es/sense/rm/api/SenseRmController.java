@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import javax.annotation.PostConstruct;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -76,8 +77,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * The SENSE RM API web services.
- *
+ * The SENSE RM API web services module based on Spring REST annotations.
+ * This class handles the SENSE RM API specific parameters, encodings, and
+ * behaviors but delegates all message processing to technology specific
+ * drivers.
+ * 
+ * Supported resource operations:
+ *  GET /api/sense/v1
+ * 
+ * @author hacksaw
  */
 @Slf4j
 @RestController
@@ -86,15 +94,26 @@ import org.springframework.web.util.UriComponentsBuilder;
 @ResourceAnnotation(name = "sense", version = "v1")
 public class SenseRmController extends SenseController {
 
+  // Spring application context. 
   @Autowired
   ApplicationContext context;
 
+  // SENSE YAML configuration.
   @Autowired(required = true)
   SenseProperties config;
 
+  // Transformer to manipulate URL path in case there are mapping issues.
   private UrlTransform utilities;
+  
+  // The solution specific technology driver implementing SENSE protocol
+  // mapping to underlying network technology.
   private Driver driver;
 
+  /**
+   * Initialize API by loading technology specific driver using reflection.
+   * 
+   * @throws Exception 
+   */
   @PostConstruct
   public void init() throws Exception {
     utilities = new UrlTransform(config.getProxy());
@@ -103,12 +122,10 @@ public class SenseRmController extends SenseController {
   }
 
   /**
-   * *********************************************************************
-   * GET /api/sense/v1 *********************************************************************
-   */
-  /**
-   * Returns a list of available SENSE service API resources.
+   * Returns a list of available SENSE service API resource URLs.
    *
+   * Operation: GET /api/sense/v1
+   * 
    * @return A RESTful response.
    * @throws java.net.MalformedURLException
    */
@@ -140,47 +157,74 @@ public class SenseRmController extends SenseController {
                     response = Error.class),})
   @RequestMapping(method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseBody
-  public List<Resource> getResources() throws MalformedURLException {
-    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
-    List<Resource> resources = new ArrayList<>();
-    Method[] methods = SenseRmController.class.getMethods();
-    for (Method m : methods) {
-      if (m.isAnnotationPresent(ResourceAnnotation.class)) {
-        ResourceAnnotation ra = m.getAnnotation(ResourceAnnotation.class);
-        RequestMapping rm = m.getAnnotation(RequestMapping.class);
-        if (ra == null || rm == null) {
-          continue;
-        }
-        Resource resource = new Resource();
-        resource.setId(ra.name());
-        resource.setVersion(ra.version());
-        UriComponentsBuilder path = utilities.getPath(location.toASCIIString());
-        path.path(rm.value()[0]);
-        resource.setHref(path.build().toUriString());
-        resources.add(resource);
-      }
-    }
+  public ResponseEntity<?> getResources() throws MalformedURLException {
+    try {
+      // We need the request URL to build fully qualified resource URLs. 
+      final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
 
-    return resources;
+      log.info("[SenseRmController] GET operation = {}", location);
+
+      // We will populate some HTTP response headers.
+      final HttpHeaders headers = new HttpHeaders();
+      headers.add("Content-Location", location.toASCIIString());
+
+      List<Resource> resources = new ArrayList<>();
+      Method[] methods = SenseRmController.class.getMethods();
+      for (Method m : methods) {
+        if (m.isAnnotationPresent(ResourceAnnotation.class)) {
+          ResourceAnnotation ra = m.getAnnotation(ResourceAnnotation.class);
+          RequestMapping rm = m.getAnnotation(RequestMapping.class);
+          if (ra == null || rm == null) {
+            continue;
+          }
+          Resource resource = new Resource();
+          resource.setId(ra.name());
+          resource.setVersion(ra.version());
+          UriComponentsBuilder path = utilities.getPath(location.toASCIIString());
+          path.path(rm.value()[0]);
+          resource.setHref(path.build().toUriString());
+          resources.add(resource);
+        }
+      }
+
+      return new ResponseEntity<>(resources, headers, HttpStatus.OK);
+    } catch (SecurityException | MalformedURLException ex) {
+      log.error("[SenseRmController] Exception caught", ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);      
+    } 
   }
 
   /**
    * Returns a list of available SENSE topology models.
+   * 
+   * Operation: GET /api/sense/v1/models
    *
-   * @param uriInfo The incoming URI context used to invoke the service.
-   * @param accept Provides media types that are acceptable for the response. At the moment 'application/json' is the
-   * supported response encoding.
-   * @param ifModifiedSince The HTTP request may contain the If-Modified-Since header requesting all models with
-   * creationTime after the specified date. The date must be specified in RFC 1123 format.
-   * @param current If current=true then a collection of models containing only the most recent model will be returned.
-   * Default value is current=false.
-   * @param encode
-   * @param summary If summary=true then a summary collection of models will be returned including the model meta-data
-   * while excluding the model element. Default value is summary=true.
-   * @param model This version’s detailed topology model in the requested format (TURTLE, etc.). To optimize transfer
-   * the contents of this model element should be gzipped (contentType="application/x-gzip") and base64 encoded
-   * (contentTransferEncoding= "base64"). This will reduce the transfer size and encapsulate the original model
-   * contents.
+   * @param accept Provides media types that are acceptable for the response.
+   *    At the moment 'application/json' is the supported response encoding.
+   * 
+   * @param ifModifiedSince The HTTP request may contain the If-Modified-Since
+   *    header requesting all models with creationTime after the specified
+   *    date. The date must be specified in RFC 1123 format.
+   * 
+   * @param current If current=true then a collection of models containing only
+   *    the most recent model will be returned. Default value is current=false.
+   * 
+   * @param encode Transfer size of the model element contents can be optimized
+   *    by gzip/base64 encoding the contained model.  If encode=true the 
+   *    returned model will be gzipped (contentType="application/x-gzip") and
+   *    base64 encoded (contentTransferEncoding= "base64") to reduce transfer
+   *    size. Default value is encode=false.
+   * 
+   * @param summary If summary=true then a summary collection of models will be
+   *    returned including the model meta-data while excluding the model
+   *    element. Default value is summary=true.
+   * 
+   * @param model Specify the model schema format (TURTLE, JSON-LD, etc.).
+   * 
    * @return A RESTful response.
    */
   @ApiOperation(
@@ -316,11 +360,13 @@ public class SenseRmController extends SenseController {
                   defaultValue = HttpConstants.MODEL_TURTLE)
           @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model) {
 
+    // We need the request URL to build fully qualified resource URLs. 
     final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
 
     log.info("[SenseRmController] GET operation = {}, accept = {}, If-Modified-Since = {}, current = {}, summary = {}, model = {}",
             location, accept, ifModifiedSince, current, summary, model);
 
+    // Process the last modified header parameter if present.
     Date lastModified = DateUtils.parseDate(ifModifiedSince);
     if (lastModified == null) {
       log.error("[SenseRmController] invalid header {}, value = {}.", HttpConstants.IF_MODIFIED_SINCE_NAME,
@@ -328,29 +374,40 @@ public class SenseRmController extends SenseController {
       lastModified = DateUtils.parseDate(HttpConstants.IF_MODIFIED_SINCE_DEFAULT);
     }
 
-    // First case is to handle a targeted request for the current model.
-    long newest = 0;
+    
+    // Populate the content location header with our URL location.
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Content-Location", location.toASCIIString());
 
     try {
+      // Track matching models here.
       List<ModelResource> models = new ArrayList<>();
+      
+      // Keep track of the most recently updated model date.
+      long newest = 0;
+      
+      // Query the driver for a list of models.
       Collection<ModelResource> result = driver.getModels(current, model).get();
+      
+      // First case is to handle a targeted request for the current model.
       if (current) {
+        // We should have received only one result of drive functioning correctly.
         Optional<ModelResource> first = result.stream().reduce((e1, e2) -> {
           throw new IllegalArgumentException("Multiple models returned for parameter current = " + current);
         });
 
-        // No results means resource not found.
+        // No results means resource not found since they specifically asked for the current.
         if (!first.isPresent()) {
           return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         ModelResource m = first.get();
-        log.info("[SenseRmController] model id = {}, creationTime = {}, If-Modified-Since = {}", m.getId(),
-                m.getCreationTime(), DateUtils.formatDate(lastModified));
+        log.info("[SenseRmController] model id = {}, creationTime = {}, If-Modified-Since = {}",
+                m.getId(), m.getCreationTime(), DateUtils.formatDate(lastModified));
 
-        long creationTime = XmlUtilities.xmlGregorianCalendar(m.getCreationTime()).toGregorianCalendar().getTimeInMillis();
+        // Determine if the creation time of this model is newer than  If-Modified-Since.
+        long creationTime = XmlUtilities.xmlGregorianCalendar(m.getCreationTime())
+                .toGregorianCalendar().getTimeInMillis();
 
         if (creationTime <= lastModified.getTime()) {
           log.info("[SenseRmController] resource not modified {}", m.getId());
@@ -358,48 +415,92 @@ public class SenseRmController extends SenseController {
           return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
         }
 
+        // Looks like we have a new model to return.
         log.info("[SenseRmController] returning matching resource {}", m.getId());
 
+        // Create the unique resource URL.
         m.setHref(UrlHelper.append(location.toASCIIString(), m.getId()));
-        if (!summary) {
+        
+        // If summary results are requested we do not return the model.
+        if (summary) {
+          m.setModel(null);
+        } else {
+          // If they requested an encoded transfer we will encode the model contents.
           if (encode) {
             m.setModel(Encoder.encode(m.getModel()));
           }
         }
+        
+        // Save this model and update If-Modified-Since with the creation time.
         models.add(m);
         newest = creationTime;
       } else {
+        // The requester asked for a list of models so apply any filtering criteria.
         for (ModelResource m : result) {
-          long creationTime = XmlUtilities.xmlGregorianCalendar(m.getCreationTime()).toGregorianCalendar().getTimeInMillis();
+          long creationTime = XmlUtilities.xmlGregorianCalendar(m.getCreationTime())
+                  .toGregorianCalendar().getTimeInMillis();
 
-          log.info("[SenseRmController] model id = {}, creationTime = {}, If-Modified-Since = {}", m.getId(),
-                m.getCreationTime(), DateUtils.formatDate(lastModified));
+          log.info("[SenseRmController] model id = {}, creationTime = {}, If-Modified-Since = {}", 
+                  m.getId(), m.getCreationTime(), DateUtils.formatDate(lastModified));
 
-          if (creationTime > newest) {
-            newest = creationTime;
-          }
-
+          // Filter model if not newer than the provided If-Modified-Since parameter.
           if (creationTime > lastModified.getTime()) {
             log.info("[SenseRmController] returning matching resource {}", m.getId());
+            
+            // Create the unique resource URL.
             m.setHref(UrlHelper.append(location.toASCIIString(), m.getId()));
-            if (!summary) {
+            
+            // If summary results are requested we do not return the model.
+            if (summary) {
+              m.setModel(null);
+            } else {
+              // If they requested an encoded transfer we will encode the model contents.
               if (encode) {
                 m.setModel(Encoder.encode(m.getModel()));
               }
             }
+            
+            // Save this model and update If-Modified-Since with the creation time.
             models.add(m);
+            
+            if (creationTime > newest) {
+              newest = creationTime;
+            }
           }
         }
       }
 
+      // Update the LastModified header with the value of the newest model.
       headers.setLastModified(newest);
 
+      // Dump the models we are returning to log for tracing.
       for (ModelResource m : models) {
-        log.info("[SenseRmController] returning id = {}, creationTime = {}, new LastModfied = {}, queries If-Modified-Since = {}.", m.getId(), m.getCreationTime(), DateUtils.formatDate(new Date(newest)), DateUtils.formatDate(lastModified));
+        log.info("[SenseRmController] returning id = {}, creationTime = {}, new LastModfied = {}, "
+                + "queries If-Modified-Since = {}.", m.getId(), m.getCreationTime(),
+                DateUtils.formatDate(new Date(newest)), DateUtils.formatDate(lastModified));
       }
 
+      // We have success so return the models we have found.
       return new ResponseEntity<>(models, headers, HttpStatus.OK);
-    } catch (InterruptedException | ExecutionException | IOException | IllegalArgumentException | DatatypeConfigurationException ex) {
+    } catch (BadRequestException br) {
+      // The driver is reporting an invalid parameter in request.
+      log.error("[SenseRmController] BadRequestException caught", br);
+      Error error = Error.builder()
+              .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+              .error_description(br.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);      
+    } catch (InternalServerErrorException ise) {
+      // Something went wrong inside the driver relating to the service.
+      log.error("[SenseRmController] InternalServerErrorException caught", ise);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ise.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);      
+    } catch (InterruptedException | ExecutionException | IOException | IllegalArgumentException 
+            | DatatypeConfigurationException ex) {
+      // Something went wrong in controller code so mark it as an internal server error.
       log.error("[SenseRmController] Exception caught", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
@@ -410,22 +511,29 @@ public class SenseRmController extends SenseController {
   }
 
   /**
-   ***********************************************************************
-   * GET /api/sense/v1/models/{id} **********************************************************************
-   */
-  /**
-   * Returns the model identified by id within the Resource Manager.
+   * Returns the SENSE topology model identified by id.
    *
-   * @param uriInfo The incoming URI context used to invoke the service.
-   * @param accept Provides media types that are acceptable for the response. At the moment 'application/json' is the
-   * supported response encoding.
-   * @param ifModifiedSince The HTTP request may contain the If-Modified-Since header requesting all models with
-   * creationTime after the specified date. The date must be specified in RFC 1123 format.
-   * @param encode
-   * @param model This version’s detailed topology model in the requested format (TURTLE, etc.). To optimize transfer
-   * the contents of this model element should be gzipped (contentType="application/x-gzip") and base64 encoded
-   * (contentTransferEncoding="base64"). This will reduce the transfer size and encapsulate the original model contents.
+   * Operation: GET /api/sense/v1/models/{id}
+   * 
+   * @param accept Provides media types that are acceptable for the response. At the moment 
+   *    'application/json' is the supported response encoding.
+   * 
+   * @param ifModifiedSince The HTTP request may contain the If-Modified-Since header requesting
+   *    all models with creationTime after the specified date. The date must be specified in
+   *    RFC 1123 format.
+   * 
+   * @param encode Transfer size of the model element contents can be optimized by gzip/base64
+   *    encoding the contained model.  If encode=true then returned model will be gzipped
+   *    (contentType="application/x-gzip") and base64 encoded (contentTransferEncoding= "base64")
+   *    to reduce transfer size. Default value is encode=false.
+   * 
+   * @param model This version’s detailed topology model in the requested format (TURTLE, etc.).
+   *    To optimize transfer the contents of this model element should be gzipped 
+   *    (contentType="application/x-gzip") and base64 encoded (contentTransferEncoding="base64").
+   *    This will reduce the transfer size and encapsulate the original model contents.
+   * 
    * @param id Identifier of the target topology model resource.
+   * 
    * @return A RESTful response.
    */
   @ApiOperation(
@@ -1503,10 +1611,6 @@ public class SenseRmController extends SenseController {
 
       log.info("[SenseRmController] getDelta returning id = {}, creationTime = {}, queried If-Modified-Since = {}.",
               d.getId(), d.getLastModified(), DateUtils.formatDate(ifnms));
-
-      //List<DeltaResource> result = new ArrayList<>();
-      //result.add(d);
-      //return new ResponseEntity<>(result, headers, HttpStatus.OK);
       return new ResponseEntity<>(d, headers, HttpStatus.OK);
 
     } catch (NotFoundException ex) {

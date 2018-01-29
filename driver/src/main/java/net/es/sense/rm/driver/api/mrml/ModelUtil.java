@@ -2,6 +2,7 @@ package net.es.sense.rm.driver.api.mrml;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import java.util.Arrays;
 import net.es.sense.rm.driver.schema.Nml;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
@@ -17,8 +18,17 @@ import org.apache.jena.rdf.model.*;
  * @author hacksaw
  */
 public class ModelUtil {
+  
+  public static final String[] supported = {
+    "turtle",
+    "ttl"
+  }; 
+  
+  public static boolean isSupported(String type) {
+    return Arrays.stream(supported).anyMatch(s -> s.equalsIgnoreCase(type));
+  } 
 
-  static public OntModel unmarshalOntModel(String ttl) throws Exception {
+  public static OntModel unmarshalOntModel(String ttl) throws Exception {
     OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
     //$$ TODO: add ontology schema and namespace handling code
     try {
@@ -29,7 +39,7 @@ public class ModelUtil {
     return model;
   }
 
-  static public String marshalOntModel(OntModel model) throws Exception {
+  public static String marshalOntModel(OntModel model) throws Exception {
     //$$ TODO: add namespace handling code
     StringWriter out = new StringWriter();
     try {
@@ -41,7 +51,7 @@ public class ModelUtil {
     return ttl;
   }
 
-  static public OntModel unmarshalOntModelJson(String json) throws Exception {
+  public static OntModel unmarshalOntModelJson(String json) throws Exception {
     OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
     //$$ TODO: add ontology schema and namespace handling code
     try {
@@ -52,7 +62,7 @@ public class ModelUtil {
     return model;
   }
 
-  static public String marshalOntModelJson(OntModel model) throws Exception {
+  public static String marshalOntModelJson(OntModel model) throws Exception {
     //$$ TODO: add namespace handling code
     StringWriter out = new StringWriter();
     try {
@@ -64,7 +74,7 @@ public class ModelUtil {
     return ttl;
   }
 
-  static public Model unmarshalModel(String ttl) throws Exception {
+  public static Model unmarshalModel(String ttl) throws Exception {
     Model model = ModelFactory.createDefaultModel();
     //$$ TODO: add ontology schema and namespace handling code
     try {
@@ -75,7 +85,7 @@ public class ModelUtil {
     return model;
   }
 
-  static public String marshalModel(Model model) throws Exception {
+  public static String marshalModel(Model model) throws Exception {
     //$$ TODO: add namespace handling code
     StringWriter out = new StringWriter();
     try {
@@ -87,7 +97,7 @@ public class ModelUtil {
     return ttl;
   }
 
-  static public Model unmarshalModelJson(String ttl) throws Exception {
+  public static Model unmarshalModelJson(String ttl) throws Exception {
     Model model = ModelFactory.createDefaultModel();
     //$$ TODO: add ontology schema and namespace handling code
     try {
@@ -98,7 +108,7 @@ public class ModelUtil {
     return model;
   }
 
-  static public String marshalModelJson(Model model) throws Exception {
+  public static String marshalModelJson(Model model) throws Exception {
     //$$ TODO: add namespace handling code
     StringWriter out = new StringWriter();
     try {
@@ -110,13 +120,13 @@ public class ModelUtil {
     return ttl;
   }
 
-  static public OntModel cloneOntModel(OntModel model) {
+  public static OntModel cloneOntModel(OntModel model) {
     OntModel cloned = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
     cloned.add(model.getBaseModel());
     return cloned;
   }
 
-  static public boolean isEmptyModel(Model model) {
+  public static boolean isEmptyModel(Model model) {
     if (model == null) {
       return true;
     }
@@ -131,7 +141,7 @@ public class ModelUtil {
     return true;
   }
 
-  static public Model getOddModel(Model model) {
+  public static Model getOddModel(Model model) {
     Model odd = ModelFactory.createDefaultModel();
     if (model == null) {
       return odd;

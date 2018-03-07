@@ -40,8 +40,8 @@ public class DeltaServiceBean implements DeltaService {
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
-  public void delete(String id) {
-    deltaRepository.delete(id);
+  public void delete(long idx) {
+    deltaRepository.deleteByIdx(idx);
   }
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
@@ -64,8 +64,8 @@ public class DeltaServiceBean implements DeltaService {
   }
 
   @Override
-  public Delta get(long id) {
-    return deltaRepository.findById(id);
+  public Delta get(long idx) {
+    return deltaRepository.findByIdx(idx);
   }
 
   @Override
@@ -86,5 +86,10 @@ public class DeltaServiceBean implements DeltaService {
   @Override
   public Delta get(String deltaId) {
     return deltaRepository.findByDeltaId(deltaId);
+  }
+
+  @Override
+  public long count() {
+    return deltaRepository.count();
   }
 }

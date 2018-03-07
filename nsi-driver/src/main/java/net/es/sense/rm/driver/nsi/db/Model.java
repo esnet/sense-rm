@@ -41,7 +41,7 @@ public class Model implements Serializable {
 
   @Id
   @GeneratedValue
-  private long id;
+  private long idx;
 
   @Basic(optional=false)
   private String topologyId;

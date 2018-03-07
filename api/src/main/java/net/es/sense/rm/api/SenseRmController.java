@@ -34,17 +34,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 import javax.annotation.PostConstruct;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.datatype.DatatypeConfigurationException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.Decoder;
 import net.es.nsi.common.util.UrlHelper;
+import net.es.nsi.common.util.UuidHelper;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.sense.rm.api.common.Encoder;
 import net.es.sense.rm.api.common.Error;
@@ -53,7 +50,12 @@ import net.es.sense.rm.api.common.Resource;
 import net.es.sense.rm.api.common.ResourceAnnotation;
 import net.es.sense.rm.api.common.UrlTransform;
 import net.es.sense.rm.api.config.SenseProperties;
+import net.es.sense.rm.driver.api.DeltaResponse;
+import net.es.sense.rm.driver.api.DeltasResponse;
 import net.es.sense.rm.driver.api.Driver;
+import net.es.sense.rm.driver.api.ModelResponse;
+import net.es.sense.rm.driver.api.ModelsResponse;
+import net.es.sense.rm.driver.api.ResourceResponse;
 import net.es.sense.rm.model.DeltaRequest;
 import net.es.sense.rm.model.DeltaResource;
 import net.es.sense.rm.model.ModelResource;
@@ -81,10 +83,10 @@ import org.springframework.web.util.UriComponentsBuilder;
  * This class handles the SENSE RM API specific parameters, encodings, and
  * behaviors but delegates all message processing to technology specific
  * drivers.
- * 
+ *
  * Supported resource operations:
  *  GET /api/sense/v1
- * 
+ *
  * @author hacksaw
  */
 @Slf4j
@@ -94,7 +96,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @ResourceAnnotation(name = "sense", version = "v1")
 public class SenseRmController extends SenseController {
 
-  // Spring application context. 
+  // Spring application context.
   @Autowired
   ApplicationContext context;
 
@@ -104,15 +106,15 @@ public class SenseRmController extends SenseController {
 
   // Transformer to manipulate URL path in case there are mapping issues.
   private UrlTransform utilities;
-  
+
   // The solution specific technology driver implementing SENSE protocol
   // mapping to underlying network technology.
   private Driver driver;
 
   /**
    * Initialize API by loading technology specific driver using reflection.
-   * 
-   * @throws Exception 
+   *
+   * @throws Exception
    */
   @PostConstruct
   public void init() throws Exception {
@@ -121,11 +123,39 @@ public class SenseRmController extends SenseController {
     driver = context.getBean(forName.asSubclass(Driver.class));
   }
 
+  private ResponseEntity<?> toResponseEntity(HttpHeaders headers, ResourceResponse rr) {
+    if (rr == null) {
+      return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    switch (rr.getStatus()) {
+      case NOT_MODIFIED:
+        return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
+
+        default:
+          Error.ErrorBuilder eb = Error.builder().error(rr.getStatus().getReasonPhrase());
+          rr.getError().ifPresent(e -> eb.error_description(e));
+          return new ResponseEntity<>(eb.build(), HttpStatus.valueOf(rr.getStatus().getStatusCode()));
+    }
+  }
+
+  private long parseIfModfiedSince(String ifModifiedSince) {
+    long ifms = 0;
+    if (!Strings.isNullOrEmpty(ifModifiedSince)) {
+      Date lastModified = DateUtils.parseDate(ifModifiedSince);
+      if (lastModified != null) {
+        ifms = lastModified.getTime();
+      }
+    }
+
+    return ifms;
+  }
+
   /**
    * Returns a list of available SENSE service API resource URLs.
    *
    * Operation: GET /api/sense/v1
-   * 
+   *
    * @return A RESTful response.
    * @throws java.net.MalformedURLException
    */
@@ -159,7 +189,7 @@ public class SenseRmController extends SenseController {
   @ResponseBody
   public ResponseEntity<?> getResources() throws MalformedURLException {
     try {
-      // We need the request URL to build fully qualified resource URLs. 
+      // We need the request URL to build fully qualified resource URLs.
       final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
 
       log.info("[SenseRmController] GET operation = {}", location);
@@ -194,37 +224,37 @@ public class SenseRmController extends SenseController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
-      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);      
-    } 
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**
    * Returns a list of available SENSE topology models.
-   * 
+   *
    * Operation: GET /api/sense/v1/models
    *
    * @param accept Provides media types that are acceptable for the response.
    *    At the moment 'application/json' is the supported response encoding.
-   * 
+   *
    * @param ifModifiedSince The HTTP request may contain the If-Modified-Since
    *    header requesting all models with creationTime after the specified
    *    date. The date must be specified in RFC 1123 format.
-   * 
+   *
    * @param current If current=true then a collection of models containing only
    *    the most recent model will be returned. Default value is current=false.
-   * 
+   *
    * @param encode Transfer size of the model element contents can be optimized
-   *    by gzip/base64 encoding the contained model.  If encode=true the 
+   *    by gzip/base64 encoding the contained model.  If encode=true the
    *    returned model will be gzipped (contentType="application/x-gzip") and
    *    base64 encoded (contentTransferEncoding= "base64") to reduce transfer
    *    size. Default value is encode=false.
-   * 
+   *
    * @param summary If summary=true then a summary collection of models will be
    *    returned including the model meta-data while excluding the model
    *    element. Default value is summary=true.
-   * 
+   *
    * @param model Specify the model schema format (TURTLE, JSON-LD, etc.).
-   * 
+   *
    * @return A RESTful response.
    */
   @ApiOperation(
@@ -282,32 +312,20 @@ public class SenseRmController extends SenseController {
             )
             ,
             @ApiResponse(
+                    code = HttpConstants.UNAUTHORIZED_CODE,
+                    message = HttpConstants.UNAUTHORIZED_MSG,
+                    response = Error.class,
+                     responseHeaders = {
+                      @ResponseHeader(
+                              name = HttpConstants.CONTENT_TYPE_NAME,
+                              description = HttpConstants.CONTENT_TYPE_DESC,
+                              response = String.class)
+                    }
+            )
+            ,
+            @ApiResponse(
                     code = HttpConstants.FORBIDDEN_CODE,
                     message = HttpConstants.FORBIDDEN_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_FOUND_CODE,
-                    message = HttpConstants.NOT_FOUND_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_ACCEPTABLE_CODE,
-                    message = HttpConstants.NOT_ACCEPTABLE_MSG,
                     response = Error.class,
                     responseHeaders = {
                       @ResponseHeader(
@@ -341,7 +359,7 @@ public class SenseRmController extends SenseController {
           @ApiParam(value = HttpConstants.ACCEPT_MSG, required = false) String accept,
           @RequestHeader(
                   value = HttpConstants.IF_MODIFIED_SINCE_NAME,
-                  defaultValue = HttpConstants.IF_MODIFIED_SINCE_DEFAULT)
+                  required = false)
           @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
           @RequestParam(
                   value = HttpConstants.CURRENT_NAME,
@@ -360,21 +378,15 @@ public class SenseRmController extends SenseController {
                   defaultValue = HttpConstants.MODEL_TURTLE)
           @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model) {
 
-    // We need the request URL to build fully qualified resource URLs. 
+    // We need the request URL to build fully qualified resource URLs.
     final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
 
-    log.info("[SenseRmController] GET operation = {}, accept = {}, If-Modified-Since = {}, current = {}, summary = {}, model = {}",
-            location, accept, ifModifiedSince, current, summary, model);
+    log.info("[SenseRmController] GET operation = {}, accept = {}, If-Modified-Since = {}, current = {}, "
+            + "summary = {}, model = {}", location, accept, ifModifiedSince, current, summary, model);
 
-    // Process the last modified header parameter if present.
-    Date lastModified = DateUtils.parseDate(ifModifiedSince);
-    if (lastModified == null) {
-      log.error("[SenseRmController] invalid header {}, value = {}.", HttpConstants.IF_MODIFIED_SINCE_NAME,
-              ifModifiedSince);
-      lastModified = DateUtils.parseDate(HttpConstants.IF_MODIFIED_SINCE_DEFAULT);
-    }
+    // Parse the If-Modified-Since header if it is present.
+    long ifms = parseIfModfiedSince(ifModifiedSince);
 
-    
     // Populate the content location header with our URL location.
     final HttpHeaders headers = new HttpHeaders();
     headers.add("Content-Location", location.toASCIIString());
@@ -382,45 +394,41 @@ public class SenseRmController extends SenseController {
     try {
       // Track matching models here.
       List<ModelResource> models = new ArrayList<>();
-      
+
       // Keep track of the most recently updated model date.
       long newest = 0;
-      
+
       // Query the driver for a list of models.
-      Collection<ModelResource> result = driver.getModels(current, model).get();
-      
+      Collection<ModelResource> result = new ArrayList<>();
+
       // First case is to handle a targeted request for the current model.
       if (current) {
-        // We should have received only one result of drive functioning correctly.
-        Optional<ModelResource> first = result.stream().reduce((e1, e2) -> {
-          throw new IllegalArgumentException("Multiple models returned for parameter current = " + current);
-        });
-
-        // No results means resource not found since they specifically asked for the current.
-        if (!first.isPresent()) {
-          return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        ModelResponse response = driver.getCurrentModel(model, ifms).get();
+        if (response == null || response.getStatus() != Status.OK) {
+          return toResponseEntity(headers, response);
         }
 
-        ModelResource m = first.get();
-        log.info("[SenseRmController] model id = {}, creationTime = {}, If-Modified-Since = {}",
-                m.getId(), m.getCreationTime(), DateUtils.formatDate(lastModified));
+        response.getModel().ifPresent(m -> result.add(m));
+      } else {
+        ModelsResponse response = driver.getModels(model, ifms).get();
+        if (response == null || response.getStatus() != Status.OK) {
+          return toResponseEntity(headers, response);
+        }
 
-        // Determine if the creation time of this model is newer than  If-Modified-Since.
+        result.addAll(response.getModels());
+      }
+
+      // The requester asked for a list of models so apply any filtering criteria.
+      for (ModelResource m : result) {
         long creationTime = XmlUtilities.xmlGregorianCalendar(m.getCreationTime())
                 .toGregorianCalendar().getTimeInMillis();
 
-        if (creationTime <= lastModified.getTime()) {
-          log.info("[SenseRmController] resource not modified {}", m.getId());
-          headers.setLastModified(creationTime);
-          return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
-        }
-
-        // Looks like we have a new model to return.
-        log.info("[SenseRmController] returning matching resource {}", m.getId());
+        log.info("[SenseRmController] model id = {}, creationTime = {}, If-Modified-Since = {}",
+                m.getId(), m.getCreationTime(), m.getCreationTime());
 
         // Create the unique resource URL.
         m.setHref(UrlHelper.append(location.toASCIIString(), m.getId()));
-        
+
         // If summary results are requested we do not return the model.
         if (summary) {
           m.setModel(null);
@@ -430,78 +438,23 @@ public class SenseRmController extends SenseController {
             m.setModel(Encoder.encode(m.getModel()));
           }
         }
-        
+
         // Save this model and update If-Modified-Since with the creation time.
         models.add(m);
-        newest = creationTime;
-      } else {
-        // The requester asked for a list of models so apply any filtering criteria.
-        for (ModelResource m : result) {
-          long creationTime = XmlUtilities.xmlGregorianCalendar(m.getCreationTime())
-                  .toGregorianCalendar().getTimeInMillis();
 
-          log.info("[SenseRmController] model id = {}, creationTime = {}, If-Modified-Since = {}", 
-                  m.getId(), m.getCreationTime(), DateUtils.formatDate(lastModified));
-
-          // Filter model if not newer than the provided If-Modified-Since parameter.
-          if (creationTime > lastModified.getTime()) {
-            log.info("[SenseRmController] returning matching resource {}", m.getId());
-            
-            // Create the unique resource URL.
-            m.setHref(UrlHelper.append(location.toASCIIString(), m.getId()));
-            
-            // If summary results are requested we do not return the model.
-            if (summary) {
-              m.setModel(null);
-            } else {
-              // If they requested an encoded transfer we will encode the model contents.
-              if (encode) {
-                m.setModel(Encoder.encode(m.getModel()));
-              }
-            }
-            
-            // Save this model and update If-Modified-Since with the creation time.
-            models.add(m);
-            
-            if (creationTime > newest) {
-              newest = creationTime;
-            }
-          }
+        if (creationTime > newest) {
+            newest = creationTime;
         }
       }
 
       // Update the LastModified header with the value of the newest model.
       headers.setLastModified(newest);
 
-      // Dump the models we are returning to log for tracing.
-      for (ModelResource m : models) {
-        log.info("[SenseRmController] returning id = {}, creationTime = {}, new LastModfied = {}, "
-                + "queries If-Modified-Since = {}.", m.getId(), m.getCreationTime(),
-                DateUtils.formatDate(new Date(newest)), DateUtils.formatDate(lastModified));
-      }
-
       // We have success so return the models we have found.
       return new ResponseEntity<>(models, headers, HttpStatus.OK);
-    } catch (BadRequestException br) {
-      // The driver is reporting an invalid parameter in request.
-      log.error("[SenseRmController] BadRequestException caught", br);
-      Error error = Error.builder()
-              .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-              .error_description(br.getMessage())
-              .build();
-      return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);      
-    } catch (InternalServerErrorException ise) {
-      // Something went wrong inside the driver relating to the service.
-      log.error("[SenseRmController] InternalServerErrorException caught", ise);
-      Error error = Error.builder()
-              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-              .error_description(ise.getMessage())
-              .build();
-      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);      
-    } catch (InterruptedException | ExecutionException | IOException | IllegalArgumentException 
-            | DatatypeConfigurationException ex) {
-      // Something went wrong in controller code so mark it as an internal server error.
-      log.error("[SenseRmController] Exception caught", ex);
+    } catch (InterruptedException | IOException | DatatypeConfigurationException | IllegalArgumentException |
+            ExecutionException ex) {
+      log.error("[SenseRmController] getModels failed, ex = {}", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
@@ -514,26 +467,26 @@ public class SenseRmController extends SenseController {
    * Returns the SENSE topology model identified by id.
    *
    * Operation: GET /api/sense/v1/models/{id}
-   * 
-   * @param accept Provides media types that are acceptable for the response. At the moment 
+   *
+   * @param accept Provides media types that are acceptable for the response. At the moment
    *    'application/json' is the supported response encoding.
-   * 
+   *
    * @param ifModifiedSince The HTTP request may contain the If-Modified-Since header requesting
    *    all models with creationTime after the specified date. The date must be specified in
    *    RFC 1123 format.
-   * 
+   *
    * @param encode Transfer size of the model element contents can be optimized by gzip/base64
    *    encoding the contained model.  If encode=true then returned model will be gzipped
    *    (contentType="application/x-gzip") and base64 encoded (contentTransferEncoding= "base64")
    *    to reduce transfer size. Default value is encode=false.
-   * 
+   *
    * @param model This version’s detailed topology model in the requested format (TURTLE, etc.).
-   *    To optimize transfer the contents of this model element should be gzipped 
+   *    To optimize transfer the contents of this model element should be gzipped
    *    (contentType="application/x-gzip") and base64 encoded (contentTransferEncoding="base64").
    *    This will reduce the transfer size and encapsulate the original model contents.
-   * 
+   *
    * @param id Identifier of the target topology model resource.
-   * 
+   *
    * @return A RESTful response.
    */
   @ApiOperation(
@@ -645,9 +598,15 @@ public class SenseRmController extends SenseController {
                   value = HttpConstants.ACCEPT_NAME,
                   defaultValue = MediaType.APPLICATION_JSON_VALUE)
           @ApiParam(value = HttpConstants.ACCEPT_MSG, required = false) String accept,
-          @RequestHeader(
+          /*
+            @RequestHeader(
                   value = HttpConstants.IF_MODIFIED_SINCE_NAME,
                   defaultValue = HttpConstants.IF_MODIFIED_SINCE_DEFAULT)
+            @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
+          */
+          @RequestHeader(
+                  value = HttpConstants.IF_MODIFIED_SINCE_NAME,
+                  required = false)
           @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
           @RequestParam(
                   value = HttpConstants.MODEL_NAME,
@@ -665,61 +624,44 @@ public class SenseRmController extends SenseController {
     log.info("[SenseRmController] operation = {}, id = {}, accept = {}, ifModifiedSince = {}, model = {}",
             location, id, accept, ifModifiedSince, model);
 
-    Date lastModified = DateUtils.parseDate(ifModifiedSince);
-    if (lastModified == null) {
-      log.error("[SenseRmController] invalid header {}, value = {}.", HttpConstants.IF_MODIFIED_SINCE_NAME,
-              ifModifiedSince);
-      lastModified = DateUtils.parseDate(HttpConstants.IF_MODIFIED_SINCE_DEFAULT);
-    }
+    // Parse the If-Modified-Since header if it is present.
+    long ifms = parseIfModfiedSince(ifModifiedSince);
 
-    ModelResource m;
+    // Return the local in HTTP header.
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Content-Location", location.toASCIIString());
+
     try {
-      m = driver.getModel(model, id).get();
+      // Retrieve the model if newer than specified If-Modified-Since header.
+      ModelResponse response = driver.getModel(id, model, ifms).get();
 
-      if (m == null) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      if (response == null || response.getStatus() != Status.OK) {
+        return toResponseEntity(headers, response);
       }
 
-      final HttpHeaders headers = new HttpHeaders();
-      headers.add("Content-Location", location.toASCIIString());
+      ModelResource m = response.getModel().get();
 
-      log.info("[SenseRmController] model id = {}, getCreationTime = {}, If-Modified-Since = {}", m.getId(),
-              m.getCreationTime(), DateUtils.formatDate(lastModified));
+      // Get the creation time for HTTP header.
+      long creationTime = XmlUtilities.xmlGregorianCalendar(m.getCreationTime())
+              .toGregorianCalendar().getTimeInMillis();
+      headers.setLastModified(creationTime);
 
-      long creationTime = XmlUtilities.xmlGregorianCalendar(m.getCreationTime()).toGregorianCalendar().getTimeInMillis();
-      if (creationTime <= lastModified.getTime()) {
-        log.info("[SenseRmController] returning not modified {}", m.getId());
-        return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
-      }
-
+      // Update the HREF to point to the absolute URL for the resource.
       m.setHref(location.toASCIIString());
       if (encode) {
         m.setModel(Encoder.encode(m.getModel()));
       }
 
-      headers.setLastModified(creationTime);
-
-      log.info("[SenseRmController] returning id = {}, creationTime = {}, queried If-Modified-Since = {}.", m.getId(), m.getCreationTime(), DateUtils.formatDate(lastModified));
-
+      log.info("[SenseRmController] returning id = {}, creationTime = {}, queried If-Modified-Since = {}.",
+              m.getId(), m.getCreationTime(), m.getCreationTime());
       return new ResponseEntity<>(m, headers, HttpStatus.OK);
-
-    } catch (InterruptedException | IOException | ExecutionException | DatatypeConfigurationException ex) {
-      log.error("getModel failed, ex = {}", ex);
+    } catch (InterruptedException | IOException | DatatypeConfigurationException | ExecutionException ex) {
+      log.error("[SenseRmController] getModel failed, ex = {}", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
-
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    } catch (NotFoundException ex) {
-      log.error("getModel failed due unknown modelId = {}, ex = {}", id, ex);
-
-      Error error = Error.builder()
-              .error(HttpStatus.NOT_FOUND.getReasonPhrase())
-              .error_description("modelId " + id + " not found")
-              .build();
-
-      return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -736,6 +678,12 @@ public class SenseRmController extends SenseController {
    * creationTime after the specified date. The date must be specified in RFC 1123 format.
    * @param summary If summary=true then a summary collection of delta resources will be returned including the delta
  meta-data while excluding the addition, reduction, and m elements. Default value is summary=true.
+ *
+   * @param encode Transfer size of the model element contents can be optimized by gzip/base64
+   *    encoding the contained model.  If encode=true then returned model will be gzipped
+   *    (contentType="application/x-gzip") and base64 encoded (contentTransferEncoding= "base64")
+   *    to reduce transfer size. Default value is encode=false.
+   *
    * @param model If model=turtle then the returned addition, reduction, and m elements will contain the full
  topology model in a TURTLE representation. Default value is model=turtle.
    * @param id The UUID uniquely identifying the topology model resource.
@@ -849,19 +797,23 @@ public class SenseRmController extends SenseController {
           produces = {MediaType.APPLICATION_JSON_VALUE}
   )
   @ResponseBody
-  public List<DeltaResource> getModelDeltas(
+  public ResponseEntity<?> getModelDeltas(
           @RequestHeader(
                   value = HttpConstants.ACCEPT_NAME,
                   defaultValue = MediaType.APPLICATION_JSON_VALUE)
           @ApiParam(value = HttpConstants.ACCEPT_MSG, required = false) String accept,
           @RequestHeader(
                   value = HttpConstants.IF_MODIFIED_SINCE_NAME,
-                  defaultValue = HttpConstants.IF_MODIFIED_SINCE_DEFAULT)
+                  required = false)
           @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
           @RequestParam(
                   value = HttpConstants.SUMMARY_NAME,
                   defaultValue = "false")
           @ApiParam(value = HttpConstants.SUMMARY_MSG, required = false) boolean summary,
+          @RequestParam(
+                  value = HttpConstants.ENCODE_NAME,
+                  defaultValue = "false")
+          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode,
           @RequestParam(
                   value = HttpConstants.MODEL_NAME,
                   defaultValue = HttpConstants.MODEL_TURTLE)
@@ -869,15 +821,79 @@ public class SenseRmController extends SenseController {
           @PathVariable(HttpConstants.ID_NAME)
           @ApiParam(value = HttpConstants.ID_MSG, required = true) String id) {
 
-    DeltaResource delta = new DeltaResource();
-    delta.setId("922f4388-c8f6-4014-b6ce-5482289b0200");
-    delta.setHref("http://localhost:8080/sense/v1/deltas/922f4388-c8f6-4014-b6ce-5482289b0200");
-    delta.setLastModified("2016-07-26T13:45:21.001Z");
-    delta.setModelId("922f4388-c8f6-4014-b6ce-5482289b02ff");
-    delta.setResult("H4sIACKIo1cAA+1Y32/aMBB+56+I6NtUx0loVZEV1K6bpkm0m5Y+7NWNTbCa2JEdCP3vZydULYUEh0CnQXlC+O6+O/ u7X1ylgozp3BJ4LH3rcpJlqQ9hnud23rO5iKDnOA50XKgEgAwnJEEnQ8vuXC30eB5XqXnQuYDqfEl+LnGVvAv/3I6CVQiFv FbF7ff7UKF4Hiice2IZmgMml5RZ8sq/0n9p82hcWFCHCtjtQacHH5AkS5qJkNWa6rDUdD2Y8ZTHPHoqtDudy6lgvpLzGclyL h59zBNE2YBIW/0y7FhvPqjw8X5h5LS40TuUEPyDYTqjeIpi6/OKltZ5IDFnkbzn1gqmxMxO0DyiEUp5qoGfj4YVxiZIfqGYCh JmlDMU/+IiW7W7FIvPOCYDOWUMhOLcT5XG4AJ60PVjyh4HKPbk8NTIBmIxSIRXmpgT4EAXOqWVT4YmwgkNX9w4V wZeu1EddEDEjIZkE4YyktNMgbCoyhhTj2Z1vwVK3PoZ3Fz/DqyvN3ddTYoq49o3bd6mLCNCffFsgqeHwZH1sS04gxmQua 3fbI1I8YIkm5xDr3xCInXmVPPAAEqztAaqtwQFtHQ7vBzJiQmeeoAW5KxwxJisP57VrOuRF2xB1ZZ37M9ixIBALCLrSG9ct 0dI8fy74NN02CQ5Yq2WPaVkE5KqaQ5UIRRRnWinq+51huIpkVbXA2dO/6ztjTZhUUXRWEnYHVUPcwY2zaOafHh553fKz dcErXCLyuuYIlnpEBYo4quVVvtzezO6K2Fd0AMG/arMWuoBLQTcWnqZ9tcNOahhX679/8muNX27IrrgWWBRbZvESFjIsV LdXYhHOYcVVAlylKb6LrtjFEvStnY2Gi4ONAn2Mxh9dJr3mYi2bDjmRWHHXaYe7N+wZk0b2FTH2rHC+EJ28NL7Se9aVp Ry9ZwwyNTDa8Uf627LdXcfM8CWk/4BTQBblaMDjb92ND2C+Gun+yNsz6ZbcdPuLBSQfLvwJ1QggDPmF6Uo5IyVt+rnCq es+AaNt7cbsh/jaxtn//6GsWYDgAEdvHddkj8Wv/3/+bCDnW+rf2DW7Xx/ASQO0KQcHgAA");
-    List<DeltaResource> deltas = new ArrayList<>();
-    deltas.add(delta);
-    return deltas;
+    // We need the request URL to build fully qualified resource URLs.
+    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+
+    log.info("[SenseRmController] GET operation = {}, accept = {}, If-Modified-Since = {}, current = {}, "
+            + "summary = {}, model = {}, modelId = {}", location, accept, ifModifiedSince, summary, model, id);
+
+    // Parse the If-Modified-Since header if it is present.
+    long ifms = parseIfModfiedSince(ifModifiedSince);
+
+    // Populate the content location header with our URL location.
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Content-Location", location.toASCIIString());
+
+    try {
+      // Track matching deltas here.
+      List<DeltaResource> deltas = new ArrayList<>();
+
+      // Keep track of the most recently updated delta date.
+      long newest = 0;
+
+      // Query the driver for a list of deltas.
+      DeltasResponse response = driver.getDeltas(model, ifms).get();
+      if (response == null || response.getStatus() != Status.OK) {
+        return toResponseEntity(headers, response);
+      }
+
+      // The requester asked for a list of models so apply any filtering criteria.
+      for (DeltaResource d : response.getDeltas()) {
+        long lastModified = XmlUtilities.xmlGregorianCalendar(d.getLastModified())
+                .toGregorianCalendar().getTimeInMillis();
+
+        log.info("[SenseRmController] delta id = {}, lastModified = {}, If-Modified-Since = {}",
+                d.getId(), d.getLastModified(), ifModifiedSince);
+
+        // Create the unique resource URL.
+        d.setHref(UrlHelper.append(location.toASCIIString(), d.getId()));
+
+        // If summary results are requested we do not return the model.
+        if (summary) {
+          d.setAddition(null);
+          d.setReduction(null);
+          d.setResult(null);
+        } else {
+          // If they requested an encoded transfer we will encode the model contents.
+          if (encode) {
+            d.setAddition(Encoder.encode(d.getAddition()));
+            d.setReduction(Encoder.encode(d.getReduction()));
+            d.setResult(Encoder.encode(d.getResult()));
+          }
+        }
+
+        // Save this model and update If-Modified-Since with the creation time.
+        deltas.add(d);
+
+        if (lastModified > newest) {
+            newest = lastModified;
+        }
+      }
+
+      // Update the LastModified header with the value of the newest model.
+      headers.setLastModified(newest);
+
+      // We have success so return the models we have found.
+      return new ResponseEntity<>(deltas, headers, HttpStatus.OK);
+    } catch (InterruptedException | IOException | DatatypeConfigurationException | IllegalArgumentException |
+            ExecutionException ex) {
+      log.error("[SenseRmController] getDeltas failed, ex = {}", ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**
@@ -889,11 +905,11 @@ public class SenseRmController extends SenseController {
    * Returns the delta resource identified by deltaId that is associated with model identified by id within the Resource
    * Manager.
    *
-   * @param uriInfo The incoming URI context used to invoke the service.
    * @param accept Provides media types that are acceptable for the response. At the moment 'application/json' is the
    * supported response encoding.
    * @param ifModifiedSince The HTTP request may contain the If-Modified-Since header requesting all models with
    * creationTime after the specified date. The date must be specified in RFC 1123 format.
+   * @param encode
    * @param model This version’s detailed topology model in the requested format (TURTLE, etc.). To optimize transfer
    * the contents of this model element should be gzipped (contentType="application/x-gzip") and base64 encoded
    * (contentTransferEncoding="base64"). This will reduce the transfer size and encapsulate the original model contents.
@@ -1036,26 +1052,22 @@ public class SenseRmController extends SenseController {
     log.info("[SenseRmController] operation = {}, id = {}, deltaId = {}, accept = {}, ifModifiedSince = {}, model = {}",
             location, id, deltaId, accept, ifModifiedSince, model);
 
-    Date ifnms = DateUtils.parseDate(ifModifiedSince);
-    if (ifnms == null) {
-      log.error("[SenseRmController] invalid header {}, value = {}.", HttpConstants.IF_MODIFIED_SINCE_NAME,
-              ifModifiedSince);
-      ifnms = DateUtils.parseDate(HttpConstants.IF_MODIFIED_SINCE_DEFAULT);
-    }
+    // Parse the If-Modified-Since header if it is present.
+    long ifms = parseIfModfiedSince(ifModifiedSince);
+
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Content-Location", location.toASCIIString());
 
     try {
-      DeltaResource d = driver.getDelta(deltaId, ifnms.getTime(), model).get();
-
-      // We have an exception to report NOT_FOUND so null is NOT_MODIFIED.
-      if (d == null) {
-        return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+      DeltaResponse response = driver.getDelta(deltaId, model, ifms).get();
+      if (response == null || response.getStatus() != Status.OK) {
+        return toResponseEntity(headers, response);
       }
 
-      final HttpHeaders headers = new HttpHeaders();
-      headers.add("Content-Location", location.toASCIIString());
+      DeltaResource d = response.getDelta().get();
 
       log.info("[SenseRmController] deltaId = {}, lastModified = {}, If-Modified-Since = {}", d.getId(),
-              d.getLastModified(), DateUtils.formatDate(ifnms));
+              d.getLastModified(), ifModifiedSince);
 
       long lastModified = XmlUtilities.xmlGregorianCalendar(d.getLastModified()).toGregorianCalendar().getTimeInMillis();
 
@@ -1069,22 +1081,15 @@ public class SenseRmController extends SenseController {
       headers.setLastModified(lastModified);
 
       log.info("[SenseRmController] getDelta returning id = {}, creationTime = {}, queried If-Modified-Since = {}.",
-              d.getId(), d.getLastModified(), DateUtils.formatDate(ifnms));
+              d.getId(), d.getLastModified(), ifModifiedSince);
 
       return new ResponseEntity<>(d, headers, HttpStatus.OK);
-
-    } catch (NotFoundException ex) {
-      log.error("getDelta could not find delta, deltaId = {}, ex = {}", deltaId, ex);
-      final HttpHeaders headers = new HttpHeaders();
-      headers.add("Content-Location", location.toASCIIString());
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } catch (InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
       log.error("getDelta failed, ex = {}", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
-
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1245,7 +1250,7 @@ public class SenseRmController extends SenseController {
     URI deltaURI;
     try {
       deltaURI = new URI("http://localhost:8080/sense/v1/deltas/922f4388-c8f6-4014-b6ce-5482289b0200");
-    } catch (Exception ex) {
+    } catch (URISyntaxException ex) {
       Error error = new Error(HttpStatus.INTERNAL_SERVER_ERROR.toString(),
               ex.getLocalizedMessage(), null);
       return new ResponseEntity<>(error, null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -1262,19 +1267,17 @@ public class SenseRmController extends SenseController {
   }
 
   /**
-   * ***********************************************************************
-   * GET /api/sense/v1/deltas ***********************************************************************
-   */
-  /**
-   * Returns a list of accepted delta resources.
+   * Returns a collection of delta resources.
    *
-   * @param uriInfo The incoming URI context used to invoke the service.
+   * Operation: GET /api/sense/v1/deltas
+   *
    * @param accept Provides media types that are acceptable for the response. At the moment 'application/json' is the
    * supported response encoding.
    * @param ifModifiedSince The HTTP request may contain the If-Modified-Since header requesting all models with
    * creationTime after the specified date. The date must be specified in RFC 1123 format.
    * @param summary If summary=true then a summary collection of delta resources will be returned including the delta
  meta-data while excluding the addition, reduction, and m elements. Default value is summary=true.
+   * @param encode
    * @param model If model=turtle then the returned addition, reduction, and m elements will contain the full
  topology model in a TURTLE representation. Default value is model=turtle.
    * @return A RESTful response.
@@ -1387,7 +1390,7 @@ public class SenseRmController extends SenseController {
           produces = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseBody
   @ResourceAnnotation(name = "deltas", version = "v1")
-  public List<DeltaResource> getDeltas(
+  public ResponseEntity<?> getDeltas(
           @RequestHeader(
                   value = HttpConstants.ACCEPT_NAME,
                   defaultValue = MediaType.APPLICATION_JSON_VALUE)
@@ -1403,36 +1406,99 @@ public class SenseRmController extends SenseController {
           @RequestParam(
                   value = HttpConstants.MODEL_NAME,
                   defaultValue = HttpConstants.MODEL_TURTLE)
-          @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model) {
+          @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model,
+          @RequestParam(
+                  value = HttpConstants.ENCODE_NAME,
+                  defaultValue = "false")
+          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode) {
 
-    DeltaResource delta = new DeltaResource();
-    delta.setId("922f4388-c8f6-4014-b6ce-5482289b0200");
-    delta.setHref("http://localhost:8080/sense/v1/deltas/922f4388-c8f6-4014-b6ce-5482289b0200");
-    delta.setLastModified("2016-07-26T13:45:21.001Z");
-    delta.setModelId("922f4388-c8f6-4014-b6ce-5482289b02ff");
-    delta.setResult("H4sIACKIo1cAA+1Y32/aMBB+56+I6NtUx0loVZEV1K6bpkm0m5Y+7NWNTbCa2JEdCP3vZydULYUEh0CnQXlC+O6+O/ u7X1ylgozp3BJ4LH3rcpJlqQ9hnud23rO5iKDnOA50XKgEgAwnJEEnQ8vuXC30eB5XqXnQuYDqfEl+LnGVvAv/3I6CVQiFv FbF7ff7UKF4Hiice2IZmgMml5RZ8sq/0n9p82hcWFCHCtjtQacHH5AkS5qJkNWa6rDUdD2Y8ZTHPHoqtDudy6lgvpLzGclyL h59zBNE2YBIW/0y7FhvPqjw8X5h5LS40TuUEPyDYTqjeIpi6/OKltZ5IDFnkbzn1gqmxMxO0DyiEUp5qoGfj4YVxiZIfqGYCh JmlDMU/+IiW7W7FIvPOCYDOWUMhOLcT5XG4AJ60PVjyh4HKPbk8NTIBmIxSIRXmpgT4EAXOqWVT4YmwgkNX9w4V wZeu1EddEDEjIZkE4YyktNMgbCoyhhTj2Z1vwVK3PoZ3Fz/DqyvN3ddTYoq49o3bd6mLCNCffFsgqeHwZH1sS04gxmQua 3fbI1I8YIkm5xDr3xCInXmVPPAAEqztAaqtwQFtHQ7vBzJiQmeeoAW5KxwxJisP57VrOuRF2xB1ZZ37M9ixIBALCLrSG9ct 0dI8fy74NN02CQ5Yq2WPaVkE5KqaQ5UIRRRnWinq+51huIpkVbXA2dO/6ztjTZhUUXRWEnYHVUPcwY2zaOafHh553fKz dcErXCLyuuYIlnpEBYo4quVVvtzezO6K2Fd0AMG/arMWuoBLQTcWnqZ9tcNOahhX679/8muNX27IrrgWWBRbZvESFjIsV LdXYhHOYcVVAlylKb6LrtjFEvStnY2Gi4ONAn2Mxh9dJr3mYi2bDjmRWHHXaYe7N+wZk0b2FTH2rHC+EJ28NL7Se9aVp Ry9ZwwyNTDa8Uf627LdXcfM8CWk/4BTQBblaMDjb92ND2C+Gun+yNsz6ZbcdPuLBSQfLvwJ1QggDPmF6Uo5IyVt+rnCq es+AaNt7cbsh/jaxtn//6GsWYDgAEdvHddkj8Wv/3/+bCDnW+rf2DW7Xx/ASQO0KQcHgAA");
-    List<DeltaResource> deltas = new ArrayList<>();
-    deltas.add(delta);
-    return deltas;
+    // We need the request URL to build fully qualified resource URLs.
+    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+
+    log.info("[SenseRmController] GET operation = {}, accept = {}, If-Modified-Since = {}, current = {}, "
+            + "summary = {}, model = {}", location, accept, ifModifiedSince, summary, model);
+
+    // Parse the If-Modified-Since header if it is present.
+    long ifms = parseIfModfiedSince(ifModifiedSince);
+
+    // Populate the content location header with our URL location.
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Content-Location", location.toASCIIString());
+
+    try {
+      // Track matching deltas here.
+      List<DeltaResource> deltas = new ArrayList<>();
+
+      // Keep track of the most recently updated delta date.
+      long newest = 0;
+
+      // Query the driver for a list of deltas.
+      DeltasResponse response = driver.getDeltas(model, ifms).get();
+      if (response == null || response.getStatus() != Status.OK) {
+        return toResponseEntity(headers, response);
+      }
+
+      // The requester asked for a list of models so apply any filtering criteria.
+      for (DeltaResource d : response.getDeltas()) {
+        long lastModified = XmlUtilities.xmlGregorianCalendar(d.getLastModified())
+                .toGregorianCalendar().getTimeInMillis();
+
+        log.info("[SenseRmController] delta id = {}, lastModified = {}, If-Modified-Since = {}",
+                d.getId(), d.getLastModified(), ifModifiedSince);
+
+        // Create the unique resource URL.
+        d.setHref(UrlHelper.append(location.toASCIIString(), d.getId()));
+
+        // If summary results are requested we do not return the model.
+        if (summary) {
+          d.setAddition(null);
+          d.setReduction(null);
+          d.setResult(null);
+        } else {
+          // If they requested an encoded transfer we will encode the model contents.
+          if (encode) {
+            d.setAddition(Encoder.encode(d.getAddition()));
+            d.setReduction(Encoder.encode(d.getReduction()));
+            d.setResult(Encoder.encode(d.getResult()));
+          }
+        }
+
+        // Save this model and update If-Modified-Since with the creation time.
+        deltas.add(d);
+
+        if (lastModified > newest) {
+            newest = lastModified;
+        }
+      }
+
+      // Update the LastModified header with the value of the newest model.
+      headers.setLastModified(newest);
+
+      // We have success so return the models we have found.
+      return new ResponseEntity<>(deltas, headers, HttpStatus.OK);
+    } catch (InterruptedException | IOException | DatatypeConfigurationException | IllegalArgumentException |
+            ExecutionException ex) {
+      log.error("[SenseRmController] getDeltas failed, ex = {}", ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**
-   * ***********************************************************************
-   * GET /api/sense/v1/deltas/{deltaId} ***********************************************************************
-   */
-  /**
-   * Returns the delta resource identified by deltaId that is associated with model identified by id within the Resource
-   * Manager.
+   * Returns the delta resource identified by deltaId.
    *
-   * @param uriInfo The incoming URI context used to invoke the service.
+   * Operation: GET /api/sense/v1/deltas/{deltaId}
+   *
    * @param accept Provides media types that are acceptable for the response. At the moment 'application/json' is the
    * supported response encoding.
+   * @param summary
    * @param ifModifiedSince The HTTP request may contain the If-Modified-Since header requesting all models with
    * creationTime after the specified date. The date must be specified in RFC 1123 format.
    * @param encode
-   * @param model This version’s detailed topology model in the requested format (TURTLE, etc.). To optimize transfer
-   * the contents of this model element should be gzipped (contentType="application/x-gzip") and base64 encoded
-   * (contentTransferEncoding="base64"). This will reduce the transfer size and encapsulate the original model contents.
+   * @param model Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
    * @param deltaId Identifier of the target delta resource.
    * @return A RESTful response.
    */
@@ -1457,8 +1523,7 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.LAST_MODIFIED_DESC,
                               response = String.class)
                     }
-            )
-            ,
+            ),
             @ApiResponse(
                     code = HttpConstants.NOT_MODIFIED,
                     message = HttpConstants.NOT_MODIFIED_MSG,
@@ -1474,8 +1539,7 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.LAST_MODIFIED_DESC,
                               response = String.class)
                     }
-            )
-            ,
+            ),
             @ApiResponse(
                     code = HttpConstants.BAD_REQUEST_CODE,
                     message = HttpConstants.BAD_REQUEST_MSG,
@@ -1486,8 +1550,7 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.CONTENT_TYPE_DESC,
                               response = String.class)
                     }
-            )
-            ,
+            ),
             @ApiResponse(
                     code = HttpConstants.FORBIDDEN_CODE,
                     message = HttpConstants.FORBIDDEN_MSG,
@@ -1498,8 +1561,7 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.CONTENT_TYPE_DESC,
                               response = String.class)
                     }
-            )
-            ,
+            ),
             @ApiResponse(
                     code = HttpConstants.NOT_FOUND_CODE,
                     message = HttpConstants.NOT_FOUND_MSG,
@@ -1510,8 +1572,7 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.CONTENT_TYPE_DESC,
                               response = String.class)
                     }
-            )
-            ,
+            ),
             @ApiResponse(
                     code = HttpConstants.NOT_ACCEPTABLE_CODE,
                     message = HttpConstants.NOT_ACCEPTABLE_MSG,
@@ -1522,8 +1583,7 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.CONTENT_TYPE_DESC,
                               response = String.class)
                     }
-            )
-            ,
+            ),
             @ApiResponse(
                     code = HttpConstants.INTERNAL_ERROR_CODE,
                     message = HttpConstants.INTERNAL_ERROR_MSG,
@@ -1534,7 +1594,8 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.CONTENT_TYPE_DESC,
                               response = String.class)
                     }
-            ),}
+            ),
+          }
   )
   @RequestMapping(
           value = "/deltas/{" + HttpConstants.DELTAID_NAME + "}",
@@ -1548,7 +1609,7 @@ public class SenseRmController extends SenseController {
           @ApiParam(value = HttpConstants.ACCEPT_MSG, required = false) String accept,
           @RequestHeader(
                   value = HttpConstants.IF_MODIFIED_SINCE_NAME,
-                  defaultValue = HttpConstants.IF_MODIFIED_SINCE_DEFAULT)
+                  required = false)
           @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
           @RequestParam(
                   value = HttpConstants.SUMMARY_NAME,
@@ -1572,54 +1633,54 @@ public class SenseRmController extends SenseController {
     log.info("[SenseRmController] operation = {}, id = {}, accept = {}, ifModifiedSince = {}, model = {}",
             location, deltaId, accept, ifModifiedSince, model);
 
-    Date ifnms = DateUtils.parseDate(ifModifiedSince);
-    if (ifnms == null) {
-      log.error("[SenseRmController] invalid header {}, value = {}.", HttpConstants.IF_MODIFIED_SINCE_NAME,
-              ifModifiedSince);
-      ifnms = DateUtils.parseDate(HttpConstants.IF_MODIFIED_SINCE_DEFAULT);
-    }
+    // Parse the If-Modified-Since header if it is present.
+    long ifms = parseIfModfiedSince(ifModifiedSince);
 
-    DeltaResource d;
+    // We need to return the current location of this resource in the response header.
+    final HttpHeaders headers = new HttpHeaders();
+    headers.add("Content-Location", location.toASCIIString());
+
     try {
-      d = driver.getDelta(deltaId, ifnms.getTime(), model).get();
-
-      // We have an exception to report NOT_FOUND so null is NOT_MODIFIED.
-      if (d == null) {
-        return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+      // Query for the requested delta.
+      DeltaResponse response = driver.getDelta(deltaId, model, ifms).get();
+      if (response == null || response.getStatus() != Status.OK) {
+        return toResponseEntity(headers, response);
       }
 
-      final HttpHeaders headers = new HttpHeaders();
-      headers.add("Content-Location", location.toASCIIString());
+      DeltaResource d = response.getDelta().get();
 
       log.info("[SenseRmController] deltaId = {}, lastModified = {}, If-Modified-Since = {}", d.getId(),
-              d.getLastModified(), DateUtils.formatDate(ifnms));
+              d.getLastModified(), ifModifiedSince);
 
-      long lastModified = XmlUtilities.xmlGregorianCalendar(d.getLastModified()).toGregorianCalendar().getTimeInMillis();
+      // Determine when this was last modified.
+      long lastModified = XmlUtilities.xmlGregorianCalendar(d.getLastModified())
+              .toGregorianCalendar().getTimeInMillis();
+      headers.setLastModified(lastModified);
+
+      // Do we need to return this delta?
+      if (lastModified <= ifms) {
+        log.info("[SenseRmController] returning not modified, deltaId = {}", d.getId());
+        return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
+      }
 
       d.setHref(location.toASCIIString());
       if (summary) {
+        // If a summary resource view was requested we do not send back any models.
         d.setAddition(null);
         d.setReduction(null);
         d.setResult(null);
       } else if (encode) {
+        // Compress and base64 encode the model contents if requested.
         d.setAddition(Encoder.encode(d.getAddition()));
         d.setReduction(Encoder.encode(d.getReduction()));
         d.setResult(Encoder.encode(d.getResult()));
       }
 
-      headers.setLastModified(lastModified);
-
       log.info("[SenseRmController] getDelta returning id = {}, creationTime = {}, queried If-Modified-Since = {}.",
-              d.getId(), d.getLastModified(), DateUtils.formatDate(ifnms));
+              d.getId(), d.getLastModified(), ifModifiedSince);
       return new ResponseEntity<>(d, headers, HttpStatus.OK);
-
-    } catch (NotFoundException ex) {
-      log.error("getDelta could not find delta, deltaId = {}, ex = {}", deltaId, ex);
-      final HttpHeaders headers = new HttpHeaders();
-      headers.add("Content-Location", location.toASCIIString());
-      return new ResponseEntity<>(headers, HttpStatus.NOT_FOUND);
     } catch (InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
-      log.error("getDelta failed, ex = {}", ex);
+      log.error("[SenseRmController] getDelta failed, deltaId = {}, ex = {}", deltaId, ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
@@ -1630,8 +1691,10 @@ public class SenseRmController extends SenseController {
   }
 
   /**
-   * ***********************************************************************
-   * POST /api/sense/v1/deltas
+   * Submits a proposed model delta to the Resource Manager based on the model
+   * identified by modelId within the deltaRequest.
+   *
+   * Operation: POST /api/sense/v1/deltas
    *
    * @param accept
    * @param deltaRequest
@@ -1640,11 +1703,6 @@ public class SenseRmController extends SenseController {
    * @return
    * @throws java.net.URISyntaxException
    */
-  @RequestMapping(
-          value = "/deltas",
-          method = RequestMethod.POST,
-          consumes = {MediaType.APPLICATION_JSON_VALUE},
-          produces = {MediaType.APPLICATION_JSON_VALUE})
   @ApiOperation(
           value = "Submits a proposed model delta to the Resource Manager based on the model "
           + "identified by id.",
@@ -1669,8 +1727,7 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.LAST_MODIFIED_DESC,
                               response = String.class)
                     }
-            )
-            ,
+            ),
             @ApiResponse(
                     code = HttpConstants.CREATED_CODE,
                     message = HttpConstants.CREATED_MSG,
@@ -1686,8 +1743,7 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.LAST_MODIFIED_DESC,
                               response = String.class)
                     }
-            )
-            ,
+            ),
             @ApiResponse(
                     code = HttpConstants.BAD_REQUEST_CODE,
                     message = HttpConstants.BAD_REQUEST_MSG,
@@ -1698,8 +1754,7 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.CONTENT_TYPE_DESC,
                               response = String.class)
                     }
-            )
-            ,
+            ),
             @ApiResponse(
                     code = HttpConstants.FORBIDDEN_CODE,
                     message = HttpConstants.FORBIDDEN_MSG,
@@ -1710,8 +1765,7 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.CONTENT_TYPE_DESC,
                               response = String.class)
                     }
-            )
-            ,
+            ),
             @ApiResponse(
                     code = HttpConstants.NOT_FOUND_CODE,
                     message = HttpConstants.NOT_FOUND_MSG,
@@ -1722,8 +1776,7 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.CONTENT_TYPE_DESC,
                               response = String.class)
                     }
-            )
-            ,
+            ),
             @ApiResponse(
                     code = HttpConstants.NOT_ACCEPTABLE_CODE,
                     message = HttpConstants.NOT_ACCEPTABLE_MSG,
@@ -1734,8 +1787,7 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.CONTENT_TYPE_DESC,
                               response = String.class)
                     }
-            )
-            ,
+            ),
             @ApiResponse(
                     code = HttpConstants.CONFLICT_CODE,
                     message = HttpConstants.CONFLICT_MSG,
@@ -1746,8 +1798,7 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.CONTENT_TYPE_DESC,
                               response = String.class)
                     }
-            )
-            ,
+            ),
             @ApiResponse(
                     code = HttpConstants.INTERNAL_ERROR_CODE,
                     message = HttpConstants.INTERNAL_ERROR_MSG,
@@ -1758,8 +1809,14 @@ public class SenseRmController extends SenseController {
                               description = HttpConstants.CONTENT_TYPE_DESC,
                               response = String.class)
                     }
-            ),}
+            ),
+          }
   )
+  @RequestMapping(
+          value = "/deltas",
+          method = RequestMethod.POST,
+          consumes = {MediaType.APPLICATION_JSON_VALUE},
+          produces = {MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<?> propagateDelta(
           @RequestHeader(
                   value = HttpConstants.ACCEPT_NAME,
@@ -1784,6 +1841,12 @@ public class SenseRmController extends SenseController {
     log.info("[SenseRmController] POST operation = {}, accept = {}, deltaId = {}, modelId = {}, deltaRequest = {}",
             location, accept, deltaRequest.getId(), model, deltaRequest);
 
+    // If the requester did not specify a delta id then we need to create one.
+    if (Strings.isNullOrEmpty(deltaRequest.getId())) {
+      deltaRequest.setId(UuidHelper.getUUID());
+      log.info("[SenseRmController] assigning delta id = {}", deltaRequest.getId());
+    }
+
     try {
       if (encode) {
         if (!Strings.isNullOrEmpty(deltaRequest.getAddition())) {
@@ -1795,11 +1858,16 @@ public class SenseRmController extends SenseController {
         }
       }
 
-      DeltaResource delta = driver.propagateDelta(deltaRequest, model).get();
+      // We need to return the current location of this resource in the response header.
+      final HttpHeaders headers = new HttpHeaders();
 
-      if (delta == null) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      // Query for the requested delta.
+      DeltaResponse response = driver.propagateDelta(deltaRequest, model).get();
+      if (response == null || response.getStatus() != Status.CREATED) {
+        return toResponseEntity(headers, response);
       }
+
+      DeltaResource delta = response.getDelta().get();
 
       String contentLocation = UrlHelper.append(location.toASCIIString(), delta.getId());
 
@@ -1823,7 +1891,6 @@ public class SenseRmController extends SenseController {
         }
       }
 
-      final HttpHeaders headers = new HttpHeaders();
       headers.add("Content-Location", contentLocation);
       headers.setLastModified(lastModified);
 
@@ -1831,25 +1898,93 @@ public class SenseRmController extends SenseController {
               delta.getId(), delta.getLastModified());
 
       return new ResponseEntity<>(delta, headers, HttpStatus.CREATED);
-
-    } catch (NotFoundException nfe) {
-      Error error = Error.builder()
-              .error(HttpStatus.NOT_FOUND.getReasonPhrase())
-              .error_description(nfe.getMessage())
-              .build();
-      return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-    }
-    catch (InternalServerErrorException | InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
+    } catch (InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
       log.error("pullModel failed", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
-
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
+  /**
+   * Transition a delta resource from the Accepted to Committed state.
+   *
+   * Operation: PUT /api/sense/v1/deltas/{id}/actions/commit
+   *
+   * @param deltaId The identifier of the delta resource to commit.
+   *
+   * @return A RESTful response with status NO_CONTENT if successful.
+   */
+  @ApiOperation(
+          value = "Transition a delta resource from the Accepted to Committed state.",
+          notes = "The Resource Manager must verify the proposed delta commit and will "
+          + "confirm success returning (204 No Content).",
+          response = DeltaResource.class)
+  @ApiResponses(
+          value = {
+            @ApiResponse(
+                    code = HttpConstants.NO_CONTENT_CODE,
+                    message = HttpConstants.NO_CONTENT_MSG
+            ),
+            @ApiResponse(
+                    code = HttpConstants.BAD_REQUEST_CODE,
+                    message = HttpConstants.BAD_REQUEST_MSG,
+                    response = Error.class,
+                    responseHeaders = {
+                      @ResponseHeader(
+                              name = HttpConstants.CONTENT_TYPE_NAME,
+                              description = HttpConstants.CONTENT_TYPE_DESC,
+                              response = String.class)
+                    }
+            ),
+            @ApiResponse(
+                    code = HttpConstants.FORBIDDEN_CODE,
+                    message = HttpConstants.FORBIDDEN_MSG,
+                    response = Error.class,
+                    responseHeaders = {
+                      @ResponseHeader(
+                              name = HttpConstants.CONTENT_TYPE_NAME,
+                              description = HttpConstants.CONTENT_TYPE_DESC,
+                              response = String.class)
+                    }
+            ),
+            @ApiResponse(
+                    code = HttpConstants.NOT_FOUND_CODE,
+                    message = HttpConstants.NOT_FOUND_MSG,
+                    response = Error.class,
+                    responseHeaders = {
+                      @ResponseHeader(
+                              name = HttpConstants.CONTENT_TYPE_NAME,
+                              description = HttpConstants.CONTENT_TYPE_DESC,
+                              response = String.class)
+                    }
+            ),
+            @ApiResponse(
+                    code = HttpConstants.NOT_ACCEPTABLE_CODE,
+                    message = HttpConstants.NOT_ACCEPTABLE_MSG,
+                    response = Error.class,
+                    responseHeaders = {
+                      @ResponseHeader(
+                              name = HttpConstants.CONTENT_TYPE_NAME,
+                              description = HttpConstants.CONTENT_TYPE_DESC,
+                              response = String.class)
+                    }
+            ),
+            @ApiResponse(
+                    code = HttpConstants.INTERNAL_ERROR_CODE,
+                    message = HttpConstants.INTERNAL_ERROR_MSG,
+                    response = Error.class,
+                    responseHeaders = {
+                      @ResponseHeader(
+                              name = HttpConstants.CONTENT_TYPE_NAME,
+                              description = HttpConstants.CONTENT_TYPE_DESC,
+                              response = String.class)
+                    }
+            ),
+          }
+  )
   @RequestMapping(
           value = "/deltas/{" + HttpConstants.DELTAID_NAME + "}/actions/commit",
           method = RequestMethod.PUT,
@@ -1867,31 +2002,26 @@ public class SenseRmController extends SenseController {
 
     DeltaResource d;
     try {
-      d = driver.commitDelta(deltaId).get();
+      // We need to return the current location of this resource in the response header.
+      final HttpHeaders headers = new HttpHeaders();
+      headers.add("Content-Location", location.toASCIIString());
 
-      // We have an exception to report NOT_FOUND so null is NOT_MODIFIED.
-      if (d == null) {
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+      // Query for the requested delta.
+      DeltaResponse response = driver.commitDelta(deltaId).get();
+      if (response == null || response.getStatus() != Status.NO_CONTENT) {
+        return toResponseEntity(headers, response);
       }
 
-      final HttpHeaders headers = new HttpHeaders();
-      headers.add("Content-Location", location.toASCIIString());
+      DeltaResource delta = response.getDelta().get();
+      log.info("[SenseRmController] commitDelta deltaId = {}, lastModified = {}", delta.getId(), delta.getLastModified());
 
-      log.info("[SenseRmController] commitDelta deltaId = {}, lastModified = {}", d.getId(), d.getLastModified());
       return new ResponseEntity<>(headers, HttpStatus.NO_CONTENT);
-
-    } catch (NotFoundException ex) {
-      log.error("getDelta could not find delta, deltaId = {}, ex = {}", deltaId, ex);
-      final HttpHeaders headers = new HttpHeaders();
-      headers.add("Content-Location", location.toASCIIString());
-      return new ResponseEntity<>(headers, HttpStatus.NOT_FOUND);
-    } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+    } catch (InterruptedException | ExecutionException ex) {
       log.error("getDelta failed, ex = {}", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
-
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

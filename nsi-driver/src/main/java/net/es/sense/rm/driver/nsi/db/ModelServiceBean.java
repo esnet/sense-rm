@@ -47,63 +47,15 @@ public class ModelServiceBean implements ModelService {
   }
 
   @Override
-  public Model get(long lastModified, String modelId) {
+  public Model get(long idx) {
+    return modelRepository.findByIdx(idx);
+  }
+
+  @Override
+  public Model getByModelId(String modelId, long lastModified) {
     return modelRepository.findByModelIdAndVersion(modelId, lastModified);
   }
-
-  @Override
-  public Model get(String modelId) {
-    return modelRepository.findByModelId(modelId);
-  }
-
-  @Override
-  public Collection<Model> get(long lastModified, boolean current, String topologyId) {
-    Collection<Model> result = new ArrayList();
-
-    if (current) {
-      Model findCurrentModelForTopologyId = modelRepository.findCurrentModelForTopologyId(topologyId);
-      if (findCurrentModelForTopologyId != null &&
-            findCurrentModelForTopologyId.getVersion() > lastModified) {
-          result.add(findCurrentModelForTopologyId);
-      }
-    }
-    else {
-      Iterable<Model> findByTopologyId = modelRepository.findTopologyIdNewerThanVersion(topologyId, lastModified);
-      findByTopologyId.forEach(m -> {
-        result.add(m);
-      });
-    }
-
-    return result;
-  }
-
-  @Override
-  public Collection<Model> get(boolean current, String topologyId) {
-    Collection<Model> result = new ArrayList();
-
-    log.info("[ModelServiceBean] current = {}, topologyId = {}", current, topologyId);
-
-    if (current) {
-      Model currentModel = modelRepository.findCurrentModelForTopologyId(topologyId);
-      if (currentModel != null) {
-        result.add(currentModel);
-        log.info("[ModelServiceBean] found topologyId = {}, modelId = {}",
-                currentModel.getTopologyId(), currentModel.getModelId());
-      }
-      else {
-        log.info("[ModelServiceBean] failed to find current {}, topologyId {}", current, topologyId);
-      }
-    }
-    else {
-      Iterable<Model> findByTopologyId = modelRepository.findByTopologyId(topologyId);
-      findByTopologyId.forEach(m -> {
-        result.add(m);
-      });
-    }
-
-    return result;
-  }
-
+  
   @Override
   public boolean isPresent(String topologyId, long version) {
     return modelRepository.isVersion(topologyId, version);
@@ -142,9 +94,46 @@ public class ModelServiceBean implements ModelService {
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
+  public void delete(long idx) {
+    modelRepository.deleteByIdx(idx);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
   public void delete() {
     for (Model model : modelRepository.findAll()) {
       modelRepository.delete(model);
     }
+  }
+
+  // Used by nsi-driver API to implement driver interface.
+  @Override
+  public Model getCurrent(String topologyId) {
+    log.info("[ModelServiceBean] getCurrent() topologyId = {}", topologyId);
+
+    return modelRepository.findCurrentModelForTopologyId(topologyId);
+  }
+
+  @Override
+  public Model getByModelId(String modelId) {
+    return modelRepository.findByModelId(modelId);
+  }
+
+  @Override
+  public Collection<Model> getByTopologyId(String topologyId, long lastModified) {
+    Collection<Model> result = new ArrayList();
+
+    Iterable<Model> findByTopologyId = modelRepository.findTopologyIdNewerThanVersion(topologyId, lastModified);
+    findByTopologyId.forEach(m -> {
+      result.add(m);
+    });
+
+    return result;
+  }
+
+  @Override
+  public long countByTopologyId(String topologyId) {
+    Long count = modelRepository.countByTopologyId(topologyId);
+    return count == null ? 0L : count;
   }
 }

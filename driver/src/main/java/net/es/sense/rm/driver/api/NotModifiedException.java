@@ -17,16 +17,25 @@
  * publicly and display publicly, and to permit other to do so.
  *
  */
-package net.es.sense.rm.driver.nsi;
+package net.es.sense.rm.driver.api;
+
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.core.Response;
 
 /**
+ * A runtime exception indicating a resource requested by a client was
+ * {@link javax.ws.rs.core.Response.Status#NOT_MODIFIED not modified}
+ * on the server.
  *
  * @author hacksaw
  */
-public interface AuditService {
+public class NotModifiedException extends ClientErrorException {
+    private static final long serialVersionUID = 1L;
 
-  void audit();
-
-  void audit(String topologyId);
-
+    /**
+     * Construct a new "not modified" exception.
+     */
+    public NotModifiedException() {
+        super(Response.Status.NOT_MODIFIED);
+    }
 }

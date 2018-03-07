@@ -42,19 +42,19 @@ public class Delta implements Serializable {
 
   @Id
   @GeneratedValue
-  private long id;
+  private long idx;
 
   @Basic(optional = false)
   private String deltaId;           // The unique uuid identifying the delta within the RM.
 
   @Basic(optional = false)
-  private long lastModified = 0;    // Representing the time of the creation, last modification, or state transition of the delta resource.
+  private long lastModified = 0;    // Representing the time of the creation, last modification, or _state transition of the delta resource.
 
   @Basic(optional = false)
   private String modelId;           // The UUID of the root model version to which this delta has been applied.
 
   @Basic(optional = false)
-  private DeltaState state;         // The current state of the delta resource. Will contain one of Accepting, Accepted, Committing, Committed, Activating, Activated, or Failed.
+  private DeltaState _state;         // The current _state of the delta resource. Will contain one of Accepting, Accepted, Committing, Committed, Activating, Activated, or Failed.
 
   @Lob
   @Basic(fetch=FetchType.LAZY, optional=true)
@@ -66,5 +66,21 @@ public class Delta implements Serializable {
 
   @Lob
   @Basic(fetch=FetchType.LAZY, optional=true)
-  private String result;            // resulting topology model that will be created by this delta resource.
+  private String _result;            // resulting topology model that will be created by this delta resource.
+
+  public DeltaState getState() {
+    return _state;
+  }
+
+  public String getResult() {
+    return _result;
+  }
+
+  public void setState(DeltaState state) {
+    this._state = state;
+  }
+
+  public void setResult(String result) {
+    this._result = result;
+  }
 }

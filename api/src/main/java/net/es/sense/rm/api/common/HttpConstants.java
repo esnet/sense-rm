@@ -94,6 +94,10 @@ public class HttpConstants {
           + "structure containin the newly created delta resource will be returned tracking the "
           + "agreed to changes, and the resulting topology model.";
 
+  public static final int NO_CONTENT_CODE = HttpURLConnection.HTTP_NO_CONTENT;
+  public static final String NO_CONTENT_MSG =
+          "Commited - Indicates the Resource Manager has committed the requested model delta.";
+
   public static final int NOT_MODIFIED = HttpURLConnection.HTTP_NOT_MODIFIED;
   public static final String NOT_MODIFIED_MSG =
           "Not Modified - A query using the If-Modified-Since header found no reources matching "

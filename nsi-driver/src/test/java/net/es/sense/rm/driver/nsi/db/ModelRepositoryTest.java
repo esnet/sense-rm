@@ -36,7 +36,7 @@ public class ModelRepositoryTest {
     model.setTopologyId("urn:ogf:network:es.net:2013:");
     model.setVersion(0);
     model.setBase(new String(Files.readAllBytes(Paths.get("src/test/resources/mrml.ttl"))));
-    log.info("Model id: {}", model.getId());
+    log.info("Model id: {}", model.getModelId());
     models.save(model);
   }
 
@@ -46,7 +46,7 @@ public class ModelRepositoryTest {
     buildDatabase();
 
     for (Model model : models.findAll()) {
-      log.info("id: {}", model.getId());
+      log.info("id: {}", model.getModelId());
     }
 
   }

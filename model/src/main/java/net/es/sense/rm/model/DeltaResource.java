@@ -139,6 +139,10 @@ public class DeltaResource {
         this.state = state;
     }
 
+    public void setState(String state) {
+        this.state = DeltaState.valueOf(state);
+    }
+
     /**
      * @return the reduction
      */
@@ -199,7 +203,7 @@ public class DeltaResource {
         sb.append(this.getModelId());
 
         sb.append("\"\n  state: \"");
-        sb.append(this.getState().name());
+        sb.append(this.getState());
 
         sb.append("\"\n  reduction: \"");
         sb.append(this.getReduction());

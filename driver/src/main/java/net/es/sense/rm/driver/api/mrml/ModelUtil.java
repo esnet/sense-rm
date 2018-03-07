@@ -18,15 +18,15 @@ import org.apache.jena.rdf.model.*;
  * @author hacksaw
  */
 public class ModelUtil {
-  
+
   public static final String[] supported = {
     "turtle",
     "ttl"
-  }; 
-  
+  };
+
   public static boolean isSupported(String type) {
     return Arrays.stream(supported).anyMatch(s -> s.equalsIgnoreCase(type));
-  } 
+  }
 
   public static OntModel unmarshalOntModel(String ttl) throws Exception {
     OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
@@ -74,14 +74,10 @@ public class ModelUtil {
     return ttl;
   }
 
-  public static Model unmarshalModel(String ttl) throws Exception {
+  public static Model unmarshalModel(String ttl) {
     Model model = ModelFactory.createDefaultModel();
     //$$ TODO: add ontology schema and namespace handling code
-    try {
-      model.read(new ByteArrayInputStream(ttl.getBytes()), null, "TURTLE");
-    } catch (Exception e) {
-      throw new Exception(String.format("failure to unmarshall ontology model, due to %s", e.getMessage()));
-    }
+    model.read(new ByteArrayInputStream(ttl.getBytes()), null, "TURTLE");
     return model;
   }
 

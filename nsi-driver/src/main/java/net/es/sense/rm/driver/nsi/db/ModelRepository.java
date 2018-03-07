@@ -18,9 +18,14 @@ public interface ModelRepository extends CrudRepository<Model, String> {
   @Query("select m from #{#entityName} m where modelId = :modelId and m.version > :version")
   public Model findByModelIdAndVersion(@Param ("modelId") String modelId, @Param("version") long version);
 
-  public Model findByModelId(String modelId);
+  public Model findByIdx(@Param("idx") long idx);
+  public Model deleteByIdx(@Param("idx") long idx);
+
+  public Model findByModelId(@Param("modelId") String modelId);
 
   public Iterable<Model> findByTopologyId(String topologyId);
+
+  public Long countByTopologyId(@Param("topologyId") String topologyId);
 
   @Query("select m from #{#entityName} m where m.version > :version")
   public Iterable<Model> findAllNewer(@Param("version") long version);

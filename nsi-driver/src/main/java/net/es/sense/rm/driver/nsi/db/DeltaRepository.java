@@ -16,7 +16,8 @@ public interface DeltaRepository extends CrudRepository<Delta, String> {
 
   public Delta findByDeltaId(@Param("deltaId") String deltaId);
 
-  public Delta findById(@Param("id") long id);
+  public Delta findByIdx(@Param("idx") long idx);
+  public Delta deleteByIdx(@Param("idx") long idx);
 
   @Query("select m from #{#entityName} m where deltaId = :deltaId and m.lastModified > :lastModified")
   public Delta findByDeltaId(@Param("deltaId") String deltaId, @Param("lastModified") long lastModified);

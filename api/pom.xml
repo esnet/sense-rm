@@ -24,7 +24,7 @@
       <artifactId>model</artifactId>
       <version>0.1.0</version>
     </dependency>
-    
+
     <dependency>
       <groupId>net.es.sense</groupId>
       <artifactId>driver</artifactId>
@@ -60,6 +60,14 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-test -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-test</artifactId>
+    <scope>test</scope>
+</dependency>
+
   </dependencies>
 
   <build>

@@ -23,19 +23,22 @@ import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.BadRequestException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.ws.soap.SOAPFaultException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
+import net.es.sense.rm.driver.api.DeltaResponse;
+import net.es.sense.rm.driver.api.DeltasResponse;
 import net.es.sense.rm.driver.api.Driver;
+import net.es.sense.rm.driver.api.ModelResponse;
+import net.es.sense.rm.driver.api.ModelsResponse;
 import net.es.sense.rm.driver.api.mrml.ModelUtil;
 import net.es.sense.rm.driver.nsi.db.Delta;
 import net.es.sense.rm.driver.nsi.db.DeltaService;
@@ -66,64 +69,15 @@ public class NsiDriver implements Driver {
   @Autowired
   private RaController raController;
 
-  @PostConstruct
-  public void init() {
-    raController.start();
-  }
-
-  @PreDestroy
-  public void destroy() {
-    raController.stop();
-  }
-
-  @Override
-  @Async
-  public Future<ModelResource> getModel(String id, String modelType) throws ExecutionException {
-    String networkId = nsiProperties.getNetworkId();
-    if (Strings.isNullOrEmpty(networkId)) {
-      log.error("[NsiDriver] no network specified in configuration.");
-      throw new ExecutionException(new IllegalArgumentException("No network specified in configuration."));
-    }
-
-    // Convert the internal referencedModel representation to the driver interface referencedModel.
-    try {
-      ModelService modelService = raController.getModelService();
-      Model model = modelService.get(id);
-      if (model == null) {
-        return new AsyncResult<>(null);
-      }
-
-      ModelResource result = new ModelResource();
-      result.setId(model.getModelId());
-      result.setCreationTime(XmlUtilities.longToXMLGregorianCalendar((model.getVersion() / 1000) * 1000).toXMLFormat());
-      result.setModel(model.getBase());
-      return new AsyncResult<>(result);
-    } catch (IllegalArgumentException | DatatypeConfigurationException ex) {
-      log.error("[NsiDriver] ontology creation failed for networkId = {}.", networkId);
-      throw new ExecutionException(ex);
-    }
-  }
+  private String networkId;
 
   /**
-   * Get a list of MRML models matching the specified query parameters.
-   * 
-   * @param current If <b>true</b> only the current model will be returned (if one exists).
-   * 
-   * @param modelType Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
-   * 
-   * @return A Future promise to return a Collection of ModelResource matching query.  The
-   *    returned collection may be empty if no models match the requested criteria.
-   * 
-   * @throws InternalServerErrorException An internal error caused a failure to process request.
-   * 
-   * @throws BadRequestException The query contains invalid parameters that halted processing.
+   * Start the NSI driver.
    */
-  @Override
-  @Async
-  public Future<Collection<ModelResource>> getModels(boolean current, String modelType) 
-          throws BadRequestException, InternalServerErrorException  {
+  @PostConstruct
+  public void init() {
     // Get the NSI network identifier we are modelling in MRML.
-    String networkId = nsiProperties.getNetworkId();
+    networkId = nsiProperties.getNetworkId();
     log.info("[NsiDriver] getting model for network = {}", networkId);
 
     if (Strings.isNullOrEmpty(networkId)) {
@@ -131,18 +85,114 @@ public class NsiDriver implements Driver {
       throw new InternalServerErrorException("No network specified in configuration.");
     }
 
+    raController.start();
+  }
+
+  /**
+   * Stop the NSI Driver.
+   */
+  @PreDestroy
+  public void destroy() {
+    raController.stop();
+  }
+
+  /**
+   * Get a specific MRML model identified by <b>id</b>.
+   *
+   * @param id The model identifier to return.
+   *
+   * @param modelType Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
+   *
+   * @param ifModifiedSince Return model only if newer than this date, otherwise throw NotModifiedException.
+   *
+   * @return A Future promise to return a ModelResponse matching id if one exists.
+   */
+  @Override
+  @Async
+  public Future<ModelResponse> getModel(String id, String modelType, long ifModifiedSince) {
+
+    ModelResponse response = new ModelResponse();
+
     // A valid model type must be provided.
     if (!ModelUtil.isSupported(modelType)) {
-      log.error("[NsiDriver] specified model type = {} not supported.", modelType);
-      throw new BadRequestException("Specified model type = " + modelType + " not supported.");      
+      response.setStatus(Status.BAD_REQUEST);
+      response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
+      return new AsyncResult<>(response);
+    }
+
+    // Convert the internal referencedModel representation to the driver interface referencedModel.
+    try {
+      ModelService modelService = raController.getModelService();
+      Model model = modelService.getByModelId(id);
+      if (model == null) {
+        response.setStatus(Status.NOT_FOUND);
+        response.setError(Optional.of("model does not exist, id = " + id));
+        return new AsyncResult<>(response);
+      }
+
+      if (model.getVersion() <= ifModifiedSince) {
+        response.setStatus(Status.NOT_MODIFIED);
+        return new AsyncResult<>(response);
+      }
+
+      ModelResource result = new ModelResource();
+      result.setId(model.getModelId());
+      result.setCreationTime(XmlUtilities.longToXMLGregorianCalendar((model.getVersion() / 1000) * 1000).toXMLFormat());
+      result.setModel(model.getBase());
+      response.setModel(Optional.of(result));
+      return new AsyncResult<>(response);
+    } catch (IllegalArgumentException | DatatypeConfigurationException ex) {
+      log.error("[NsiDriver] ontology creation failed for networkId = {}.", networkId);
+      response.setStatus(Status.INTERNAL_SERVER_ERROR);
+      response.setError(Optional.of("Could not generate model for networkId = " + networkId));
+      return new AsyncResult<>(response);
+    }
+  }
+
+  /**
+   * Get a specific MRML model identified by <b>id</b>.
+   *
+   * @param id The model identifier to return.
+   *
+   * @param modelType Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
+
+   * @return A Future promise to return a ModelResponse matching id if one exists.
+   */
+  @Override
+  @Async
+  public Future<ModelResponse> getModel(String id, String modelType) {
+    return this.getModel(id, modelType, 0L);
+  }
+
+  /**
+   * Get a list of MRML models matching the specified query parameters.
+   *
+   * @param modelType Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
+   *
+   * @param ifModifiedSince Return model only if newer than this date, otherwise throw NotModifiedException.
+   *
+   * @return A Future promise to return a Collection of ModelResponse matching query.  The
+   *    returned collection may be empty if no models match the requested criteria.
+   */
+  @Override
+  @Async
+  public Future<ModelsResponse> getModels(String modelType, long ifModifiedSince) {
+
+    ModelsResponse response = new ModelsResponse();
+
+    // A valid model type must be provided.
+    if (!ModelUtil.isSupported(modelType)) {
+      response.setStatus(Status.BAD_REQUEST);
+      response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
+      return new AsyncResult<>(response);
     }
 
     // The RA Controller maintains a database of MRML models created from NML and NSI connections.
+    ModelService modelService = raController.getModelService();
     try {
       Collection<ModelResource> results = new ArrayList<>();
-      ModelService modelService = raController.getModelService();
-      Collection<Model> models = modelService.get(current, networkId);
-      
+      Collection<Model> models = modelService.getByTopologyId(networkId, ifModifiedSince);
+
       // If we did get a set of results we need to map them into a ModelResource to return.
       if (models != null) {
         for (Model m : models) {
@@ -155,44 +205,156 @@ public class NsiDriver implements Driver {
           log.info("[NsiDriver] found matching modelId = {}", model.getId());
           results.add(model);
         }
+      } else if (modelService.countByTopologyId(networkId) != 0) {
+        // There are models for this topology but none are newer than provided ifModifiedSince.
+        response.setStatus(Status.NOT_MODIFIED);
+        return new AsyncResult<>(response);
       } else {
         log.info("[NsiDriver] no matching model entries returned for network = {}", networkId);
       }
 
-      return new AsyncResult<>(results);
+      response.setModels(results);
+      return new AsyncResult<>(response);
     } catch (IllegalArgumentException | DatatypeConfigurationException ex) {
       log.error("[NsiDriver] ontology creation failed for networkId = {}.", networkId, ex);
-      throw new InternalServerErrorException("Could not generate model for networkId = " 
-              + networkId);
+      response.setStatus(Status.INTERNAL_SERVER_ERROR);
+      response.setError(Optional.of("Could not generate model for networkId = " + networkId));
+      return new AsyncResult<>(response);
     }
   }
 
+  /**
+   * Get a list of MRML models.
+   *
+   * @param modelType Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
+   *
+   * @return A Future promise to return a Collection of ModelResponse matching query.  The
+   *    returned collection may be empty if no models match the requested criteria.
+   */
   @Override
   @Async
-  public Future<DeltaResource> propagateDelta(DeltaRequest deltaRequest, String modelType) throws ExecutionException, NotFoundException, InternalServerErrorException {
+  public Future<ModelsResponse> getModels(String modelType) {
+    return this.getModels(modelType, 0L);
+  }
+
+  /**
+   * Get a the current MRML model matching the specified query parameters.
+   *
+   * @param modelType Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
+   *
+   * @param ifModifiedSince Return model only if newer than this date, otherwise throw NotModifiedException.
+   *
+   * @return A Future promise to return a ModelResponse matching query.  The
+   *    returned model may be empty if there is no current model.
+   */
+  @Override
+  @Async
+  public Future<ModelResponse> getCurrentModel(String modelType, long ifModifiedSince) {
+
+    ModelResponse response = new ModelResponse();
+
+    // A valid model type must be provided.
+    if (!ModelUtil.isSupported(modelType)) {
+      response.setStatus(Response.Status.BAD_REQUEST);
+      response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
+      return new AsyncResult<>(response);
+    }
+
+    // The RA Controller maintains a database of MRML models created from NML and NSI connections.
+    try {
+      ModelService modelService = raController.getModelService();
+      Model model = modelService.getCurrent(networkId);
+
+      // If we did get a set of results we need to map them into a ModelResource to return.
+      if (model != null) {
+        if (model.getVersion() <= ifModifiedSince) {
+          response.setStatus(Response.Status.NOT_MODIFIED);
+          return new AsyncResult<>(response);
+        }
+
+        ModelResource result = new ModelResource();
+        result.setId(model.getModelId());
+        result.setCreationTime(XmlUtilities
+                .longToXMLGregorianCalendar((model.getVersion() / 1000) * 1000).toXMLFormat());
+        result.setModel(model.getBase());
+
+        log.info("[NsiDriver] found current matching modelId = {}", model.getIdx());
+        response.setModel(Optional.of(result));
+        return new AsyncResult<>(response);
+      }
+    } catch (IllegalArgumentException | DatatypeConfigurationException ex) {
+      log.error("[NsiDriver] ontology creation failed for networkId = {}.", networkId, ex);
+      response.setStatus(Response.Status.INTERNAL_SERVER_ERROR);
+      response.setError(Optional.of("Could not generate model for networkId = " + networkId));
+      return new AsyncResult<>(response);
+    }
+
+    log.info("[NsiDriver] no matching model entries returned for network = {}", networkId);
+    response.setStatus(Response.Status.NOT_FOUND);
+    response.setError(Optional.of("no current model exists"));
+    return new AsyncResult<>(response);
+  }
+
+  /**
+   * Get a the current MRML model.
+   *
+   * @param modelType Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
+   *
+   * @return A Future promise to return a ModelResponse containing the current MRML model.  The
+   *    returned collection may be empty if there is no current model.
+   */
+  @Override
+  @Async
+  public Future<ModelResponse> getCurrentModel(String modelType) {
+    return this.getCurrentModel(modelType, 0);
+  }
+
+  /**
+   * Apply a MRML model delta to a specific model resource.
+   *
+   * @param deltaRequest The request specifying the model delta.
+   *
+   * @param modelType Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
+   *
+   * @return A Future promise to return a DeltaResponse containing an accepted or failed delta.
+   */
+  @Override
+  @Async
+  public Future<DeltaResponse> propagateDelta(DeltaRequest deltaRequest, String modelType) {
+    DeltaResponse response = new DeltaResponse();
+
+    // A valid model type must be provided.
+    if (!ModelUtil.isSupported(modelType)) {
+      response.setStatus(Status.BAD_REQUEST);
+      response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
+      return new AsyncResult<>(response);
+    }
+
     log.info("[propagateDelta] processing deltaId = {}, modelId = {}",
             deltaRequest.getId(), deltaRequest.getModelId());
 
     // Make sure the referenced referencedModel has not expired.
     ModelService modelService = raController.getModelService();
-    Model referencedModel = modelService.get(deltaRequest.getModelId());
+    Model referencedModel = modelService.getByModelId(deltaRequest.getModelId());
     if (referencedModel == null) {
       log.error("[NsiDriver] specified model not found, modelId = {}.", deltaRequest.getModelId());
-      throw new NotFoundException("Specified model not found, modelId = " + deltaRequest.getModelId());
+      response.setStatus(Status.NOT_FOUND);
+      response.setError(Optional.of("Specified model not found, modelId = " + deltaRequest.getModelId()));
+      return new AsyncResult<>(response);
     }
 
-    // We need to apply the reduction and addition to the current referencedModel so we
-    // can getNewer the result of this delta for storage.
-    Collection<Model> currentModel = modelService.get(true, nsiProperties.getNetworkId());
-    if (currentModel == null || currentModel.isEmpty()) {
-      throw new InternalServerErrorException("Could not find current model");
+    // We need to apply the reduction and addition to the current referenced model.
+    Model currentModel = modelService.getCurrent(nsiProperties.getNetworkId());
+    if (currentModel == null) {
+      log.error("[NsiDriver] Could not find current model for networkId = {}", nsiProperties.getNetworkId());
+      response.setStatus(Status.INTERNAL_SERVER_ERROR);
+      response.setError(Optional.of("Could not find current model for networkId = " + nsiProperties.getNetworkId()));
+      return new AsyncResult<>(response);
     }
 
     try {
       // Get the referencedModel on which we apply the changes.
-      Model baseModel = currentModel.stream().findFirst().get();
-      org.apache.jena.rdf.model.Model rdfModel
-              = ModelUtil.unmarshalModel(baseModel.getBase());
+      org.apache.jena.rdf.model.Model rdfModel = ModelUtil.unmarshalModel(currentModel.getBase());
 
       // Apply the delta reduction.
       Optional<org.apache.jena.rdf.model.Model> reduction = Optional.empty();
@@ -219,9 +381,9 @@ public class NsiDriver implements Driver {
       delta.setAddition(deltaRequest.getAddition());
       delta.setReduction(deltaRequest.getReduction());
       delta.setResult(ModelUtil.marshalModel(rdfModel));
-      long id = deltaService.store(delta).getId();
+      long id = deltaService.store(delta).getIdx();
 
-      log.info("[NsiDriver] stored deltaId: {}", delta.getDeltaId());
+      log.info("[NsiDriver] stored deltaId = {}", delta.getDeltaId());
 
       // Now process the delta which may result in an asynchronous
       // modification to the delta.  Keep track of the connectionId
@@ -231,10 +393,14 @@ public class NsiDriver implements Driver {
         raController.getCsProvider().processDelta(
                 referencedModel, delta.getDeltaId(), reduction, addition);
       } catch (Exception ex) {
+        log.error("[NsiDriver] NSI CS processing of delta failed,  deltaId = {}", delta.getDeltaId());
         delta = deltaService.get(id);
         delta.setState(DeltaState.Failed);
         deltaService.store(delta);
-        throw ex;
+
+        response.setStatus(Status.INTERNAL_SERVER_ERROR);
+        response.setError(Optional.of(ex.getLocalizedMessage()));
+        return new AsyncResult<>(response);
       }
 
       // Read the delta again then update if needed.  The orchestrator should
@@ -252,30 +418,44 @@ public class NsiDriver implements Driver {
       deltaResponse.setId(delta.getDeltaId());
       deltaResponse.setState(delta.getState());
       deltaResponse.setLastModified(XmlUtilities.longToXMLGregorianCalendar(delta.getLastModified()).toXMLFormat());
-      deltaResponse.setModelId(baseModel.getModelId());
+      deltaResponse.setModelId(currentModel.getModelId());
       deltaResponse.setReduction(delta.getReduction());
       deltaResponse.setAddition(delta.getAddition());
       deltaResponse.setResult(delta.getResult());
 
-      return new AsyncResult<>(deltaResponse);
+      response.setStatus(Status.CREATED);
+      response.setDelta(Optional.of(deltaResponse));
+      return new AsyncResult<>(response);
     } catch (Exception ex) {
       log.error("[NsiDriver] propagateDelta failed for modelId = {}", deltaRequest.getModelId(), ex);
-      throw new ExecutionException(ex);
+      response.setStatus(Status.INTERNAL_SERVER_ERROR);
+      response.setError(Optional.of(ex.getLocalizedMessage()));
+      return new AsyncResult<>(response);
     }
   }
 
+  /**
+   * Commit the model delta referenced by id.
+   *
+   * @param id The delta id to commit.
+   *
+   * @return A Future promise to return a DeltaResponse containing the committed delta.
+   */
   @Override
   @Async
-  public Future<DeltaResource> commitDelta(String id) throws ExecutionException, NotFoundException, TimeoutException {
-
+  public Future<DeltaResponse> commitDelta(String id) {
     log.info("[NsiDriver] processing commitDelta for id = {}", id);
+
+    DeltaResponse response = new DeltaResponse();
 
     // Make sure the referenced delta has not expired.
     DeltaService deltaService = raController.getDeltaService();
     Delta delta = deltaService.get(id);
     if (delta == null) {
       log.info("[NsiDriver] requested delta not found, id = {}.", id);
-      throw new NotFoundException("Requested delta not found, id = " + id);
+      response.setStatus(Status.NOT_FOUND);
+      response.setError(Optional.of("Requested delta not found, id = " + id));
+      return new AsyncResult<>(response);
     }
 
     // Make sure we are in the correct state.
@@ -283,7 +463,10 @@ public class NsiDriver implements Driver {
     if (delta.getState().compareTo(DeltaState.Accepted) != 0) {
       log.info("[NsiDriver] requested delta not in Accepted state, id = {}, state = {}.",
               id, delta.getState().name());
-      return new AsyncResult<>(null);
+      response.setStatus(Status.CONFLICT);
+      response.setError(Optional.of("Requested delta not in Accepted state, id = " + id
+              + ", state = " + delta.getState().name()));
+      return new AsyncResult<>(response);
     }
 
     // Update our internal delta state.
@@ -316,102 +499,173 @@ public class NsiDriver implements Driver {
       deltaResponse.setReduction(delta.getReduction());
       deltaResponse.setAddition(delta.getAddition());
       deltaResponse.setResult(delta.getResult());
-
-      return new AsyncResult<>(deltaResponse);
-
+      response.setStatus(Status.NO_CONTENT);
+      response.setDelta(Optional.of(deltaResponse));
+      return new AsyncResult<>(response);
     } catch (ServiceException se) {
-      delta = deltaService.get(id);
-      delta.setState(DeltaState.Failed);
-      deltaService.store(delta);
       log.error("NSI CS failed {}", se.getFaultInfo());
-      throw new InternalServerErrorException("NSI CS failed, errorId = " + se.getFaultInfo().getErrorId() + "message = " + se.getFaultInfo().getText(), se);
-    } catch (TimeoutException te) {
       delta = deltaService.get(id);
       delta.setState(DeltaState.Failed);
       deltaService.store(delta);
-      log.error("NSI CS failed with timeout", te);
-      throw te;
-    } catch (DatatypeConfigurationException dc) {
+      response.setStatus(Status.INTERNAL_SERVER_ERROR);
+      response.setError(Optional.of("NSI CS failed, errorId = " + se.getFaultInfo().getErrorId() + "message = " + se.getFaultInfo().getText()));
+      return new AsyncResult<>(response);
+    } catch (IllegalArgumentException | TimeoutException | DatatypeConfigurationException | SOAPFaultException ex) {
+      log.error("NSI CS failed", ex);
       delta = deltaService.get(id);
       delta.setState(DeltaState.Failed);
       deltaService.store(delta);
-      throw new InternalServerErrorException("XML formatters failed", dc);
-    } catch (IllegalArgumentException ia) {
-      delta = deltaService.get(id);
-      delta.setState(DeltaState.Failed);
-      deltaService.store(delta);
-      throw new InternalServerErrorException("Illegal argument encountered", ia);
-    } catch (SOAPFaultException ex) {
-      delta = deltaService.get(id);
-      delta.setState(DeltaState.Failed);
-      deltaService.store(delta);
-      throw new InternalServerErrorException("Unexpected SOAPFault encountered", ex);
+      response.setStatus(Status.INTERNAL_SERVER_ERROR);
+      response.setError(Optional.of("NSI CS failed, message = " + ex.getLocalizedMessage()));
+      return new AsyncResult<>(response);
     }
   }
 
+  /**
+   * Get a specific delta resource identified by <b>id</b>.
+   *
+   * @param id The delta identifier to return.
+   *
+   * @param modelType Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
+   *
+   * @param ifModifiedSince Return model only if newer than this date, otherwise throw NotModifiedException.
+   *
+   * @return A Future promise to return a DeltaResponse matching id if one exists.
+   */
   @Override
   @Async
-  public Future<DeltaResource> getDelta(String id, long lastModified, String modelType) throws ExecutionException {
+  public Future<DeltaResponse> getDelta(String id, String modelType, long ifModifiedSince) {
     log.info("[NsiDriver] processing getDelta for id = {}", id);
+
+    DeltaResponse response = new DeltaResponse();
+
+    // A valid model type must be provided.
+    if (!ModelUtil.isSupported(modelType)) {
+      response.setStatus(Status.BAD_REQUEST);
+      response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
+      return new AsyncResult<>(response);
+    }
 
     // Make sure the referenced delta has not expired.
     DeltaService deltaService = raController.getDeltaService();
-    Delta delta = deltaService.get(id, lastModified);
+    Delta delta = deltaService.get(id);
     if (delta == null) {
-      log.info("[NsiDriver] requested delta not found, id = {}.", id);
-      throw new NotFoundException("Requested delta not found, id = " + id);
-    } else if (delta.getLastModified() < lastModified) {
-      log.info("[NsiDriver] requested delta not modified, id = {}, test = {} < {}.",
-              id, delta.getLastModified(), lastModified);
-      return new AsyncResult<>(null);
+      response.setStatus(Status.NOT_FOUND);
+      response.setError(Optional.of("Requested delta not found, id = " + id));
+      return new AsyncResult<>(response);
+    }
+
+    if (delta.getLastModified() <= ifModifiedSince) {
+      log.info("[NsiDriver] requested delta not modified, id = {}.", id);
+      response.setStatus(Status.NOT_MODIFIED);
+      return new AsyncResult<>(response);
     }
 
     try {
-      DeltaResource response = new DeltaResource();
-      response.setId(delta.getDeltaId());
-      response.setModelId(delta.getModelId());
-      response.setLastModified(XmlUtilities.longToXMLGregorianCalendar(delta.getLastModified()).toXMLFormat());
-      response.setState(delta.getState());
-      response.setResult(delta.getResult());
-      response.setReduction(delta.getReduction());
-      response.setAddition(delta.getAddition());
+      DeltaResource resource = new DeltaResource();
+      resource.setId(delta.getDeltaId());
+      resource.setModelId(delta.getModelId());
+      resource.setLastModified(XmlUtilities.longToXMLGregorianCalendar(delta.getLastModified()).toXMLFormat());
+      resource.setState(delta.getState());
+      resource.setResult(delta.getResult());
+      resource.setReduction(delta.getReduction());
+      resource.setAddition(delta.getAddition());
+      response.setDelta(Optional.of(resource));
       return new AsyncResult<>(response);
     } catch (DatatypeConfigurationException ex) {
       log.error("[NsiDriver] Failed to encode delta = {}.", delta.getDeltaId());
-      throw new ExecutionException(ex);
+      response.setStatus(Status.INTERNAL_SERVER_ERROR);
+      response.setError(Optional.of("Failed to encode delta id = " + delta.getDeltaId()));
+      return new AsyncResult<>(response);
     }
   }
 
+  /**
+   * Get a specific delta resource identified by <b>id</b>.
+   *
+   * @param id The identifier of the delta to return.
+   *
+   * @param modelType Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
+   *
+   * @return A Future promise to return a DeltaResponse matching id if one exists.
+   */
   @Override
   @Async
-  public Future<Collection<DeltaResource>> getDeltas(long lastModified, String modelType) throws ExecutionException {
-    log.info("[NsiDriver] processing getDeltas for lastModified = {}", lastModified);
+  public Future<DeltaResponse> getDelta(String id, String modelType) {
+    return this.getDelta(id, modelType, 0L);
+  }
+
+  /**
+   * Get a list of delta resources matching the specified query parameters.
+   *
+   * @param modelType Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
+   *
+   * @param ifModifiedSince
+   *
+   * @return A Future promise to return a DeltasResponse matching the specified criteria.
+   */
+  @Override
+  @Async
+  public Future<DeltasResponse> getDeltas(String modelType, long ifModifiedSince) {
+    log.info("[NsiDriver] processing getDeltas for lastModified = {}", ifModifiedSince);
+
+    DeltasResponse response = new DeltasResponse();
+
+    // A valid model type must be provided.
+    if (!ModelUtil.isSupported(modelType)) {
+      response.setStatus(Status.BAD_REQUEST);
+      response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
+      return new AsyncResult<>(response);
+    }
 
     Collection<DeltaResource> results = new ArrayList<>();
 
     // Make sure the referenced referencedModel has not expired.
     DeltaService deltaService = raController.getDeltaService();
-    Collection<Delta> deltas = deltaService.getNewer(lastModified);
+    Collection<Delta> deltas = deltaService.getNewer(ifModifiedSince);
     if (deltas == null || deltas.isEmpty()) {
-      log.info("getDeltas: no deltas new than {}", lastModified);
-    } else {
-      try {
-        for (Delta delta : deltas) {
-          DeltaResource response = new DeltaResource();
-          response.setId(delta.getDeltaId());
-          response.setModelId(delta.getModelId());
-          response.setLastModified(XmlUtilities.longToXMLGregorianCalendar(delta.getLastModified()).toXMLFormat());
-          response.setState(delta.getState());
-          response.setResult(delta.getResult());
-          response.setReduction(delta.getReduction());
-          response.setAddition(delta.getAddition());
-          results.add(response);
-        }
-      } catch (DatatypeConfigurationException ex) {
-        log.error("[NsiDriver] Failed to encode delta", ex);
-        throw new ExecutionException(ex);
+      if (deltaService.count() != 0) {
+        // We have deltas but none are newer than the specified date.
+        log.info("[NsiDriver] no deltas new than {}", ifModifiedSince);
+        response.setStatus(Status.NOT_MODIFIED);
+      } else {
+        log.info("[NsiDriver] no deltas in database.");
+        response.setDeltas(results);
       }
+
+      return new AsyncResult<>(response);
     }
-    return new AsyncResult<>(results);
+
+    try {
+      for (Delta delta : deltas) {
+        DeltaResource resource = new DeltaResource();
+        resource.setId(delta.getDeltaId());
+        resource.setModelId(delta.getModelId());
+        resource.setLastModified(XmlUtilities.longToXMLGregorianCalendar(delta.getLastModified()).toXMLFormat());
+        resource.setState(delta.getState());
+        resource.setResult(delta.getResult());
+        resource.setReduction(delta.getReduction());
+        resource.setAddition(delta.getAddition());
+        results.add(resource);
+      }
+    } catch (DatatypeConfigurationException ex) {
+      log.error("[NsiDriver] Failed to encode delta", ex);
+      throw new InternalServerErrorException("Failed to encode delta response");
+    }
+
+    response.setDeltas(results);
+    return new AsyncResult<>(response);
+  }
+
+  /**
+   * Get a list of delta resources.
+   *
+   * @param modelType Specifies the model encoding to use (i.e. turtle, ttl, json-ld, etc).
+   * @return
+   */
+  @Override
+  @Async
+  public Future<DeltasResponse> getDeltas(String modelType) {
+    return this.getDeltas(modelType, 0L);
   }
 }

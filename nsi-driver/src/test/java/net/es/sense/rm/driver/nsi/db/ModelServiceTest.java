@@ -42,39 +42,54 @@ public class ModelServiceTest {
     modelService.delete();
 
     for (Model model : input) {
-      log.info("[ModelServiceTest] Adding model id {} to database.", model.getId());
+      log.info("[ModelServiceTest] Adding model idx {} to database.", model.getIdx());
       modelService.create(model);
     }
   }
 
+  /**
+   * Add tests as more API are used by the nsi-driver.
+   * 
+   * @throws JAXBException
+   * @throws IOException
+   * @throws DatatypeConfigurationException
+   */
   @Test
   public void verify() throws JAXBException, IOException, DatatypeConfigurationException {
     // Set up test data.
     buildDatabase();
 
+    // Count the models.
+    Assert.assertEquals(3, modelService.countByTopologyId("urn:ogf:network:es.net:2013:"));
+
+    // Get a specific model.
+    Model model = modelService.getByModelId("eb9efcf8-4987-430e-a47e-b456dcd8f46c");
+    Assert.assertNotNull(model);
+    Assert.assertEquals(1506766513000L, model.getVersion());
+    Assert.assertEquals("urn:ogf:network:es.net:2013:", model.getTopologyId());
+    Assert.assertEquals("eb9efcf8-4987-430e-a47e-b456dcd8f46c", model.getModelId());
+
+    // Get current model.
+    model = modelService.getCurrent("urn:ogf:network:es.net:2013:");
+    Assert.assertNotNull(model);
+    Assert.assertEquals(1506852913000L, model.getVersion());
+    Assert.assertEquals("urn:ogf:network:es.net:2013:", model.getTopologyId());
+    Assert.assertEquals("dd58cadb-55e0-410c-891a-ddb2666e100b", model.getModelId());
+
+    // Get all the topologies.
     Collection<Model> models = modelService.get();
     Assert.assertEquals(3, models.size());
 
-    // Get current model.
-    models = modelService.get(true, "urn:ogf:network:es.net:2013:");
-    Assert.assertEquals(1, models.size());
-    Assert.assertTrue(models.stream().findFirst().isPresent());
-    models.stream().findFirst().ifPresent(m -> {
-      Assert.assertEquals(1506852913000L, m.getVersion());
-      Assert.assertEquals("urn:ogf:network:es.net:2013:", m.getTopologyId());
-      Assert.assertEquals("dd58cadb-55e0-410c-891a-ddb2666e100b", m.getModelId());
-    });
-
     // Test ifModifiedSince - should return no results.
-    models = modelService.get(1506852913000L, true, "urn:ogf:network:es.net:2013:");
+    models = modelService.getByTopologyId("urn:ogf:network:es.net:2013:", 1506852913000L);
     Assert.assertEquals(0, models.size());
 
     // Test ifModifiedSince - should return no results.
-    models = modelService.get(1506852913000L, false, "urn:ogf:network:es.net:2013:");
-    Assert.assertEquals(0, models.size());
+    models = modelService.getByTopologyId("urn:ogf:network:es.net:2013:", 1506680113001L);
+    Assert.assertEquals(2, models.size());
 
     // Test ifModifiedSince - should return 1 result.
-    models = modelService.get(1506766513000L, true, "urn:ogf:network:es.net:2013:");
+    models = modelService.getByTopologyId("urn:ogf:network:es.net:2013:", 1506766513000L);
     Assert.assertEquals(1, models.size());
   }
 }

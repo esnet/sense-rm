@@ -325,6 +325,11 @@ public class SwitchingSubnetModel {
 
     childPort.setNmlLabels(simpleStp);
 
+    if (stpParent.getAvailableCapacity().isPresent() && capacity.isPresent()) {
+      long available = stpParent.getAvailableCapacity().get() - capacity.get();
+      stpParent.setAvailableCapacity(Optional.of(available));
+    }
+
     // Add to the parent port.
     stpParent.getChildren().add(childPort.getId());
     nml.addPort(childPort);

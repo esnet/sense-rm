@@ -420,8 +420,10 @@ public class MrmlFactory {
               } else {
                 bwId = p.getId() + ":BandwidthService";
               }
+
               Resource bw = createResource(model, bwId, Mrs.BandwidthService);
               bi.addProperty(Nml.hasService, bw);
+              bw.addProperty(Nml.existsDuring, createLifetime(model, p.getStartTime(), p.getEndTime()));
               bw.addLiteral(Mrs.type, p.getType().name());
               bw.addLiteral(Mrs.unit, nml.getDefaultUnits());
               bw.addLiteral(Mrs.granularity, p.getGranularity().orElse(nml.getDefaultGranularity()));
@@ -431,9 +433,7 @@ public class MrmlFactory {
               p.getAvailableCapacity().ifPresent(c -> bw.addLiteral(Mrs.availableCapacity, c));
               p.getReservableCapacity().ifPresent(c -> bw.addLiteral(Mrs.reservableCapacity, c));
               p.getIndividualCapacity().ifPresent(c -> bw.addLiteral(Mrs.individualCapacity, c));
-
               bw.addProperty(Nml.belongsTo, bi);
-
               biPorts.put(p.getId(), bi);
             });
 

@@ -30,7 +30,8 @@ import javax.persistence.Table;
 import net.es.sense.rm.model.DeltaState;
 
 /**
- *
+ * A delta object for storage.
+ * 
  * @author hacksaw
  */
 @lombok.NoArgsConstructor
@@ -42,7 +43,7 @@ public class Delta implements Serializable {
 
   @Id
   @GeneratedValue
-  private long idx;
+  private long idx;                 // Internal database index.
 
   @Basic(optional = false)
   private String deltaId;           // The unique uuid identifying the delta within the RM.

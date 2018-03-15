@@ -12,7 +12,12 @@ import org.springframework.scheduling.annotation.Async;
  * @author hacksaw
  */
 public interface Driver {
+/**@Async
+  public Future<Void> start() throws Exception;
 
+  @Async
+  public Future<Void> stop() throws Exception;
+**/
   /**
    * Get a specific MRML model identified by <b>id</b>.
    *

@@ -393,8 +393,9 @@ public class MrmlFactory {
                 bi.addProperty(Mrs.tag, tag);
               });
 
-              model.add(model.createStatement(bi, Nml.existsDuring,
-                      createLifetime(model, p.getStartTime(), p.getEndTime())));
+              Resource lifetime = createLifetime(model, p.getStartTime(), p.getEndTime());
+
+              model.add(model.createStatement(bi, Nml.existsDuring, lifetime));
 
               // Make a label relationship.
               p.getLabels().stream().forEach(l -> {
@@ -423,7 +424,7 @@ public class MrmlFactory {
 
               Resource bw = createResource(model, bwId, Mrs.BandwidthService);
               bi.addProperty(Nml.hasService, bw);
-              bw.addProperty(Nml.existsDuring, createLifetime(model, p.getStartTime(), p.getEndTime()));
+              model.add(model.createStatement(bw, Nml.existsDuring, lifetime));
               bw.addLiteral(Mrs.type, p.getType().name());
               bw.addLiteral(Mrs.unit, nml.getDefaultUnits());
               bw.addLiteral(Mrs.granularity, p.getGranularity().orElse(nml.getDefaultGranularity()));

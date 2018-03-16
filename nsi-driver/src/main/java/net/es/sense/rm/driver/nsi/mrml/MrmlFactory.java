@@ -366,11 +366,9 @@ public class MrmlFactory {
 
     nml.getPorts(topologyId, Orientation.child).values().stream()
             .forEach(p -> {
-              log.info("[MrmlFactory] creating child port {}", p.getId());
-
               Resource parentPort = model.getResource(p.getParentPort().get());
 
-              log.info("[MrmlFactory] parentPort {}, resource {}", p.getParentPort().get(), parentPort);
+              log.info("[MrmlFactory] creating child port {}, parentPort {}, resource {}", p.getId(), p.getParentPort().get(), parentPort);
 
               Resource bi = createResource(model, p.getId(), Nml.BidirectionalPort);
               bi.addProperty(Nml.belongsTo, parentPort);
@@ -393,9 +391,8 @@ public class MrmlFactory {
                 bi.addProperty(Mrs.tag, tag);
               });
 
-              Resource lifetime = createLifetime(model, p.getStartTime(), p.getEndTime());
-
-              model.add(model.createStatement(bi, Nml.existsDuring, lifetime));
+              model.add(model.createStatement(bi, Nml.existsDuring,
+                      createLifetime(model, p.getStartTime(), p.getEndTime())));
 
               // Make a label relationship.
               p.getLabels().stream().forEach(l -> {
@@ -424,7 +421,8 @@ public class MrmlFactory {
 
               Resource bw = createResource(model, bwId, Mrs.BandwidthService);
               bi.addProperty(Nml.hasService, bw);
-              model.add(model.createStatement(bw, Nml.existsDuring, lifetime));
+              model.add(model.createStatement(bw, Nml.existsDuring,
+                      createLifetime(model, p.getStartTime(), p.getEndTime())));
               bw.addLiteral(Mrs.type, p.getType().name());
               bw.addLiteral(Mrs.unit, nml.getDefaultUnits());
               bw.addLiteral(Mrs.granularity, p.getGranularity().orElse(nml.getDefaultGranularity()));

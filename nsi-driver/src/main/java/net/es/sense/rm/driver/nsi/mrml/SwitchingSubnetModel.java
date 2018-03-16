@@ -265,6 +265,18 @@ public class SwitchingSubnetModel {
     }
   }
 
+  /**
+   * Create a child port under a the parent bidirectional port by using NSI connection information.
+   *
+   * @param topologyId
+   * @param connectionId
+   * @param stp
+   * @param connMap
+   * @param startTime
+   * @param endTime
+   * @param capacity
+   * @return
+   */
   private Optional<NmlPort> createChildPort(
           String topologyId,
           String connectionId,
@@ -325,25 +337,17 @@ public class SwitchingSubnetModel {
 
     childPort.setNmlLabels(simpleStp);
 
+    // Adjust the parent port avaialble capacity to remove this port.
+    // TODO: this is only temorary.  Adjustment for schedule handling will
+    // change this behavior.
     if (stpParent.getAvailableCapacity().isPresent() && capacity.isPresent()) {
-      log.info("[SwitchingSubnetModel] parent {}, child {}", simpleStp.getId(), childPortId);
-      log.info("[SwitchingSubnetModel] parent {}, child {}", stpParent.getAvailableCapacity().get(), capacity.get());
       long available = stpParent.getAvailableCapacity().get() - capacity.get();
-      log.info("[SwitchingSubnetModel] changing available from {} to {}", stpParent.getAvailableCapacity().get(), available);
       stpParent.setAvailableCapacity(Optional.of(available));
-
     }
 
     // Add to the parent port.
     stpParent.getChildren().add(childPort.getId());
     nml.addPort(childPort);
-
-    // Debug...
-    stpParent = nml.getPort(simpleStp.getId());
-    if (stpParent.getAvailableCapacity().isPresent()) {
-      log.info("[SwitchingSubnetModel] stored value {}", stpParent.getAvailableCapacity().get());
-    }
-
     return Optional.of(childPort);
   }
 

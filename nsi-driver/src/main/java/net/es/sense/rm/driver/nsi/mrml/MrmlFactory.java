@@ -390,9 +390,9 @@ public class MrmlFactory {
                 bi.addProperty(Mrs.tag, tag);
               });
 
-              // Special exists during handling: If we do not have an existsDuring resource
-              // with the same identfifier as ours, we will need to create a new one,
-              // otherewise, just reference the existing one.
+              // Special nml:existsDuring handling: If we do not have an existsDuring
+              // resource with the same identfifier as ours, we will need to create a new
+              // one, otherewise, just reference the existing one.
               final Resource existsDuring = createLifetime(model, p.getNmlExistsDuringId().get(),
                       p.getStartTime(), p.getEndTime());
               bi.addProperty(Nml.existsDuring, existsDuring);
@@ -486,6 +486,8 @@ public class MrmlFactory {
         switchingSubnet.getPorts().forEach(bi -> {
           ssr.addProperty(Nml.hasBidirectionalPort, model.getResource(bi.getId()));
         });
+
+        ssCollection.put(ssr.getURI(), ssr);
       }
     }
 
@@ -496,9 +498,10 @@ public class MrmlFactory {
 
     // If the lifetime resource already exists then return it (trust there
     // is not a conflicting id being used by a different resource type).
-    Resource existsDuring = model.getResource(id);
-    if (existsDuring != null) {
-      return existsDuring;
+    Resource lifeTime = model.getResource(id);
+    if (lifeTime != null) {
+      log.debug("[createLifetime] found Lifetime resource {}, {}", lifeTime.getURI(), lifeTime.getNameSpace());
+      return lifeTime;
     }
 
     final Resource res = createResource(model, id, Nml.Lifetime);
@@ -519,6 +522,8 @@ public class MrmlFactory {
         log.error("[MrmlFactory] failed to create endTime xmlGregorianCalendar, {}", ex);
       }
     });
+
+    log.debug("[createLifetime] created new Lifetime resource {}, {}", res.getURI(), res.getNameSpace());
 
     return res;
   }

@@ -1,6 +1,5 @@
 package net.es.sense.rm.driver.nsi.mrml;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,16 +139,6 @@ public class SwitchingSubnetModel {
         continue;
       }
 
-      // We will need to map any reservations made by SENSE back into the original  naming scheme.
-      Collection<ConnectionMap> get = connectionMapService.get();
-      log.info("connectionMapService contents:...");
-      for (ConnectionMap c : get) {
-        log.info("{}, {}, {}", c.getDescription(), c.getDeltaId(), c.getSwitchingSubnetId());
-        for (StpMapping m : c.getMap()) {
-          log.info(m.toString());
-        }
-      }
-
       // The GlobalReservationId hold the original SwitchingSubnet name, while
       // the description holds a unique identifier for the connection created by
       // us before the connectionId is assigned by the PA.
@@ -236,10 +225,16 @@ public class SwitchingSubnetModel {
           // If this is a SwtichingSubnet created by an MRML delta request
           // we will have a specific mapping name for this.
           String nssId;
+          String nssExistsDuringId = null;
           if (connMap.isPresent()) {
             nssId = connMap.get().getSwitchingSubnetId();
+            nssExistsDuringId = connMap.get().getExistsDuringId();
           } else {
             nssId = NmlSwitchingSubnet.id(reservation.getTopologyId(), ConnectionId.strip(reservation.getConnectionId()));
+          }
+
+          if (Strings.isNullOrEmpty(nssExistsDuringId)) {
+            nssExistsDuringId = NmlExistsDuring.id(nssId);
           }
 
           NmlSwitchingSubnet nss = new NmlSwitchingSubnet();
@@ -247,6 +242,7 @@ public class SwitchingSubnetModel {
           nss.getPorts().add(srcChildPort.get());
           nss.getPorts().add(dstChildPort.get());
           nss.setConnectionId(reservation.getConnectionId());
+          nss.setExistsDuringId(nssExistsDuringId);
           nss.setStartTime(startTime);
           nss.setEndTime(endTime);
           nss.setTopologyId(reservation.getTopologyId());
@@ -306,12 +302,18 @@ public class SwitchingSubnetModel {
     String childPortId;
     Optional<String> childPortBwId = Optional.empty();
     Optional<String> childPortLabelId = Optional.empty();
+    Optional<String> childPortExistsDuringId = Optional.empty();
     if (stpMapping.isPresent()) {
       childPortId = stpMapping.get().getMrsPortId();
       childPortBwId = Optional.ofNullable(stpMapping.get().getMrsBandwidthId());
       childPortLabelId = Optional.ofNullable(stpMapping.get().getMrsLabelId());
+      childPortExistsDuringId = Optional.ofNullable(stpMapping.get().getNmlExistsDuringId());
     } else {
       childPortId = simpleStp.getMrmlId() + ":cid+" + ConnectionId.strip(connectionId);
+    }
+
+    if (!childPortExistsDuringId.isPresent()) {
+      childPortExistsDuringId = Optional.of(NmlExistsDuring.id(childPortId));
     }
 
     NmlPort childPort = NmlPort.builder()
@@ -319,6 +321,7 @@ public class SwitchingSubnetModel {
             .topologyId(topologyId)
             .mrsBandwidthId(childPortBwId)
             .mrsLabelId(childPortLabelId)
+            .nmlExistsDuringId(childPortExistsDuringId)
             .name(Optional.of(connectionId))
             .orientation(Orientation.child)
             .parentPort(Optional.of(stpParent.getId()))
@@ -336,14 +339,6 @@ public class SwitchingSubnetModel {
             .build();
 
     childPort.setNmlLabels(simpleStp);
-
-    // Adjust the parent port avaialble capacity to remove this port.
-    // TODO: this is only temorary.  Adjustment for schedule handling will
-    // change this behavior.
-    if (stpParent.getAvailableCapacity().isPresent() && capacity.isPresent()) {
-      long available = stpParent.getAvailableCapacity().get() - capacity.get();
-      stpParent.setAvailableCapacity(Optional.of(available));
-    }
 
     // Add to the parent port.
     stpParent.getChildren().add(childPort.getId());

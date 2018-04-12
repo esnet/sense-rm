@@ -200,6 +200,15 @@ public class MrmlFactory {
     return res;
   }
 
+  /**
+   * Create the parent bidirectional ports and annotate with static attributes.
+   * Creation of the child ports representing the utilized VLANS and consumed
+   * bandwidth will occur later.
+   *
+   * @param model
+   * @return
+   * @throws IllegalArgumentException
+   */
   private Map<String, Resource> createBidirectionalPorts(OntModel model) throws IllegalArgumentException {
     Map<String, Resource> biPorts = new HashMap<>();
 
@@ -246,28 +255,10 @@ public class MrmlFactory {
               bw.addLiteral(Mrs.granularity, p.getGranularity().orElse(nml.getDefaultGranularity()));
               p.getMaximumCapacity().ifPresent(c -> bw.addLiteral(Mrs.maximumCapacity, c));
               bw.addLiteral(Mrs.minimumCapacity, p.getMinimumCapacity().orElse(1L));
-              p.getUsedCapacity().ifPresent(c -> bw.addLiteral(Mrs.usedCapacity, c));
-              p.getAvailableCapacity().ifPresent(c -> bw.addLiteral(Mrs.availableCapacity, c));
+              //p.getUsedCapacity().ifPresent(c -> bw.addLiteral(Mrs.usedCapacity, c));
+              //p.getAvailableCapacity().ifPresent(c -> bw.addLiteral(Mrs.availableCapacity, c));
               p.getReservableCapacity().ifPresent(c -> bw.addLiteral(Mrs.reservableCapacity, c));
               p.getIndividualCapacity().ifPresent(c -> bw.addLiteral(Mrs.individualCapacity, c));
-
-              /*if (p.getMaximumReservableCapacity().isPresent()) {
-                long c = p.getMaximumReservableCapacity().get();
-                // Calculate used capacity.
-                // availableCapacity = reservableCapacity - usedCapacity;
-                long usedCapacity = 0;
-                for (String child : p.getChildren()) {
-                  Optional<NmlPort> childPort = Optional.ofNullable(nml.getPort(child));
-                  if (childPort.isPresent() && childPort.get().getMaximumReservableCapacity().isPresent()) {
-                    usedCapacity =  usedCapacity + childPort.get().getMaximumReservableCapacity().get();
-                  }
-                  else {
-                    log.error("[MrmlFactory] Capacity missing on child port {}", child);
-                  }
-                }
-                bw.addLiteral(Mrs.usedCapacity, usedCapacity);
-                bw.addLiteral(Mrs.availableCapacity, c - usedCapacity);
-              }*/
               bw.addProperty(Nml.belongsTo, bi);
               biPorts.put(p.getId(), bi);
             });
@@ -359,6 +350,13 @@ public class MrmlFactory {
     return ssCollection;
   }
 
+  /**
+   * Create the children ports based off of the discovered NSI connections.
+   *
+   * @param model
+   * @return
+   * @throws IllegalArgumentException
+   */
   private Map<String, Resource> createBidirectionalPortsFromConnections(OntModel model) throws IllegalArgumentException {
     Map<String, Resource> biPorts = new HashMap<>();
 
@@ -368,7 +366,8 @@ public class MrmlFactory {
             .forEach(p -> {
               Resource parentPort = model.getResource(p.getParentPort().get());
 
-              log.info("[MrmlFactory] creating child port {}, parentPort {}, resource {}", p.getId(), p.getParentPort().get(), parentPort);
+              log.info("[MrmlFactory] creating child port {}, parentPort {}, resource {}",
+                      p.getId(), p.getParentPort().get(), parentPort);
 
               Resource bi = createResource(model, p.getId(), Nml.BidirectionalPort);
               bi.addProperty(Nml.belongsTo, parentPort);
@@ -391,8 +390,12 @@ public class MrmlFactory {
                 bi.addProperty(Mrs.tag, tag);
               });
 
-              model.add(model.createStatement(bi, Nml.existsDuring,
-                      createLifetime(model, p.getStartTime(), p.getEndTime())));
+              // Special exists during handling: If we do not have an existsDuring resource
+              // with the same identfifier as ours, we will need to create a new one,
+              // otherewise, just reference the existing one.
+              final Resource existsDuring = createLifetime(model, p.getNmlExistsDuringId().get(),
+                      p.getStartTime(), p.getEndTime());
+              bi.addProperty(Nml.existsDuring, existsDuring);
 
               // Make a label relationship.
               p.getLabels().stream().forEach(l -> {
@@ -405,6 +408,7 @@ public class MrmlFactory {
 
                 Resource label = createResource(model, labelId, Nml.Label);
                 Resource labelType = model.createResource(l.getLabeltype());
+                label.addProperty(Nml.existsDuring, existsDuring);
                 label.addProperty(Nml.labeltype, labelType);
                 label.addLiteral(Nml.value, l.getValue());
                 bi.addProperty(Nml.hasLabel, label);
@@ -421,8 +425,7 @@ public class MrmlFactory {
 
               Resource bw = createResource(model, bwId, Mrs.BandwidthService);
               bi.addProperty(Nml.hasService, bw);
-              model.add(model.createStatement(bw, Nml.existsDuring,
-                      createLifetime(model, p.getStartTime(), p.getEndTime())));
+              bw.addProperty(Nml.existsDuring, existsDuring);
               bw.addLiteral(Mrs.type, p.getType().name());
               bw.addLiteral(Mrs.unit, nml.getDefaultUnits());
               bw.addLiteral(Mrs.granularity, p.getGranularity().orElse(nml.getDefaultGranularity()));
@@ -475,8 +478,9 @@ public class MrmlFactory {
           ssr.addProperty(Nml.labeltype, encoding);
         }
 
-        model.add(model.createStatement(ssr, Nml.existsDuring,
-                createLifetime(model, switchingSubnet.getStartTime(), switchingSubnet.getEndTime())));
+        Resource existsDuring = createLifetime(model, switchingSubnet.getExistsDuringId(),
+                switchingSubnet.getStartTime(), switchingSubnet.getEndTime());
+        ssr.addProperty(Nml.existsDuring, existsDuring);
 
         // Add all the bidirectional port identifiers.
         switchingSubnet.getPorts().forEach(bi -> {
@@ -488,8 +492,16 @@ public class MrmlFactory {
     return ssCollection;
   }
 
-  private Resource createLifetime(OntModel model, Optional<Long> startTime, Optional<Long> endTime) {
-    Resource res = model.createResource(Nml.Lifetime);
+  private Resource createLifetime(OntModel model, String id, Optional<Long> startTime, Optional<Long> endTime) {
+
+    // If the lifetime resource already exists then return it (trust there
+    // is not a conflicting id being used by a different resource type).
+    Resource existsDuring = model.getResource(id);
+    if (existsDuring != null) {
+      return existsDuring;
+    }
+
+    final Resource res = createResource(model, id, Nml.Lifetime);
     startTime.ifPresent(s -> {
       try {
         XMLGregorianCalendar start = XmlUtilities.xmlGregorianCalendar(new Date(s));

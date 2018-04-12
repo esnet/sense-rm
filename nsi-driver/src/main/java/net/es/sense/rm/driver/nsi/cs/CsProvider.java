@@ -28,12 +28,10 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPFaultException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
-import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.cs.lib.Client;
 import net.es.nsi.cs.lib.ClientUtil;
 import net.es.nsi.cs.lib.Helper;
@@ -56,6 +54,7 @@ import net.es.sense.rm.driver.nsi.cs.db.StateType;
 import net.es.sense.rm.driver.nsi.cs.db.StpMapping;
 import net.es.sense.rm.driver.nsi.mrml.MrsBandwidthService;
 import net.es.sense.rm.driver.nsi.mrml.MrsUnits;
+import net.es.sense.rm.driver.nsi.mrml.NmlExistsDuring;
 import net.es.sense.rm.driver.nsi.mrml.NmlLabel;
 import net.es.sense.rm.driver.nsi.mrml.StpHolder;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
@@ -275,6 +274,7 @@ public class CsProvider {
     // addition model for all those provided.
     ResultSet ssSet = ModelUtil.getResourcesOfType(addition, Mrs.SwitchingSubnet);
 
+    // We will treat each mrs:SwitchingSubnet as an independent reservation in NSI.
     while (ssSet.hasNext()) {
       QuerySolution querySolution = ssSet.next();
 
@@ -282,9 +282,20 @@ public class CsProvider {
       Resource switchingSubnet = querySolution.get("resource").asResource();
       log.debug("SwitchingSubnet: " + switchingSubnet.getURI());
 
-      //Statement tag = switchingSubnet.getProperty(Mrs.tag);
-      //String description = tag.getString();
-      //log.debug("description: " + description);
+      // Get the existDruing lifetime object if it exists so we can model a schedule.
+      Optional<Statement> existsDuring = Optional.ofNullable(switchingSubnet.getProperty(Nml.existsDuring));
+      NmlExistsDuring ssExistsDuring;
+      if (existsDuring.isPresent()) {
+        // We have an existsDuring resource specifying the schedule time.
+        Resource existsDuringRef = existsDuring.get().getResource();
+        log.debug("existsDuringRef: " + existsDuringRef.getURI());
+
+        ssExistsDuring = new NmlExistsDuring(existsDuringRef);
+      } else {
+        // We need to create our own schedule using the defaults.
+        ssExistsDuring = new NmlExistsDuring(switchingSubnet.getURI() + ":existsDuring");
+      }
+
       // We need the associated parent SwitchingService resource to determine
       // the ServiceDefinition that holds the serviceType.
       Statement belongsTo = switchingSubnet.getProperty(Nml.belongsTo);
@@ -313,7 +324,6 @@ public class CsProvider {
       if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceTypeRef.getString().trim())) {
         // Find the ports that ate part of this SwitchSubnet and build NSI STP
         // identifiers for the service.
-
         StmtIterator listProperties = switchingSubnet.listProperties(Nml.hasBidirectionalPort);
         while (listProperties.hasNext()) {
           Statement hasBidirectionalPort = listProperties.next();
@@ -337,6 +347,18 @@ public class CsProvider {
           log.debug("maximumCapacity: {} {}", bws.getMaximumCapacity(), bws.getUnit());
           log.debug("maximumCapacity: {} mbps", MrsUnits.normalize(bws.getMaximumCapacity(), bws.getUnit(), MrsUnits.mbps));
 
+          // Now determine if there is an independent existsDuring object.
+          String childExistsDuringId = ssExistsDuring.getId();
+          existsDuring = Optional.ofNullable(biChild.getProperty(Nml.existsDuring));
+          if (existsDuring.isPresent()) {
+            Resource childExistsDuringRef = existsDuring.get().getResource();
+            log.debug("childExistsDuringRef: " + childExistsDuringRef.getURI());
+            if (!ssExistsDuring.getId().contentEquals(childExistsDuringRef.getURI())) {
+              // We have a different existsDuring reference than our SwitchingSubnet.
+              childExistsDuringId = childExistsDuringRef.getURI();
+            }
+          }
+
           // Now get the label for this port.
           Statement labelRef = biChild.getProperty(Nml.hasLabel);
           Resource label = ModelUtil.getResourceOfType(addition, labelRef.getResource(), Nml.Label);
@@ -350,7 +372,7 @@ public class CsProvider {
           SimpleStp stp = new SimpleStp(parentBi.getURI(), simpleLabel);
           log.debug("stpId: {}", stp.getStpId());
 
-          stps.add(new StpHolder(biChild.getURI(), stp, bws, label.getURI()));
+          stps.add(new StpHolder(biChild.getURI(), stp, bws, childExistsDuringId, label.getURI()));
         }
 
         // We need exactly two ports for our point-to-point connection.
@@ -374,11 +396,15 @@ public class CsProvider {
         p2ps.setSourceSTP(src.getStp().getStpId());
         p2ps.setDestSTP(dst.getStp().getStpId());
 
+        // Base the reservation off of the specified existsDuring criteria.
         ScheduleType sch = CS_FACTORY.createScheduleType();
-        //sch.setStartTime(CS_FACTORY.createScheduleTypeStartTime(XmlUtilities.xmlGregorianCalendar()));
-        XMLGregorianCalendar endTime = XmlUtilities.xmlGregorianCalendar();
-        endTime.setYear(endTime.getYear() + 1);
-        sch.setEndTime(CS_FACTORY.createScheduleTypeEndTime(endTime));
+        if (ssExistsDuring.getStart() != null) {
+          sch.setStartTime(CS_FACTORY.createScheduleTypeStartTime(ssExistsDuring.getStart()));
+        }
+
+        if (ssExistsDuring.getEnd() != null) {
+          sch.setEndTime(CS_FACTORY.createScheduleTypeEndTime(ssExistsDuring.getEnd()));
+        }
 
         ReservationRequestCriteriaType rrc = CS_FACTORY.createReservationRequestCriteriaType();
         rrc.setVersion(0);
@@ -396,12 +422,16 @@ public class CsProvider {
         cm.setDescription(r.getDescription());
         cm.setDeltaId(deltaId);
         cm.setSwitchingSubnetId(switchingSubnet.getURI());
+        cm.setExistsDuringId(ssExistsDuring.getId());
+
         StpMapping smSrc = new StpMapping(src.getStp().getStpId(), src.getMrsPortId(),
-                src.getmrsLabelId(), src.getBw().getId());
+                src.getMrsLabelId(), src.getBw().getId(), src.getNmlExistsDuringId());
         cm.getMap().add(smSrc);
+
         StpMapping smDst = new StpMapping(dst.getStp().getStpId(), dst.getMrsPortId(),
-                dst.getmrsLabelId(), dst.getBw().getId());
+                dst.getMrsLabelId(), dst.getBw().getId(), dst.getNmlExistsDuringId());
         cm.getMap().add(smDst);
+
         ConnectionMap stored = connectionMapService.store(cm);
 
         log.debug("[SwitchingSubnet] storing connectionMap = {}", stored);

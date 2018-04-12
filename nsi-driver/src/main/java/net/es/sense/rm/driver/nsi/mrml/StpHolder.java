@@ -10,12 +10,14 @@ public class StpHolder {
   private final String mrsPortId;
   private final SimpleStp stp;
   private final MrsBandwidthService bw;
+  private final String nmlExistsDuringId;
   private final String mrsLabelId;
 
-  public StpHolder(String mrsPortId, SimpleStp stp, MrsBandwidthService bw, String mrsLabelId) {
+  public StpHolder(String mrsPortId, SimpleStp stp, MrsBandwidthService bw, String nmlExistsDuringId, String mrsLabelId) {
     this.mrsPortId = mrsPortId;
     this.stp = stp;
     this.bw = bw;
+    this.nmlExistsDuringId = nmlExistsDuringId;
     this.mrsLabelId = mrsLabelId;
   }
 
@@ -32,7 +34,11 @@ public class StpHolder {
     return bw;
   }
 
-  public String getmrsLabelId() {
+  public String getNmlExistsDuringId() {
+    return nmlExistsDuringId;
+  }
+
+  public String getMrsLabelId() {
     return mrsLabelId;
   }
 }

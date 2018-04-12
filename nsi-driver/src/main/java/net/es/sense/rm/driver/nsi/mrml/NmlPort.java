@@ -51,16 +51,22 @@ public class NmlPort {
   // MRML id mapping information;
   @lombok.Builder.Default
   private Optional<String> mrsLabelId = Optional.empty();
+
   @lombok.Builder.Default
   private Optional<String> mrsBandwidthId = Optional.empty();
+
+  @lombok.Builder.Default
+  private Optional<String> nmlExistsDuringId = Optional.empty();
 
   @lombok.Builder.Default
   private Optional<String> tag = Optional.empty();
 
   @lombok.Builder.Default
   private Optional<String> encoding = Optional.empty();
+
   //@lombok.Builder.Default
   //private Optional<String> labelType = Optional.empty();
+
   @lombok.Builder.Default
   private Set<NmlLabelGroupType> labels = new LinkedHashSet<>();
 
@@ -106,7 +112,7 @@ public class NmlPort {
   @lombok.Builder.Default
   private Optional<Long> granularity = Optional.empty(); //granularity
 
-  // maximumCapacity - total port capacity (a guaranteed reservation could bust up to this capacity).
+  // maximumCapacity - total port capacity (a guaranteed reservation could burst up to this capacity).
   @lombok.Builder.Default
   private Optional<Long> maximumCapacity = Optional.empty(); // capacity
 

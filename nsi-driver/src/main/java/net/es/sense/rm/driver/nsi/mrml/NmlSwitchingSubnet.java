@@ -34,16 +34,12 @@ public class NmlSwitchingSubnet {
   private String topologyId;
   private String connectionId;
   private long discovered;
-
-  private List<NmlPort> ports = new ArrayList<>();
-
+  private String existsDuringId;
   private Optional<Long> startTime = Optional.empty();
-
   private Optional<Long> endTime = Optional.empty();
-
   private String tag;
-
   private NmlSwitchingServiceType switchingService;
+  private List<NmlPort> ports = new ArrayList<>();
 
   public static String id(String topology, String localId) {
     return topology + ":switchingSubnet+" + localId;

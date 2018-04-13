@@ -65,6 +65,8 @@ public class MrmlFactory {
   }
 
   public String getModelAsString(String modelType) {
+    log.debug("[MrmlFactory] getModelAsString for modelType {}", modelType);
+
     Lang encoding;
     switch (modelType.toLowerCase()) {
       case "jasonld":
@@ -82,6 +84,8 @@ public class MrmlFactory {
   }
 
   public String getModelAsString(Lang encoding) {
+    log.debug("[MrmlFactory] getModelAsString for encoding {}", encoding);
+
     StringWriter sw = new StringWriter();
     RDFDataMgr.write(sw, getOntologyModel().getBaseModel(), encoding);
     return sw.toString();
@@ -500,7 +504,7 @@ public class MrmlFactory {
 
   private Resource createLifetime(OntModel model, String id, Optional<Long> startTime, Optional<Long> endTime) {
     log.debug("[createLifetime] entering");
-    
+
     // If the lifetime resource already exists then return it (trust there
     // is not a conflicting id being used by a different resource type).
     Resource lifeTime = model.getResource(id);

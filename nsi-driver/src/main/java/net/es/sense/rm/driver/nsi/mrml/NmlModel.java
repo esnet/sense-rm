@@ -72,7 +72,7 @@ public class NmlModel {
      // Resolve all ports across all networks for later access.
     Collection<NmlTopologyType> topologies = documentReader.getNmlTopologyAll();
     for (NmlTopologyType nml : topologies) {
-      log.info("[NmlModel] processing NML model {}", nml.getId());
+      log.debug("[NmlModel] processing NML model {}", nml.getId());
       ports.putAll(getNmlPorts(nml));
     }
 
@@ -415,7 +415,7 @@ public class NmlModel {
 
     if (inLabels == null && outLabels == null) {
       // No labels is a valid case.
-      log.info("[MrmlFactory] Bidirectional port {} has no labels for members {} and {} ", port.getId(), inbound.getId(), outbound.getId());
+      log.debug("[MrmlFactory] Bidirectional port {} has no labels for members {} and {} ", port.getId(), inbound.getId(), outbound.getId());
     } else if (inLabels != null && outLabels != null) {
       // Determine if the labels defined in the member unidirectional ports match.
       boolean consistent = true;
@@ -628,23 +628,22 @@ public class NmlModel {
   public Map<String, NmlSwitchingServiceType> getSwitchingServicesIndexed(String topologyId) throws IllegalArgumentException {
     NmlTopologyType topology = getTopology(topologyId)
             .orElseThrow(new IllegalArgumentExceptionSupplier(
-                    "[getServiceDefinition] Could not find NML document for networkId = " + topologyId));
+                    "[getSwitchingServicesIndexed] Could not find NML document for networkId = " + topologyId));
 
-    log.info("[getSwitchingServicesIndexed] entering.");
-
+    log.debug("[getSwitchingServicesIndexed] entering.");
 
     Map<String, NmlSwitchingServiceType> newSwitchingServices = new HashMap<>();
 
     // The SwitchingService is modelled as a "hasService" relation.
     for (NmlTopologyRelationType relation : topology.getRelation()) {
-      log.info("[getSwitchingServicesIndexed] relation = {}", relation.getType());
+      log.debug("[getSwitchingServicesIndexed] relation = {}", relation.getType());
       if (relation.getType().equalsIgnoreCase(Relationships.HAS_SERVICE)) {
         for (NmlNetworkObject service : relation.getService()) {
           // We want the SwitchingService.
-          log.info("SwitchingService instance {}", service.getClass().getCanonicalName());
+          log.debug("[getSwitchingServicesIndexed] SwitchingService instance {}", service.getClass().getCanonicalName());
           if (service instanceof NmlSwitchingServiceType) {
             NmlSwitchingServiceType s = (NmlSwitchingServiceType) service;
-            log.info("found SwitchingService {}", service.getId());
+            log.debug("found SwitchingService {}", service.getId());
             newSwitchingServices.put(s.getId(), s);
           }
         }
@@ -655,18 +654,18 @@ public class NmlModel {
     // defined, and if not, create the default one with all ports and
     // labelSwapping set to false.
     if (newSwitchingServices.isEmpty()) {
-      log.info("No SwitchingService found so creating a default, topologyId = {}", topologyId);
+      log.debug("No SwitchingService found so creating a default, topologyId = {}", topologyId);
       NmlSwitchingServiceType switchingService = newNmlSwitchingService(topologyId);
       newSwitchingServices.put(switchingService.getId(), switchingService);
 
     } else {
-      log.info("SwitchingService found but no port members so adding matching, topologyId = {}", topologyId);
+      log.debug("SwitchingService found but no port members so adding matching, topologyId = {}", topologyId);
       // NML Default Behavior #2: If we have a SwitchingService with no port
       // members then we must add all ports of matching label and encoding
       // type.  We use a boolean here to tell us if the SwitchingService
       // held a port.
       for (NmlSwitchingServiceType switchingService : newSwitchingServices.values()) {
-        log.info("Adding ports to SwitchingService = {}", switchingService.getId());
+        log.debug("Adding ports to SwitchingService = {}", switchingService.getId());
         boolean foundPort = false;
         for (NmlSwitchingServiceRelationType relation : switchingService.getRelation()) {
           if (Relationships.HAS_INBOUND_PORT.equalsIgnoreCase(relation.getType())) {
@@ -679,7 +678,7 @@ public class NmlModel {
         }
 
         if (!foundPort) {
-          log.info("[getSwitchingServicesIndexed] no ports defined so populating wildcard.");
+          log.debug("[getSwitchingServicesIndexed] no ports defined so populating wildcard.");
           // Treat this as a wildcard SwitchingService buy adding all
           // unidirectional ports with maching attributes.
           populateWildcardSwitchingService(switchingService, topologyId);
@@ -697,7 +696,7 @@ public class NmlModel {
     Optional<String> encoding = Optional.ofNullable(switchingService.getEncoding());
     Optional<String> labelType = Optional.ofNullable(switchingService.getLabelType());
 
-    log.info("Found empty SwitchingService id= {} so populating based on wildcard rules, encoding = {}, labelType = {}.",
+    log.debug("Found empty SwitchingService id= {} so populating based on wildcard rules, encoding = {}, labelType = {}.",
             switchingService.getId(), encoding, labelType);
 
     // Add the unidirectional port references.

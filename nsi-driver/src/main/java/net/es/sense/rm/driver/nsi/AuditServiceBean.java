@@ -62,27 +62,34 @@ public class AuditServiceBean implements AuditService {
     log.info("[AuditService] starting audit.");
 
     // Get the new document context.
+    log.debug("[AuditService] generating NML topology model.");
     NmlModel nml = new NmlModel(documentReader);
 
     String topologyId = nsiProperties.getNetworkId();
 
     //nml.getTopologyIds().forEach((topologyId) -> {
-      log.info("[AuditService] processing topologyId = {}", topologyId);
+      log.debug("[AuditService] processing topologyId = {}", topologyId);
 
+      log.debug("[AuditService] generating SwitchingSubnet model.");
       SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, connectionMapService, nml, topologyId);
+
+      log.debug("[AuditService] generating MRML model.");
       MrmlFactory mrml = new MrmlFactory(nml, ssm, topologyId);
 
-      // Check to see if this is a new version.
-      if (modelService.isPresent(topologyId, mrml.getVersion())) {
-        log.info("[AuditService] found matching model topologyId = {}, version = {}.", topologyId, mrml.getVersion());
+    // Check to see if this is a new version.
+      long version = mrml.getVersion();
+      if (modelService.isPresent(topologyId, version)) {
+        log.info("[AuditService] found matching model topologyId = {}, version = {}.", topologyId, version);
       } else {
-        log.info("[AuditService] adding new topology version, topologyId = {}, version = {}", topologyId, mrml.getVersion());
+        log.info("[AuditService] adding new topology version, topologyId = {}, version = {}", topologyId, version);
+        String modelAsString = mrml.getModelAsString(Lang.TURTLE);
+
         UUID uuid = UUID.randomUUID();
         Model model = new Model();
         model.setTopologyId(topologyId);
         model.setModelId(uuid.toString());
         model.setVersion(mrml.getVersion());
-        model.setBase(mrml.getModelAsString(Lang.TURTLE));
+        model.setBase(modelAsString);
         modelService.create(model);
       }
     //});

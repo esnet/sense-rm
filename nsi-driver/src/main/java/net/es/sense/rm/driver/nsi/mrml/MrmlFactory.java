@@ -11,6 +11,7 @@ import java.util.Optional;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
+import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.jaxb.nml.NmlLocationType;
 import net.es.nsi.dds.lib.jaxb.nml.NmlLocationType.NmlAddress;
@@ -29,21 +30,18 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author hacksaw
  */
+@Slf4j
 public class MrmlFactory {
 
   private final NmlModel nml;
   private final SwitchingSubnetModel ssm;
   private final String topologyId;
   private final NmlTopologyType topology;
-
-  private final Logger log = LoggerFactory.getLogger(MrmlFactory.class);
 
   public MrmlFactory(NmlModel nml, SwitchingSubnetModel ssm, String topologyId) throws IllegalArgumentException {
     log.debug("[MrmlFactory] creating topologyId = {}", topologyId);
@@ -86,8 +84,10 @@ public class MrmlFactory {
   public String getModelAsString(Lang encoding) {
     log.debug("[MrmlFactory] getModelAsString for encoding {}", encoding);
 
+    OntModel baseModel = getOntologyModel();
+
     StringWriter sw = new StringWriter();
-    RDFDataMgr.write(sw, getOntologyModel().getBaseModel(), encoding);
+    RDFDataMgr.write(sw, baseModel.getBaseModel(), encoding);
     return sw.toString();
   }
 
@@ -98,7 +98,7 @@ public class MrmlFactory {
    */
   public OntModel getOntologyModel() {
 
-    log.info("[getOntologyModel] topologyId = {}", topologyId);
+    log.debug("[MrmlFactory] getOntologyModel for topologyId = {}", topologyId);
 
     // Create the empty model in which to place the content.
     OntModel model = createEmptyModel();
@@ -368,13 +368,13 @@ public class MrmlFactory {
   private Map<String, Resource> createBidirectionalPortsFromConnections(OntModel model) throws IllegalArgumentException {
     Map<String, Resource> biPorts = new HashMap<>();
 
-    log.info("[MrmlFactory] createBidirectionalPortsFromConnections for topologyId {}", topologyId);
+    log.debug("[MrmlFactory] createBidirectionalPortsFromConnections for topologyId {}", topologyId);
 
     nml.getPorts(topologyId, Orientation.child).values().stream()
             .forEach(p -> {
               Resource parentPort = model.getResource(p.getParentPort().get());
 
-              log.info("[MrmlFactory] creating child port {}, parentPort {}, resource {}",
+              log.debug("[MrmlFactory] creating child port {}, parentPort {}, resource {}",
                       p.getId(), p.getParentPort().get(), parentPort);
 
               Resource bi = createResource(model, p.getId(), Nml.BidirectionalPort);
@@ -507,11 +507,11 @@ public class MrmlFactory {
 
     // If the lifetime resource already exists then return it (trust there
     // is not a conflicting id being used by a different resource type).
-    Resource lifeTime = model.getResource(id);
+    /**Resource lifeTime = model.getResource(id);
     if (lifeTime != null) {
-      log.debug("[createLifetime] found Lifetime resource {}, {}", lifeTime.getURI(), lifeTime.getNameSpace());
+      log.debug("[createLifetime] found Lifetime resource {}, {}", lifeTime.getURI());
       return lifeTime;
-    }
+    }**/
 
     final Resource res = createResource(model, id, Nml.Lifetime);
     startTime.ifPresent(s -> {
@@ -532,7 +532,7 @@ public class MrmlFactory {
       }
     });
 
-    log.debug("[createLifetime] created new Lifetime resource {}, {}", res.getURI(), res.getNameSpace());
+    log.debug("[createLifetime] created new Lifetime resource {}", res.getURI());
 
     return res;
   }

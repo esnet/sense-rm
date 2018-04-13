@@ -18,7 +18,7 @@ logging:
     org.springframework: INFO
     org.springframework.data: INFO
     net.es.sense.rm: DEBUG
-  file: "sense-rm.log"
+  file: "var/log/sense-n-rm.log"
 
 # Configuration for database.
 spring:

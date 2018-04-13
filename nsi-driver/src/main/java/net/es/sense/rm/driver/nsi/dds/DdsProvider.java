@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
@@ -108,10 +109,15 @@ public class DdsProvider implements DdsProviderI {
 
   public void load() {
     final DdsClient client = ddsClientProvider.get();
-    nsiProperties.getPeers().forEach((url) -> {
+    for (String url : nsiProperties.getPeers()) {
       log.debug("[load] registering url={}", url);
-      DocumentsResult documents = client.getDocuments(url);
-      documents.getDocuments().stream().filter(d -> d != null).forEach(d -> {
+      DocumentsResult results = client.getDocuments(url);
+      if (results.getStatus() != Status.OK) {
+        log.error("[DdsProvider] could not not load documents from peer = {}, status = {}", url, results.getStatus());
+        continue;
+      }
+
+      results.getDocuments().stream().filter(d -> d != null).forEach(d -> {
         String documentId = Document.documentId(d);
 
         Document entry = documentService.get(documentId);
@@ -131,8 +137,7 @@ public class DdsProvider implements DdsProviderI {
           }
         }
       });
-    });
-
+    }
   }
 
   @Override

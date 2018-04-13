@@ -1,6 +1,7 @@
 package net.es.sense.rm.driver.nsi.properties;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -37,7 +38,7 @@ public class NsiProperties {
   private int ddsPoolSize = 4;
 
   // The DDS servers we will connect to for discovery information.
-  private List<String> peers;
+  private List<String> peers = new ArrayList<>();
 
   // How often (in seconds) do we audit the NSI connection on our associated NSA?
   private int connectionAuditTimer = 100;

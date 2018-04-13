@@ -3,8 +3,8 @@
 export USER=sense
 export GROUP=sense
 export HOME=.
-export TRUSTSTORE=./config/truststore.nsi-aggr-west.jks
-export KEYSTORE=./config/keystore.nsi-aggr-west.jks
+export TRUSTSTORE=./config/truststore.jks
+export KEYSTORE=./config/keystore.jks
 export PASSWORD="changeit"
 
 /usr/bin/java \

@@ -11,7 +11,6 @@ import java.util.Optional;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
-import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.jaxb.nml.NmlLocationType;
 import net.es.nsi.dds.lib.jaxb.nml.NmlLocationType.NmlAddress;
@@ -30,12 +29,13 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author hacksaw
  */
-@Slf4j
 public class MrmlFactory {
 
   private final NmlModel nml;
@@ -43,7 +43,11 @@ public class MrmlFactory {
   private final String topologyId;
   private final NmlTopologyType topology;
 
+  private final Logger log = LoggerFactory.getLogger(MrmlFactory.class);
+
   public MrmlFactory(NmlModel nml, SwitchingSubnetModel ssm, String topologyId) throws IllegalArgumentException {
+    log.debug("[MrmlFactory] creating topologyId = {}", topologyId);
+
     this.nml = nml;
     this.ssm = ssm;
     this.topologyId = topologyId;
@@ -495,7 +499,8 @@ public class MrmlFactory {
   }
 
   private Resource createLifetime(OntModel model, String id, Optional<Long> startTime, Optional<Long> endTime) {
-
+    log.debug("[createLifetime] entering");
+    
     // If the lifetime resource already exists then return it (trust there
     // is not a conflicting id being used by a different resource type).
     Resource lifeTime = model.getResource(id);

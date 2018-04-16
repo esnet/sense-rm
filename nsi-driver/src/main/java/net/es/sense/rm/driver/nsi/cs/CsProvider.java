@@ -338,10 +338,7 @@ public class CsProvider {
 
           log.debug("biChild: " + biChild.getURI());
 
-          // Get the MrsBandwidthService assocated with this BidirectionalPort.
-          Statement bwServiceRef = biChild.getProperty(Nml.hasService);
-          Resource bwService = ModelUtil.getResourceOfType(addition, bwServiceRef.getResource(), Mrs.BandwidthService);
-          MrsBandwidthService bws = new MrsBandwidthService(bwService);
+          MrsBandwidthService bws = new MrsBandwidthService(biChild, addition);
 
           log.debug("BandwidthService: {}", bws.getId());
           log.debug("maximumCapacity: {} {}", bws.getMaximumCapacity(), bws.getUnit());

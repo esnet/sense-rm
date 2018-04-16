@@ -393,13 +393,13 @@ public class NsiDriver implements Driver {
         raController.getCsProvider().processDelta(
                 referencedModel, delta.getDeltaId(), reduction, addition);
       } catch (Exception ex) {
-        log.error("[NsiDriver] NSI CS processing of delta failed,  deltaId = {}", delta.getDeltaId());
+        log.error("[NsiDriver] NSI CS processing of delta failed,  deltaId = {}", delta.getDeltaId(), ex);
         delta = deltaService.get(id);
         delta.setState(DeltaState.Failed);
         deltaService.store(delta);
 
         response.setStatus(Status.INTERNAL_SERVER_ERROR);
-        response.setError(Optional.of(ex.getLocalizedMessage()));
+        response.setError(Optional.ofNullable(ex.getMessage()));
         return new AsyncResult<>(response);
       }
 
@@ -429,7 +429,7 @@ public class NsiDriver implements Driver {
     } catch (Exception ex) {
       log.error("[NsiDriver] propagateDelta failed for modelId = {}", deltaRequest.getModelId(), ex);
       response.setStatus(Status.INTERNAL_SERVER_ERROR);
-      response.setError(Optional.of(ex.getLocalizedMessage()));
+      response.setError(Optional.of(ex.getMessage()));
       return new AsyncResult<>(response);
     }
   }
@@ -516,7 +516,7 @@ public class NsiDriver implements Driver {
       delta.setState(DeltaState.Failed);
       deltaService.store(delta);
       response.setStatus(Status.INTERNAL_SERVER_ERROR);
-      response.setError(Optional.of("NSI CS failed, message = " + ex.getLocalizedMessage()));
+      response.setError(Optional.of("NSI CS failed, message = " + ex.getMessage()));
       return new AsyncResult<>(response);
     }
   }

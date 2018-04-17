@@ -39,6 +39,7 @@ import net.es.sense.rm.driver.api.DeltasResponse;
 import net.es.sense.rm.driver.api.Driver;
 import net.es.sense.rm.driver.api.ModelResponse;
 import net.es.sense.rm.driver.api.ModelsResponse;
+import net.es.sense.rm.driver.api.ResourceResponse;
 import net.es.sense.rm.driver.api.mrml.ModelUtil;
 import net.es.sense.rm.driver.nsi.db.Delta;
 import net.es.sense.rm.driver.nsi.db.DeltaService;
@@ -390,15 +391,14 @@ public class NsiDriver implements Driver {
       // so that we can commit connections associated with this
       // delta.
       try {
-        raController.getCsProvider().processDelta(
-                referencedModel, delta.getDeltaId(), reduction, addition);
+        raController.getCsProvider().processDelta(referencedModel, delta.getDeltaId(), reduction, addition);
       } catch (Exception ex) {
         log.error("[NsiDriver] NSI CS processing of delta failed,  deltaId = {}", delta.getDeltaId(), ex);
         delta = deltaService.get(id);
         delta.setState(DeltaState.Failed);
         deltaService.store(delta);
 
-        response.setStatus(Status.INTERNAL_SERVER_ERROR);
+        response.setStatus(ResourceResponse.exceptionToStatus(ex));
         response.setError(Optional.ofNullable(ex.getMessage()));
         return new AsyncResult<>(response);
       }
@@ -428,7 +428,7 @@ public class NsiDriver implements Driver {
       return new AsyncResult<>(response);
     } catch (Exception ex) {
       log.error("[NsiDriver] propagateDelta failed for modelId = {}", deltaRequest.getModelId(), ex);
-      response.setStatus(Status.INTERNAL_SERVER_ERROR);
+      response.setStatus(ResourceResponse.exceptionToStatus(ex));
       response.setError(Optional.of(ex.getMessage()));
       return new AsyncResult<>(response);
     }
@@ -515,7 +515,7 @@ public class NsiDriver implements Driver {
       delta = deltaService.get(id);
       delta.setState(DeltaState.Failed);
       deltaService.store(delta);
-      response.setStatus(Status.INTERNAL_SERVER_ERROR);
+      response.setStatus(ResourceResponse.exceptionToStatus(ex));
       response.setError(Optional.of("NSI CS failed, message = " + ex.getMessage()));
       return new AsyncResult<>(response);
     }

@@ -53,6 +53,7 @@ import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.cs.db.StateType;
 import net.es.sense.rm.driver.nsi.cs.db.StpMapping;
 import net.es.sense.rm.driver.nsi.mrml.MrsBandwidthService;
+import net.es.sense.rm.driver.nsi.mrml.MrsBandwidthType;
 import net.es.sense.rm.driver.nsi.mrml.MrsUnits;
 import net.es.sense.rm.driver.nsi.mrml.NmlExistsDuring;
 import net.es.sense.rm.driver.nsi.mrml.NmlLabel;
@@ -341,8 +342,20 @@ public class CsProvider {
           MrsBandwidthService bws = new MrsBandwidthService(biChild, addition);
 
           log.debug("BandwidthService: {}", bws.getId());
+          log.debug("type: {}", bws.getBandwidthType());
           log.debug("maximumCapacity: {} {}", bws.getMaximumCapacity(), bws.getUnit());
-          log.debug("maximumCapacity: {} mbps", MrsUnits.normalize(bws.getMaximumCapacity(), bws.getUnit(), MrsUnits.mbps));
+          log.debug("maximumCapacity: {} mbps", MrsUnits.normalize(bws.getMaximumCapacity(),
+                  bws.getUnit(), MrsUnits.mbps));
+
+          // The "guaranteedCapped" BandwidthService maps to the NSI_SERVICETYPE_EVTS service so
+          // we need to verify this is a valid request.
+          if (MrsBandwidthType.guaranteedCapped != bws.getBandwidthType()) {
+            String error = "Requested BandwidthService type = " + bws.getBandwidthType() +
+                    " not supported by SwitchingService = " + switchingService.getURI() +
+                    " on portId = " + biRef.getURI();
+            log.error("[CsProvider] {}.", error);
+            throw new IllegalArgumentException(error);
+          }
 
           // Now determine if there is an independent existsDuring object.
           String childExistsDuringId = ssExistsDuring.getId();
@@ -446,6 +459,7 @@ public class CsProvider {
 
         // Add this to the operation map to track progress.
         Operation op = new Operation();
+        op.setOperation(OperationType.reserve);
         op.setState(StateType.reserving);
         op.setCorrelationId(requestHeader.getCorrelationId());
         operationMap.store(op);
@@ -460,19 +474,25 @@ public class CsProvider {
           // Update the operation map with the new cid.
           commits.add(response.getConnectionId());
 
-          log.debug("[processDelta] issued reserve operation correlationId = {}, connectionId = {}",
+          log.debug("[csProvider] issued reserve operation correlationId = {}, connectionId = {}",
                   op.getCorrelationId(), response.getConnectionId());
         } catch (ServiceException ex) {
           //TODO: Consider whether we should unwrap any NSI reservations that were successful.
           // For now just delete the correlationId we added.
           operationMap.delete(correlationIds);
-
-          log.error("Failed to send NSI CS reserve message, correlationId = {}, errorId = {}, text = {}",
+          log.error("[csProvider] Failed to send NSI CS reserve message, correlationId = {}, errorId = {}, text = {}",
                   requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+          throw ex;
+        } catch (SOAPFaultException ex) {
+          //TODO: Consider whether we should unwrap any NSI reservations that were successful.
+          // For now just delete the correlationId we added.
+          operationMap.delete(correlationIds);
+          log.error("[csProvider] Failed to send NSI CS reserve message, correlationId = {}, SOAP Fault = {}",
+                  requestHeader.getCorrelationId(), ex.getFault().toString());
           throw ex;
         }
       } else {
-        log.error("serviceType not supported {}", serviceTypeRef.getString());
+        log.error("[csProvider] serviceType not supported {}", serviceTypeRef.getString());
         throw new IllegalArgumentException("serviceType not supported " + serviceTypeRef.getString());
       }
     }
@@ -535,6 +555,7 @@ public class CsProvider {
 
       // Add this to the operation map to track progress.
       Operation op = new Operation();
+      op.setOperation(OperationType.terminate);
       op.setState(StateType.terminating);
       op.setCorrelationId(requestHeader.getCorrelationId());
       operationMap.store(op);
@@ -544,14 +565,23 @@ public class CsProvider {
       try {
         ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
         nsiClient.getProxy().terminate(terminate, header);
-        log.debug("[processDelta] issued terminate operation correlationId = {}, connectionId = {}",
+        log.debug("[csProvider] issued terminate operation correlationId = {}, connectionId = {}",
                 op.getCorrelationId(), terminate.getConnectionId());
       } catch (ServiceException ex) {
         // Continue on this error but clean up this correlationId.
         operationMap.delete(requestHeader.getCorrelationId());
-
-        log.error("Failed to send NSI CS terminate message, correlationId = {}, errorId = {}, text = {}",
+        log.error("[csProvider] Failed to send NSI CS terminate message, correlationId = {}, errorId = {}, text = {}",
                 requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+      } catch (SOAPFaultException ex) {
+        // Continue on this error but clean up this correlationId.
+        operationMap.delete(requestHeader.getCorrelationId());
+        log.error("[csProvider] Failed to send NSI CS terminate message, correlationId = {}, SOAP Fault = {}",
+                requestHeader.getCorrelationId(), ex.getFault().toString());
+      } catch (Exception ex) {
+        operationMap.delete(requestHeader.getCorrelationId());
+        log.error("[csProvider] Failed to send NSI CS terminate message, correlationId = {}",
+                requestHeader.getCorrelationId(), ex);
+        throw ex;
       }
     }
 
@@ -580,6 +610,7 @@ public class CsProvider {
 
       // Add this to the operation map to track progress.
       Operation op = new Operation();
+      op.setOperation(OperationType.reserveCommit);
       op.setState(StateType.committing);
       op.setCorrelationId(requestHeader.getCorrelationId());
       operationMap.store(op);
@@ -595,15 +626,18 @@ public class CsProvider {
         //TODO: Consider whether we should unwrap any NSI reservations that were successful.
         // For now just delete the correlationId we added.
         operationMap.delete(correlationIds);
-
         log.error("[csProvider] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}, errorId = {}, text = {}",
                 requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
         throw ex;
       } catch (SOAPFaultException soap) {
-        log.error("[csProvider] commitDelta encountered a SOAP Fault", soap);
+        operationMap.delete(correlationIds);
+        log.error("[csProvider] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}, SOAP Fault {}",
+                requestHeader.getCorrelationId(), soap.getFault().toString());
         throw soap;
       } catch (Exception ex) {
-        log.error("[csProvider] commitDelta encountered unexpected error = {}", ex);
+        operationMap.delete(correlationIds);
+        log.error("[csProvider] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}",
+                requestHeader.getCorrelationId(), ex);
         throw ex;
       }
     }
@@ -628,6 +662,7 @@ public class CsProvider {
 
       // Add this to the operation map to track progress.
       Operation op = new Operation();
+      op.setOperation(OperationType.provision);
       op.setState(StateType.provisioning);
       op.setCorrelationId(requestHeader.getCorrelationId());
       operationMap.store(op);
@@ -643,9 +678,18 @@ public class CsProvider {
         //TODO: Consider whether we should unwrap any NSI reservations that were successful.
         // For now just delete the correlationId we added.
         operationMap.delete(correlationIds);
-
-        log.error("Failed to send NSI CS provision message, correlationId = {}, errorId = {}, text = {}",
+        log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}, errorId = {}, text = {}",
                 requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+        throw ex;
+      } catch (SOAPFaultException soap) {
+        operationMap.delete(correlationIds);
+        log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}, SOAP Fault {}",
+                requestHeader.getCorrelationId(), soap.getFault().toString());
+        throw soap;
+      } catch (Exception ex) {
+        operationMap.delete(correlationIds);
+        log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}",
+                requestHeader.getCorrelationId(), ex);
         throw ex;
       }
     }

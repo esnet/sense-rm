@@ -20,12 +20,15 @@
 package net.es.sense.rm.driver.nsi.mrml;
 
 import com.google.common.base.Strings;
+import java.util.Optional;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import net.es.nsi.common.util.XmlDate;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.sense.rm.driver.schema.Nml;
+import org.apache.jena.ontology.DatatypeProperty;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 
 /**
  *
@@ -39,8 +42,8 @@ public class NmlExistsDuring {
 
   public NmlExistsDuring(Resource service) throws DatatypeConfigurationException {
     this.id = service.getURI();
-    this.start = getStartTime(service.getProperty(Nml.start).getString());
-    this.end = getEndTime(service.getProperty(Nml.end).getString());
+    this.start = getTime(service, Nml.start);
+    this.end = getTime(service, Nml.end);
   }
 
   public NmlExistsDuring(String id) throws DatatypeConfigurationException {
@@ -62,17 +65,11 @@ public class NmlExistsDuring {
     return end;
   }
 
-  private XMLGregorianCalendar getStartTime(String s) throws DatatypeConfigurationException {
-    if (!Strings.isNullOrEmpty(s)) {
-      return XmlDate.xmlGregorianCalendar(s);
-    }
-
-    return null;
-  }
-
-  private XMLGregorianCalendar getEndTime(String e) throws DatatypeConfigurationException {
-    if (!Strings.isNullOrEmpty(e)) {
-      return XmlDate.xmlGregorianCalendar(e);
+  private XMLGregorianCalendar getTime(Resource service, DatatypeProperty property)
+          throws DatatypeConfigurationException {
+    Optional<Statement> s = Optional.ofNullable(service.getProperty(property));
+    if (s.isPresent() && !Strings.isNullOrEmpty(s.get().getString())) {
+      return XmlDate.xmlGregorianCalendar(s.get().getString());
     }
 
     return null;

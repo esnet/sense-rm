@@ -33,51 +33,87 @@ import org.apache.jena.rdf.model.Statement;
  */
 @Slf4j
 public class MrsBandwidthService {
+  private final String id;
+  private MrsUnits unit = MrsUnits.bps;
+  private long maximumCapacity = 0;
+  private MrsBandwidthType bandwidthType = MrsBandwidthType.bestEffort;
 
-  private final Resource service;
-  private final MrsUnits unit;
-  private final long maximumCapacity;
-
-  public MrsBandwidthService(Resource port, Model model) throws IllegalArgumentException {
+  /**
+   *
+   * @param port
+   * @param model
+   * @throws IllegalArgumentException
+   */
+  public MrsBandwidthService(Resource port, Model model) {
     // Get the MrsBandwidthService assocated with this BidirectionalPort.
     Statement bwServiceRef = port.getProperty(Nml.hasService);
+
+    // No BandwidthService indicates "bestEffort" service.
     if (bwServiceRef == null) {
-      log.error("BidirectionalPort does not contain hasService property {}", port.getURI());
-      throw new IllegalArgumentException("BidirectionalPort does not contain hasService property " + port.getURI());
+      log.info("[MrsBandwidthService] port does not contain a hasService property {}", port.getURI());
+      this.id = port.getURI() + ":BandwidthService";
+      return;
     }
 
-    service = ModelUtil.getResourceOfType(model, bwServiceRef.getResource(), Mrs.BandwidthService);
+    Resource service = ModelUtil.getResourceOfType(model, bwServiceRef.getResource(), Mrs.BandwidthService);
     if (service == null) {
-      log.error("BidirectionalPort does not contain BandwidthService {}", port.getURI());
-      throw new IllegalArgumentException("BidirectionalPort does not contain BandwidthService " + port.getURI());
+      log.info("[MrsBandwidthService] BidirectionalPort does not contain BandwidthService {}", port.getURI());
+      this.id = port.getURI() + ":BandwidthService";
+      return;
+    }
+
+    this.id = service.getURI();
+
+    Statement typeProperty = service.getProperty(Mrs.type);
+    if (typeProperty == null) {
+      log.info("[MrsBandwidthService] BandwidthService does not contain a type property {}", service.getURI());
+    } else {
+      bandwidthType = MrsBandwidthType.valueOf(typeProperty.getString());
     }
 
     Statement unitProperty = service.getProperty(Mrs.unit);
     if (unitProperty == null) {
-      log.error("BandwidthService does not contain a unit property {}", service.getURI());
-      throw new IllegalArgumentException("BandwidthService does not contain a unit property " + service.getURI());
+      log.info("[MrsBandwidthService] BandwidthService does not contain a unit property {}", service.getURI());
+    } else {
+      unit = MrsUnits.valueOf(unitProperty.getString().toLowerCase());
     }
-
-    unit = MrsUnits.valueOf(unitProperty.getString().toLowerCase());
 
     Statement mcProperty = service.getProperty(Mrs.maximumCapacity);
     if (mcProperty == null) {
-      log.error("BandwidthService does not contain a maximumCapacity property {}", service.getURI());
-      throw new IllegalArgumentException("BandwidthService does not contain a maximumCapacity property " + service.getURI());
+      log.info("BandwidthService does not contain a maximumCapacity property {}", service.getURI());
+    } else {
+      maximumCapacity = mcProperty.getLong();
     }
-    
-    maximumCapacity = mcProperty.getLong();
   }
 
+  /**
+   *
+   * @return
+   */
   public String getId() {
-    return service.getURI();
+    return id;
   }
 
+  /**
+   *
+   * @return
+   */
   public MrsUnits getUnit() {
     return unit;
   }
 
+  /**
+   *
+   * @return
+   */
   public long getMaximumCapacity() {
     return maximumCapacity;
+  }
+
+  /**
+   * @return the bandwidthType
+   */
+  public MrsBandwidthType getBandwidthType() {
+    return bandwidthType;
   }
 }

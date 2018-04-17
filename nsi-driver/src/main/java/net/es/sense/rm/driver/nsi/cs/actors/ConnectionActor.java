@@ -94,9 +94,11 @@ public class ConnectionActor extends UntypedAbstractActor {
     try {
       log.info("[ConnectionActor] Sending querySummary: correlationId = {}", requestHeader.getCorrelationId());
       nsiClient.getProxy().querySummary(query, header);
-      log.info("[ConnectionActor] Ack recieved, providerNSA = {}, correlationId = {}", header.value.getProviderNSA(), header.value.getCorrelationId());
+      log.info("[ConnectionActor] Ack recieved, providerNSA = {}, correlationId = {}",
+              header.value.getProviderNSA(), header.value.getCorrelationId());
     } catch (org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException ex) {
-      log.error("[ConnectionActor] querySummary exception - {} {}", ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+      log.error("[ConnectionActor] querySummary exception - {} {}",
+              ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
       log.error(JaxbParser.jaxb2String(ServiceExceptionType.class, ex.getFaultInfo()));
       throw ex;
     }

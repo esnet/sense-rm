@@ -72,6 +72,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.ogf.schemas.nsi._2013._12.connection.provider.Error;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException;
 import org.ogf.schemas.nsi._2013._12.connection.types.GenericRequestType;
+import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QueryType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationRequestCriteriaType;
@@ -250,6 +251,8 @@ public class CsProvider {
 
       // Look up all the reservation segments associated with this SwitchingSubnet.
       terminates.addAll(reservationService.getByGlobalReservationId(ssid).stream()
+              .filter(r -> (LifecycleStateEnumType.TERMINATED != r.getLifecycleState()
+                      && LifecycleStateEnumType.TERMINATING != r.getLifecycleState()))
               .map(Reservation::getConnectionId).collect(Collectors.toList()));
     }
 

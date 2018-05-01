@@ -76,6 +76,7 @@ import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QueryType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationRequestCriteriaType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReserveResponseType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReserveType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ScheduleType;
@@ -565,11 +566,13 @@ public class CsProvider {
       correlationIds.add(requestHeader.getCorrelationId());
 
       // Issue the NSI reservation request.
+      boolean error = true;
       try {
         ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
         nsiClient.getProxy().terminate(terminate, header);
         log.debug("[csProvider] issued terminate operation correlationId = {}, connectionId = {}",
                 op.getCorrelationId(), terminate.getConnectionId());
+        error = false;
       } catch (ServiceException ex) {
         // Continue on this error but clean up this correlationId.
         operationMap.delete(requestHeader.getCorrelationId());
@@ -585,6 +588,20 @@ public class CsProvider {
         log.error("[csProvider] Failed to send NSI CS terminate message, correlationId = {}",
                 requestHeader.getCorrelationId(), ex);
         throw ex;
+      } finally {
+        if (error) {
+          Reservation r = reservationService.get(nsiProperties.getProviderNsaId(), cid);
+          if (r == null) {
+            // We have not seen this reservation before so ignore it.
+            log.info("[CsProvider] commitDeltaReduction: no reference to reservation, cid = {}", cid);
+          } else {
+            // We have to determine if the stored reservation needs to be updated.
+            log.info("[CsProvider] commitDeltaReduction: storing reservation update, cid = {}", cid);
+            r.setReservationState(ReservationStateEnumType.RESERVE_START);
+            r.setDiscovered(System.currentTimeMillis());
+            reservationService.store(r);
+          }
+        }
       }
     }
 
@@ -619,12 +636,14 @@ public class CsProvider {
       operationMap.store(op);
       correlationIds.add(requestHeader.getCorrelationId());
 
+      boolean error = true;
       try {
         ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
         nsiClient.getProxy().reserveCommit(commitBody, header);
 
         log.debug("[csProvider] issued commitDelta operation correlationId = {}, connectionId = {}",
                 op.getCorrelationId(), cid);
+        error = false;
       } catch (ServiceException ex) {
         //TODO: Consider whether we should unwrap any NSI reservations that were successful.
         // For now just delete the correlationId we added.
@@ -642,6 +661,20 @@ public class CsProvider {
         log.error("[csProvider] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}",
                 requestHeader.getCorrelationId(), ex);
         throw ex;
+      } finally {
+        if (error) {
+          Reservation r = reservationService.get(nsiProperties.getProviderNsaId(), cid);
+          if (r == null) {
+            // We have not seen this reservation before so ignore it.
+            log.info("[CsProvider] commitDeltaReduction: no reference to reservation, cid = {}", cid);
+          } else {
+            // We have to determine if the stored reservation needs to be updated.
+            log.info("[CsProvider] commitDeltaReduction: storing reservation update, cid = {}", cid);
+            r.setReservationState(ReservationStateEnumType.RESERVE_START);
+            r.setDiscovered(System.currentTimeMillis());
+            reservationService.store(r);
+          }
+        }
       }
     }
 

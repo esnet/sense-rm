@@ -29,6 +29,7 @@ import net.es.sense.rm.driver.nsi.dds.api.DiscoveryError;
 import net.es.sense.rm.driver.nsi.dds.api.Exceptions;
 import net.es.sense.rm.driver.nsi.dds.db.Document;
 import net.es.sense.rm.driver.nsi.dds.db.DocumentService;
+import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQuery;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQueryResult;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
@@ -101,6 +102,12 @@ public class DdsProvider implements DdsProviderI {
   }
 
   public void terminate() {
+    // Unsubscribe from our peer DDS servers.
+    RegistrationEvent event = new RegistrationEvent();
+    event.setEvent(RegistrationEvent.Event.Delete);
+    registrationRouter.tell(event, registrationRouter);
+    try { Thread.sleep(4000); } catch (Exception ex) {}
+
     // We need to kill each of our actors but not touch the actorSystem.
     nsiActorSystem.shutdown(localDocumentActor);
     nsiActorSystem.shutdown(documentExpiryActor);

@@ -75,7 +75,7 @@ public class QuerySummary {
               reservationState, provisionState, lifecycleState, dataPlaneStatus.isActive(), providerNsa);
 
       if (reservationState == null) {
-        reservationState = ReservationStateEnumType.RESERVE_CHECKING;
+        reservationState = ReservationStateEnumType.RESERVE_START;
       }
 
       if (provisionState == null) {

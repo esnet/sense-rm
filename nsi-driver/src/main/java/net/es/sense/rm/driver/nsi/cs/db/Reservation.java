@@ -127,6 +127,7 @@ public class Reservation implements Serializable {
     }
 
     if (reservationState != r.getReservationState()
+            || provisionState != r.getProvisionState()
             || lifecycleState != r.getLifecycleState()
             || dataPlaneActive != r.isDataPlaneActive()) {
       return true;

@@ -131,14 +131,15 @@ public class NsiDriver implements Driver {
         return new AsyncResult<>(response);
       }
 
-      if (model.getVersion() <= ifModifiedSince) {
+      long version = (model.getVersion() / 1000) * 1000;
+      if (version <= ifModifiedSince) {
         response.setStatus(Status.NOT_MODIFIED);
         return new AsyncResult<>(response);
       }
 
       ModelResource result = new ModelResource();
       result.setId(model.getModelId());
-      result.setCreationTime(XmlUtilities.longToXMLGregorianCalendar((model.getVersion() / 1000) * 1000).toXMLFormat());
+      result.setCreationTime(XmlUtilities.longToXMLGregorianCalendar(version).toXMLFormat());
       result.setModel(model.getBase());
       response.setModel(Optional.of(result));
       return new AsyncResult<>(response);
@@ -270,7 +271,8 @@ public class NsiDriver implements Driver {
       if (model != null) {
         log.debug("[NsiDriver] getCurrentModel: model id = {}, version = {} compared to ifModifiedSince = {}",
                 model.getModelId(), model.getVersion(), ifModifiedSince);
-        if (model.getVersion() <= ifModifiedSince) {
+        long version = (model.getVersion() / 1000) * 1000;
+        if (version <= ifModifiedSince) {
           log.debug("[NsiDriver] getCurrentModel: model id = {} NOT_MODIFIED", model.getModelId());
           response.setStatus(Response.Status.NOT_MODIFIED);
           return new AsyncResult<>(response);
@@ -279,7 +281,7 @@ public class NsiDriver implements Driver {
         ModelResource result = new ModelResource();
         result.setId(model.getModelId());
         result.setCreationTime(XmlUtilities
-                .longToXMLGregorianCalendar((model.getVersion() / 1000) * 1000).toXMLFormat());
+                .longToXMLGregorianCalendar(version).toXMLFormat());
         result.setModel(model.getBase());
 
         log.info("[NsiDriver] found current matching modelId = {}", model.getIdx());
@@ -558,7 +560,8 @@ public class NsiDriver implements Driver {
       return new AsyncResult<>(response);
     }
 
-    if (delta.getLastModified() <= ifModifiedSince) {
+    long modified = (delta.getLastModified() / 1000) * 1000;
+    if (modified <= ifModifiedSince) {
       log.info("[NsiDriver] requested delta not modified, id = {}.", id);
       response.setStatus(Status.NOT_MODIFIED);
       return new AsyncResult<>(response);
@@ -568,7 +571,7 @@ public class NsiDriver implements Driver {
       DeltaResource resource = new DeltaResource();
       resource.setId(delta.getDeltaId());
       resource.setModelId(delta.getModelId());
-      resource.setLastModified(XmlUtilities.longToXMLGregorianCalendar(delta.getLastModified()).toXMLFormat());
+      resource.setLastModified(XmlUtilities.longToXMLGregorianCalendar(modified).toXMLFormat());
       resource.setState(delta.getState());
       resource.setResult(delta.getResult());
       resource.setReduction(delta.getReduction());

@@ -423,8 +423,8 @@ public class SenseRmController extends SenseController {
         long creationTime = XmlUtilities.xmlGregorianCalendar(m.getCreationTime())
                 .toGregorianCalendar().getTimeInMillis();
 
-        log.info("[SenseRmController] model id = {}, creationTime = {}, If-Modified-Since = {}",
-                m.getId(), m.getCreationTime(), m.getCreationTime());
+        log.info("[SenseRmController] returning model id = {}, creationTime = {}, If-Modified-Since = {}\n{}",
+                m.getId(), m.getCreationTime(), m.getCreationTime(), Encoder.encode(m.getModel()));
 
         // Create the unique resource URL.
         m.setHref(UrlHelper.append(location.toASCIIString(), m.getId()));
@@ -646,14 +646,15 @@ public class SenseRmController extends SenseController {
               .toGregorianCalendar().getTimeInMillis();
       headers.setLastModified(creationTime);
 
+      log.info("[SenseRmController] returning id = {}, creationTime = {}, queried If-Modified-Since = {}\n{}",
+              m.getId(), m.getCreationTime(), m.getCreationTime(), Encoder.encode(m.getModel()));
+
       // Update the HREF to point to the absolute URL for the resource.
       m.setHref(location.toASCIIString());
       if (encode) {
         m.setModel(Encoder.encode(m.getModel()));
       }
 
-      log.info("[SenseRmController] returning id = {}, creationTime = {}, queried If-Modified-Since = {}.",
-              m.getId(), m.getCreationTime(), m.getCreationTime());
       return new ResponseEntity<>(m, headers, HttpStatus.OK);
     } catch (InterruptedException | IOException | DatatypeConfigurationException | ExecutionException ex) {
       log.error("[SenseRmController] getModel failed, ex = {}", ex);

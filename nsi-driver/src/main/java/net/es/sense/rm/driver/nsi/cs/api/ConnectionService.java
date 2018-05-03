@@ -335,7 +335,7 @@ public class ConnectionService {
               provisionConfirmed.getConnectionId());
     } else {
       // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] reserveConfirmed: storing reservation update, cid = {}",
+      log.info("[ConnectionService] provisionConfirmed: storing reservation update, cid = {}",
               provisionConfirmed.getConnectionId());
       r.setProvisionState(ProvisionStateEnumType.PROVISIONED);
       r.setDiscovered(System.currentTimeMillis());

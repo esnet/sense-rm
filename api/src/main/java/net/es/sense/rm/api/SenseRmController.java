@@ -424,7 +424,7 @@ public class SenseRmController extends SenseController {
                 .toGregorianCalendar().getTimeInMillis();
 
         log.info("[SenseRmController] returning model id = {}, creationTime = {}, If-Modified-Since = {}\n{}",
-                m.getId(), m.getCreationTime(), m.getCreationTime(), Encoder.encode(m.getModel()));
+                m.getId(), m.getCreationTime(), ifModifiedSince, Encoder.encode(m.getModel()));
 
         // Create the unique resource URL.
         m.setHref(UrlHelper.append(location.toASCIIString(), m.getId()));
@@ -647,7 +647,7 @@ public class SenseRmController extends SenseController {
       headers.setLastModified(creationTime);
 
       log.info("[SenseRmController] returning id = {}, creationTime = {}, queried If-Modified-Since = {}\n{}",
-              m.getId(), m.getCreationTime(), m.getCreationTime(), Encoder.encode(m.getModel()));
+              m.getId(), m.getCreationTime(), ifModifiedSince, Encoder.encode(m.getModel()));
 
       // Update the HREF to point to the absolute URL for the resource.
       m.setHref(location.toASCIIString());

@@ -82,34 +82,30 @@ public class NmlModel {
              .filter(p -> p.getOrientation() == Orientation.bidirectional)
              .forEach(p -> {
                 try {
-                  log.debug("NmlModel: processing inboundPort {}", p.getInboundPort().orElse("missing"));
+                  // We need the member in and out unidirectional ports to look up isAlias entries.
                   NmlPort inboundPort = ports.get(p.getInboundPort().get());
-
-                  log.debug("NmlModel: processing outboundPort {}", p.getOutboundPort().orElse("missing"));
                   NmlPort outboundPort = ports.get(p.getOutboundPort().get());
 
+                  // If these unidirectional ports have isAlias entries we will try to consolidate.
                   if (inboundPort.getIsAlias().isPresent() && outboundPort.getIsAlias().isPresent()) {
-                    String in = inboundPort.getIsAlias().get();
-                    String out = outboundPort.getIsAlias().get();
-
-                    log.debug("NmlModel: processing isAlias entries {} and {}", in, out);
-
-                    Optional<NmlPort> remoteOut = Optional.ofNullable(ports.get(in));
-                    Optional<NmlPort> remoteIn = Optional.ofNullable(ports.get(out));
+                    // Look to see if the referenced isAlias ports are in the topology.
+                    Optional<NmlPort> remoteOut = Optional.ofNullable(ports.get(inboundPort.getIsAlias().get()));
+                    Optional<NmlPort> remoteIn = Optional.ofNullable(ports.get(outboundPort.getIsAlias().get()));
 
                     // If the remote port's isAlias points back to our member ports...
                     if (remoteOut.isPresent() && remoteOut.get().getIsAlias().isPresent() &&
                             inboundPort.getId().equalsIgnoreCase(remoteOut.get().getIsAlias().get()) &&
                         remoteIn.isPresent() && remoteIn.get().getIsAlias().isPresent() &&
                             outboundPort.getId().equalsIgnoreCase(remoteIn.get().getIsAlias().get())) {
+                      // We consolidated the isAlias to a port in topology so now we save it.
                       p.setIsAlias(remoteOut.get().getParentPort());
                     }
                   }
                 } catch (NoSuchElementException nse) {
+                  // Something was missing from our model for this port.
                   log.error("[NmlModel] Failed to load {}", p.getId());
                 }
              });
-
   }
 
   public void setDefaultServiceType(String defaultServiceType) {

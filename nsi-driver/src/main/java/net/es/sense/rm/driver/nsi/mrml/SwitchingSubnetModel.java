@@ -89,7 +89,6 @@ public class SwitchingSubnetModel {
               .map((jaxb) -> (ServiceDefinitionType) jaxb.getValue())
               .forEachOrdered((sd) -> {
                 ServiceDefinitionType servdef = serviceDefinitions.get(sd.getId());
-                log.info("[SwitchingSubnetModel] processing serviceDefinition {}", servdef.getId());
                 // We have a ServiceDefinition against this SwitchingService.
                 ServiceHolder sh = new ServiceHolder.ServiceHolderBuilder()
                         .serviceType(servdef.getServiceType())
@@ -101,7 +100,6 @@ public class SwitchingSubnetModel {
 
       // Now link all the bidirection port members back to their containing SwitchingService.
       nml.getBidirectionalPortIdFromSwitchingService(ss).forEach((p) -> {
-        log.info("[SwitchingSubnetModel] linking port {} to switchingService {}", p, ss.getId());
         Optional<NmlPort> ofNullable = Optional.ofNullable(nml.getPort(p));
         ofNullable.ifPresent(np -> np.getSwitchingServices().add(ss));
       });

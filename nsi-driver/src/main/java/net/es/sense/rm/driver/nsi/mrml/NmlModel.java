@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -69,34 +70,42 @@ public class NmlModel {
   }
 
   private void load() {
-     // Resolve all ports across all networks for later access.
-    Collection<NmlTopologyType> topologies = documentReader.getNmlTopologyAll();
-    for (NmlTopologyType nml : topologies) {
-      log.debug("[NmlModel] processing NML model {}", nml.getId());
-      ports.putAll(getNmlPorts(nml));
-    }
+      // Resolve all ports across all networks for later access.
+     Collection<NmlTopologyType> topologies = documentReader.getNmlTopologyAll();
+     for (NmlTopologyType nml : topologies) {
+       log.debug("[NmlModel] processing NML model {}", nml.getId());
+       ports.putAll(getNmlPorts(nml));
+     }
 
-    // Consolidate isAlias entries in the bidirectional ports.
-    ports.values().stream()
-            .filter(p -> p.getOrientation() == Orientation.bidirectional)
-            .forEach(p -> {
-              NmlPort inboundPort = ports.get(p.getInboundPort().get());
-              NmlPort outboundPort = ports.get(p.getOutboundPort().get());
+     // Consolidate isAlias entries in the bidirectional ports.
+     ports.values().stream()
+             .filter(p -> p.getOrientation() == Orientation.bidirectional)
+             .forEach(p -> {
+                try {
+                  log.debug("NmlModel: processing inboundPort {}", p.getInboundPort().orElse("missing"));
+                  NmlPort inboundPort = ports.get(p.getInboundPort().get());
 
-              if (inboundPort.getIsAlias().isPresent() && outboundPort.getIsAlias().isPresent()) {
-                String in = inboundPort.getIsAlias().get();
-                String out = outboundPort.getIsAlias().get();
+                  log.debug("NmlModel: processing outboundPort {}", p.getOutboundPort().orElse("missing"));
+                  NmlPort outboundPort = ports.get(p.getOutboundPort().get());
 
-                Optional<NmlPort> remoteOut = Optional.ofNullable(ports.get(in));
-                Optional<NmlPort> remoteIn = Optional.ofNullable(ports.get(out));
+                  if (inboundPort.getIsAlias().isPresent() && outboundPort.getIsAlias().isPresent()) {
+                    String in = inboundPort.getIsAlias().get();
+                    String out = outboundPort.getIsAlias().get();
 
-                // If the remote port's isAlias points back to our member ports...
-                if (remoteOut.isPresent() && inboundPort.getId().equalsIgnoreCase(remoteOut.get().getIsAlias().get()) &&
+                    Optional<NmlPort> remoteOut = Optional.ofNullable(ports.get(in));
+                    Optional<NmlPort> remoteIn = Optional.ofNullable(ports.get(out));
+
+                    // If the remote port's isAlias points back to our member ports...
+                    if (remoteOut.isPresent() && inboundPort.getId().equalsIgnoreCase(remoteOut.get().getIsAlias().get()) &&
                         remoteIn.isPresent() && outboundPort.getId().equalsIgnoreCase(remoteIn.get().getIsAlias().get())) {
-                  p.setIsAlias(remoteOut.get().getParentPort());
+                      p.setIsAlias(remoteOut.get().getParentPort());
+                    }
+                  }
+                } catch (NoSuchElementException nse) {
+                  log.error("[NmlModel] Failed to load {}", p.getId());
                 }
-              }
-            });
+             });
+
   }
 
   public void setDefaultServiceType(String defaultServiceType) {

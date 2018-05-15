@@ -54,7 +54,7 @@ public class ModelAuditActor extends UntypedAbstractActor {
       try {
         auditService.audit();
       } catch (Exception ex) {
-        log.error("[ModelAuditActor] audit failed, {}", ex);
+        log.error("[ModelAuditActor] audit failed", ex);
       }
 
       TimerMsg message = (TimerMsg) msg;

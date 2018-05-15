@@ -92,12 +92,16 @@ public class NmlModel {
                     String in = inboundPort.getIsAlias().get();
                     String out = outboundPort.getIsAlias().get();
 
+                    log.debug("NmlModel: processing isAlias entries {} and {}", in, out);
+
                     Optional<NmlPort> remoteOut = Optional.ofNullable(ports.get(in));
                     Optional<NmlPort> remoteIn = Optional.ofNullable(ports.get(out));
 
                     // If the remote port's isAlias points back to our member ports...
-                    if (remoteOut.isPresent() && inboundPort.getId().equalsIgnoreCase(remoteOut.get().getIsAlias().get()) &&
-                        remoteIn.isPresent() && outboundPort.getId().equalsIgnoreCase(remoteIn.get().getIsAlias().get())) {
+                    if (remoteOut.isPresent() && remoteOut.get().getIsAlias().isPresent() &&
+                            inboundPort.getId().equalsIgnoreCase(remoteOut.get().getIsAlias().get()) &&
+                        remoteIn.isPresent() && remoteIn.get().getIsAlias().isPresent() &&
+                            outboundPort.getId().equalsIgnoreCase(remoteIn.get().getIsAlias().get())) {
                       p.setIsAlias(remoteOut.get().getParentPort());
                     }
                   }

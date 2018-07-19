@@ -430,73 +430,105 @@ public class ConnectionService {
     throw new UnsupportedOperationException("Not implemented yet.");
   }
 
-  /**
-   * public GenericAcknowledgmentType queryRecursiveConfirmed( QueryRecursiveConfirmedType queryRecursiveConfirmed,
-   * Holder<CommonHeaderType> header) throws ServiceException {
-   *
-   * log.debug("[ConnectionService] queryRecursiveConfirmed: reservationService = {}", reservationService);
-   *
-   * // Get the providerNSA identifier. String providerNsa = header.value.getProviderNSA();
-   *
-   * // Extract the uPA connection segments associated with individual networks. List<QueryRecursiveResultType>
-   * reservations = queryRecursiveConfirmed.getReservation(); log.info("[ConnectionService] queryRecursiveConfirmed:
-   * providerNSA = {}, # of reservations = {}", providerNsa, reservations.size());
-   *
-   * // Process each reservation returned. for (QueryRecursiveResultType reservation : reservations) { // Get the
-   * parent reservation information to apply to child connections. ReservationStateEnumType reservationState =
-   * reservation.getConnectionStates().getReservationState(); DataPlaneStatusType dataPlaneStatus =
-   * reservation.getConnectionStates().getDataPlaneStatus(); log.info("[ConnectionService] queryRecursiveConfirmed: cid
-   * = {}, gid = {}, state = {}", reservation.getConnectionId(), reservation.getGlobalReservationId(),
-   * reservationState);
-   *
-   * processRecursiveCriteria( providerNsa, reservation.getGlobalReservationId(), reservation.getConnectionId(),
-   * reservationState, dataPlaneStatus, reservation.getCriteria()); }
-   *
-   * return FACTORY.createGenericAcknowledgmentType(); }
-   *
-   * private void processRecursiveCriteria( String providerNsa, String gid, String cid, ReservationStateEnumType
-   * reservationState, DataPlaneStatusType dataPlaneStatus, List<QueryRecursiveResultCriteriaType> criteriaList) {
-   *
-   * // There will be one criteria for each version of this reservation. We // will check to see if there are any new
-   * versions than what is already // stored. for (QueryRecursiveResultCriteriaType criteria : criteriaList) {
-   * log.info("[ConnectionService] processCriteria: cid = {}, version = {}, serviceType = {}", cid,
-   * criteria.getVersion(), criteria.getServiceType());
-   *
-   * ChildRecursiveListType children = criteria.getChildren(); if (children == null || children.getChild().isEmpty()) {
-   * // We are at a leaf child so check to see if we need to store this reservation information. Reservation existing =
-   * reservationService.get(providerNsa, cid); if (existing != null && existing.getVersion() >= criteria.getVersion()) {
-   * // We have already stored this so update only if state has changed. if
-   * (reservationState.compareTo(existing.getReservationState()) != 0 || dataPlaneStatus.isActive() !=
-   * existing.isDataPlaneActive()) { existing.setReservationState(reservationState);
-   * existing.setDataPlaneActive(dataPlaneStatus.isActive()); existing.setDiscovered(System.currentTimeMillis());
-   * reservationService.update(existing); } continue; }
-   *
-   * Reservation reservation = new Reservation(); reservation.setDiscovered(System.currentTimeMillis());
-   * reservation.setGlobalReservationId(gid); reservation.setProviderNsa(providerNsa); reservation.setConnectionId(cid);
-   * reservation.setVersion(criteria.getVersion()); reservation.setServiceType(criteria.getServiceType().trim());
-   * reservation.setStartTime(getStartTime(criteria.getSchedule().getStartTime()));
-   * reservation.setEndTime(getEndTime(criteria.getSchedule().getEndTime()));
-   *
-   * // Now we need to determine the network based on the STP used in the service. if
-   * (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(reservation.getServiceType()) ||
-   * Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(reservation.getServiceType())) {
-   * reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS); for (Object any : criteria.getAny()) { if (any instanceof
-   * JAXBElement) { JAXBElement jaxb = (JAXBElement) any; if (jaxb.getDeclaredType() == P2PServiceBaseType.class) {
-   * log.debug("[ConnectionService] processRecursiveCriteria: found P2PServiceBaseType");
-   * reservation.setService(XmlUtilities.jaxbToString(P2PServiceBaseType.class, jaxb));
-   *
-   * // Get the network identifier from and STP. P2PServiceBaseType p2p = (P2PServiceBaseType) jaxb.getValue();
-   * SimpleStp stp = new SimpleStp(p2p.getSourceSTP()); reservation.setTopologyId(stp.getNetworkId()); break; } } } }
-   *
-   * // Replace the existing entry with this new criteria if we already have one. if (existing != null) {
-   * reservation.setId(existing.getId()); reservationService.update(reservation); } else {
-   * reservationService.create(reservation); } } else { // We still have children so this must be an aggregator.
-   * children.getChild().forEach((child) -> { child.getConnectionStates(); processRecursiveCriteria(
-   * child.getProviderNSA(), gid, child.getConnectionId(), child.getConnectionStates().getReservationState(),
-   * child.getConnectionStates().getDataPlaneStatus(), child.getCriteria()); }); } } }
-   *
-   */
-  private long getStartTime(JAXBElement<XMLGregorianCalendar> time) {
+  /*
+  public GenericAcknowledgmentType queryRecursiveConfirmed(QueryRecursiveConfirmedType queryRecursiveConfirmed,
+          Holder<CommonHeaderType> header) throws ServiceException {
+
+    log.debug("[ConnectionService] queryRecursiveConfirmed: reservationService = {}", reservationService);
+
+    // Get the providerNSA identifier.
+    String providerNsa = header.value.getProviderNSA();
+
+    // Extract the uPA connection segments associated with individual networks.
+    List<QueryRecursiveResultType> reservations = queryRecursiveConfirmed.getReservation();
+    log.info("[ConnectionService] queryRecursiveConfirmed: providerNSA = {}, # of reservations = {}",
+            providerNsa, reservations.size());
+
+    // Process each reservation returned.
+    for (QueryRecursiveResultType reservation : reservations) {
+      // Get the parent reservation information to apply to child connections.
+      ReservationStateEnumType reservationState = reservation.getConnectionStates().getReservationState();
+      DataPlaneStatusType dataPlaneStatus = reservation.getConnectionStates().getDataPlaneStatus();
+      log.info("[ConnectionService] queryRecursiveConfirmed: cid = {}, gid = {}, state = {}",
+              reservation.getConnectionId(), reservation.getGlobalReservationId(), reservationState);
+
+      processRecursiveCriteria(providerNsa, reservation.getGlobalReservationId(), reservation.getConnectionId(),
+              reservationState, dataPlaneStatus, reservation.getCriteria());
+    }
+
+    return FACTORY.createGenericAcknowledgmentType();
+  }
+
+  private void processRecursiveCriteria(String providerNsa, String gid, String cid, ReservationStateEnumType reservationState, DataPlaneStatusType dataPlaneStatus, List<QueryRecursiveResultCriteriaType> criteriaList) {
+
+    // There will be one criteria for each version of this reservation. We
+    // will check to see if there are any new versions than what is already
+    // stored.
+    for (QueryRecursiveResultCriteriaType criteria : criteriaList) {
+      log.info("[ConnectionService] processCriteria: cid = {}, version = {}, serviceType = {}", cid,
+              criteria.getVersion(), criteria.getServiceType());
+
+      ChildRecursiveListType children = criteria.getChildren();
+      if (children == null || children.getChild().isEmpty()) {
+        // We are at a leaf child so check to see if we need to store this reservation information.
+        Reservation existing = reservationService.get(providerNsa, cid);
+        if (existing != null && existing.getVersion() >= criteria.getVersion()) {
+          // We have already stored this so update only if state has changed.
+          if (reservationState.compareTo(existing.getReservationState()) != 0
+                  || dataPlaneStatus.isActive() != existing.isDataPlaneActive()) {
+            existing.setReservationState(reservationState);
+            existing.setDataPlaneActive(dataPlaneStatus.isActive());
+            existing.setDiscovered(System.currentTimeMillis());
+            reservationService.update(existing);
+          }
+          continue;
+        }
+
+        Reservation reservation = new Reservation();
+        reservation.setDiscovered(System.currentTimeMillis());
+        reservation.setGlobalReservationId(gid);
+        reservation.setProviderNsa(providerNsa);
+        reservation.setConnectionId(cid);
+        reservation.setVersion(criteria.getVersion());
+        reservation.setServiceType(criteria.getServiceType().trim());
+        reservation.setStartTime(getStartTime(criteria.getSchedule().getStartTime()));
+        reservation.setEndTime(getEndTime(criteria.getSchedule().getEndTime()));
+        // Now we need to determine the network based on the STP used in the service. if
+        (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(reservation.getServiceType())
+                || Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(reservation.getServiceType())) {
+          reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
+          for (Object any : criteria.getAny()) {
+            if (any instanceof JAXBElement) {
+              JAXBElement jaxb = (JAXBElement) any;
+              if (jaxb.getDeclaredType() == P2PServiceBaseType.class) {
+                log.debug("[ConnectionService] processRecursiveCriteria: found P2PServiceBaseType");
+                reservation.setService(XmlUtilities.jaxbToString(P2PServiceBaseType.class, jaxb));
+
+                // Get the network identifier from and STP. P2PServiceBaseType p2p = (P2PServiceBaseType) jaxb.getValue();
+                SimpleStp stp = new SimpleStp(p2p.getSourceSTP());
+                reservation.setTopologyId(stp.getNetworkId());
+                break;
+              }
+            }
+          }
+        }
+
+        // Replace the existing entry with this new criteria if we already have one. if (existing != null) {
+        reservation.setId(existing.getId());
+        reservationService.update(reservation);
+      } else {
+        reservationService.create(reservation);
+      }
+    }else { // We still have children so this must be an aggregator.
+   children.getChild().forEach((child) -> { child.getConnectionStates(); processRecursiveCriteria(
+   child.getProviderNSA(), gid, child.getConnectionId(), child.getConnectionStates().getReservationState(),
+   child.getConnectionStates().getDataPlaneStatus(), child.getCriteria()); }); }
+  }
+}
+
+*/
+
+private long getStartTime(JAXBElement<XMLGregorianCalendar> time) {
     if (time == null || time.getValue() == null) {
       return 0;
     }

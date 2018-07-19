@@ -32,6 +32,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
+ * This class models a mapping of an MRML delta to an NSI reservation.
  *
  * @author hacksaw
  */
@@ -55,6 +56,9 @@ public class ConnectionMap implements Serializable {
 
   @Basic(optional=false)
   String switchingSubnetId;
+
+  @Basic(optional=false)
+  String serviceType;
 
   @Basic(optional=false)
   String existsDuringId;

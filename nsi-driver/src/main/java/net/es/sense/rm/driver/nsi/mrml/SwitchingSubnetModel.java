@@ -1,3 +1,22 @@
+/*
+ * SENSE Resource Manager (SENSE-RM) Copyright (c) 2016, The Regents
+ * of the University of California, through Lawrence Berkeley National
+ * Laboratory (subject to receipt of any required approvals from the
+ * U.S. Dept. of Energy).  All rights reserved.
+ *
+ * If you have questions about your rights to use or distribute this
+ * software, please contact Berkeley Lab's Innovation & Partnerships
+ * Office at IPO@lbl.gov.
+ *
+ * NOTICE.  This Software was developed under funding from the
+ * U.S. Department of Energy and the U.S. Government consequently retains
+ * certain rights. As such, the U.S. Government has been granted for
+ * itself and others acting on its behalf a paid-up, nonexclusive,
+ * irrevocable, worldwide license in the Software to reproduce,
+ * distribute copies to the public, prepare derivative works, and perform
+ * publicly and display publicly, and to permit other to do so.
+ *
+ */
 package net.es.sense.rm.driver.nsi.mrml;
 
 import java.util.HashMap;
@@ -22,6 +41,7 @@ import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 
 /**
+ * Create MRML SwitchingSubnet model from stored NSI reservations and connection maps.
  *
  * @author hacksaw
  */
@@ -77,6 +97,9 @@ public class SwitchingSubnetModel {
     processReservations();
   }
 
+  /**
+   * Process the JAXB representation of the NML SwitchingService elements.
+   */
   private void processSwitchingService() {
     // Pull out ServiceDefinitions from the SwitchingServices.
     nml.getSwitchingServices(topologyId).forEach((ss) -> {
@@ -106,6 +129,10 @@ public class SwitchingSubnetModel {
     });
   }
 
+  /**
+   * Convert the NSI CS reservations into MRML SwitchingSubnet elements and
+   * link to parent SwitchingService.
+   */
   private void processReservations() {
     // Process NSI connections adding SwitchingSubnets and associated child
     // ports associated with the parent bidirectional port.
@@ -146,6 +173,14 @@ public class SwitchingSubnetModel {
       Optional<ConnectionMap> connMap = Optional.empty();
       if (!Strings.isNullOrEmpty(reservation.getDescription())) {
         connMap = Optional.ofNullable(connectionMapService.getByDescription(reservation.getDescription()));
+      }
+
+      // We may have a mapping to a different serviceType so us it if available.
+      String serviceType;
+      if (connMap.isPresent()) {
+        serviceType = connMap.get().getServiceType();
+      } else {
+        serviceType = reservation.getServiceType();
       }
 
       log.info("[SwitchingSubnetModel] connMap = {}", connMap);
@@ -204,11 +239,8 @@ public class SwitchingSubnetModel {
           }
 
           // Now build the SwitchingSubnet.
-          Optional<String> srcSSid = createSwitchingSubnet(srcChildPort.get().getParentPort().get(),
-                  reservation.getServiceType());
-
-          Optional<String> dstSSid = createSwitchingSubnet(dstChildPort.get().getParentPort().get(),
-                  reservation.getServiceType());
+          Optional<String> srcSSid = createSwitchingSubnet(srcChildPort.get().getParentPort().get(), serviceType);
+          Optional<String> dstSSid = createSwitchingSubnet(dstChildPort.get().getParentPort().get(), serviceType);
 
           log.info("[SwitchingSubnetModel] srcSSid = {}, dstSSid = {}", srcSSid, dstSSid);
 

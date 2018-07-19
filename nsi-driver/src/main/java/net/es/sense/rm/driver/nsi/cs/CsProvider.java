@@ -87,6 +87,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
+ * A provider implementing MRML delta operations using the NSI Connection Service.
  *
  * @author hacksaw
  */
@@ -326,7 +327,9 @@ public class CsProvider {
       // We currently know about the EVTS p2p service.
       List<StpHolder> stps = new ArrayList<>();
 
-      if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceTypeRef.getString().trim())) {
+      String serviceType = serviceTypeRef.getString().trim();
+      if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType) ||
+              Nsi.NSI_SERVICETYPE_L2_LB_ES.equalsIgnoreCase(serviceType)) {
         // Find the ports that ate part of this SwitchSubnet and build NSI STP
         // identifiers for the service.
         StmtIterator listProperties = switchingSubnet.listProperties(Nml.hasBidirectionalPort);
@@ -437,6 +440,7 @@ public class CsProvider {
         cm.setDeltaId(deltaId);
         cm.setSwitchingSubnetId(switchingSubnet.getURI());
         cm.setExistsDuringId(ssExistsDuring.getId());
+        cm.setServiceType(serviceType);
 
         StpMapping smSrc = new StpMapping(src.getStp().getStpId(), src.getMrsPortId(),
                 src.getMrsLabelId(), src.getBw().getId(), src.getNmlExistsDuringId());

@@ -20,11 +20,10 @@
 package net.es.sense.rm.driver.nsi.cs.api;
 
 import javax.jws.WebService;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
+import net.es.nsi.common.jaxb.JaxbParser;
 import net.es.sense.rm.driver.nsi.cs.db.Operation;
 import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
@@ -180,8 +179,8 @@ public class ConnectionService {
     reservation.setDataPlaneActive(dataPlaneStatus.isActive());
     reservation.setVersion(criteria.getVersion());
     reservation.setServiceType(criteria.getServiceType());
-    reservation.setStartTime(getStartTime(criteria.getSchedule().getStartTime()));
-    reservation.setEndTime(getEndTime(criteria.getSchedule().getEndTime()));
+    reservation.setStartTime(CsUtils.getStartTime(criteria.getSchedule().getStartTime()));
+    reservation.setEndTime(CsUtils.getEndTime(criteria.getSchedule().getEndTime()));
 
     // Now we need to determine the network based on the STP used in the service.
     try {
@@ -194,12 +193,15 @@ public class ConnectionService {
     }
   }
 
-  public GenericAcknowledgmentType reserveFailed(GenericFailedType reserveFailed, Holder<CommonHeaderType> header) throws ServiceException {
+  public GenericAcknowledgmentType reserveFailed(GenericFailedType reserveFailed,
+          Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
-    log.info("[ConnectionService] reserveFailed recieved for correlationId = {}, connectionId: {}",
+    log.info("[ConnectionService] reserveFailed recieved for correlationId = {}, connectionId = {}",
             value.getCorrelationId(), reserveFailed.getConnectionId());
 
-    // First we update the corresponding reservation in the datbase.
+    // First we update the corresponding reservation in the datbase.  This
+    // reservation should not exist based on the current code logic where we
+    // add the reservation on the reserveConfirmed message.
     Reservation r = reservationService.get(value.getProviderNSA(), reserveFailed.getConnectionId());
     if (r == null) {
       // We have not seen this reservation before so ignore it.
@@ -224,10 +226,14 @@ public class ConnectionService {
       op.getCompleted().release();
     }
 
+    log.error("reserveFailed: connectionId = " + reserveFailed.getConnectionId() + ", serviceException = " +
+            JaxbParser.jaxb2String(ServiceExceptionType.class, reserveFailed.getServiceException()));
+
     return FACTORY.createGenericAcknowledgmentType();
   }
 
-  public GenericAcknowledgmentType reserveCommitConfirmed(GenericConfirmedType reserveCommitConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
+  public GenericAcknowledgmentType reserveCommitConfirmed(GenericConfirmedType reserveCommitConfirmed,
+          Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
     log.info("[ConnectionService] reserveCommitConfirmed recieved for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), reserveCommitConfirmed.getConnectionId());
@@ -527,22 +533,6 @@ public class ConnectionService {
 }
 
 */
-
-private long getStartTime(JAXBElement<XMLGregorianCalendar> time) {
-    if (time == null || time.getValue() == null) {
-      return 0;
-    }
-
-    return time.getValue().toGregorianCalendar().getTimeInMillis();
-  }
-
-  private long getEndTime(JAXBElement<XMLGregorianCalendar> time) {
-    if (time == null || time.getValue() == null) {
-      return Long.MAX_VALUE;
-    }
-
-    return time.getValue().toGregorianCalendar().getTimeInMillis();
-  }
 
   public GenericAcknowledgmentType queryNotificationConfirmed(QueryNotificationConfirmedType queryNotificationConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
     //TODO implement this method

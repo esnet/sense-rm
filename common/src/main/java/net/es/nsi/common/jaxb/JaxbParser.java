@@ -248,8 +248,8 @@ public class JaxbParser {
    * Utility method to marshal a JAXB annotated java object to an XML string.
    *
    * @param messageClass	The class of the object to marshal.
-   * @param message	The object to marshal.
-   * @return	String containing the XML encoded object.
+   * @param message             The object to marshal.
+   * @return                    String containing the XML encoded object.
    */
   public static String jaxb2String(Class<?> messageClass, Object message) {
 

@@ -57,7 +57,11 @@ public class NsiProperties {
   private String defaultUnits = "bps";
   private long defaultGranularity = 1L;
 
+  // How often do we check if a new model should be generated?
   private long modelAuditTimer = 120;
+
+  // How small should we prune the model database.
+  private int modelPruneSize = 10;
 
   // Configuration for web server and client.
   //@Value ("${server}")

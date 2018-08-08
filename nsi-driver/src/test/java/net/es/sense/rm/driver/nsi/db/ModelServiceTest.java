@@ -49,7 +49,7 @@ public class ModelServiceTest {
 
   /**
    * Add tests as more API are used by the nsi-driver.
-   * 
+   *
    * @throws JAXBException
    * @throws IOException
    * @throws DatatypeConfigurationException
@@ -78,7 +78,13 @@ public class ModelServiceTest {
 
     // Get all the topologies.
     Collection<Model> models = modelService.get();
+    Assert.assertEquals(18, models.size());
+
+    models = modelService.getByTopologyId("urn:ogf:network:es.net:2013:");
     Assert.assertEquals(3, models.size());
+
+    models = modelService.getByTopologyId("urn:ogf:network:example.net:2013:");
+    Assert.assertEquals(15, models.size());
 
     // Test ifModifiedSince - should return no results.
     models = modelService.getByTopologyId("urn:ogf:network:es.net:2013:", 1506852913000L);
@@ -91,5 +97,22 @@ public class ModelServiceTest {
     // Test ifModifiedSince - should return 1 result.
     models = modelService.getByTopologyId("urn:ogf:network:es.net:2013:", 1506766513000L);
     Assert.assertEquals(1, models.size());
+  }
+
+  @Test
+  public void purge() throws JAXBException, IOException, DatatypeConfigurationException {
+    // Set up test data.
+    buildDatabase();
+
+    Collection<Model> models = modelService.getByTopologyId("urn:ogf:network:example.net:2013:");
+    models.parallelStream().forEach(System.out::println);
+    Assert.assertEquals(15, models.size());
+
+    modelService.purge("urn:ogf:network:example.net:2013:", 10);
+
+    models = modelService.getByTopologyId("urn:ogf:network:example.net:2013:");
+    models.parallelStream().forEach(System.out::println);
+    Assert.assertEquals(10, models.size());
+
   }
 }

@@ -19,7 +19,6 @@
  */
 package net.es.sense.rm.driver.nsi;
 
-import java.util.Collection;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
@@ -94,13 +93,14 @@ public class AuditServiceBean implements AuditService {
       }
     //});
 
-    // TODO: Go through and delete any models for topologies no longer avalable.
-    // TODO: Write an audit to clean up old model versions.
-    Collection<Model> models = modelService.get();
+    // Delete older models (keep last 5).
+    modelService.purge(topologyId, nsiProperties.getModelPruneSize());
+
+    // Dump the current contents as an audit log.
     log.info("[AuditService] stored models after the audit...");
-    for (Model m : models) {
-      log.info("idx = {}, modelId= {}, topologyId = {}, version = {}, ", m.getIdx(), m.getModelId(), m.getTopologyId(), m.getVersion());
-    }
+    modelService.get().forEach((m) -> {
+      log.info(m.toString());
+    });
   }
 
   @Override

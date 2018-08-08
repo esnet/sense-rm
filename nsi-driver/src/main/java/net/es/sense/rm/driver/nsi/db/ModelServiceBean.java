@@ -23,8 +23,13 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +60,7 @@ public class ModelServiceBean implements ModelService {
   public Model getByModelId(String modelId, long lastModified) {
     return modelRepository.findByModelIdAndVersion(modelId, lastModified);
   }
-  
+
   @Override
   public boolean isPresent(String topologyId, long version) {
     return modelRepository.isVersion(topologyId, version);
@@ -120,6 +125,17 @@ public class ModelServiceBean implements ModelService {
   }
 
   @Override
+  public Collection<Model> getByTopologyId(String topologyId) {
+    Collection<Model> result = new ArrayList();
+    Iterable<Model> list = modelRepository.findByTopologyId(topologyId);
+    list.forEach(m -> {
+      result.add(m);
+    });
+
+    return result;
+  }
+
+  @Override
   public Collection<Model> getByTopologyId(String topologyId, long lastModified) {
     Collection<Model> result = new ArrayList();
 
@@ -135,5 +151,15 @@ public class ModelServiceBean implements ModelService {
   public long countByTopologyId(String topologyId) {
     Long count = modelRepository.countByTopologyId(topologyId);
     return count == null ? 0L : count;
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public void purge(String topologyId, int size) {
+    Pageable newest = new PageRequest(0, size, Direction.DESC, "version");
+    Page<Model> top = modelRepository.findByTopologyId(topologyId, newest);
+    List<Long> list = top.map((m)-> m.getVersion()).getContent();
+    Long last = list.get(list.size() - 1);
+    modelRepository.deleteByTopologyIdAndLessThanVersion(topologyId, last);
   }
 }

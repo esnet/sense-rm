@@ -18,6 +18,9 @@ public interface ModelService {
 
   public void delete();
 
+  // Prune Model entries down to size.
+  public void purge(String topologyId, int size);
+
   public Collection<Model> get();
 
   public Model get(long idx);
@@ -31,6 +34,8 @@ public interface ModelService {
   // Used by nsi-driver API to implement driver interface.
   public Model getByModelId(String modelId);
   public Model getCurrent(String topologyId);
-  public Collection<Model> getByTopologyId(String topologyId, long lastModified);
+
   public long countByTopologyId(String topologyId);
+  public Collection<Model> getByTopologyId(String topologyId);
+  public Collection<Model> getByTopologyId(String topologyId, long lastModified);
 }

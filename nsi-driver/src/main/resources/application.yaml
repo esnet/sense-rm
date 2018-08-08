@@ -57,6 +57,9 @@ nsi:
   # Control the polling of change within the network.
   modelAuditTimer: 120
 
+  # How small should we prune the model database.
+  modelPruneSize: 10
+
   # This was for the DDS HTTP server configuation for incoming requests but now springboot handles this.  Will need
   # a specific springboot configuration section.
   server:

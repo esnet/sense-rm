@@ -55,4 +55,8 @@ public class Model implements Serializable {
   @Basic(fetch=FetchType.LAZY, optional=true)
   private String base;
 
+  @Override
+  public String toString() {
+    return "idx: " + this.idx + ", modelId: " + this.modelId + ", topologyId: " + this.topologyId + ", modelId: " + this.modelId;
+  }
 }

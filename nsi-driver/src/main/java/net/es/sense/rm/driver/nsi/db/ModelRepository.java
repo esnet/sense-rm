@@ -1,5 +1,8 @@
 package net.es.sense.rm.driver.nsi.db;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -19,24 +22,39 @@ public interface ModelRepository extends CrudRepository<Model, String> {
   public Model findByModelIdAndVersion(@Param ("modelId") String modelId, @Param("version") long version);
 
   public Model findByIdx(@Param("idx") long idx);
-  public Model deleteByIdx(@Param("idx") long idx);
+
+  @Modifying
+  @Query("delete from #{#entityName} m where m.idx = :idx")
+  public void deleteByIdx(@Param("idx") long idx);
 
   public Model findByModelId(@Param("modelId") String modelId);
 
   public Iterable<Model> findByTopologyId(String topologyId);
+  public Page<Model> findByTopologyId(String topologyId, Pageable pageable);
 
   public Long countByTopologyId(@Param("topologyId") String topologyId);
 
   @Query("select m from #{#entityName} m where m.version > :version")
   public Iterable<Model> findAllNewer(@Param("version") long version);
 
-  @Query("select m from #{#entityName} m where modelId = :modelId and m.version > :version")
+  @Query("select m from #{#entityName} m where m.version < :version")
+  public Iterable<Model> findAllOlder(@Param("version") long version);
+
+  @Query("select m from #{#entityName} m where m.modelId = :modelId and m.version > :version")
   public Model findModelIdNewerThanVersion(@Param ("modelId") String modelId, @Param("version") long version);
 
   @Query("select m from #{#entityName} m where m.topologyId = :topologyId and m.version = (select max(mm.version) from #{#entityName} mm where mm.topologyId = m.topologyId)")
   public Model findCurrentModelForTopologyId(@Param ("topologyId") String topologyId);
 
-  @Query("select m from #{#entityName} m where topologyId = :topologyId and m.version > :version")
+  @Query("select m from #{#entityName} m where m.topologyId = :topologyId and m.version > :version")
   public Iterable<Model> findTopologyIdNewerThanVersion(@Param ("topologyId") String topologyId, @Param("version") long version);
 
+  @Query("select m from #{#entityName} m where m.topologyId = :topologyId and m.version < :version")
+  public Iterable<Model> findTopologyIdOlderThanVersion(@Param ("topologyId") String topologyId, @Param("version") long version);
+
+  @Modifying
+  @Query("delete from #{#entityName} m where m.topologyId = :topologyId and m.version < :version")
+  public void deleteByTopologyIdAndLessThanVersion(@Param ("topologyId") String topologyId, @Param("version") long version);
+
+  Page<Model> findAll(Pageable pageable);
 }

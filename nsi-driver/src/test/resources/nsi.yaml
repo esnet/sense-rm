@@ -14,6 +14,7 @@ nsi:
 
   # Control the polling of change within the network.
   modelAuditTimer: 120
+  modelPruneSize: 10
 
   server:
     address: example.net

@@ -55,11 +55,10 @@ public class MrmlFactory {
   }
 
   public long getVersion() {
-    XMLGregorianCalendar version = topology.getVersion();
-    GregorianCalendar cal = version.toGregorianCalendar();
+    GregorianCalendar version = topology.getVersion().toGregorianCalendar();
     log.debug("[MrmlFactory] version query nml version = {}, connection version = {}",
-            cal.getTimeInMillis(), ssm.getVersion());
-    return cal.getTimeInMillis() > ssm.getVersion() ? cal.getTimeInMillis() : ssm.getVersion();
+            version.getTimeInMillis(), ssm.getVersion());
+    return version.getTimeInMillis() > ssm.getVersion() ? version.getTimeInMillis() : ssm.getVersion();
   }
 
   public String getModelAsString(String modelType) {

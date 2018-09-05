@@ -97,6 +97,47 @@ public class ModelServiceTest {
     // Test ifModifiedSince - should return 1 result.
     models = modelService.getByTopologyId("urn:ogf:network:es.net:2013:", 1506766513000L);
     Assert.assertEquals(1, models.size());
+
+    // Test the update of a model.
+    model = modelService.getByModelId("dd58cadb-55e0-410c-891a-ddb2666e100b");
+    Assert.assertNotNull(model);
+    Assert.assertEquals(1506852913000L, model.getVersion());
+    Assert.assertEquals("urn:ogf:network:es.net:2013:", model.getTopologyId());
+    Assert.assertEquals("dd58cadb-55e0-410c-891a-ddb2666e100b", model.getModelId());
+    long time = System.currentTimeMillis();
+    model.setVersion(time);
+
+    Model update = modelService.update(model);
+    Assert.assertNotNull(update);
+    Assert.assertEquals(time, update.getVersion());
+
+    // Test if we read the object is comes back changed.
+    model = modelService.getByModelId("dd58cadb-55e0-410c-891a-ddb2666e100b");
+    Assert.assertNotNull(model);
+    Assert.assertEquals("urn:ogf:network:es.net:2013:", model.getTopologyId());
+    Assert.assertEquals("dd58cadb-55e0-410c-891a-ddb2666e100b", model.getModelId());
+    Assert.assertEquals(time, model.getVersion());
+
+    // Now make a new object, copy the contents, update the time.
+    Model newModel = new Model();
+    newModel.setIdx(model.getIdx());
+    newModel.setTopologyId(model.getTopologyId());
+    newModel.setModelId(model.getModelId());
+    newModel.setBase(model.getBase());
+    time = System.currentTimeMillis();
+    newModel.setVersion(time);
+
+    update = modelService.update(newModel);
+    Assert.assertNotNull(update);
+    Assert.assertEquals(time, update.getVersion());
+    Assert.assertEquals(newModel.getIdx(), update.getIdx());
+
+    // Test if we read the object is comes back changed.
+    model = modelService.getByModelId("dd58cadb-55e0-410c-891a-ddb2666e100b");
+    Assert.assertNotNull(model);
+    Assert.assertEquals("urn:ogf:network:es.net:2013:", model.getTopologyId());
+    Assert.assertEquals("dd58cadb-55e0-410c-891a-ddb2666e100b", model.getModelId());
+    Assert.assertEquals(time, model.getVersion());
   }
 
   @Test

@@ -143,6 +143,7 @@ public class SwitchingSubnetModel {
       // If we had a model change then make sure to update our version.
       if (version < reservation.getDiscovered()) {
         version = reservation.getDiscovered();
+        log.info("[SwitchingSubnetModel] new version discovered reservation cid = {}", reservation.getConnectionId());
       }
 
       // Skip generating model for reservation if it is expired.

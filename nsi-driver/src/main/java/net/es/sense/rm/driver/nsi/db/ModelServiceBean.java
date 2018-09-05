@@ -78,7 +78,7 @@ public class ModelServiceBean implements ModelService {
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
   public Model update(Model model) {
-    Model findOne = modelRepository.findOne(model.getModelId());
+    Model findOne = modelRepository.findByIdx(model.getIdx());
     if (findOne == null) {
       return null;
     }

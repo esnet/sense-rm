@@ -117,18 +117,18 @@ public class QuerySummary {
       Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
       if (r == null) {
         // We have not seen this reservation before so store it.
-        log.debug("[QuerySummary] storing new reservation, cid = {}",
-                reservation.getConnectionId());
+        log.debug("[QuerySummary] storing new reservation, cid = {}, discovered = {}",
+                reservation.getConnectionId(), reservation.getDiscovered());
         reservationService.store(reservation);
       } else if (r.diff(reservation)) {
         // We have to determine if the stored reservation needs to be updated.
-        log.debug("[QuerySummary] storing updated reservation update, cid = {}",
-                reservation.getConnectionId());
+        log.debug("[QuerySummary] storing updated reservation, cid = {}, discovered = {}",
+                reservation.getConnectionId(), reservation.getDiscovered());
         reservation.setId(r.getId());
         reservationService.store(reservation);
-      } else {
-        log.debug("[QuerySummary] reservation no change, cid = {}",
-                reservation.getConnectionId());
+      }
+      else {
+        log.debug("[QuerySummary] reservation no change, cid = {}", reservation.getConnectionId());
       }
     }
   }

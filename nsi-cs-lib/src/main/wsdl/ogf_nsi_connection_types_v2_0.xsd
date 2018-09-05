@@ -353,8 +353,8 @@
             <xsd:choice>
                 <xsd:element name="connectionId"        type="ftypes:ConnectionIdType" minOccurs="0" maxOccurs="unbounded" />
                 <xsd:element name="globalReservationId" type="tns:GlobalReservationIdType" minOccurs="0" maxOccurs="unbounded" />
-                <xsd:element name="ifModifiedSince"     type="xsd:dateTime" minOccurs="0" />
             </xsd:choice>
+            <xsd:element name="ifModifiedSince"     type="xsd:dateTime" minOccurs="0" />
         </xsd:sequence>
     </xsd:complexType>
 

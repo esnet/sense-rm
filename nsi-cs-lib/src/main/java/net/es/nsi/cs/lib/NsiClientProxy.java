@@ -36,7 +36,7 @@ public class NsiClientProxy {
         }
 
         // Bypass transport layer certificate security for HTTPS.
-        logger.info("Bypass transport layer certificate security for HTTPS.");
+        //logger.info("Bypass transport layer certificate security for HTTPS.");
         //context.put(JAXWSProperties.HOSTNAME_VERIFIER, new TestHostnameVerifier());
         //TestSecurityProvider.registerProvider();
 

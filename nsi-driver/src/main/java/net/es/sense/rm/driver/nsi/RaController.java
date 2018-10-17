@@ -107,6 +107,11 @@ public class RaController {
     // Start the CS controller.
     csProvider.start();
 
+    // Do a one time load of connections from remote NSA since the web
+    // server may not yet be servicing requests.  From this point on it is
+    // controlled through the asynchronous process.
+    csProvider.load();
+
     // Perform a model audit to consolitate the loaded DDS and CS information.
     auditService.audit();
 

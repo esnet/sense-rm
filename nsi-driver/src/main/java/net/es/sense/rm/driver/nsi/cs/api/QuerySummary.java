@@ -24,6 +24,7 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
+import net.es.nsi.common.constants.Nsi;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException;
@@ -196,7 +197,12 @@ public class QuerySummary {
         reservation.setLifecycleState(lifecycleState);
         reservation.setDataPlaneActive(dataPlaneStatus.isActive());
         reservation.setVersion(criteria.getVersion());
-        reservation.setServiceType(criteria.getServiceType());
+        if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(criteria.getServiceType()) ||
+                Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(criteria.getServiceType())) {
+          reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
+        } else {
+          reservation.setServiceType(criteria.getServiceType());
+        }
         reservation.setStartTime(CsUtils.getStartTime(criteria.getSchedule().getStartTime()));
         reservation.setEndTime(CsUtils.getEndTime(criteria.getSchedule().getEndTime()));
 
@@ -223,6 +229,12 @@ public class QuerySummary {
           reservation.setConnectionId(child.getConnectionId());
           reservation.setVersion(criteria.getVersion());
           reservation.setServiceType(child.getServiceType());
+          if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(child.getServiceType()) ||
+                Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(child.getServiceType())) {
+            reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
+          } else {
+            reservation.setServiceType(child.getServiceType());
+          }
           reservation.setReservationState(reservationState);
           reservation.setProvisionState(provisionState);
           reservation.setLifecycleState(lifecycleState);

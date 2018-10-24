@@ -134,6 +134,11 @@ public class CsProvider {
       log.error("[CsProvider] Failed to initialize actor", ex);
     }
 
+    // Do a one time load of connections from remote NSA since the web
+    // server may not yet be servicing requests.  From this point on it is
+    // controlled through the asynchronous process.
+    load();
+
     log.info("[CsProvider] Completed NSI CS system initialization.");
   }
 

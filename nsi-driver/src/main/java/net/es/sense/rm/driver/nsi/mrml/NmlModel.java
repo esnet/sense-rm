@@ -131,6 +131,17 @@ public class NmlModel {
   }
 
   /**
+   * @param defaultType the defaultType to set
+   */
+  public void setDefaultType(String defaultType) {
+    try {
+      this.defaultType = MrsBandwidthType.valueOf(defaultType);
+    } catch (IllegalArgumentException ex) {
+      log.error("[NmlModel] could not convert defaultType " + defaultType, ex);
+    }
+  }
+
+  /**
    * @return the defaultUnits
    */
   public String getDefaultUnits() {
@@ -149,14 +160,6 @@ public class NmlModel {
    */
   public long getDefaultGranularity() {
     return defaultGranularity;
-  }
-
-  public Collection<String> getTopologyIds() {
-    Collection<String> results = new ArrayList<>();
-    for (NmlTopologyType topology : documentReader.getNmlTopologyAll()) {
-      results.add(topology.getId());
-    }
-    return results;
   }
 
   /**
@@ -204,6 +207,14 @@ public class NmlModel {
 
   public Optional<NmlTopologyType> getTopology(String topologyId) {
     return documentReader.getTopologyById(topologyId).stream().findFirst();
+  }
+
+  public Collection<String> getTopologyIds() {
+    Collection<String> results = new ArrayList<>();
+    for (NmlTopologyType topology : documentReader.getNmlTopologyAll()) {
+      results.add(topology.getId());
+    }
+    return results;
   }
 
   private Map<String, NmlPort> getNmlPorts(NmlTopologyType nmlTopology) {

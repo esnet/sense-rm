@@ -59,6 +59,9 @@ public class MrmlFactoryTest {
     log.info("[testCreateOntologyModel] building NML model");
     NmlModel model = new NmlModel(drMock);
     model.setDefaultServiceType("http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE");
+    model.setDefaultGranularity(1L);
+    model.setDefaultType(MrsBandwidthType.guaranteed);
+    model.setDefaultUnits("bps");
 
     log.info("[testCreateOntologyModel] building SwitchingSubnet");
     ReservationService rsMock = Mockito.mock(ReservationService.class);
@@ -82,6 +85,10 @@ public class MrmlFactoryTest {
 
     log.info("[testWidlcardSwitchingService] building NML model");
     NmlModel model = new NmlModel(drMock);
+    model.setDefaultServiceType("http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE");
+    model.setDefaultGranularity(1L);
+    model.setDefaultType(MrsBandwidthType.guaranteed);
+    model.setDefaultUnits("bps");
 
     log.info("[testCreateOntologyModel] building SwitchingSubnet");
     ReservationService rsMock = Mockito.mock(ReservationService.class);
@@ -107,6 +114,10 @@ public class MrmlFactoryTest {
 
     log.info("[testLargeTopology] building NML model");
     NmlModel model = new NmlModel(drMock);
+    model.setDefaultServiceType("http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE");
+    model.setDefaultGranularity(1L);
+    model.setDefaultType(MrsBandwidthType.guaranteed);
+    model.setDefaultUnits("bps");
 
     log.info("[testCreateOntologyModel] building SwitchingSubnet");
     ReservationService rsMock = Mockito.mock(ReservationService.class);

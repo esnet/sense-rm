@@ -48,6 +48,9 @@ nsi:
   # The default serviceDefinition if one is not specified.
   defaultServiceType: http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE
 
+  # The default service type (undefined, guaranteedCapped, guaranteed, bestEffort).
+  defaultType: "guaranteedCapped"
+
   # The default bandwidth unit.
   defaultUnits: "bps"
 

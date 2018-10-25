@@ -63,6 +63,10 @@ public class AuditServiceBean implements AuditService {
     // Get the new document context.
     log.debug("[AuditService] generating NML topology model.");
     NmlModel nml = new NmlModel(documentReader);
+    nml.setDefaultServiceType(nsiProperties.getDefaultServiceType());
+    nml.setDefaultType(nsiProperties.getDefaultType());
+    nml.setDefaultUnits(nsiProperties.getDefaultUnits());
+    nml.setDefaultGranularity(nsiProperties.getDefaultGranularity());
 
     String topologyId = nsiProperties.getNetworkId();
 
@@ -109,6 +113,11 @@ public class AuditServiceBean implements AuditService {
 
     // Get the new document context.
     NmlModel nml = new NmlModel(documentReader);
+    nml.setDefaultServiceType(nsiProperties.getDefaultServiceType());
+    nml.setDefaultType(nsiProperties.getDefaultType());
+    nml.setDefaultUnits(nsiProperties.getDefaultUnits());
+    nml.setDefaultGranularity(nsiProperties.getDefaultGranularity());
+
     SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, connectionMapService, nml, topologyId);
     MrmlFactory mrml = new MrmlFactory(nml, ssm, topologyId);
 

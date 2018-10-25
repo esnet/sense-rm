@@ -56,19 +56,31 @@ import net.es.sense.rm.driver.nsi.dds.api.DocumentReader;
  */
 @Slf4j
 public class NmlModel {
-
+  // Globals.
   private final static ObjectFactory FACTORY = new ObjectFactory();
   private final DocumentReader documentReader;
-  private String defaultServiceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE";
-  private MrsBandwidthType defaultType = MrsBandwidthType.guaranteedCapped;
-  private String defaultUnits = "bps";
-  private long defaultGranularity = 1L;
   private final Map<String, NmlPort> ports = new HashMap<>();
 
+  // These are Ethernet service parameter defaults.
+  private String defaultServiceType;
+  private MrsBandwidthType defaultType = MrsBandwidthType.undefined;
+  private String defaultUnits;
+  private long defaultGranularity;
+
+  /**
+   * Class constructor.
+   *
+   * @param documentReader A reader for topology documents from the DDS.
+   */
   public NmlModel(DocumentReader documentReader) {
     this.documentReader = documentReader;
   }
 
+  /**
+   * This method will load every NML port from all discovered network
+   * topologies, resolve the unidirection port isAlias entries, and assign
+   * this adjacency information to the bidirectional port pair.
+   */
   private void load() {
       // Resolve all ports across all networks for later access.
      Collection<NmlTopologyType> topologies = documentReader.getNmlTopologyAll();
@@ -108,15 +120,29 @@ public class NmlModel {
              });
   }
 
-  public void setDefaultServiceType(String defaultServiceType) {
-    this.defaultServiceType = defaultServiceType;
-  }
-
+  /**
+   * Get the default service definition type used when creating
+   * SwitchingService elements.
+   *
+   * @return
+   */
   public String getDefaultServiceType() {
     return defaultServiceType;
   }
 
   /**
+   * Set the default service definition type used when creating
+   * SwitchingService elements.
+   *
+   * @param defaultServiceType
+   */
+  public void setDefaultServiceType(String defaultServiceType) {
+    this.defaultServiceType = defaultServiceType;
+  }
+
+  /**
+   * Get the default bandwidth QoS type.
+   *
    * @return the defaultType
    */
   public MrsBandwidthType getDefaultType() {
@@ -124,6 +150,8 @@ public class NmlModel {
   }
 
   /**
+   * Set the default bandwidth QoS type.
+   *
    * @param defaultType the defaultType to set
    */
   public void setDefaultType(MrsBandwidthType defaultType) {
@@ -131,6 +159,8 @@ public class NmlModel {
   }
 
   /**
+   * Set the default bandwidth QoS type.
+   *
    * @param defaultType the defaultType to set
    */
   public void setDefaultType(String defaultType) {
@@ -142,6 +172,8 @@ public class NmlModel {
   }
 
   /**
+   * Get the default bandwidth metric unit.
+   *
    * @return the defaultUnits
    */
   public String getDefaultUnits() {
@@ -149,6 +181,8 @@ public class NmlModel {
   }
 
   /**
+   * Set the default bandwidth metric unit.
+   *
    * @param defaultUnits the defaultUnits to set
    */
   public void setDefaultUnits(String defaultUnits) {
@@ -156,6 +190,8 @@ public class NmlModel {
   }
 
   /**
+   * Get the default bandwidth granularity value.
+   *
    * @return the defaultGranularity
    */
   public long getDefaultGranularity() {
@@ -163,12 +199,20 @@ public class NmlModel {
   }
 
   /**
+   * Set the default bandwidth granularity value.
+   *
    * @param defaultGranularity the defaultGranularity to set
    */
   public void setDefaultGranularity(long defaultGranularity) {
     this.defaultGranularity = defaultGranularity;
   }
 
+  /**
+   * Get a bidirectional NmlPort matching the specified identifier.
+   *
+   * @param id
+   * @return
+   */
   public NmlPort getPort(String id) {
     if (ports.isEmpty()) {
       load();
@@ -176,6 +220,11 @@ public class NmlModel {
     return ports.get(id);
   }
 
+  /**
+   * Get a map of bidirectional NmlPort indexed by port identifier.
+   *
+   * @return
+   */
   public Map<String, NmlPort> getPorts() {
     if (ports.isEmpty()) {
       load();
@@ -183,10 +232,25 @@ public class NmlModel {
     return ports;
   }
 
+  /**
+   * Add an NmlPort to to the port map indexed by the port identifier.
+   *
+   * @param port the NmlPort to add to the port map.
+   *
+   * @return
+   */
   public NmlPort addPort(NmlPort port) {
     return ports.put(port.getId(), port);
   }
 
+  /**
+   * Get a new map of NmlPort entries indexed by port identifier for the
+   * specified topologyId.
+   *
+   * @param topologyId The topology identifier of the network for which to build the port map.
+   *
+   * @return
+   */
   public Map<String, NmlPort> getPorts(String topologyId) {
     if (ports.isEmpty()) {
       load();
@@ -196,6 +260,15 @@ public class NmlModel {
             .collect(Collectors.toMap(p -> p.getId(), p -> p));
   }
 
+  /**
+   * Get a new map of NmlPort entries indexed by port identifier and matching
+   * the provided orientation for the specified topologyId.
+   *
+   * @param topologyId The topology identifier of the network for which to build the port map.
+   * @param orientation The orientation of the ports to include in the map.
+   *
+   * @return
+   */
   public Map<String, NmlPort> getPorts(String topologyId, Orientation orientation) {
     if (ports.isEmpty()) {
       load();
@@ -205,10 +278,22 @@ public class NmlModel {
             .collect(Collectors.toMap(p -> p.getId(), p -> p));
   }
 
+  /**
+   * Get an NmlTopology matching the provided topology identifier.
+   *
+   * @param topologyId The topology identifier to retrieve.
+   *
+   * @return
+   */
   public Optional<NmlTopologyType> getTopology(String topologyId) {
     return documentReader.getTopologyById(topologyId).stream().findFirst();
   }
 
+  /**
+   * Get a list of available topology identifiers.
+   *
+   * @return
+   */
   public Collection<String> getTopologyIds() {
     Collection<String> results = new ArrayList<>();
     for (NmlTopologyType topology : documentReader.getNmlTopologyAll()) {
@@ -217,10 +302,18 @@ public class NmlModel {
     return results;
   }
 
+  /**
+   * Create a new map of NmlPorts for the given nmlTopology indexed by port
+   * identifier.  This map will contain both unidirectional and bidirectional NML ports.
+   *
+   * @param nmlTopology NML topology to parse for a list of ports.
+   *
+   * @return
+   */
   private Map<String, NmlPort> getNmlPorts(NmlTopologyType nmlTopology) {
     Map<String, NmlPort> portMap = new HashMap<>();
 
-    // Unidirectional ports and SwitchingService are modelled using Relations.
+    // Unidirectional ports and SwitchingService are modeled using Relations.
     nmlTopology.getRelation().forEach((relation) -> {
       String type = relation.getType();
       if (type.equalsIgnoreCase(Relationships.HAS_OUTBOUND_PORT)) {
@@ -262,6 +355,15 @@ public class NmlModel {
     return portMap;
   }
 
+  /**
+   * Convert the NmlPortGroupType element into an NmlPort.
+   *
+   * @param portGroup The PortGroup to convert.
+   * @param orientation The orientation of the port.
+   * @param topologyId The topology identifier for this port.
+   *
+   * @return
+   */
   private NmlPort convertPortGroup(NmlPortGroupType portGroup, Orientation orientation, String topologyId) {
     // Extract the labels associated with this port.  We
     // currently expect a single labelType with a range of
@@ -318,6 +420,15 @@ public class NmlModel {
     return builder.build();
   }
 
+  /**
+   * Convert the NmlPortType element into an NmlPort.
+   *
+   * @param port The Port to convert.
+   * @param orientation The orientation of the port.
+   * @param topologyId The topology identifier for this port.
+
+   * @return
+   */
   private NmlPort convertPort(NmlPortType port, Orientation orientation, String topologyId) {
     // Port relationship has isAlias connection information.
     String isAlias = null;

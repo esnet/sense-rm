@@ -16,10 +16,10 @@ import org.springframework.stereotype.Repository;
 public interface ModelRepository extends CrudRepository<Model, String> {
 
   @Query("select count(m) > 0 from #{#entityName} m where m.topologyId = :topologyId and m.version = :version")
-  public boolean isVersion(@Param ("topologyId") String topologyId, @Param("version") long version);
+  public boolean isVersion(@Param ("topologyId") String topologyId, @Param("version") String version);
 
-  @Query("select m from #{#entityName} m where modelId = :modelId and m.version > :version")
-  public Model findByModelIdAndVersion(@Param ("modelId") String modelId, @Param("version") long version);
+  //@Query("select m from #{#entityName} m where modelId = :modelId and m.version > :version")
+  //public Model findByModelIdAndVersion(@Param ("modelId") String modelId, @Param("version") long version);
 
   public Model findByIdx(@Param("idx") long idx);
 
@@ -34,27 +34,27 @@ public interface ModelRepository extends CrudRepository<Model, String> {
 
   public Long countByTopologyId(@Param("topologyId") String topologyId);
 
-  @Query("select m from #{#entityName} m where m.version > :version")
-  public Iterable<Model> findAllNewer(@Param("version") long version);
+  @Query("select m from #{#entityName} m where m.created > :created")
+  public Iterable<Model> findAllNewer(@Param("created") long created);
 
-  @Query("select m from #{#entityName} m where m.version < :version")
-  public Iterable<Model> findAllOlder(@Param("version") long version);
+  @Query("select m from #{#entityName} m where m.created < :created")
+  public Iterable<Model> findAllOlder(@Param("created") long created);
 
-  @Query("select m from #{#entityName} m where m.modelId = :modelId and m.version > :version")
-  public Model findModelIdNewerThanVersion(@Param ("modelId") String modelId, @Param("version") long version);
+  @Query("select m from #{#entityName} m where m.modelId = :modelId and m.created > :created")
+  public Model findModelIdNewerThanCreated(@Param ("modelId") String modelId, @Param("created") long created);
 
-  @Query("select m from #{#entityName} m where m.topologyId = :topologyId and m.version = (select max(mm.version) from #{#entityName} mm where mm.topologyId = m.topologyId)")
+  @Query("select m from #{#entityName} m where m.topologyId = :topologyId and m.created = (select max(mm.created) from #{#entityName} mm where mm.topologyId = m.topologyId)")
   public Model findCurrentModelForTopologyId(@Param ("topologyId") String topologyId);
 
-  @Query("select m from #{#entityName} m where m.topologyId = :topologyId and m.version > :version")
-  public Iterable<Model> findTopologyIdNewerThanVersion(@Param ("topologyId") String topologyId, @Param("version") long version);
+  @Query("select m from #{#entityName} m where m.topologyId = :topologyId and m.created > :created")
+  public Iterable<Model> findTopologyIdNewerThanCreated(@Param ("topologyId") String topologyId, @Param("created") long created);
 
-  @Query("select m from #{#entityName} m where m.topologyId = :topologyId and m.version < :version")
-  public Iterable<Model> findTopologyIdOlderThanVersion(@Param ("topologyId") String topologyId, @Param("version") long version);
+  @Query("select m from #{#entityName} m where m.topologyId = :topologyId and m.created < :created")
+  public Iterable<Model> findTopologyIdOlderThanCreated(@Param ("topologyId") String topologyId, @Param("created") long created);
 
   @Modifying
-  @Query("delete from #{#entityName} m where m.topologyId = :topologyId and m.version < :version")
-  public void deleteByTopologyIdAndLessThanVersion(@Param ("topologyId") String topologyId, @Param("version") long version);
+  @Query("delete from #{#entityName} m where m.topologyId = :topologyId and m.created < :created")
+  public void deleteByTopologyIdAndLessThanCreated(@Param ("topologyId") String topologyId, @Param("created") long created);
 
   Page<Model> findAll(Pageable pageable);
 }

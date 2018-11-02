@@ -1,5 +1,6 @@
 package net.es.sense.rm.driver.nsi.cs.db;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,4 +21,7 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
   public Reservation findByProviderNsaAndConnectionId(
           @Param ("providerNSA") String providerNsa,
           @Param("connectionId") String connectionId);
+
+  @Query("select max(m.discovered) from #{#entityName} m")
+  public Reservation findNewestReservation();
 }

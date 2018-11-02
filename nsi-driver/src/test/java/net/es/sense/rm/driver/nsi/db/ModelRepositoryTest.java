@@ -34,7 +34,8 @@ public class ModelRepositoryTest {
     Model model = new Model();
     model.setModelId("ce4762ef-5bb3-420b-8dfd-1b1f099ed4ff");
     model.setTopologyId("urn:ogf:network:es.net:2013:");
-    model.setVersion(0);
+    model.setVersion("bignumber:largenumber");
+    model.setCreated(0);
     model.setBase(new String(Files.readAllBytes(Paths.get("src/test/resources/mrml.ttl"))));
     log.info("Model id: {}", model.getModelId());
     models.save(model);

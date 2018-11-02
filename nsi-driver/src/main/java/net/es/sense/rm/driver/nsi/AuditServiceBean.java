@@ -56,9 +56,34 @@ public class AuditServiceBean implements AuditService {
   @Autowired
   private ModelService modelService;
 
+  private long lastDds = 0;
+  private long lastCon = 0;
+
   @Override
   public void audit() {
-    log.info("[AuditService] starting audit.");
+    audit(nsiProperties.getNetworkId());
+  }
+
+  @Override
+  public void audit(String topologyId) {
+    log.info("[AuditService] starting audit for {}.", topologyId);
+    log.info("[AuditService] lastDds = {}, lastCon = {}", lastDds, lastCon);
+
+    // How do we determine if there was a change in network data that would
+    // result in a new model being generated?  First check to see if we have
+    // had a new DDS document or connection arrive since our last audit.
+    long dds = documentReader.getLastDiscovered();
+    long con = reservationService.getLastDiscovered();
+
+    // If we have then there is a possibility a change in topology has occured.
+    if (lastDds == dds && lastCon == con) {
+      log.info("[AuditService] No new documents so skipping audit.");
+      return;
+    }
+
+    // Save these values for the next audit.
+    lastDds = dds;
+    lastCon = con;
 
     // Get the new document context.
     log.debug("[AuditService] generating NML topology model.");
@@ -68,34 +93,39 @@ public class AuditServiceBean implements AuditService {
     nml.setDefaultUnits(nsiProperties.getDefaultUnits());
     nml.setDefaultGranularity(nsiProperties.getDefaultGranularity());
 
-    String topologyId = nsiProperties.getNetworkId();
+    log.debug("[AuditService] processing topologyId = {}", topologyId);
 
-    //nml.getTopologyIds().forEach((topologyId) -> {
-      log.debug("[AuditService] processing topologyId = {}", topologyId);
+    // Generate a SwitchingSubnet model based off of the NSI connections and
+    // discovered NML model.
+    SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, connectionMapService, nml, topologyId);
 
-      log.debug("[AuditService] generating SwitchingSubnet model.");
-      SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, connectionMapService, nml, topologyId);
-
-      log.debug("[AuditService] generating MRML model.");
-      MrmlFactory mrml = new MrmlFactory(nml, ssm, topologyId);
+    // Now generate an MRML model based on the combined NSI and NML information.
+    log.debug("[AuditService] generating MRML model.");
+    MrmlFactory mrml = new MrmlFactory(nml, ssm, topologyId);
 
     // Check to see if this is a new version.
-      long version = mrml.getVersion();
-      if (modelService.isPresent(topologyId, version)) {
-        log.info("[AuditService] found matching model topologyId = {}, version = {}.", topologyId, version);
-      } else {
-        log.info("[AuditService] adding new topology version, topologyId = {}, version = {}", topologyId, version);
-        String modelAsString = mrml.getModelAsString(Lang.TURTLE);
+    if (modelService.isPresent(topologyId, mrml.getVersion())) {
+      log.info("[AuditService] found matching model topologyId = {}, version = {}.", topologyId, mrml.getVersion());
+    } else {
+      log.info("[AuditService] adding new topology version, topologyId = {}, version = {}", topologyId, mrml.getVersion());
+      String modelAsString = mrml.getModelAsString(Lang.TURTLE);
 
-        UUID uuid = UUID.randomUUID();
-        Model model = new Model();
-        model.setTopologyId(topologyId);
-        model.setModelId(uuid.toString());
-        model.setVersion(mrml.getVersion());
-        model.setBase(modelAsString);
-        modelService.create(model);
+      UUID uuid = UUID.randomUUID();
+      Model model = new Model();
+      model.setTopologyId(topologyId);
+      model.setModelId(uuid.toString());
+      model.setVersion(mrml.getVersion());
+      model.setBase(modelAsString);
+
+      Model create = modelService.create(model);
+      if (create != null) {
+        log.debug("[AuditService] created modelId = {} for topology {}",
+                create.getModelId(), create.getTopologyId());
+      } else {
+        log.error("[AuditService] failed to create modelId = {} for topology {}",
+                model.getModelId(), model.getTopologyId());
       }
-    //});
+    }
 
     // Delete older models (keep last 5).
     modelService.purge(topologyId, nsiProperties.getModelPruneSize());
@@ -105,34 +135,5 @@ public class AuditServiceBean implements AuditService {
     modelService.get().forEach((m) -> {
       log.info(m.toString());
     });
-  }
-
-  @Override
-  public void audit(String topologyId) {
-    log.info("[AuditService] starting audit for {}.", topologyId);
-
-    // Get the new document context.
-    NmlModel nml = new NmlModel(documentReader);
-    nml.setDefaultServiceType(nsiProperties.getDefaultServiceType());
-    nml.setDefaultType(nsiProperties.getDefaultType());
-    nml.setDefaultUnits(nsiProperties.getDefaultUnits());
-    nml.setDefaultGranularity(nsiProperties.getDefaultGranularity());
-
-    SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, connectionMapService, nml, topologyId);
-    MrmlFactory mrml = new MrmlFactory(nml, ssm, topologyId);
-
-    // Check to see if this is a new version.
-    if (modelService.isPresent(topologyId, mrml.getVersion())) {
-      log.debug("[AuditService] found matching model topologyId = {}, version = {}.", topologyId, mrml.getVersion());
-    } else {
-      log.info("[AuditService] adding new topology version, topologyId = {}, version = {}", topologyId, mrml.getVersion());
-      UUID uuid = UUID.randomUUID();
-      Model model = new Model();
-      model.setTopologyId(topologyId);
-      model.setModelId(uuid.toString());
-      model.setVersion(mrml.getVersion());
-      model.setBase(mrml.getModelAsString(Lang.TURTLE));
-      modelService.create(model);
-    }
   }
 }

@@ -29,4 +29,7 @@ public interface DocumentRepository extends CrudRepository<Document, String> {
 
   @Query("select d from #{#entityName} d where d.expires <= :expires")
   public Iterable<Document> findExpired(@Param("expires") long expires);
+
+  @Query("select max(m.lastDiscovered) from #{#entityName} m")
+  public Document findNewestDocument();
 }

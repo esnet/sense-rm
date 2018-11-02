@@ -131,7 +131,7 @@ public class NsiDriver implements Driver {
         return new AsyncResult<>(response);
       }
 
-      long version = (model.getVersion() / 1000) * 1000;
+      long version = (model.getCreated() / 1000) * 1000;
       if (version <= ifModifiedSince) {
         response.setStatus(Status.NOT_MODIFIED);
         return new AsyncResult<>(response);
@@ -201,7 +201,7 @@ public class NsiDriver implements Driver {
           ModelResource model = new ModelResource();
           model.setId(m.getModelId());
           model.setCreationTime(XmlUtilities
-                  .longToXMLGregorianCalendar((m.getVersion() / 1000) * 1000).toXMLFormat());
+                  .longToXMLGregorianCalendar((m.getCreated() / 1000) * 1000).toXMLFormat());
           model.setModel(m.getBase());
 
           log.info("[NsiDriver] found matching modelId = {}", model.getId());
@@ -271,7 +271,7 @@ public class NsiDriver implements Driver {
       if (model != null) {
         log.debug("[NsiDriver] getCurrentModel: model id = {}, version = {} compared to ifModifiedSince = {}",
                 model.getModelId(), model.getVersion(), ifModifiedSince);
-        long version = (model.getVersion() / 1000) * 1000;
+        long version = (model.getCreated() / 1000) * 1000;
         if (version <= ifModifiedSince) {
           log.debug("[NsiDriver] getCurrentModel: model id = {} NOT_MODIFIED", model.getModelId());
           response.setStatus(Response.Status.NOT_MODIFIED);

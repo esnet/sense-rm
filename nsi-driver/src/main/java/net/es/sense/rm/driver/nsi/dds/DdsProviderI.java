@@ -18,9 +18,7 @@ public interface DdsProviderI {
   public Document addDocument(DocumentType document, Source context) throws WebApplicationException;
 
   public Document deleteDocument(String nsa, String type, String id) throws WebApplicationException;
-
-  public Document updateDocument(String nsa, String type, String id, DocumentType document, Source context) throws WebApplicationException, InvalidVersionException;
-
+  
   public Document updateDocument(DocumentType request, Source context) throws WebApplicationException, InvalidVersionException;
 
   public Collection<Document> getNewerDocuments(long lastDiscovered);

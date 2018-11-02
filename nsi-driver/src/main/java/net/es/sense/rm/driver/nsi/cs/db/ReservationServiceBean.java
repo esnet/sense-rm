@@ -22,6 +22,12 @@ public class ReservationServiceBean implements ReservationService {
   private ReservationRepository reservationRepository;
 
   @Override
+  public long getLastDiscovered() {
+    Reservation findNewest = reservationRepository.findNewestReservation();
+    return findNewest.getDiscovered();
+  }
+
+  @Override
   public Collection<Reservation> get() {
     return Lists.newArrayList(reservationRepository.findAll());
   }

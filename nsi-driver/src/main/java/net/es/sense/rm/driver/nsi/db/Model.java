@@ -49,7 +49,13 @@ public class Model implements Serializable {
   @Basic(optional=false)
   String modelId;
 
-  private long version;
+  // A model is composed of two different data sources so we need a compound
+  // version number to encapulate the two versions of data.
+  private String version;
+
+  // We need to know when this model was created so we can manage cleanup of
+  // old models.
+  private long created = System.currentTimeMillis();
 
   @Lob
   @Basic(fetch=FetchType.LAZY, optional=true)
@@ -57,6 +63,7 @@ public class Model implements Serializable {
 
   @Override
   public String toString() {
-    return "idx: " + this.idx + ", modelId: " + this.modelId + ", topologyId: " + this.topologyId + ", version: " + this.getVersion();
+    return "idx: " + this.idx + ", modelId: " + this.modelId + ", topologyId: "
+            + this.topologyId + ", version: " + this.getVersion();
   }
 }

@@ -27,6 +27,10 @@ public class DocumentReader {
   @Autowired
   private DdsProvider ddsProvider;
 
+  public long getLastDiscovered() {
+    return ddsProvider.getLastDiscovered();
+  }
+
   public Collection<NsaType> getNsaAll() {
     return decode(NsaType.class, ddsProvider.getDocumentsByType(Nsi.NSI_DOC_TYPE_NSA_V1));
   }

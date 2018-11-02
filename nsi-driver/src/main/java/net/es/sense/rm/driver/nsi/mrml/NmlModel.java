@@ -274,7 +274,8 @@ public class NmlModel {
       load();
     }
     return ports.values().stream()
-            .filter(p -> p.getTopologyId().equalsIgnoreCase(topologyId) && p.getOrientation().compareTo(orientation) == 0)
+            .filter(p -> p.getTopologyId().equalsIgnoreCase(topologyId) &&
+                    p.getOrientation().compareTo(orientation) == 0)
             .collect(Collectors.toMap(p -> p.getId(), p -> p));
   }
 

@@ -8,6 +8,8 @@ import java.util.Collection;
  */
 public interface ReservationService {
 
+  public long getLastDiscovered();
+
   public Reservation store(Reservation reservation);
 
   public void delete(Reservation reservation);

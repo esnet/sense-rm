@@ -25,9 +25,7 @@ public interface ModelService {
 
   public Model get(long idx);
 
-  public Model getByModelId(String modelId, long lastModified);
-
-  public boolean isPresent(String topologyId, long version);
+  public boolean isPresent(String topologyId, String version);
 
   public Model update(Model model);
 

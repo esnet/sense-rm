@@ -101,6 +101,10 @@ public class DdsProvider implements DdsProviderI {
     return registrationRouter;
   }
 
+  public long getLastDiscovered() {
+    return documentService.getLastDiscovered();
+  }
+
   public void terminate() {
     // Unsubscribe from our peer DDS servers.
     RegistrationEvent event = new RegistrationEvent();
@@ -175,7 +179,8 @@ public class DdsProvider implements DdsProviderI {
         updateDocument(document, Source.REMOTE);
       } catch (InvalidVersionException ex) {
         // This is an old document version so discard.
-        log.debug("[processNotification] old document version documentId = {}", documentId);
+        log.debug("[processNotification] recieved old document version documentId = {}, version = {}",
+                documentId, document.getVersion());
       }
     }
   }
@@ -215,7 +220,15 @@ public class DdsProvider implements DdsProviderI {
     }
 
     // This is a new document so add it into the document space.
-    documentService.create(document);
+    Document create = documentService.create(document);
+
+    if (create != null) {
+      log.debug("[addDocument] added documentId=" + document.getDocumentId());
+    } else {
+      log.error("[addDocument] failed to add documentId=" + document.getDocumentId());
+      throw Exceptions.doesNotExistException(DiscoveryError.INTERNAL_SERVER_ERROR, "document", document.getDocumentId());
+    }
+
 /**
     // Route a new document event.
     DocumentEvent de = new DocumentEvent();
@@ -270,7 +283,15 @@ public class DdsProvider implements DdsProviderI {
       throw Exceptions.internalServerErrorException("getDocumentFull", ex.getMessage());
     }
 
-    documentService.create(document);
+    Document update = documentService.update(document);
+
+    if (update != null) {
+      log.debug("[deleteDocument] deleted documentId=" + documentId);
+    } else {
+      log.error("[deleteDocument] failed to delete documentId=" + documentId);
+      throw Exceptions.doesNotExistException(DiscoveryError.INTERNAL_SERVER_ERROR, "document", documentId);
+    }
+
 /**
     // Route a update document event.
     DocumentEvent de = new DocumentEvent();
@@ -282,9 +303,9 @@ public class DdsProvider implements DdsProviderI {
   }
 
   @Override
-  public Document updateDocument(String nsa, String type, String id, DocumentType request, Source context) throws WebApplicationException, InvalidVersionException {
+  public Document updateDocument(DocumentType request, Source context) throws WebApplicationException, InvalidVersionException {
     // Create a document identifier to look up in our documet table.
-    String documentId = Document.documentId(nsa, type, id);
+    String documentId = Document.documentId(request.getNsa(), request.getType(), request.getId());
 
     // See if we have a document under this id.
     Document document = documentService.get(documentId);
@@ -329,9 +350,14 @@ public class DdsProvider implements DdsProviderI {
       throw Exceptions.invalidVersionException(DiscoveryError.DOCUMENT_VERSION, request.getId(), request.getVersion(), documentT.getVersion());
     }
 
-    Document newDoc = new Document(request, nsiProperties.getDdsUrl());
-    documentService.create(newDoc);
-    log.debug("[updateDocument] updated documentId=" + documentId);
+    Document doc = new Document(request, nsiProperties.getDdsUrl());
+    Document update = documentService.update(doc);
+    if (update != null) {
+      log.debug("[updateDocument] updated documentId=" + documentId);
+    } else {
+      log.error("[updateDocument] failed to update documentId=" + documentId);
+      throw Exceptions.doesNotExistException(DiscoveryError.INTERNAL_SERVER_ERROR, "document", documentId);
+    }
 
     // Route a update document event.
 /**
@@ -340,12 +366,7 @@ public class DdsProvider implements DdsProviderI {
     de.setDocument(newDoc);
     ddsController.sendNotification(de);
 **/
-    return newDoc;
-  }
-
-  @Override
-  public Document updateDocument(DocumentType request, Source context) throws WebApplicationException, InvalidVersionException {
-    return updateDocument(request.getNsa(), request.getType(), request.getId(), request, context);
+    return update;
   }
 
   @Override

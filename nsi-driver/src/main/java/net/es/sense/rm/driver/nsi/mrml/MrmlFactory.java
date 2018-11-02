@@ -54,11 +54,11 @@ public class MrmlFactory {
                     "[MrmlFactory] Could not find NML document for topologyId = " + topologyId));
   }
 
-  public long getVersion() {
+  public String getVersion() {
     GregorianCalendar version = topology.getVersion().toGregorianCalendar();
     log.debug("[MrmlFactory] version query nml version = {}, connection version = {}",
             version.getTimeInMillis(), ssm.getVersion());
-    return version.getTimeInMillis() > ssm.getVersion() ? version.getTimeInMillis() : ssm.getVersion();
+    return version.getTimeInMillis() + ":" + ssm.getVersion();
   }
 
   public String getModelAsString(String modelType) {

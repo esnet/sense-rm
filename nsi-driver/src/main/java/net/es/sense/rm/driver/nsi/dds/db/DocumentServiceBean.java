@@ -20,6 +20,12 @@ public class DocumentServiceBean implements DocumentService {
   private DocumentRepository documentRepository;
 
   @Override
+  public long getLastDiscovered() {
+    Document findNewestDocument = documentRepository.findNewestDocument();
+    return findNewestDocument.getLastDiscovered();
+  }
+
+  @Override
   public Collection<Document> get() {
     return Lists.newArrayList(documentRepository.findAll());
   }

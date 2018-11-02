@@ -65,14 +65,14 @@ public class ModelServiceTest {
     // Get a specific model.
     Model model = modelService.getByModelId("eb9efcf8-4987-430e-a47e-b456dcd8f46c");
     Assert.assertNotNull(model);
-    Assert.assertEquals(1506766513000L, model.getVersion());
+    Assert.assertEquals(1506766513000L, model.getCreated());
     Assert.assertEquals("urn:ogf:network:es.net:2013:", model.getTopologyId());
     Assert.assertEquals("eb9efcf8-4987-430e-a47e-b456dcd8f46c", model.getModelId());
 
     // Get current model.
     model = modelService.getCurrent("urn:ogf:network:es.net:2013:");
     Assert.assertNotNull(model);
-    Assert.assertEquals(1506852913000L, model.getVersion());
+    Assert.assertEquals(1506852913000L, model.getCreated());
     Assert.assertEquals("urn:ogf:network:es.net:2013:", model.getTopologyId());
     Assert.assertEquals("dd58cadb-55e0-410c-891a-ddb2666e100b", model.getModelId());
 
@@ -101,22 +101,22 @@ public class ModelServiceTest {
     // Test the update of a model.
     model = modelService.getByModelId("dd58cadb-55e0-410c-891a-ddb2666e100b");
     Assert.assertNotNull(model);
-    Assert.assertEquals(1506852913000L, model.getVersion());
+    Assert.assertEquals(1506852913000L, model.getCreated());
     Assert.assertEquals("urn:ogf:network:es.net:2013:", model.getTopologyId());
     Assert.assertEquals("dd58cadb-55e0-410c-891a-ddb2666e100b", model.getModelId());
     long time = System.currentTimeMillis();
-    model.setVersion(time);
+    model.setCreated(time);
 
     Model update = modelService.update(model);
     Assert.assertNotNull(update);
-    Assert.assertEquals(time, update.getVersion());
+    Assert.assertEquals(time, update.getCreated());
 
     // Test if we read the object is comes back changed.
     model = modelService.getByModelId("dd58cadb-55e0-410c-891a-ddb2666e100b");
     Assert.assertNotNull(model);
     Assert.assertEquals("urn:ogf:network:es.net:2013:", model.getTopologyId());
     Assert.assertEquals("dd58cadb-55e0-410c-891a-ddb2666e100b", model.getModelId());
-    Assert.assertEquals(time, model.getVersion());
+    Assert.assertEquals(time, model.getCreated());
 
     // Now make a new object, copy the contents, update the time.
     Model newModel = new Model();
@@ -125,11 +125,11 @@ public class ModelServiceTest {
     newModel.setModelId(model.getModelId());
     newModel.setBase(model.getBase());
     time = System.currentTimeMillis();
-    newModel.setVersion(time);
+    newModel.setCreated(time);
 
     update = modelService.update(newModel);
     Assert.assertNotNull(update);
-    Assert.assertEquals(time, update.getVersion());
+    Assert.assertEquals(time, update.getCreated());
     Assert.assertEquals(newModel.getIdx(), update.getIdx());
 
     // Test if we read the object is comes back changed.
@@ -137,7 +137,7 @@ public class ModelServiceTest {
     Assert.assertNotNull(model);
     Assert.assertEquals("urn:ogf:network:es.net:2013:", model.getTopologyId());
     Assert.assertEquals("dd58cadb-55e0-410c-891a-ddb2666e100b", model.getModelId());
-    Assert.assertEquals(time, model.getVersion());
+    Assert.assertEquals(time, model.getCreated());
   }
 
   @Test

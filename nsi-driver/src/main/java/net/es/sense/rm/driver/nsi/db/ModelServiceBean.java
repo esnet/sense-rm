@@ -57,12 +57,7 @@ public class ModelServiceBean implements ModelService {
   }
 
   @Override
-  public Model getByModelId(String modelId, long lastModified) {
-    return modelRepository.findByModelIdAndVersion(modelId, lastModified);
-  }
-
-  @Override
-  public boolean isPresent(String topologyId, long version) {
+  public boolean isPresent(String topologyId, String version) {
     return modelRepository.isVersion(topologyId, version);
   }
 
@@ -136,10 +131,10 @@ public class ModelServiceBean implements ModelService {
   }
 
   @Override
-  public Collection<Model> getByTopologyId(String topologyId, long lastModified) {
+  public Collection<Model> getByTopologyId(String topologyId, long created) {
     Collection<Model> result = new ArrayList();
 
-    Iterable<Model> findByTopologyId = modelRepository.findTopologyIdNewerThanVersion(topologyId, lastModified);
+    Iterable<Model> findByTopologyId = modelRepository.findTopologyIdNewerThanCreated(topologyId, created);
     findByTopologyId.forEach(m -> {
       result.add(m);
     });
@@ -156,10 +151,10 @@ public class ModelServiceBean implements ModelService {
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
   public void purge(String topologyId, int size) {
-    Pageable newest = new PageRequest(0, size, Direction.DESC, "version");
+    Pageable newest = new PageRequest(0, size, Direction.DESC, "created");
     Page<Model> top = modelRepository.findByTopologyId(topologyId, newest);
-    List<Long> list = top.map((m)-> m.getVersion()).getContent();
+    List<Long> list = top.map((m)-> m.getCreated()).getContent();
     Long last = list.get(list.size() - 1);
-    modelRepository.deleteByTopologyIdAndLessThanVersion(topologyId, last);
+    modelRepository.deleteByTopologyIdAndLessThanCreated(topologyId, last);
   }
 }

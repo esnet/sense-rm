@@ -877,7 +877,7 @@ public class SenseRmController extends SenseController {
         deltas.add(d);
 
         if (lastModified > newest) {
-            newest = lastModified;
+          newest = lastModified;
         }
       }
 

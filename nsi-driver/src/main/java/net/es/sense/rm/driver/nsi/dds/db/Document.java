@@ -6,7 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -76,9 +75,9 @@ public class Document implements Serializable {
     this.documentId = documentT.getId().trim();
 
     // This is the time we discovered this documentT.
-    Date discovered = new Date();
-    discovered.setTime(discovered.getTime() - discovered.getTime() % 1000);
-    lastDiscovered = discovered.getTime();
+    //Date discovered = new Date();
+    //discovered.setTime(discovered.getTime() - discovered.getTime() % 1000);
+    lastDiscovered = (System.currentTimeMillis() / 1000) * 1000;
 
     if (documentT.getExpires() != null) {
       try {

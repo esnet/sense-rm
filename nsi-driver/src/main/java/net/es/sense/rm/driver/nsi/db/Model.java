@@ -55,7 +55,8 @@ public class Model implements Serializable {
 
   // We need to know when this model was created so we can manage cleanup of
   // old models.
-  private long created = System.currentTimeMillis();
+  private long created = (System.currentTimeMillis() / 1000) * 1000;
+  //private long created = System.currentTimeMillis();
 
   @Lob
   @Basic(fetch=FetchType.LAZY, optional=true)

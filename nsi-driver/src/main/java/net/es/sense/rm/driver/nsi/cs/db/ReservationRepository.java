@@ -23,5 +23,5 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
           @Param("connectionId") String connectionId);
 
   @Query("select max(m.discovered) from #{#entityName} m")
-  public Reservation findNewestReservation();
+  public long findNewestReservation();
 }

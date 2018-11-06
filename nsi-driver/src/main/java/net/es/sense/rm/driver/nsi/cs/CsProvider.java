@@ -456,8 +456,9 @@ public class CsProvider {
 
         log.debug("[SwitchingSubnet] storing connectionMap = {}", stored);
 
+        String correlationId = Helper.getUUID();
         CommonHeaderType requestHeader = NsiHeader.builder()
-                .correlationId(Helper.getUUID())
+                .correlationId(correlationId)
                 .providerNSA(nsiProperties.getProviderNsaId())
                 .requesterNSA(nsiProperties.getNsaId())
                 .replyTo(nsiProperties.getRequesterConnectionURL())
@@ -471,10 +472,10 @@ public class CsProvider {
         Operation op = new Operation();
         op.setOperation(OperationType.reserve);
         op.setState(StateType.reserving);
-        op.setCorrelationId(requestHeader.getCorrelationId());
+        op.setCorrelationId(correlationId);
         operationMap.store(op);
 
-        correlationIds.add(requestHeader.getCorrelationId());
+        correlationIds.add(correlationId);
 
         // Issue the NSI reservation request.
         try {
@@ -485,7 +486,7 @@ public class CsProvider {
           commits.add(response.getConnectionId());
 
           log.debug("[csProvider] issued reserve operation correlationId = {}, connectionId = {}",
-                  op.getCorrelationId(), response.getConnectionId());
+                  correlationId, response.getConnectionId());
         } catch (ServiceException ex) {
           //TODO: Consider whether we should unwrap any NSI reservations that were successful.
           // For now just delete the correlationId we added.
@@ -549,8 +550,9 @@ public class CsProvider {
     // For each cid we must create and send an NSI terminate request.
     for (String cid : connectionIds) {
       // If we have some changes apply them into the network.
+      String correlationId = Helper.getUUID();
       CommonHeaderType requestHeader = NsiHeader.builder()
-              .correlationId(Helper.getUUID())
+              .correlationId(correlationId)
               .providerNSA(nsiProperties.getProviderNsaId())
               .requesterNSA(nsiProperties.getNsaId())
               .replyTo(nsiProperties.getRequesterConnectionURL())
@@ -567,32 +569,35 @@ public class CsProvider {
       Operation op = new Operation();
       op.setOperation(OperationType.terminate);
       op.setState(StateType.terminating);
-      op.setCorrelationId(requestHeader.getCorrelationId());
+      op.setCorrelationId(correlationId);
       operationMap.store(op);
-      correlationIds.add(requestHeader.getCorrelationId());
+      correlationIds.add(correlationId);
 
-      // Issue the NSI reservation request.
+      // Issue the NSI terminate request for the specified connection.
       boolean error = true;
       try {
         ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
         nsiClient.getProxy().terminate(terminate, header);
         log.debug("[csProvider] issued terminate operation correlationId = {}, connectionId = {}",
-                op.getCorrelationId(), terminate.getConnectionId());
+                correlationId, terminate.getConnectionId());
         error = false;
       } catch (ServiceException ex) {
         // Continue on this error but clean up this correlationId.
-        operationMap.delete(requestHeader.getCorrelationId());
+        operationMap.delete(correlationId);
+        correlationIds.remove(correlationId);
         log.error("[csProvider] Failed to send NSI CS terminate message, correlationId = {}, errorId = {}, text = {}",
-                requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+                correlationId, ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
       } catch (SOAPFaultException ex) {
         // Continue on this error but clean up this correlationId.
-        operationMap.delete(requestHeader.getCorrelationId());
+        operationMap.delete(correlationId);
+        correlationIds.remove(correlationId);
         log.error("[csProvider] Failed to send NSI CS terminate message, correlationId = {}, SOAP Fault = {}",
-                requestHeader.getCorrelationId(), ex.getFault().toString());
+                correlationId, ex.getFault().toString());
       } catch (Exception ex) {
-        operationMap.delete(requestHeader.getCorrelationId());
+        operationMap.delete(correlationId);
+        correlationIds.remove(correlationId);
         log.error("[csProvider] Failed to send NSI CS terminate message, correlationId = {}",
-                requestHeader.getCorrelationId(), ex);
+                correlationId, ex);
         throw ex;
       } finally {
         if (error) {
@@ -690,8 +695,9 @@ public class CsProvider {
     // Now we go through and provision each of these connectionIds.
     correlationIds.clear();
     for (String cid : connectionIds) {
+      String correlationId = Helper.getUUID();
       CommonHeaderType requestHeader = NsiHeader.builder()
-              .correlationId(Helper.getUUID())
+              .correlationId(correlationId)
               .providerNSA(nsiProperties.getProviderNsaId())
               .requesterNSA(nsiProperties.getNsaId())
               .replyTo(nsiProperties.getRequesterConnectionURL())
@@ -706,32 +712,31 @@ public class CsProvider {
       Operation op = new Operation();
       op.setOperation(OperationType.provision);
       op.setState(StateType.provisioning);
-      op.setCorrelationId(requestHeader.getCorrelationId());
+      op.setCorrelationId(correlationId);
       operationMap.store(op);
-      correlationIds.add(requestHeader.getCorrelationId());
+      correlationIds.add(correlationId);
 
       try {
         ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
         nsiClient.getProxy().provision(commitBody, header);
 
         log.debug("[csProvider] issued provision operation correlationId = {}, connectionId = {}",
-                op.getCorrelationId(), cid);
+                correlationId, cid);
       } catch (ServiceException ex) {
         //TODO: Consider whether we should unwrap any NSI reservations that were successful.
         // For now just delete the correlationId we added.
         operationMap.delete(correlationIds);
         log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}, errorId = {}, text = {}",
-                requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+                correlationId, ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
         throw ex;
       } catch (SOAPFaultException soap) {
         operationMap.delete(correlationIds);
         log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}, SOAP Fault {}",
-                requestHeader.getCorrelationId(), soap.getFault().toString());
+                correlationId, soap.getFault().toString());
         throw soap;
       } catch (Exception ex) {
         operationMap.delete(correlationIds);
-        log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}",
-                requestHeader.getCorrelationId(), ex);
+        log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}", correlationId, ex);
         throw ex;
       }
     }
@@ -773,8 +778,12 @@ public class CsProvider {
       } else {
         log.error("[CsProvider] timeout, failed to get response for correlationId = {}", id);
         Operation op = operationMap.delete(id);
+        StateType state = StateType.unknown;
+        if (op != null) {
+          state = op.getState();
+        }
         exception = Optional.of(new TimeoutException("Operation failed to reserve, correlationId = "
-                  + id + ", state = " + op.getState()));
+                  + id + ", state = " + state));
       }
     }
 

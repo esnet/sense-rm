@@ -20,6 +20,7 @@
 package net.es.sense.rm.driver.nsi.mrml;
 
 import com.google.common.base.Strings;
+import java.util.Date;
 import java.util.Optional;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -59,6 +60,26 @@ public class NmlExistsDuring {
 
   public XMLGregorianCalendar getStart() {
     return start;
+  }
+
+  /**
+   * OpenNSA will not accept a starTime in the past so we want to give
+   * ourselves a 10 second padding for a startTime in the future to
+   * account for delay in propagation.  If the specified startTime is
+   * in the past, or within 10 seconds from now, we return a startTime
+   * of now just to be safe.
+   *
+   * @return
+   * @throws DatatypeConfigurationException
+   */
+  public XMLGregorianCalendar getPaddedStart() throws DatatypeConfigurationException {
+    // We want pad the current date with 10 seconds before comparing.
+    Date now = new Date(System.currentTimeMillis() + 1000 * 10);
+    if (now.before(XmlUtilities.xmlGregorianCalendarToDate(start))) {
+      return start;
+    }
+
+    return null;
   }
 
   public XMLGregorianCalendar getEnd() {

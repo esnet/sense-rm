@@ -418,7 +418,7 @@ public class CsProvider {
         // Base the reservation off of the specified existsDuring criteria.
         ScheduleType sch = CS_FACTORY.createScheduleType();
         if (ssExistsDuring.getStart() != null) {
-          sch.setStartTime(CS_FACTORY.createScheduleTypeStartTime(ssExistsDuring.getStart()));
+          sch.setStartTime(CS_FACTORY.createScheduleTypeStartTime(ssExistsDuring.getPaddedStart()));
         }
 
         if (ssExistsDuring.getEnd() != null) {

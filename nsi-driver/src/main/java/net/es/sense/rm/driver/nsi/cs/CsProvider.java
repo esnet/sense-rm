@@ -28,6 +28,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPFaultException;
 import lombok.extern.slf4j.Slf4j;
@@ -417,8 +418,9 @@ public class CsProvider {
 
         // Base the reservation off of the specified existsDuring criteria.
         ScheduleType sch = CS_FACTORY.createScheduleType();
-        if (ssExistsDuring.getStart() != null) {
-          sch.setStartTime(CS_FACTORY.createScheduleTypeStartTime(ssExistsDuring.getPaddedStart()));
+        XMLGregorianCalendar paddedStart = ssExistsDuring.getPaddedStart();
+        if (paddedStart != null) {
+          sch.setStartTime(CS_FACTORY.createScheduleTypeStartTime(paddedStart));
         }
 
         if (ssExistsDuring.getEnd() != null) {

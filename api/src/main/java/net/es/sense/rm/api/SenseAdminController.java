@@ -51,7 +51,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -264,9 +263,9 @@ public class SenseAdminController extends SenseController {
                   value = HttpConstants.IF_MODIFIED_SINCE_NAME,
                   required = false)
           @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
-          @RequestParam(
+          @RequestHeader(
                   value = HttpConstants.IF_NONE_MATCH_NAME,
-                  defaultValue = "false")
+                  required = false)
           @ApiParam(value = HttpConstants.IF_NONE_MATCH_MSG, required = false) String ifNoneMatch) {
 
     // We need the request URL to build fully qualified resource URLs.

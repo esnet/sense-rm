@@ -17,24 +17,47 @@
  * publicly and display publicly, and to permit other to do so.
  *
  */
-package net.es.sense.rm.driver.nsi.cs.db;
+package net.es.sense.rm.measurements.db;
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import io.swagger.annotations.ApiModel;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  *
  * @author hacksaw
  */
-@Repository
-public interface ConnectionMapRepository extends CrudRepository<ConnectionMap, Long> {
+@ApiModel(value="type", description="The type of metric.")
+@XmlType(name = "type")
+@XmlEnum
+public enum MetricType {
+  DURATION(1001, "duration"),
+  END(9000, "");
 
-  public ConnectionMap findByDescription(@Param("description") String description);
-  public Iterable<ConnectionMap> findByDeltaId(@Param("deltaId") String deltaId);
-  public Iterable<ConnectionMap> findBySwitchingSubnetId(@Param("switchingSubnetId") String switchingSubnetId);
-  public Iterable<ConnectionMap> findByDeltaIdAndSwitchingSubnetId(
-          @Param("deltaId") String deltaId,
-          @Param("switchingSubnetId") String switchingSubnetId);
+  private final int code;
+  private final String label;
 
+  private MetricType(int code, String label) {
+    this.code = code;
+    this.label = label;
+  }
+
+  /**
+   * @return the code
+   */
+  public int getCode() {
+    return code;
+  }
+
+  /**
+   * @return the label
+   */
+  public String getLabel() {
+    return label;
+  }
+
+  @Override
+  public String toString() {
+    return label;
+  }
 }

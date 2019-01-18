@@ -1,4 +1,4 @@
-package net.es.sense.rm.api;
+package net.es.sense.rm.driver.nsi.cs.db;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
@@ -9,11 +9,8 @@ import org.springframework.context.annotation.Configuration;
  * @author hacksaw
  */
 @Configuration
-@ComponentScan({
-  "net.es.sense.rm.api",
-  "net.es.sense.rm.measurements"
-})
+@ComponentScan
 @EnableAutoConfiguration
-public class ApiTestConfiguration {
+public class DbUnitTestConfiguration {
 
 }

@@ -21,6 +21,18 @@ public class HttpConstants {
           + "creationTime after the specified date. The date must be specified in RFC 1123 format.";
   public static final String IF_MODIFIED_SINCE_DEFAULT = "Thu, 02 Jan 1970 00:00:00 GMT";
 
+  public static final String ETAG_NAME = "ETag";
+  public static final String ETAG_MSG =
+          "The HTTP request may contain the If-Modified-Since header requesting all models with "
+          + "creationTime after the specified date. The date must be specified in RFC 1123 format.";
+
+  public static final String IF_NONE_MATCH_NAME = "If-None-Match";
+  public static final String IF_NONE_MATCH_MSG =
+          "The HTTP request may contain the If-None-Match header specifying a previously provided "
+          + "resource ETag value.  If the resource version identified by the provided ETag value "
+          + "has not changed then a 304 NOT_MODIFIED is returned, otherwise a new version of the "
+          + "resource is returned.";
+
   // Response header parameters.
   public static final String CONTENT_TYPE_NAME = "Content-Type";
   public static final String CONTENT_TYPE_DESC =
@@ -67,11 +79,15 @@ public class HttpConstants {
   // HTTP Response Codes/
   public static final int OK_CODE = HttpURLConnection.HTTP_OK;
   public static final String OK_MSG = "OK - Success";
+
   public static final String OK_TOPOLOGIES_MSG =
           "OK - On success, a JSON structure-containing (a possibly empty) collection of "
           + "topology model versions. Each model resource entry will contain id, creationTime, "
           + "href, and model elements (summary=true will exclude the model element).";
-  public static final String OK_TOPOLOGY_MSG = "";
+  public static final String OK_TOPOLOGY_MSG =
+          "OK - On success, a JSON structure-containing a specific topology model version. "
+          + "The topology model resource entry will contain id, creationTime, "
+          + "href, and model elements (summary=true will exclude the model element).";
 
   public static final String OK_DELTAS_MSG =
           "OK - On success a JSON structure-containing (a possibly empty) collection of delta "
@@ -86,6 +102,11 @@ public class HttpConstants {
           "OK - A 200 OK indicates the Resource Manager is unwilling to complete the requested "
           + "model delta but is suggesting a possible alternative delta in the returned JSON "
           + "structure.";
+
+  public static final String OK_LOGS_MSG =
+            "OK - On success, a JSON structure-containing (a possibly empty) collection of "
+          + "operational log messages. Each log resource entry will contain a unique uuid,"
+          + " a resource id to which the log applies (model, delta, etc.), creationTime, ???";
 
   public static final int CREATED_CODE = HttpURLConnection.HTTP_CREATED;
   public static final String CREATED_MSG =

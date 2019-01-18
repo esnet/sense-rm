@@ -30,6 +30,9 @@ import net.es.sense.rm.driver.nsi.mrml.MrmlFactory;
 import net.es.sense.rm.driver.nsi.mrml.NmlModel;
 import net.es.sense.rm.driver.nsi.mrml.SwitchingSubnetModel;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
+import net.es.sense.rm.measurements.MeasurementController;
+import net.es.sense.rm.measurements.db.MeasurementType;
+import net.es.sense.rm.measurements.db.MetricType;
 import org.apache.jena.riot.Lang;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +59,9 @@ public class AuditServiceBean implements AuditService {
   @Autowired
   private ModelService modelService;
 
+  @Autowired
+  private MeasurementController measurementController;
+
   private long lastDds = 0;
   private long lastCon = 0;
 
@@ -66,6 +72,8 @@ public class AuditServiceBean implements AuditService {
 
   @Override
   public void audit(String topologyId) {
+    long start = System.currentTimeMillis();
+
     log.info("[AuditService] starting audit for {}.", topologyId);
     log.info("[AuditService] lastDds = {}, lastCon = {}", lastDds, lastCon);
 
@@ -125,6 +133,12 @@ public class AuditServiceBean implements AuditService {
         log.error("[AuditService] failed to create modelId = {} for topology {}",
                 model.getModelId(), model.getTopologyId());
       }
+
+      measurementController.add(
+              MeasurementType.MODEL_AUDIT,
+              uuid.toString(),
+              MetricType.DURATION,
+              String.valueOf(System.currentTimeMillis() - start));
     }
 
     // Delete older models (keep last 5).

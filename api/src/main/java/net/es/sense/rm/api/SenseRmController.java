@@ -32,7 +32,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.PostConstruct;
@@ -55,11 +54,12 @@ import net.es.sense.rm.driver.api.DeltasResponse;
 import net.es.sense.rm.driver.api.Driver;
 import net.es.sense.rm.driver.api.ModelResponse;
 import net.es.sense.rm.driver.api.ModelsResponse;
-import net.es.sense.rm.driver.api.ResourceResponse;
+import net.es.sense.rm.measurements.MeasurementController;
+import net.es.sense.rm.measurements.db.MeasurementType;
+import net.es.sense.rm.measurements.db.MetricType;
 import net.es.sense.rm.model.DeltaRequest;
 import net.es.sense.rm.model.DeltaResource;
 import net.es.sense.rm.model.ModelResource;
-import org.apache.http.client.utils.DateUtils;
 import org.apache.jena.ext.com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -104,6 +104,9 @@ public class SenseRmController extends SenseController {
   @Autowired(required = true)
   SenseProperties config;
 
+  @Autowired
+  private MeasurementController measurementController;
+
   // Transformer to manipulate URL path in case there are mapping issues.
   private UrlTransform utilities;
 
@@ -121,34 +124,6 @@ public class SenseRmController extends SenseController {
     utilities = new UrlTransform(config.getProxy());
     Class<?> forName = Class.forName(config.getDriver());
     driver = context.getBean(forName.asSubclass(Driver.class));
-  }
-
-  private ResponseEntity<?> toResponseEntity(HttpHeaders headers, ResourceResponse rr) {
-    if (rr == null) {
-      return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    switch (rr.getStatus()) {
-      case NOT_MODIFIED:
-        return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
-
-        default:
-          Error.ErrorBuilder eb = Error.builder().error(rr.getStatus().getReasonPhrase());
-          rr.getError().ifPresent(e -> eb.error_description(e));
-          return new ResponseEntity<>(eb.build(), HttpStatus.valueOf(rr.getStatus().getStatusCode()));
-    }
-  }
-
-  private long parseIfModfiedSince(String ifModifiedSince) {
-    long ifms = 0;
-    if (!Strings.isNullOrEmpty(ifModifiedSince)) {
-      Date lastModified = DateUtils.parseDate(ifModifiedSince);
-      if (lastModified != null) {
-        ifms = lastModified.getTime();
-      }
-    }
-
-    return ifms;
   }
 
   /**
@@ -196,7 +171,7 @@ public class SenseRmController extends SenseController {
 
       // We will populate some HTTP response headers.
       final HttpHeaders headers = new HttpHeaders();
-      headers.add("Content-Location", location.toASCIIString());
+      headers.add(HttpHeaders.CONTENT_LOCATION, location.toASCIIString());
 
       List<Resource> resources = new ArrayList<>();
       Method[] methods = SenseRmController.class.getMethods();
@@ -385,11 +360,11 @@ public class SenseRmController extends SenseController {
             + "summary = {}, model = {}", location, accept, ifModifiedSince, current, summary, model);
 
     // Parse the If-Modified-Since header if it is present.
-    long ifms = parseIfModfiedSince(ifModifiedSince);
+    long ifms = Common.parseIfModfiedSince(ifModifiedSince);
 
     // Populate the content location header with our URL location.
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Content-Location", location.toASCIIString());
+    headers.add(HttpHeaders.CONTENT_LOCATION, location.toASCIIString());
 
     try {
       // Track matching models here.
@@ -405,14 +380,14 @@ public class SenseRmController extends SenseController {
       if (current) {
         ModelResponse response = driver.getCurrentModel(model, ifms).get();
         if (response == null || response.getStatus() != Status.OK) {
-          return toResponseEntity(headers, response);
+          return Common.toResponseEntity(headers, response);
         }
 
         response.getModel().ifPresent(m -> result.add(m));
       } else {
         ModelsResponse response = driver.getModels(model, ifms).get();
         if (response == null || response.getStatus() != Status.OK) {
-          return toResponseEntity(headers, response);
+          return Common.toResponseEntity(headers, response);
         }
 
         result.addAll(response.getModels());
@@ -625,18 +600,18 @@ public class SenseRmController extends SenseController {
             location, id, accept, ifModifiedSince, model);
 
     // Parse the If-Modified-Since header if it is present.
-    long ifms = parseIfModfiedSince(ifModifiedSince);
+    long ifms = Common.parseIfModfiedSince(ifModifiedSince);
 
     // Return the local in HTTP header.
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Content-Location", location.toASCIIString());
+    headers.add(HttpHeaders.CONTENT_LOCATION, location.toASCIIString());
 
     try {
       // Retrieve the model if newer than specified If-Modified-Since header.
       ModelResponse response = driver.getModel(id, model, ifms).get();
 
       if (response == null || response.getStatus() != Status.OK) {
-        return toResponseEntity(headers, response);
+        return Common.toResponseEntity(headers, response);
       }
 
       ModelResource m = response.getModel().get();
@@ -829,11 +804,11 @@ public class SenseRmController extends SenseController {
             + "summary = {}, model = {}, modelId = {}", location, accept, ifModifiedSince, summary, model, id);
 
     // Parse the If-Modified-Since header if it is present.
-    long ifms = parseIfModfiedSince(ifModifiedSince);
+    long ifms = Common.parseIfModfiedSince(ifModifiedSince);
 
     // Populate the content location header with our URL location.
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Content-Location", location.toASCIIString());
+    headers.add(HttpHeaders.CONTENT_LOCATION, location.toASCIIString());
 
     try {
       // Track matching deltas here.
@@ -845,7 +820,7 @@ public class SenseRmController extends SenseController {
       // Query the driver for a list of deltas.
       DeltasResponse response = driver.getDeltas(model, ifms).get();
       if (response == null || response.getStatus() != Status.OK) {
-        return toResponseEntity(headers, response);
+        return Common.toResponseEntity(headers, response);
       }
 
       // The requester asked for a list of models so apply any filtering criteria.
@@ -1054,15 +1029,15 @@ public class SenseRmController extends SenseController {
             location, id, deltaId, accept, ifModifiedSince, model);
 
     // Parse the If-Modified-Since header if it is present.
-    long ifms = parseIfModfiedSince(ifModifiedSince);
+    long ifms = Common.parseIfModfiedSince(ifModifiedSince);
 
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Content-Location", location.toASCIIString());
+    headers.add(HttpHeaders.CONTENT_LOCATION, location.toASCIIString());
 
     try {
       DeltaResponse response = driver.getDelta(deltaId, model, ifms).get();
       if (response == null || response.getStatus() != Status.OK) {
-        return toResponseEntity(headers, response);
+        return Common.toResponseEntity(headers, response);
       }
 
       DeltaResource d = response.getDelta().get();
@@ -1420,11 +1395,11 @@ public class SenseRmController extends SenseController {
             + "summary = {}, model = {}", location, accept, ifModifiedSince, summary, model);
 
     // Parse the If-Modified-Since header if it is present.
-    long ifms = parseIfModfiedSince(ifModifiedSince);
+    long ifms = Common.parseIfModfiedSince(ifModifiedSince);
 
     // Populate the content location header with our URL location.
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Content-Location", location.toASCIIString());
+    headers.add(HttpHeaders.CONTENT_LOCATION, location.toASCIIString());
 
     try {
       // Track matching deltas here.
@@ -1436,7 +1411,7 @@ public class SenseRmController extends SenseController {
       // Query the driver for a list of deltas.
       DeltasResponse response = driver.getDeltas(model, ifms).get();
       if (response == null || response.getStatus() != Status.OK) {
-        return toResponseEntity(headers, response);
+        return Common.toResponseEntity(headers, response);
       }
 
       // The requester asked for a list of models so apply any filtering criteria.
@@ -1635,17 +1610,17 @@ public class SenseRmController extends SenseController {
             location, deltaId, accept, ifModifiedSince, model);
 
     // Parse the If-Modified-Since header if it is present.
-    long ifms = parseIfModfiedSince(ifModifiedSince);
+    long ifms = Common.parseIfModfiedSince(ifModifiedSince);
 
     // We need to return the current location of this resource in the response header.
     final HttpHeaders headers = new HttpHeaders();
-    headers.add("Content-Location", location.toASCIIString());
+    headers.add(HttpHeaders.CONTENT_LOCATION, location.toASCIIString());
 
     try {
       // Query for the requested delta.
       DeltaResponse response = driver.getDelta(deltaId, model, ifms).get();
       if (response == null || response.getStatus() != Status.OK) {
-        return toResponseEntity(headers, response);
+        return Common.toResponseEntity(headers, response);
       }
 
       DeltaResource d = response.getDelta().get();
@@ -1862,10 +1837,19 @@ public class SenseRmController extends SenseController {
       // We need to return the current location of this resource in the response header.
       final HttpHeaders headers = new HttpHeaders();
 
-      // Query for the requested delta.
+      // Propagate the requested delta.
+      long start = System.currentTimeMillis();
+
       DeltaResponse response = driver.propagateDelta(deltaRequest, model).get();
+
+      measurementController.add(
+              MeasurementType.DELTA_RESERVE,
+              deltaRequest.getId(),
+              MetricType.DURATION,
+              String.valueOf(System.currentTimeMillis() - start));
+
       if (response == null || response.getStatus() != Status.CREATED) {
-        return toResponseEntity(headers, response);
+        return Common.toResponseEntity(headers, response);
       }
 
       DeltaResource delta = response.getDelta().get();
@@ -1892,7 +1876,7 @@ public class SenseRmController extends SenseController {
         }
       }
 
-      headers.add("Content-Location", contentLocation);
+      headers.add(HttpHeaders.CONTENT_LOCATION, contentLocation);
       headers.setLastModified(lastModified);
 
       log.info("[SenseRmController] Delta returning id = {}, creationTime = {}",
@@ -2005,15 +1989,25 @@ public class SenseRmController extends SenseController {
     try {
       // We need to return the current location of this resource in the response header.
       final HttpHeaders headers = new HttpHeaders();
-      headers.add("Content-Location", location.toASCIIString());
+      headers.add(HttpHeaders.CONTENT_LOCATION, location.toASCIIString());
 
       // Query for the requested delta.
+      long start = System.currentTimeMillis();
+
       DeltaResponse response = driver.commitDelta(deltaId).get();
+
+      measurementController.add(
+              MeasurementType.DELTA_RESERVE,
+              deltaId,
+              MetricType.DURATION,
+              String.valueOf(System.currentTimeMillis() - start));
+
       if (response == null || response.getStatus() != Status.NO_CONTENT) {
-        return toResponseEntity(headers, response);
+        return Common.toResponseEntity(headers, response);
       }
 
       DeltaResource delta = response.getDelta().get();
+
       log.info("[SenseRmController] commitDelta deltaId = {}, lastModified = {}", delta.getId(), delta.getLastModified());
 
       return new ResponseEntity<>(headers, HttpStatus.NO_CONTENT);

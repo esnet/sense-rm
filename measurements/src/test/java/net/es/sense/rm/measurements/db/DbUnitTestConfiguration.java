@@ -1,5 +1,5 @@
 /*
- * SENSE Resource Manager (SENSE-RM) Copyright (c) 2016, The Regents
+ * SENSE Resource Manager (SENSE-RM) Copyright (c) 2016 - 2019, The Regents
  * of the University of California, through Lawrence Berkeley National
  * Laboratory (subject to receipt of any required approvals from the
  * U.S. Dept. of Energy).  All rights reserved.
@@ -17,24 +17,19 @@
  * publicly and display publicly, and to permit other to do so.
  *
  */
-package net.es.sense.rm.driver.nsi.cs.db;
+package net.es.sense.rm.measurements.db;
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 /**
  *
  * @author hacksaw
  */
-@Repository
-public interface ConnectionMapRepository extends CrudRepository<ConnectionMap, Long> {
-
-  public ConnectionMap findByDescription(@Param("description") String description);
-  public Iterable<ConnectionMap> findByDeltaId(@Param("deltaId") String deltaId);
-  public Iterable<ConnectionMap> findBySwitchingSubnetId(@Param("switchingSubnetId") String switchingSubnetId);
-  public Iterable<ConnectionMap> findByDeltaIdAndSwitchingSubnetId(
-          @Param("deltaId") String deltaId,
-          @Param("switchingSubnetId") String switchingSubnetId);
+@Configuration
+@ComponentScan
+@EnableAutoConfiguration
+public class DbUnitTestConfiguration {
 
 }

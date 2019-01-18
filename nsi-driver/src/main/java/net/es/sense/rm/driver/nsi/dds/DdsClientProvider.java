@@ -12,7 +12,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class DdsClientProvider {
-  DdsClient client = new DdsClient();
+  DdsClient client;
+
+  public DdsClientProvider() {
+    client = new DdsClient();
+  }
 
   public static DdsClientProvider getInstance() {
     DdsClientProvider instance = SpringApplicationContext.getBean("ddsClientProvider", DdsClientProvider.class);

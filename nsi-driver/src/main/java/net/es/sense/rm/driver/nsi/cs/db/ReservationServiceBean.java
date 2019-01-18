@@ -3,6 +3,7 @@ package net.es.sense.rm.driver.nsi.cs.db;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import java.util.Collection;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,20 @@ public class ReservationServiceBean implements ReservationService {
 
   @Override
   public long getLastDiscovered() {
-    return reservationRepository.findNewestReservation();
+    Long result = reservationRepository.findNewestDiscovered();
+    return result != null ? result : 0;
+  }
+
+  @Override
+  public Reservation getNewest() {
+    Collection<Reservation> results = reservationRepository.findFirst1ByOrderByDiscoveredDesc();
+    if (results != null) {
+      Optional<Reservation> findFirst = results.stream().findFirst();
+      if (findFirst.isPresent()) {
+        return findFirst.get();
+      }
+    }
+    return null;
   }
 
   @Override
@@ -33,12 +47,12 @@ public class ReservationServiceBean implements ReservationService {
 
   @Override
   public Collection<Reservation> getByTopologyId(String topologyId) {
-    return Lists.newArrayList(reservationRepository.findByTopologyId(topologyId));
+    return reservationRepository.findByTopologyId(topologyId);
   }
 
   @Override
   public Collection<Reservation> getByGlobalReservationId(String globalReservationId) {
-    return Lists.newArrayList(reservationRepository.findByGlobalReservationId(globalReservationId));
+    return reservationRepository.findByGlobalReservationId(globalReservationId);
   }
 
   @Override
@@ -48,7 +62,7 @@ public class ReservationServiceBean implements ReservationService {
 
   @Override
   public Collection<Reservation> get(String connectionId) {
-    return Lists.newArrayList(reservationRepository.findByConnectionId(connectionId));
+    return reservationRepository.findByConnectionId(connectionId);
   }
 
   @Override

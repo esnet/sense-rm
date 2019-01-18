@@ -17,24 +17,36 @@
  * publicly and display publicly, and to permit other to do so.
  *
  */
-package net.es.sense.rm.driver.nsi.cs.db;
+package net.es.sense.rm.measurements.db;
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import java.util.Collection;
 
 /**
  *
  * @author hacksaw
  */
-@Repository
-public interface ConnectionMapRepository extends CrudRepository<ConnectionMap, Long> {
+public interface MeasurementService {
 
-  public ConnectionMap findByDescription(@Param("description") String description);
-  public Iterable<ConnectionMap> findByDeltaId(@Param("deltaId") String deltaId);
-  public Iterable<ConnectionMap> findBySwitchingSubnetId(@Param("switchingSubnetId") String switchingSubnetId);
-  public Iterable<ConnectionMap> findByDeltaIdAndSwitchingSubnetId(
-          @Param("deltaId") String deltaId,
-          @Param("switchingSubnetId") String switchingSubnetId);
+  public long size();
+
+  public Collection<MeasurementResource> prune();
+
+  public Collection<MeasurementResource> get(long lastModified);
+
+  public MeasurementResource get(String id);
+
+  public Collection<MeasurementResource> get();
+
+  public MeasurementResource first();
+
+  public MeasurementResource last();
+
+  public MeasurementResource store(MeasurementResource measurement);
+
+  public void delete(MeasurementResource measurement);
+
+  public void delete(String id);
+
+  public void delete();
 
 }

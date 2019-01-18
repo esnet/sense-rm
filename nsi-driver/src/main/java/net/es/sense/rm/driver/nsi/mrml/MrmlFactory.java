@@ -121,7 +121,7 @@ public class MrmlFactory {
     return model;
   }
 
-  public OntModel createEmptyModel() {
+  public static OntModel createEmptyModel() {
     OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
     model.setNsPrefix("rdfs", Rdfs.getURI());
     model.setNsPrefix("rdf", Rdf.getURI());
@@ -133,7 +133,7 @@ public class MrmlFactory {
     return model;
   }
 
-  private Resource createResource(OntModel model, String uri, Resource type) {
+  private static Resource createResource(OntModel model, String uri, Resource type) {
     Resource res = model.createResource(uri);
     model.add(model.createStatement(res, Rdf.type, type));
     return res;
@@ -253,7 +253,7 @@ public class MrmlFactory {
                 label.addProperty(Nml.belongsTo, bi);
               });
 
-              // Make the bandwidth service - NSI supports guaranteedCapped only.
+              // Make the bandwidth service.
               Resource bw = createResource(model, p.getId() + ":BandwidthService", Mrs.BandwidthService);
 
               bi.addProperty(Nml.hasService, bw);

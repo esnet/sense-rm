@@ -19,22 +19,27 @@
  */
 package net.es.sense.rm.driver.nsi.cs.db;
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  *
  * @author hacksaw
  */
-@Repository
-public interface ConnectionMapRepository extends CrudRepository<ConnectionMap, Long> {
+@Slf4j
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = { ReservationService.class, ReservationServiceBean.class, ReservationRepository.class, Reservation.class, DbUnitTestConfiguration.class })
+@DataJpaTest
+@ActiveProfiles("test")
+public class ReservationServiceTest {
 
-  public ConnectionMap findByDescription(@Param("description") String description);
-  public Iterable<ConnectionMap> findByDeltaId(@Param("deltaId") String deltaId);
-  public Iterable<ConnectionMap> findBySwitchingSubnetId(@Param("switchingSubnetId") String switchingSubnetId);
-  public Iterable<ConnectionMap> findByDeltaIdAndSwitchingSubnetId(
-          @Param("deltaId") String deltaId,
-          @Param("switchingSubnetId") String switchingSubnetId);
+  @Test
+  public void verify() {
 
+  }
 }

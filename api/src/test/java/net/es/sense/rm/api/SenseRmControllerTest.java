@@ -21,15 +21,19 @@ package net.es.sense.rm.api;
 
 import javax.ws.rs.core.MediaType;
 import lombok.extern.slf4j.Slf4j;
+import net.es.sense.rm.measurements.MeasurementController;
 import net.es.sense.rm.model.DeltaRequest;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.ApplicationContext;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -49,6 +53,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     TestDriver.class,
     ApiTestConfiguration.class
   })
+@EntityScan(basePackages = {"net.es.sense.rm.measurements"})
+@EnableJpaRepositories("net.es.sense.rm.measurements")
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public class SenseRmControllerTest {
@@ -56,11 +62,16 @@ public class SenseRmControllerTest {
   @Autowired
   private MockMvc mvc;
 
+  @Autowired
+  ApplicationContext context;
+
   private static final JsonProxy proxy = new JsonProxy();
 
   @Test
   public void testRoot() throws Exception {
     log.info("Testing SENSE-N-RM / resource");
+
+    MeasurementController userRepoFromContext = context.getBean(MeasurementController.class);
 
     // We expect an OK for root listing of available resources.
     mvc.perform(get("/api/sense/v1").contentType(MediaType.APPLICATION_JSON))

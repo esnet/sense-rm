@@ -175,17 +175,19 @@ public class CsProvider {
 
       QuerySummary q = new QuerySummary(reservationService);
       q.process(querySummarySync, header);
-
     } catch (Error ex) {
       log.error("[CsProvider] querySummarySync exception on operation - {} {}",
               ex.getFaultInfo().getServiceException().getErrorId(),
               ex.getFaultInfo().getServiceException().getText());
     } catch (org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException ex) {
-      log.error("[CsProvider] querySummarySync exception processing results - {} {}",
+      log.error("[CsProvider] querySummarySync exception processing - {} {}",
               ex.getFaultInfo().getErrorId(),
               ex.getFaultInfo().getText());
+    } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+      log.error("[CsProvider] querySummarySync SOAPFaultException exception: {}", ex.getMessage());
+      log.error("{}", ex);
     } catch (Exception ex) {
-      log.error("[CsProvider] querySummarySync exception processing results.", ex);
+      log.error("[CsProvider] querySummarySync exception processing results", ex);
     }
   }
 

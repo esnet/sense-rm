@@ -305,7 +305,7 @@ public class SenseAdminController extends SenseController {
       }
 
       // Add the HTTP headers for our response.
-      headers.setETag(results.get().getUuid());
+      headers.setETag("\"" + results.get().getUuid() + "\"");
       headers.setLastModified(results.get().getLastModifiedTime());
 
       // The provided ETAG matches the current ETAG so return NOT MODIFIED.

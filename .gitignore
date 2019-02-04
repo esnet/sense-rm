@@ -9,3 +9,5 @@
 *.log
 .DS_Store
 *.jks
+/api/nbproject/
+/nsi-driver/nbproject/

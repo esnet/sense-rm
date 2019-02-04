@@ -354,7 +354,17 @@ public class SenseRmController extends SenseController {
           @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model) {
 
     // We need the request URL to build fully qualified resource URLs.
-    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    final URI location;
+    try {
+      location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    } catch (Exception ex) {
+      log.error("Exception caught in GET of /models", ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     log.info("[SenseRmController] GET operation = {}, accept = {}, If-Modified-Since = {}, current = {}, "
             + "summary = {}, model = {}", location, accept, ifModifiedSince, current, summary, model);
@@ -594,7 +604,17 @@ public class SenseRmController extends SenseController {
           @PathVariable(HttpConstants.ID_NAME)
           @ApiParam(value = HttpConstants.ID_MSG, required = true) String id) {
 
-    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    final URI location;
+    try {
+      location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    } catch (Exception ex) {
+      log.error("Exception caught in GET of /models/{}", id, ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     log.info("[SenseRmController] operation = {}, id = {}, accept = {}, ifModifiedSince = {}, model = {}",
             location, id, accept, ifModifiedSince, model);

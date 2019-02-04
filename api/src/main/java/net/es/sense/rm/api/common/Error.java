@@ -20,8 +20,12 @@
 
 package net.es.sense.rm.api.common;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
@@ -29,6 +33,9 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @lombok.Builder
 @ApiModel(value = "error", description = "Error structure for REST interface.")
+@XmlRootElement(name = "error")
+@XmlAccessorType(XmlAccessType.FIELD)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Error {
 
   private String error;               // A short error description.

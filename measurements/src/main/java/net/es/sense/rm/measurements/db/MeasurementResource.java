@@ -193,7 +193,7 @@ public class MeasurementResource implements Serializable {
     sb.append(this.getMtype());
     sb.append("\"\n  value: \"");
     sb.append(this.getMvalue());
-    sb.append("\"/n}");
+    sb.append("}");
 
     return sb.toString();
   }

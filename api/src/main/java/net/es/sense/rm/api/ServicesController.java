@@ -76,7 +76,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RestController
 @RequestMapping("/api")
 @Api(tags = "SENSE Services API")
-public class ServicesController extends SenseController {
+public class ServicesController extends SenseControllerErrorHandling {
 
   @Autowired(required = true)
   SenseProperties config;

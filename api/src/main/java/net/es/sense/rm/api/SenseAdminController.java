@@ -65,7 +65,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequestMapping(value = "/api/admin/v1")
 @Api(tags = "SENSE Admin API")
 @ResourceAnnotation(name = "admin", version = "v1")
-public class SenseAdminController extends SenseController {
+public class SenseAdminController {
 
   @Autowired(required = true)
   SenseProperties config;

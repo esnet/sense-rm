@@ -94,7 +94,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequestMapping(value = "/api/sense/v1")
 @Api(tags = "SENSE RM API")
 @ResourceAnnotation(name = "sense", version = "v1")
-public class SenseRmController extends SenseController {
+public class SenseRmController {
 
   // Spring application context.
   @Autowired
@@ -165,7 +165,17 @@ public class SenseRmController extends SenseController {
   public ResponseEntity<?> getResources() throws MalformedURLException {
     try {
       // We need the request URL to build fully qualified resource URLs.
-      final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+      final URI location;
+      try {
+        location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+      } catch (Exception ex) {
+        log.error("Exception caught in GET of /", ex);
+        Error error = Error.builder()
+                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                .error_description(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
 
       log.info("[SenseRmController] GET operation = {}", location);
 
@@ -818,7 +828,17 @@ public class SenseRmController extends SenseController {
           @ApiParam(value = HttpConstants.ID_MSG, required = true) String id) {
 
     // We need the request URL to build fully qualified resource URLs.
-    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    final URI location;
+    try {
+      location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    } catch (Exception ex) {
+      log.error("Exception caught in GET of /models/{}", id, ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     log.info("[SenseRmController] GET operation = {}, accept = {}, If-Modified-Since = {}, current = {}, "
             + "summary = {}, model = {}, modelId = {}", location, accept, ifModifiedSince, summary, model, id);
@@ -1043,7 +1063,17 @@ public class SenseRmController extends SenseController {
 
 
     // Get the requested resource URL.
-    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    final URI location;
+    try {
+      location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    } catch (Exception ex) {
+      log.error("Exception caught in GET of /models/{}/deltas/{}", id, deltaId, ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     log.info("[SenseRmController] operation = {}, id = {}, deltaId = {}, accept = {}, ifModifiedSince = {}, model = {}",
             location, id, deltaId, accept, ifModifiedSince, model);
@@ -1409,7 +1439,17 @@ public class SenseRmController extends SenseController {
           @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode) {
 
     // We need the request URL to build fully qualified resource URLs.
-    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    final URI location;
+    try {
+      location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    } catch (Exception ex) {
+      log.error("Exception caught in GET of /deltas", ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     log.info("[SenseRmController] GET operation = {}, accept = {}, If-Modified-Since = {}, current = {}, "
             + "summary = {}, model = {}", location, accept, ifModifiedSince, summary, model);
@@ -1624,7 +1664,17 @@ public class SenseRmController extends SenseController {
   ) {
 
     // Get the requested resource URL.
-    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    final URI location;
+    try {
+      location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    } catch (Exception ex) {
+      log.error("Exception caught in GET of /deltas/{}", deltaId, ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     log.info("[SenseRmController] operation = {}, id = {}, accept = {}, ifModifiedSince = {}, model = {}",
             location, deltaId, accept, ifModifiedSince, model);
@@ -1832,7 +1882,18 @@ public class SenseRmController extends SenseController {
                   + " followed by the model addition element.", required = true) DeltaRequest deltaRequest
   ) throws URISyntaxException {
 
-    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    // Get the requested resource URL.
+    final URI location;
+    try {
+      location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    } catch (Exception ex) {
+      log.error("Exception caught in POST on /deltas", ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     log.info("[SenseRmController] POST operation = {}, accept = {}, deltaId = {}, modelId = {}, deltaRequest = {}",
             location, accept, deltaRequest.getId(), model, deltaRequest);
@@ -2001,7 +2062,17 @@ public class SenseRmController extends SenseController {
   ) {
 
     // Get the requested resource URL.
-    final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    final URI location;
+    try {
+      location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
+    } catch (Exception ex) {
+      log.error("Exception caught in PUT on /deltas/{}/actions/commit", deltaId, ex);
+      Error error = Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     log.info("[SenseRmController] operation = {}, deltaId = {}", location, deltaId);
 

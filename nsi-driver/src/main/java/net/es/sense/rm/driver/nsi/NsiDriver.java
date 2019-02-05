@@ -269,14 +269,22 @@ public class NsiDriver implements Driver {
 
       // If we did get a set of results we need to map them into a ModelResource to return.
       if (model != null) {
-        log.debug("[NsiDriver] getCurrentModel: model id = {}, version = {} compared to ifModifiedSince = {}",
-                model.getModelId(), model.getVersion(), ifModifiedSince);
+        log.debug("[NsiDriver] getCurrentModel: model id = {}, version = {}, " +
+                "created = {} compared to ifModifiedSince = {}",
+                model.getModelId(), model.getVersion(), model.getCreated(),
+                ifModifiedSince);
         long version = (model.getCreated() / 1000) * 1000;
         if (version <= ifModifiedSince) {
-          log.debug("[NsiDriver] getCurrentModel: model id = {} NOT_MODIFIED", model.getModelId());
+          log.debug("[NsiDriver] getCurrentModel: model id = {} NOT_MODIFIED, " +
+                  "model version = {} <= ifModifiedSince = {}",
+                  model.getModelId(), version, ifModifiedSince);
           response.setStatus(Response.Status.NOT_MODIFIED);
           return new AsyncResult<>(response);
         }
+
+        log.debug("[NsiDriver] getCurrentModel: model id = {} MODIFIED, " +
+                  "model version = {} > ifModifiedSince = {}",
+                  model.getModelId(), version, ifModifiedSince);
 
         ModelResource result = new ModelResource();
         result.setId(model.getModelId());

@@ -315,6 +315,10 @@ public class CsProvider {
 
       // Get the full SwitchingService definition from the merged model.
       Resource switchingService = ModelUtil.getResourceOfType(model, switchingServiceRef, Nml.SwitchingService);
+      if (switchingService == null) {
+        throw new IllegalArgumentException("Could not find referenced switching service "
+                + switchingServiceRef.getURI());
+      }
       log.debug("SwitchingService: " + switchingService.getURI());
 
       // Now we need the ServiceDefinition associated with this SwitchingService.

@@ -42,6 +42,8 @@ public class Error {
   private String error_description;   // longer description, human-readable.
   private String error_uri;           // URI to a detailed error description on the API developer website.
 
+  public Error() {}
+  
   public Error(String error, String error_description, String error_uri) {
     this.error = error;
     this.error_description = error_description;

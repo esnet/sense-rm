@@ -60,6 +60,7 @@ public class NmlModel {
   private final static ObjectFactory FACTORY = new ObjectFactory();
   private final DocumentReader documentReader;
   private final Map<String, NmlPort> ports = new HashMap<>();
+  private long lastDiscovered = 0;
 
   // These are Ethernet service parameter defaults.
   private String defaultServiceType;
@@ -82,15 +83,16 @@ public class NmlModel {
    * this adjacency information to the bidirectional port pair.
    */
   private void load() {
-      // Resolve all ports across all networks for later access.
-     Collection<NmlTopologyType> topologies = documentReader.getNmlTopologyAll();
-     for (NmlTopologyType nml : topologies) {
-       log.debug("[NmlModel] processing NML model {}", nml.getId());
-       ports.putAll(getNmlPorts(nml));
-     }
+    // Resolve all ports across all networks for later access.
+    lastDiscovered = documentReader.getLastDiscovered();
+    Collection<NmlTopologyType> topologies = documentReader.getNmlTopologyAll();
+    for (NmlTopologyType nml : topologies) {
+      log.debug("[NmlModel] processing NML model {}", nml.getId());
+      ports.putAll(getNmlPorts(nml));
+    }
 
-     // Consolidate isAlias entries in the bidirectional ports.
-     ports.values().stream()
+    // Consolidate isAlias entries in the bidirectional ports.
+    ports.values().stream()
              .filter(p -> p.getOrientation() == Orientation.bidirectional)
              .forEach(p -> {
                 try {
@@ -118,6 +120,13 @@ public class NmlModel {
                   log.error("[NmlModel] Failed to load {}", p.getId());
                 }
              });
+  }
+
+  /**
+   * @return the lastDiscovered
+   */
+  public long getLastDiscovered() {
+    return lastDiscovered;
   }
 
   /**

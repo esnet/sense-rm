@@ -19,6 +19,7 @@
  */
 package net.es.sense.rm.driver.nsi;
 
+import akka.actor.ActorRef;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +46,7 @@ import net.es.sense.rm.driver.nsi.db.Delta;
 import net.es.sense.rm.driver.nsi.db.DeltaService;
 import net.es.sense.rm.driver.nsi.db.Model;
 import net.es.sense.rm.driver.nsi.db.ModelService;
+import net.es.sense.rm.driver.nsi.messages.AuditRequest;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.model.DeltaRequest;
 import net.es.sense.rm.model.DeltaResource;
@@ -502,6 +504,11 @@ public class NsiDriver implements Driver {
 
       delta.setLastModified(System.currentTimeMillis());
       deltaService.store(delta);
+
+      // We just did something successfully so invoke a model audit to
+      // generate an updated version.
+      AuditRequest req = new AuditRequest(networkId);
+      raController.getModelAuditActor().tell(req, ActorRef.noSender());
 
       // Sent back the delta created to the orchestrator.
       DeltaResource deltaResponse = new DeltaResource();

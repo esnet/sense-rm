@@ -3,7 +3,6 @@ package net.es.sense.rm.driver.nsi.mrml;
 import com.google.common.base.Strings;
 import java.io.StringWriter;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,11 +53,17 @@ public class MrmlFactory {
                     "[MrmlFactory] Could not find NML document for topologyId = " + topologyId));
   }
 
+  /**
+   * MRML model version is a compound identifier composed of the lastDiscovered
+   * time from the DDS for most recent document change and the connection
+   * version (based on time we discovered the connection).
+   *
+   * @return
+   */
   public String getVersion() {
-    GregorianCalendar version = topology.getVersion().toGregorianCalendar();
-    log.debug("[MrmlFactory] version query nml version = {}, connection version = {}",
-            version.getTimeInMillis(), ssm.getVersion());
-    return version.getTimeInMillis() + ":" + ssm.getVersion();
+    log.debug("[MrmlFactory] version query dds version = {}, connection version = {}",
+            nml.getLastDiscovered(), ssm.getVersion());
+    return nml.getLastDiscovered() + ":" + ssm.getVersion();
   }
 
   public String getModelAsString(String modelType) {

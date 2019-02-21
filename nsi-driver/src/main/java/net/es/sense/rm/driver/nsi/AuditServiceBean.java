@@ -93,8 +93,9 @@ public class AuditServiceBean implements AuditService {
     lastDds = dds;
     lastCon = con;
 
+    log.debug("[AuditService] generating NML topology model, new lastDds = {}, lastCon = {}", lastDds, lastCon);
+
     // Get the new document context.
-    log.debug("[AuditService] generating NML topology model.");
     NmlModel nml = new NmlModel(documentReader);
     nml.setDefaultServiceType(nsiProperties.getDefaultServiceType());
     nml.setDefaultType(nsiProperties.getDefaultType());

@@ -165,4 +165,8 @@ public class RaController {
   public DeltaService getDeltaService() {
     return deltaService;
   }
+
+  public ActorRef getModelAuditActor() {
+    return modelAuditActor;
+  }
 }

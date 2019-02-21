@@ -25,6 +25,7 @@ public class ReservationServiceBean implements ReservationService {
   @Override
   public long getLastDiscovered() {
     Long result = reservationRepository.findNewestDiscovered();
+    log.debug("ReservationServiceBean: getLastDiscovered returned {}", result);
     return result != null ? result : 0;
   }
 

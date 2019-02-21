@@ -29,6 +29,7 @@ import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.cs.db.StateType;
+import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException;
 import org.ogf.schemas.nsi._2013._12.connection.types.DataPlaneStateChangeRequestType;
 import org.ogf.schemas.nsi._2013._12.connection.types.DataPlaneStatusType;
@@ -70,6 +71,8 @@ import org.springframework.stereotype.Component;
         targetNamespace = "http://schemas.ogf.org/nsi/2013/12/connection/requester",
         wsdlLocation = "")
 public class ConnectionService {
+  // The runtime NSI configuration information.
+  private final NsiProperties nsiProperties;
 
   // We store reservations using the reservation service.
   private final ReservationService reservationService;
@@ -82,12 +85,15 @@ public class ConnectionService {
 
   /**
    * We initialize the ConnectionService component with the needed references since this component does not support
-   * autowiring.
+   * auto-wiring.
    *
+   * @param nsiProperties The runtime NSI configuration information.
    * @param reservationService We store reservations using the reservation service.
    * @param operationMap We synchronize with the requester thread using the operationMap that holds a semaphore.
    */
-  public ConnectionService(ReservationService reservationService, OperationMapRepository operationMap) {
+  public ConnectionService(NsiProperties nsiProperties, ReservationService reservationService,
+          OperationMapRepository operationMap) {
+    this.nsiProperties = nsiProperties;
     this.reservationService = reservationService;
     this.operationMap = operationMap;
   }
@@ -101,7 +107,8 @@ public class ConnectionService {
    * @throws ServiceException
    */
   public GenericAcknowledgmentType reserveConfirmed(
-          ReserveConfirmedType reserveConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
+          ReserveConfirmedType reserveConfirmed,
+          Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
     log.info("[ConnectionService] reserveConfirmed recieved for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), reserveConfirmed.getConnectionId());
@@ -114,6 +121,7 @@ public class ConnectionService {
 
     Reservation reservation = processConfirmedCriteria(
             header.value.getProviderNSA(),
+            nsiProperties.getNetworkId(),
             reserveConfirmed.getGlobalReservationId(),
             reserveConfirmed.getDescription(),
             reserveConfirmed.getConnectionId(),
@@ -156,6 +164,7 @@ public class ConnectionService {
 
   private Reservation processConfirmedCriteria(
           String providerNsa,
+          String networkId,
           String gid,
           String description,
           String cid,
@@ -167,7 +176,11 @@ public class ConnectionService {
 
     log.info("[ConnectionService] processConfirmedCriteria: connectionId = {}", cid);
 
+    // We should look into the P2PS service for the connection endpoints to
+    // determine the networkId but we will shortcut and just use the
+    // configured id.
     Reservation reservation = new Reservation();
+    reservation.setTopologyId(networkId);
     reservation.setGlobalReservationId(gid);
     reservation.setDescription(description);
     reservation.setDiscovered(System.currentTimeMillis());

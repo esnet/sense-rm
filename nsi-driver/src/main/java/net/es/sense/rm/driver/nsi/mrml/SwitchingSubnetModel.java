@@ -136,6 +136,12 @@ public class SwitchingSubnetModel {
   private void processReservations() {
     // Process NSI connections adding SwitchingSubnets and associated child
     // ports associated with the parent bidirectional port.
+    log.debug("processReservations: loading topologyId = {}", topologyId);
+
+    for (Reservation reservation : reservationService.get()) {
+      log.debug("processReservations: topologyId = {}, connectionId = {}, discovered = {}", reservation.getTopologyId(), reservation.getConnectionId(), reservation.getDiscovered());
+    }
+
     for (Reservation reservation : reservationService.getByTopologyId(topologyId)) {
       log.info("[SwitchingSubnetModel] processing reservation cid = {}, gid = {}, description={}",
               reservation.getConnectionId(), reservation.getGlobalReservationId(), reservation.getDescription());

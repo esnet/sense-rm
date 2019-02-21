@@ -173,7 +173,7 @@ public class CsProvider {
       log.info("[CsProvider] QuerySummaryConfirmed recieved, providerNSA = {}, correlationId = {}",
               header.value.getProviderNSA(), header.value.getCorrelationId());
 
-      QuerySummary q = new QuerySummary(reservationService);
+      QuerySummary q = new QuerySummary(nsiProperties.getNetworkId(), reservationService);
       q.process(querySummarySync, header);
     } catch (Error ex) {
       log.error("[CsProvider] querySummarySync exception on operation - {} {}",

@@ -48,8 +48,9 @@ import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
  *
  * @author hacksaw
  */
-@Data
+
 @Slf4j
+@Data
 public class CsOperations {
   private final NsiProperties nsiProperties;
   private final OperationMapRepository operationMap;
@@ -64,10 +65,10 @@ public class CsOperations {
   private static final org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory P2PS_FACTORY
           = new org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory();
 
-  public CsOperations(NsiProperties nsiProperties, OperationMapRepository operationMap) {
+  /*public CsOperations(NsiProperties nsiProperties, OperationMapRepository operationMap) {
     this.nsiProperties = nsiProperties;
     this.operationMap = operationMap;
-  }
+  }*/
 
   public boolean addCorrelationId(String correlationId) {
     return this.correlationIds.add(correlationId);

@@ -19,11 +19,16 @@
  */
 package net.es.sense.rm.driver.nsi.cs.api;
 
+import java.util.List;
+import java.util.Optional;
 import javax.jws.WebService;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
+import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.jaxb.JaxbParser;
+import net.es.nsi.cs.lib.SimpleStp;
 import net.es.sense.rm.driver.nsi.cs.db.Operation;
 import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
@@ -52,6 +57,7 @@ import org.ogf.schemas.nsi._2013._12.connection.types.ReserveConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReserveTimeoutRequestType;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 import org.ogf.schemas.nsi._2013._12.framework.types.ServiceExceptionType;
+import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 import org.springframework.stereotype.Component;
 
 /**
@@ -180,7 +186,6 @@ public class ConnectionService {
     // determine the networkId but we will shortcut and just use the
     // configured id.
     Reservation reservation = new Reservation();
-    reservation.setTopologyId(networkId);
     reservation.setGlobalReservationId(gid);
     reservation.setDescription(description);
     reservation.setDiscovered(System.currentTimeMillis());
@@ -195,6 +200,13 @@ public class ConnectionService {
     reservation.setStartTime(CsUtils.getStartTime(criteria.getSchedule().getStartTime()));
     reservation.setEndTime(CsUtils.getEndTime(criteria.getSchedule().getEndTime()));
 
+    Optional<String> result = getNetworkId(criteria.getServiceType(), criteria.getAny());
+    if (result.isPresent()) {
+      reservation.setTopologyId(result.get());
+    } else{
+      reservation.setTopologyId(networkId);
+    }
+
     // Now we need to determine the network based on the STP used in the service.
     try {
       CsUtils.serializeP2PS(criteria.getServiceType(), criteria.getAny(), reservation);
@@ -204,6 +216,28 @@ public class ConnectionService {
               reservation.getConnectionId(), ex);
       return null;
     }
+  }
+
+  public static Optional<String> getNetworkId(String serviceType, List<Object> anyList) {
+    // Now we need to determine the network based on the STP used in the service.
+    if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType)
+        || Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(serviceType)) {
+      for (Object any : anyList) {
+        if (any instanceof JAXBElement) {
+          JAXBElement jaxb = (JAXBElement) any;
+          if (jaxb.getDeclaredType() == P2PServiceBaseType.class) {
+            log.debug("[getNetworkId] getNetworkId found P2PServiceBaseType");
+
+            // Get the network identifier from and STP
+            P2PServiceBaseType p2p = (P2PServiceBaseType) jaxb.getValue();
+            SimpleStp stp = new SimpleStp(p2p.getSourceSTP());
+            return Optional.of(stp.getNetworkId());
+          }
+        }
+      }
+    }
+
+    return Optional.empty();
   }
 
   public GenericAcknowledgmentType reserveFailed(GenericFailedType reserveFailed,
@@ -438,7 +472,7 @@ public class ConnectionService {
   }
 
   public GenericAcknowledgmentType querySummaryConfirmed(QuerySummaryConfirmedType querySummaryConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
-    QuerySummary q = new QuerySummary(reservationService);
+    QuerySummary q = new QuerySummary(nsiProperties.getNetworkId(), reservationService);
     q.process(querySummaryConfirmed, header);
     return FACTORY.createGenericAcknowledgmentType();
   }
@@ -512,24 +546,7 @@ public class ConnectionService {
         reservation.setServiceType(criteria.getServiceType().trim());
         reservation.setStartTime(getStartTime(criteria.getSchedule().getStartTime()));
         reservation.setEndTime(getEndTime(criteria.getSchedule().getEndTime()));
-        // Now we need to determine the network based on the STP used in the service. if
-        (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(reservation.getServiceType())
-                || Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(reservation.getServiceType())) {
-          reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
-          for (Object any : criteria.getAny()) {
-            if (any instanceof JAXBElement) {
-              JAXBElement jaxb = (JAXBElement) any;
-              if (jaxb.getDeclaredType() == P2PServiceBaseType.class) {
-                log.debug("[ConnectionService] processRecursiveCriteria: found P2PServiceBaseType");
-                reservation.setService(XmlUtilities.jaxbToString(P2PServiceBaseType.class, jaxb));
 
-                // Get the network identifier from and STP. P2PServiceBaseType p2p = (P2PServiceBaseType) jaxb.getValue();
-                SimpleStp stp = new SimpleStp(p2p.getSourceSTP());
-                reservation.setTopologyId(stp.getNetworkId());
-                break;
-              }
-            }
-          }
         }
 
         // Replace the existing entry with this new criteria if we already have one. if (existing != null) {

@@ -21,6 +21,7 @@ package net.es.sense.rm.driver.nsi.cs.api;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.xml.bind.JAXBException;
 import javax.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
@@ -45,10 +46,11 @@ import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
  */
 @Slf4j
 public class QuerySummary {
-
+  private final String networkId;
   private final ReservationService reservationService;
 
-  public QuerySummary(ReservationService reservationService) {
+  public QuerySummary(String networkId, ReservationService reservationService) {
+    this.networkId = networkId;
     this.reservationService = reservationService;
   }
 
@@ -148,6 +150,7 @@ public class QuerySummary {
 
     // We have had a state change so update the reservation.
     Reservation reservation = new Reservation();
+    reservation.setTopologyId(networkId);
     reservation.setGlobalReservationId(gid);
     reservation.setDescription(description);
     reservation.setProviderNsa(providerNsa);
@@ -158,7 +161,6 @@ public class QuerySummary {
     reservation.setLifecycleState(lifecycleState);
     reservation.setDataPlaneActive(dataPlaneStatus.isActive());
     reservation.setDiscovered(System.currentTimeMillis());
-
     return reservation;
   }
 
@@ -203,6 +205,14 @@ public class QuerySummary {
         } else {
           reservation.setServiceType(criteria.getServiceType());
         }
+
+        Optional<String> result = ConnectionService.getNetworkId(reservation.getServiceType(), criteria.getAny());
+        if (result.isPresent()) {
+          reservation.setTopologyId(result.get());
+        } else {
+          reservation.setTopologyId(networkId);
+        }
+
         reservation.setStartTime(CsUtils.getStartTime(criteria.getSchedule().getStartTime()));
         reservation.setEndTime(CsUtils.getEndTime(criteria.getSchedule().getEndTime()));
 
@@ -234,6 +244,12 @@ public class QuerySummary {
             reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
           } else {
             reservation.setServiceType(child.getServiceType());
+          }
+          Optional<String> result = ConnectionService.getNetworkId(reservation.getServiceType(), criteria.getAny());
+          if (result.isPresent()) {
+            reservation.setTopologyId(result.get());
+          } else {
+            reservation.setTopologyId(networkId);
           }
           reservation.setReservationState(reservationState);
           reservation.setProvisionState(provisionState);

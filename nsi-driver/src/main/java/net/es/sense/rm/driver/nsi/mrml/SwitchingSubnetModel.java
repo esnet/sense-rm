@@ -194,7 +194,14 @@ public class SwitchingSubnetModel {
 
       // We only know about the EVTS service at this point so ignore anything
       // else.
-      if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(reservation.getServiceType().trim())) {
+      String st = reservation.getServiceType().trim();
+      if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(st) ||
+              Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(st) ||
+              Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(st)) {
+
+        // Normalize to a single service type.
+        reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
+
         log.info("[SwitchingSubnetModel] processing EVTS service");
         try {
           // We have two tasks here: 1. We need to create child bidirectional

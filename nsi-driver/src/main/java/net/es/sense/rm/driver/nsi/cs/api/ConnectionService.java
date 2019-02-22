@@ -221,7 +221,8 @@ public class ConnectionService {
   public static Optional<String> getNetworkId(String serviceType, List<Object> anyList) {
     // Now we need to determine the network based on the STP used in the service.
     if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType)
-        || Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(serviceType)) {
+        || Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(serviceType) ||
+            Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(serviceType)) {
       for (Object any : anyList) {
         if (any instanceof JAXBElement) {
           JAXBElement jaxb = (JAXBElement) any;

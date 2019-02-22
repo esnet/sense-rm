@@ -35,7 +35,8 @@ public class Nsi {
 
   // Point-to-point service definitions.
   public static final String NSI_SERVICETYPE_EVTS = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE";
-  public static final String NSI_SERVICETYPE_EVTS_OPENNSA = "{http://schemas.ogf.org/nsi/2013/12/services/point2point}p2ps";
+  public static final String NSI_SERVICETYPE_EVTS_OPENNSA_1 = "{http://schemas.ogf.org/nsi/2013/12/services/point2point}p2ps";
+  public static final String NSI_SERVICETYPE_EVTS_OPENNSA_2 = "http://services.ogf.org/nsi/2013/07/descriptions/EVTS.A-GOLE";
   public static final String NSI_SERVICETYPE_EVTS_OSCARS = "http://services.ogf.org/nsi/2013/07/definitions/EVTS.A-GOLE";
   public static final String NSI_SERVICETYPE_L2_LB_ES = "http://services.ogf.org/nsi/2018/06/descriptions/l2-lb-es";
 

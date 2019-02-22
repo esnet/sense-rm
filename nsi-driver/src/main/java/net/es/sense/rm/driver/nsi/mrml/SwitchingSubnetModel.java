@@ -196,7 +196,8 @@ public class SwitchingSubnetModel {
       // else.
       String st = reservation.getServiceType().trim();
       if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(st) ||
-              Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(st) ||
+              Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_1.equalsIgnoreCase(st) ||
+              Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_2.equalsIgnoreCase(st) ||
               Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(st)) {
 
         // Normalize to a single service type.

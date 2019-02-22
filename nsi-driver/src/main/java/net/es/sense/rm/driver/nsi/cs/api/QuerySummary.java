@@ -199,8 +199,9 @@ public class QuerySummary {
         reservation.setLifecycleState(lifecycleState);
         reservation.setDataPlaneActive(dataPlaneStatus.isActive());
         reservation.setVersion(criteria.getVersion());
-        if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(criteria.getServiceType()) ||
-                Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(criteria.getServiceType())) {
+          if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_1.equalsIgnoreCase(criteria.getServiceType()) ||
+                  Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_2.equalsIgnoreCase(criteria.getServiceType()) ||
+                  Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(criteria.getServiceType())) {
           reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
         } else {
           reservation.setServiceType(criteria.getServiceType());
@@ -239,8 +240,9 @@ public class QuerySummary {
           reservation.setConnectionId(child.getConnectionId());
           reservation.setVersion(criteria.getVersion());
           reservation.setServiceType(child.getServiceType());
-          if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(child.getServiceType()) ||
-                Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(child.getServiceType())) {
+          if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_1.equalsIgnoreCase(child.getServiceType()) ||
+                  Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_2.equalsIgnoreCase(child.getServiceType()) ||
+                  Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(child.getServiceType())) {
             reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
           } else {
             reservation.setServiceType(child.getServiceType());

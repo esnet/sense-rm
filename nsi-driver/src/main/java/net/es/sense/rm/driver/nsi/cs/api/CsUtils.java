@@ -37,9 +37,10 @@ import org.w3c.dom.Node;
 public class CsUtils {
 
   public static void serializeP2PS(String serviceType, List<Object> any, Reservation reservation) throws JAXBException {
-    if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType)
-            || Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(serviceType)
-            || Nsi.NSI_SERVICETYPE_EVTS_OPENNSA.equalsIgnoreCase(serviceType)) {
+    if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType) ||
+            Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(serviceType) ||
+            Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_1.equalsIgnoreCase(serviceType) ||
+            Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_2.equalsIgnoreCase(serviceType)) {
       reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
       for (Object object : any) {
         if (object instanceof JAXBElement) {

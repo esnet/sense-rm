@@ -187,13 +187,13 @@ public class MeasurementResource implements Serializable {
     sb.append(this.getMeasurement());
     sb.append("\"\n  resource: \"");
     sb.append(this.getResource());
-    sb.append("\"\n  time: \"");
+    sb.append("\"\n  generated: \"");
     sb.append(this.getGenerated());
-    sb.append("\"\n  type: \"");
+    sb.append("\"\n  mtype: \"");
     sb.append(this.getMtype());
-    sb.append("\"\n  value: \"");
+    sb.append("\"\n  mvalue: \"");
     sb.append(this.getMvalue());
-    sb.append("}");
+    sb.append("\"}");
 
     return sb.toString();
   }

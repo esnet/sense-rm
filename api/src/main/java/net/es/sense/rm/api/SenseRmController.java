@@ -2088,7 +2088,7 @@ public class SenseRmController {
       DeltaResponse response = driver.commitDelta(deltaId).get();
 
       measurementController.add(
-              MeasurementType.DELTA_RESERVE,
+              MeasurementType.DELTA_COMMIT,
               deltaId,
               MetricType.DURATION,
               String.valueOf(System.currentTimeMillis() - start));

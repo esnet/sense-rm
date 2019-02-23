@@ -365,7 +365,8 @@ public class CsProvider {
 
           // The "guaranteedCapped" BandwidthService maps to the NSI_SERVICETYPE_EVTS service so
           // we need to verify this is a valid request.
-          if (MrsBandwidthType.guaranteedCapped != bws.getBandwidthType()) {
+          if (MrsBandwidthType.guaranteedCapped != bws.getBandwidthType() &&
+                  MrsBandwidthType.bestEffort != bws.getBandwidthType()) {
             String error = "Requested BandwidthService type = " + bws.getBandwidthType() +
                     " not supported by SwitchingService = " + switchingService.getURI() +
                     " on portId = " + biRef.getURI();

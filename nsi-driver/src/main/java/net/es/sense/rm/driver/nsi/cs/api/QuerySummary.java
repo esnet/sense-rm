@@ -92,6 +92,8 @@ public class QuerySummary {
       // If this reservation is in the process of being created, or failed
       // creation, then there will be no associated criteria.
       if (reservation.getCriteria().isEmpty()) {
+        log.error("[QuerySummary] criteria is empty for cid = {}", reservation.getConnectionId());
+
         results.add(processReservationNoCriteria(
                 providerNsa,
                 reservation.getGlobalReservationId(),
@@ -199,27 +201,24 @@ public class QuerySummary {
         reservation.setLifecycleState(lifecycleState);
         reservation.setDataPlaneActive(dataPlaneStatus.isActive());
         reservation.setVersion(criteria.getVersion());
-          if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_1.equalsIgnoreCase(criteria.getServiceType()) ||
-                  Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_2.equalsIgnoreCase(criteria.getServiceType()) ||
-                  Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(criteria.getServiceType())) {
+        reservation.setStartTime(CsUtils.getStartTime(criteria.getSchedule().getStartTime()));
+        reservation.setEndTime(CsUtils.getEndTime(criteria.getSchedule().getEndTime()));
+
+        if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_1.equalsIgnoreCase(criteria.getServiceType()) ||
+                Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_2.equalsIgnoreCase(criteria.getServiceType()) ||
+                Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(criteria.getServiceType())) {
           reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
         } else {
           reservation.setServiceType(criteria.getServiceType());
         }
 
-        Optional<String> result = ConnectionService.getNetworkId(reservation.getServiceType(), criteria.getAny());
-        if (result.isPresent()) {
-          reservation.setTopologyId(result.get());
-        } else {
-          reservation.setTopologyId(networkId);
-        }
-
-        reservation.setStartTime(CsUtils.getStartTime(criteria.getSchedule().getStartTime()));
-        reservation.setEndTime(CsUtils.getEndTime(criteria.getSchedule().getEndTime()));
-
-        // Now we need to determine the network based on the STP used in the service.
         try {
-          CsUtils.serializeP2PS(criteria.getServiceType(), criteria.getAny(), reservation);
+          if (!CsUtils.serializeP2PS(reservation.getServiceType(), criteria.getAny(), reservation)) {
+            log.error("[QuerySummary] unable to locate P2PS structure, cid = {}, serviceType = {}",
+                    cid, reservation.getServiceType());
+            throw new IllegalArgumentException("Unable to locate P2PS structure in cid = " +
+                    cid + " for serviceType = " + reservation.getServiceType());
+          }
         } catch (JAXBException ex) {
           log.error("[QuerySummary] serializeP2PS failed for cid = {}", cid, ex);
           continue;

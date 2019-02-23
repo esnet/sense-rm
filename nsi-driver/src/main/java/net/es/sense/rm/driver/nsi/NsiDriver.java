@@ -88,7 +88,12 @@ public class NsiDriver implements Driver {
       throw new InternalServerErrorException("No network specified in configuration.");
     }
 
-    raController.start();
+    try {
+      raController.start();
+    } catch (Exception ex) {
+      log.error("[NsiDriver] Caught exception during initialization.", ex);
+      System.exit(0);
+    }
   }
 
   /**

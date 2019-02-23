@@ -336,7 +336,7 @@ public class CsProvider {
       // We currently know about the EVTS p2p service.
       List<StpHolder> stps = new ArrayList<>();
 
-      String serviceType = serviceTypeRef.getString().trim();
+      String serviceType = serviceTypeRef.getString();
       if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType) ||
               Nsi.NSI_SERVICETYPE_L2_LB_ES.equalsIgnoreCase(serviceType)) {
         // Find the ports that ate part of this SwitchSubnet and build NSI STP

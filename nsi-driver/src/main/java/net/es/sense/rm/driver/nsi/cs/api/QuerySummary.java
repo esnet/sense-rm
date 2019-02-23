@@ -21,13 +21,13 @@ package net.es.sense.rm.driver.nsi.cs.api;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javax.xml.bind.JAXBException;
 import javax.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
+import org.apache.jena.ext.com.google.common.base.Strings;
 import org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException;
 import org.ogf.schemas.nsi._2013._12.connection.types.ChildSummaryListType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ChildSummaryType;
@@ -238,7 +238,7 @@ public class QuerySummary {
           reservation.setProviderNsa(child.getProviderNSA());
           reservation.setConnectionId(child.getConnectionId());
           reservation.setVersion(criteria.getVersion());
-          reservation.setServiceType(child.getServiceType());
+
           if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_1.equalsIgnoreCase(child.getServiceType()) ||
                   Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_2.equalsIgnoreCase(child.getServiceType()) ||
                   Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(child.getServiceType())) {
@@ -246,12 +246,7 @@ public class QuerySummary {
           } else {
             reservation.setServiceType(child.getServiceType());
           }
-          Optional<String> result = ConnectionService.getNetworkId(reservation.getServiceType(), criteria.getAny());
-          if (result.isPresent()) {
-            reservation.setTopologyId(result.get());
-          } else {
-            reservation.setTopologyId(networkId);
-          }
+
           reservation.setReservationState(reservationState);
           reservation.setProvisionState(provisionState);
           reservation.setLifecycleState(lifecycleState);
@@ -262,6 +257,10 @@ public class QuerySummary {
           // Now we need to determine the network based on the STP used in the service.
           try {
             CsUtils.serializeP2PS(child.getServiceType(), child.getAny(), reservation);
+
+            if (Strings.isNullOrEmpty(reservation.getTopologyId())) {
+              reservation.setTopologyId(networkId);
+            }
           } catch (JAXBException ex) {
             log.error("[ConnectionService] processSummaryCriteria: failed for connectionId = {}",
                     reservation.getConnectionId(), ex);

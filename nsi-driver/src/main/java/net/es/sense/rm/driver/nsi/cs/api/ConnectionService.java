@@ -19,6 +19,7 @@
  */
 package net.es.sense.rm.driver.nsi.cs.api;
 
+import com.google.common.base.Strings;
 import java.util.List;
 import java.util.Optional;
 import javax.jws.WebService;
@@ -28,6 +29,7 @@ import javax.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.jaxb.JaxbParser;
+import net.es.nsi.cs.lib.CsParser;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.sense.rm.driver.nsi.cs.db.Operation;
 import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
@@ -59,6 +61,7 @@ import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 import org.ogf.schemas.nsi._2013._12.framework.types.ServiceExceptionType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Node;
 
 /**
  * This is the NSI CS 2.1 web service requester endpoint used to receive responses from our associated uPA.
@@ -200,16 +203,14 @@ public class ConnectionService {
     reservation.setStartTime(CsUtils.getStartTime(criteria.getSchedule().getStartTime()));
     reservation.setEndTime(CsUtils.getEndTime(criteria.getSchedule().getEndTime()));
 
-    Optional<String> result = getNetworkId(criteria.getServiceType(), criteria.getAny());
-    if (result.isPresent()) {
-      reservation.setTopologyId(result.get());
-    } else{
-      reservation.setTopologyId(networkId);
-    }
-
     // Now we need to determine the network based on the STP used in the service.
     try {
       CsUtils.serializeP2PS(criteria.getServiceType(), criteria.getAny(), reservation);
+
+      if (Strings.isNullOrEmpty(reservation.getTopologyId())) {
+        reservation.setTopologyId(networkId);
+      }
+
       return reservation;
     } catch (JAXBException ex) {
       log.error("[ConnectionService] processReservation failed for connectionId = {}",
@@ -218,7 +219,7 @@ public class ConnectionService {
     }
   }
 
-  public static Optional<String> getNetworkId(String serviceType, List<Object> anyList) {
+  public static Optional<String> getNetworkId(String serviceType, List<Object> anyList) throws JAXBException {
     // Now we need to determine the network based on the STP used in the service.
     if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType) ||
             Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_1.equalsIgnoreCase(serviceType) ||
@@ -233,6 +234,13 @@ public class ConnectionService {
             // Get the network identifier from and STP
             P2PServiceBaseType p2p = (P2PServiceBaseType) jaxb.getValue();
             SimpleStp stp = new SimpleStp(p2p.getSourceSTP());
+            return Optional.of(stp.getNetworkId());
+          }
+        } else if (any instanceof org.w3c.dom.Element) {
+          org.w3c.dom.Element element = (org.w3c.dom.Element) any;
+          if ("p2ps".equalsIgnoreCase(element.getLocalName())) {
+            P2PServiceBaseType p2ps = CsParser.getInstance().node2p2ps((Node) element);
+            SimpleStp stp = new SimpleStp(p2ps.getSourceSTP());
             return Optional.of(stp.getNetworkId());
           }
         }

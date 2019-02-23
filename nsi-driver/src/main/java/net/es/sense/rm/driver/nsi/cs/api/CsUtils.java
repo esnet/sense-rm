@@ -64,8 +64,8 @@ public class CsUtils {
             found = true;
             break;
           }
-        } else if (object instanceof org.apache.xerces.dom.ElementNSImpl) {
-          org.apache.xerces.dom.ElementNSImpl element = (org.apache.xerces.dom.ElementNSImpl) object;
+        } else if (object instanceof org.w3c.dom.Element) {
+          org.w3c.dom.Element element = (org.w3c.dom.Element) object;
           if ("p2ps".equalsIgnoreCase(element.getLocalName())) {
             P2PServiceBaseType p2ps = CsParser.getInstance().node2p2ps((Node) element);
             SimpleStp stp = new SimpleStp(p2ps.getSourceSTP());
@@ -73,7 +73,7 @@ public class CsUtils {
             reservation.setService(CsParser.getInstance().p2ps2xml(p2ps));
             found = true;
             break;
-          }
+          } 
         } else {
           log.debug("[serializeP2PS] ignoring element = {}", object.getClass().getName());
         }

@@ -334,6 +334,7 @@ public class DdsProvider implements DdsProviderI {
 
     // Now we update the existing document with the new parameters.
     document.setLastDiscovered(Document.now());
+    document.setVersion(requestVersion);
     document.setExpires(Document.expires(request.getExpires()));
     try {
       document.setDocumentType(request);

@@ -4,7 +4,6 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
@@ -193,30 +191,8 @@ public class DdsProvider implements DdsProviderI {
     Document document = new Document(request, nsiProperties.getDdsUrl());
 
     // See if we already have a document under this id.
-    Optional<Document> get = Optional.fromNullable(documentService.get(document.getId()));
-    if (get.isPresent()) {
+    if (documentService.get(document.getId()) != null) {
       throw Exceptions.resourceExistsException(DiscoveryError.DOCUMENT_EXISTS, "document", document.getId());
-    }
-
-    // Validate basic fields.
-    if (Strings.isNullOrEmpty(request.getNsa())) {
-      throw Exceptions.missingParameterException(document.getId(), "nsa");
-    }
-
-    if (Strings.isNullOrEmpty(request.getType())) {
-      throw Exceptions.missingParameterException(document.getId(), "type");
-    }
-
-    if (Strings.isNullOrEmpty(request.getId())) {
-      throw Exceptions.missingParameterException(document.getId(), "id");
-    }
-
-    if (request.getVersion() == null || !request.getVersion().isValid()) {
-      throw Exceptions.missingParameterException(document.getId(), "version");
-    }
-
-    if (request.getExpires() == null || !request.getExpires().isValid()) {
-      throw Exceptions.missingParameterException(document.getId(), "expires");
     }
 
     // This is a new document so add it into the document space.
@@ -277,7 +253,7 @@ public class DdsProvider implements DdsProviderI {
       documentT = document.getDocumentFull();
       documentT.setExpires(currentDate);
       documentT.setVersion(currentDate);
-      document.setLastDiscovered(now);
+      document.setLastDiscovered(Document.now());
       document.setDocumentType(documentT);
     } catch (JAXBException | IOException ex) {
       throw Exceptions.internalServerErrorException("getDocumentFull", ex.getMessage());
@@ -302,10 +278,17 @@ public class DdsProvider implements DdsProviderI {
     return document;
   }
 
+  /**
+   *
+   * @param request
+   * @param context
+   * @return
+   * @throws WebApplicationException
+   */
   @Override
-  public Document updateDocument(DocumentType request, Source context) throws WebApplicationException, InvalidVersionException {
+  public Document updateDocument(DocumentType request, Source context) throws WebApplicationException {
     // Create a document identifier to look up in our documet table.
-    String documentId = Document.documentId(request.getNsa(), request.getType(), request.getId());
+    String documentId = Document.documentId(request);
 
     // See if we have a document under this id.
     Document document = documentService.get(documentId);
@@ -314,50 +297,70 @@ public class DdsProvider implements DdsProviderI {
     }
 
     // Validate basic fields.
-    if (request.getNsa() == null || request.getNsa().isEmpty() || !request.getNsa().equalsIgnoreCase(document.getNsa())) {
-      throw Exceptions.missingParameterException(documentId, "nsa");
-    }
-
-    if (request.getType() == null || request.getType().isEmpty() || !request.getType().equalsIgnoreCase(document.getType())) {
-      throw Exceptions.missingParameterException(documentId, "type");
-    }
-
-    if (request.getId() == null || request.getId().isEmpty() || !request.getId().equalsIgnoreCase(document.getDocumentId())) {
-      throw Exceptions.missingParameterException(documentId, "id");
-    }
-
+    long requestVersion;
     if (request.getVersion() == null || !request.getVersion().isValid()) {
       throw Exceptions.missingParameterException(documentId, "version");
+    } else {
+      try {
+        requestVersion = Document.getTime(request.getVersion());
+      } catch (DatatypeConfigurationException ex) {
+        throw Exceptions.illegalArgumentException(DiscoveryError.INVALID_PARAMETER, documentId, "version");
+      }
     }
 
     if (request.getExpires() == null || !request.getExpires().isValid()) {
       throw Exceptions.missingParameterException(documentId, "expires");
     }
 
-    DocumentType documentT;
-    try {
-      documentT = document.getDocumentFull();
-    } catch (JAXBException | IOException ex) {
-      throw Exceptions.internalServerErrorException("getDocumentFull", ex.getMessage());
-    }
-
     // Make sure this is a new version of the document.
-    if (request.getVersion().compare(documentT.getVersion()) == DatatypeConstants.EQUAL) {
+    if (requestVersion == document.getVersion()) {
       log.debug("[updateDocument] received document is a duplicate id=" + documentId);
-      throw Exceptions.invalidVersionException(DiscoveryError.DOCUMENT_VERSION, request.getId(), request.getVersion(), documentT.getVersion());
-    } else if (request.getVersion().compare(documentT.getVersion()) == DatatypeConstants.LESSER) {
+      throw Exceptions.invalidVersionException(DiscoveryError.DOCUMENT_VERSION, request.getId(), requestVersion, document.getVersion());
+    } else if (requestVersion < document.getVersion()) {
       log.debug("[updateDocument] received document is an old version id=" + documentId);
-      throw Exceptions.invalidVersionException(DiscoveryError.DOCUMENT_VERSION, request.getId(), request.getVersion(), documentT.getVersion());
+      throw Exceptions.invalidVersionException(DiscoveryError.DOCUMENT_VERSION, request.getId(), requestVersion, document.getVersion());
     }
 
-    Document doc = new Document(request, nsiProperties.getDdsUrl());
-    Document update = documentService.update(doc);
+    // Begin temp debugging.
+    log.debug("[updateDocument] updating document from {} to {}", document.getVersion(), requestVersion);
+    try {
+      log.debug("[updateDocument] original doc version: {}, new doc version {}",
+              document.getDocumentSummary().getVersion(),
+              request.getVersion());
+    } catch (JAXBException | IOException ex) {
+      log.error("Failed to decode old document {}", documentId);
+    }
+    // End temp debugging.
+
+    // Now we update the existing document with the new parameters.
+    document.setLastDiscovered(Document.now());
+    document.setExpires(Document.expires(request.getExpires()));
+    try {
+      document.setDocumentType(request);
+    } catch (JAXBException | IOException ex) {
+      throw Exceptions.illegalArgumentException(DiscoveryError.INVALID_PARAMETER, documentId, "DocumentType");
+    }
+
+    // Now we write this out to disk updating the existing document.
+    Document update = documentService.update(document);
     if (update != null) {
       log.debug("[updateDocument] updated documentId=" + documentId);
     } else {
       log.error("[updateDocument] failed to update documentId=" + documentId);
       throw Exceptions.doesNotExistException(DiscoveryError.INTERNAL_SERVER_ERROR, "document", documentId);
     }
+
+    // Begin temp debugging.
+    Document test = documentService.get(documentId);
+    log.debug("[updateDocument] read updated document {}, {}", documentId, test.getVersion());
+    try {
+      log.debug("[updateDocument] updated doc version: {}",
+              test.getDocumentSummary().getVersion());
+    } catch (JAXBException | IOException ex) {
+      log.error("Failed to decode new document {}", documentId);
+    }
+    // End temp debugging.
+
 
     // Route a update document event.
 /**

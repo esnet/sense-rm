@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import java.util.Collection;
 import org.apache.jena.ext.com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,6 +102,11 @@ public class DocumentServiceBean implements DocumentService {
     return Lists.newArrayList(documentRepository.findExpired(expires));
   }
 
+  /**
+   *
+   * @param document
+   * @return
+   */
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
   @Override
   public Document create(Document document) {
@@ -110,7 +116,14 @@ public class DocumentServiceBean implements DocumentService {
     return documentRepository.save(document);
   }
 
+  /**
+   * Update an existing document with the provided version.
+   *
+   * @param document
+   * @return
+   */
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+  @Modifying
   @Override
   public Document update(Document document) {
     Document findOne = documentRepository.findOne(document.getId());

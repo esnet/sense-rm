@@ -1,5 +1,6 @@
 package net.es.sense.rm.driver.nsi.dds.db;
 
+import com.google.common.base.Strings;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -15,6 +16,7 @@ import javax.persistence.Table;
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.jaxb.DdsParser;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentType;
@@ -50,6 +52,9 @@ public class Document implements Serializable {
   @Basic(optional=false)
   private String documentId;
 
+  // The version of the document.
+  private long version;
+
   // When we first encountered this document.
   private long lastDiscovered;
 
@@ -70,36 +75,28 @@ public class Document implements Serializable {
   public Document(DocumentType documentT, String baseURL) throws WebApplicationException {
     // Populate the searchable fields.
     this.id = documentId(documentT);
-    this.nsa = documentT.getNsa().trim();
-    this.type = documentT.getType().trim();
-    this.documentId = documentT.getId().trim();
+    this.nsa = documentT.getNsa();
+    this.type = documentT.getType();
+    this.documentId = documentT.getId();
 
     // This is the time we discovered this documentT.
     //Date discovered = new Date();
     //discovered.setTime(discovered.getTime() - discovered.getTime() % 1000);
-    lastDiscovered = (System.currentTimeMillis() / 1000) * 1000;
-
-    if (documentT.getExpires() != null) {
-      try {
-        expires = XmlUtilities.xmlGregorianCalendarToDate(documentT.getExpires()).getTime();
-      } catch (DatatypeConfigurationException ex) {
-        throw Exceptions.illegalArgumentException(DiscoveryError.INVALID_PARAMETER, "document", "expires");
-      }
-    }
-    else {
-      expires = Long.MAX_VALUE;
+    lastDiscovered = now();
+    expires = expires(documentT.getExpires());
+    try {
+      version = getTime(documentT.getVersion());
+    } catch (DatatypeConfigurationException ex) {
+      throw Exceptions.illegalArgumentException(DiscoveryError.INVALID_PARAMETER, this.id, "version");
     }
 
     // Store the documentT contents.
-    documentT.setNsa(this.nsa);
-    documentT.setType(this.type);
-    documentT.setId(this.documentId);
     documentT.setHref(getDocumentURL(baseURL));
 
     try {
       this.document = DdsParser.getInstance().document2Xml(documentT);
     } catch (JAXBException | IOException ex) {
-      throw Exceptions.illegalArgumentException(DiscoveryError.INVALID_PARAMETER, "document", "DocumentType");
+      throw Exceptions.illegalArgumentException(DiscoveryError.INVALID_PARAMETER, this.id, "DocumentType");
     }
   }
 
@@ -116,23 +113,34 @@ public class Document implements Serializable {
    * @throws WebApplicationException
    */
   public static String documentId(String nsa, String type, String id) throws WebApplicationException {
-    if (nsa == null || nsa.trim().isEmpty()) {
+    if (Strings.isNullOrEmpty(nsa)) {
       throw Exceptions.missingParameterException("document", "nsa");
-    } else if (type == null || type.trim().isEmpty()) {
+    } else if (Strings.isNullOrEmpty(type)) {
       throw Exceptions.missingParameterException("document", "type");
-    } else if (id == null || id.trim().isEmpty()) {
+    } else if (Strings.isNullOrEmpty(id)) {
       throw Exceptions.missingParameterException("document", "id");
     }
 
     StringBuilder sb = new StringBuilder();
 
     try {
-      sb.append(URLEncoder.encode(nsa.trim(), "UTF-8"));
-      sb.append("/").append(URLEncoder.encode(type.trim(), "UTF-8"));
-      sb.append("/").append(URLEncoder.encode(id.trim(), "UTF-8"));
+      sb.append(URLEncoder.encode(nsa, "UTF-8"));
     } catch (UnsupportedEncodingException ex) {
-      throw Exceptions.illegalArgumentException(DiscoveryError.DOCUMENT_INVALID, "document", "id");
+      throw Exceptions.illegalArgumentException(DiscoveryError.DOCUMENT_INVALID, "nsa", nsa);
     }
+
+    try {
+      sb.append("/").append(URLEncoder.encode(type, "UTF-8"));
+    } catch (UnsupportedEncodingException ex) {
+      throw Exceptions.illegalArgumentException(DiscoveryError.DOCUMENT_INVALID, "type", type);
+    }
+
+    try {
+      sb.append("/").append(URLEncoder.encode(id, "UTF-8"));
+    } catch (UnsupportedEncodingException ex) {
+      throw Exceptions.illegalArgumentException(DiscoveryError.DOCUMENT_INVALID, "id", id);
+    }
+
     return sb.toString();
   }
 
@@ -201,5 +209,27 @@ public class Document implements Serializable {
 
   public void setDocumentType(DocumentType documentT) throws JAXBException, IOException {
     this.document = DdsParser.getInstance().document2Xml(documentT);
+  }
+
+
+  public static long now() {
+    return (System.currentTimeMillis() / 1000) * 1000;
+  }
+
+  public static long expires(XMLGregorianCalendar expires) throws WebApplicationException {
+    if (expires != null) {
+      try {
+        return getTime(expires);
+      } catch (DatatypeConfigurationException ex) {
+        throw Exceptions.illegalArgumentException(DiscoveryError.INVALID_PARAMETER, "document", "expires");
+      }
+    }
+    else {
+      return Long.MAX_VALUE;
+    }
+  }
+
+  public static long getTime(XMLGregorianCalendar date) throws DatatypeConfigurationException {
+    return XmlUtilities.xmlGregorianCalendarToDate(date).getTime();
   }
 }

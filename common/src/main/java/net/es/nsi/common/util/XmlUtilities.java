@@ -157,6 +157,14 @@ public class XmlUtilities {
   }
 
   public static Date xmlGregorianCalendarToDate(XMLGregorianCalendar cal) throws DatatypeConfigurationException {
+    if (cal == null) {
+      throw new DatatypeConfigurationException("Parameter \"cal\" is null");
+    }
+
+    if (!cal.isValid()) {
+      throw new DatatypeConfigurationException("Parameter \"cal\" is not a valid xmlGregorianCalendar");
+    }
+
     GregorianCalendar gregorianCalendar = cal.toGregorianCalendar();
     return gregorianCalendar.getTime();
   }

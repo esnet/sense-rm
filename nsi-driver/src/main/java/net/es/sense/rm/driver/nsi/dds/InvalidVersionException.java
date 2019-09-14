@@ -2,7 +2,6 @@ package net.es.sense.rm.driver.nsi.dds;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  *
@@ -10,23 +9,23 @@ import javax.xml.datatype.XMLGregorianCalendar;
  */
 public class InvalidVersionException extends WebApplicationException {
     private static final long serialVersionUID = 1L;
-    private final XMLGregorianCalendar version;
-    private final XMLGregorianCalendar actual;
+    private final long version;
+    private final long actual;
 
-    public InvalidVersionException(Response response, final XMLGregorianCalendar version, final XMLGregorianCalendar actual) {
+    public InvalidVersionException(Response response, final long version, final long actual) {
         super(response);
         this.version = version;
         this.actual = actual;
     }
 
-    public XMLGregorianCalendar getVersion() {
+    public long getVersion() {
         return version;
     }
 
     /**
      * @return the actual
      */
-    public XMLGregorianCalendar getActual() {
+    public long getActual() {
         return actual;
     }
 }

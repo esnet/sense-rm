@@ -1,13 +1,12 @@
 package net.es.sense.rm.driver.nsi.dds.api;
 
-import net.es.sense.rm.driver.nsi.dds.InvalidVersionException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.XMLGregorianCalendar;
 import net.es.nsi.dds.lib.jaxb.dds.ErrorType;
 import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
+import net.es.sense.rm.driver.nsi.dds.InvalidVersionException;
 
 /**
  *
@@ -58,8 +57,8 @@ public class Exceptions {
         return new WebApplicationException(ex);
     }
 
-    public static InvalidVersionException invalidVersionException(DiscoveryError errorEnum, String resource, XMLGregorianCalendar request, XMLGregorianCalendar actual) {
-        ErrorType error = DiscoveryError.getErrorType(errorEnum, resource, "request=" + request.toString() + ", actual=" + actual.toString());
+    public static InvalidVersionException invalidVersionException(DiscoveryError errorEnum, String resource, long request, long actual) {
+        ErrorType error = DiscoveryError.getErrorType(errorEnum, resource, "request=" + request + ", actual=" + actual);
         Response ex = Response.status(Response.Status.BAD_REQUEST).entity(new GenericEntity<JAXBElement<ErrorType>>(factory.createError(error)){}).build();
         return new InvalidVersionException(ex, request, actual);
     }

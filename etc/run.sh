@@ -15,6 +15,6 @@ export PASSWORD="changeit"
         -Djavax.net.ssl.keyStorePassword=$PASSWORD \
 	-Dlogback.configurationFile="file:$HOME/config/logback.xml" \
 	-XX:+StartAttachListener \
-        -jar "$HOME/target/dist/sense-nsi-rm.jar" \
-	--spring.config.location="file:$HOME/target/dist/config/" 
+        -jar "$HOME/sense-nsi-rm.jar" \
+	--spring.config.location="file:$HOME/config/" 
 

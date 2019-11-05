@@ -86,7 +86,7 @@
                 <copy todir="${basedir}/target/dist/config">
                   <fileset dir="${basedir}/config"/>
                 </copy>
-                <copy file="${basedir}/rm/target/rm-${project.version}.jar" tofile="${basedir}/target/dist/sense-nsi-rm.jar"/>
+                <copy file="${basedir}/rm/target/rm-${project.version}.jar" tofile="${basedir}/target/dist/sense-n-rm.jar"/>
                 <copy todir="${basedir}/target/dist">
                   <fileset dir="${basedir}/etc"/>
                 </copy>

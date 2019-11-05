@@ -24,6 +24,9 @@ do
         -alias $alias \
         -trustcacerts \
         -file $file \
-        -noprompt
+        -noprompt \
+        -deststoretype JKS
+        #-deststoretype PKCS12
+
 done
 

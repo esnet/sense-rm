@@ -28,7 +28,7 @@ The Java 1.8 runtime and Postgres database is required to run the SENSE-N-RM nai
 
 
 ## Create a non-root user account
-The SENSE-N-RM application should be run as a low-privilege user on the target production server. Ideally it should be run as a user created only for the purpose of running the set of software associated with the SENSE-N-RM application.  However, an existing account can be used if available (i.e. opennsa).
+The SENSE-N-RM application should be run as a low-privilege user on the target production server. Ideally it should be run as a user created only for the purpose of running the set of software associated with the SENSE-N-RM application.  However, an existing account can be used if available (i.e. opennsa).  However, if an account other than "sense" is used to run the application make sure to create the SENSE-N-RM database user using the utilized id.
 
 As an example, we create the following new user and user group for the SENSE-N-RM application if you have not already done so (for example, below we create a "sense" user and user group).
 
@@ -65,7 +65,7 @@ $ mvn antrun:run@package-runtime
 Copy the contents of target/dist to the location you would like to use as the runtime directory for the SENSE-N-RM.  For example, if you are running under a dedicated sense user id then place in a location in the home directory `/home/sense/sense-rm`.  It is recommended that you do not run from the build directory as any new builds will overwrite the existing jar and configuration.
 
 ## Create a Postgres application account
-The SENSE-N-RM requires a dedicated Postgres user and database to tbe created for storage of MRML related model information, and other runtime data needed to map requests from the SENSE-O through to underlying resources.
+The SENSE-N-RM requires a dedicated Postgres user and database to be created for storage of MRML related model information, and other runtime data needed to map requests from the SENSE-O through to underlying resources.
 
 First we create new database user called "sense" using the Postgres interactive tools.  You can use a different user name but remember it for when you configure the SENSE-N-RM runtime.
 
@@ -106,7 +106,7 @@ Here is an example where we create the a `truststore.jks` file with a default pa
 
 ```
 $ cd certificates
-$ ./build_truststore.sh truststore.jks changeit
+$ ./build_truststore.sh truststore.p12 changeit
 Adding 179-132_research_maxgigapop_net.pem as alias 179-132_research_maxgigapop_net
 Certificate was added to keystore
 Adding agg_netherlight_net.pem as alias agg_netherlight_net
@@ -135,17 +135,18 @@ For creating the Java keystore you will need the host SSL key, certificate, and 
 Usage: build_keystore.sh <keystorefile> <passwd> <keyfile> <certfile> <ca-file>
 ```
 
-Here is an example where we create the a `keystore.jks` file with a password of `changeit`.  Once created move the your SENSE-N-RM runtime `/config` directory, or somewhere it can be accessed.
+Here is an example where we create the a `keystore.p12` file with a password of `changeit`.  Once created move the your SENSE-N-RM runtime `/config` directory, or somewhere it can be accessed.
 
 ```
-$ ./build_keystore.sh keystore.jks changeit test.key test.crt test-ca.crt 
+$ ./build_keystore.sh keystore.p12 changeit test.key test.crt test-ca.crt 
 Entry for alias 1 successfully imported.
 Import command completed:  1 entries successfully imported, 0 entries failed or cancelled
-[Storing keystore.jks]
+[Storing keystore.p12]
 ```
  
 ## Configuring the SENSE-N-RM
 
+'sdjsjf';sldjfsd;fjsd';fjsfjsdjFK
 
 ## How-to install Java on CentOS 7
 If you decide to use the java runtime on CentOS 7 then we will need to install the Java 8 runtime to execute our SENSE-N-RM jar file.
@@ -158,10 +159,10 @@ Reference: [https://www.liquidweb.com/kb/install-java-8-on-centos-7/](Install Ja
 $ sudo yum -y update
 ```
 
-### Step 2: As root install Java 8 OpenJDK.
+### Step 2: As root install Java 8 OpenJDK development kit.
 
 ```
-$ sudo yum install java-1.8.0-openjdk
+$ sudo yum install java-1.8.0-openjdk java-1.8.0-openjdk-devel
 ```
 
 ### Step 3: Verify Java is installed
@@ -184,7 +185,7 @@ OpenJDK 64-Bit Server VM (build 25.232-b09, mixed mode)
 Determine the JAVA_HOME location:
 
 ```
-$ update-alternatives --config java
+$ sudo update-alternatives --config java
 ```
 
 Output will look like:
@@ -289,7 +290,7 @@ Finally we clean up.
 ```
 $ rm /tmp/apache-maven-3.6.2-bin.tar.gz
 ```
-## How-to install PostgreSQL on CentOS 7
+## How-to install Postrges on CentOS 7
 The default CentOS repository contain a postgresql package we can install using the yum package system.  If you require a specific version then follow published instructions.
 
 Reference: [https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-centos-7](How To Install and Use PostgreSQL on CentOS 7))
@@ -316,7 +317,7 @@ Create a new PostgreSQL database cluster:
 $ sudo postgresql-setup initdb
 ```
 
-By default, PostgreSQL does not allow password authentication. We will change that by editing its host-based authentication (HBA) configuration.
+Now we will need to configure Postgres authentication of the SENSE-N-RM.  There are two options for this depending on how you have configured the runtime environment.  If you have created a dedicated OS user id (say "sense") and have created a dedicated postgres user that matches the OS user id (i.e. "sense") then the default Postgres "ident" authentication mechanism should work out of the box.  However, if this does not work, or if you are running the SENSE-N-RM under a different user id than the Postgres user you created, then you should change the Postrges authentication mechanism from "ident" to the password authentication mechanism "md5".  We can change the authentication mechanism by editing the Postgres host-based authentication (HBA) configuration.
 
 Open the HBA configuration with your favorite text editor. We will use vi:
 
@@ -422,3 +423,8 @@ Now collect the components together under `${builddir}/target/dist`:
 $ docker run -it --rm --name sense-rm -v "$(pwd)":/usr/src/mymaven -v "$HOME/.m2":/root/.m2  -w /usr/src/mymaven maven:3.6.2-jdk-8 mvn antrun:run@package-runtime
 ```
 
+## Useful debug commands
+
+```
+$ openssl s_client -debug -connect nsi0.snvaca.pacificwave.net:9443 -no_ssl2 -no_ssl3 -no_tls1
+```

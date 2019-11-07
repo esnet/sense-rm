@@ -7,10 +7,10 @@
   </appender>
 
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>var/log/sense-rm.log</file>
+    <file>var/log/sense-rm/sense-n-rm.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- daily rollover -->
-      <fileNamePattern>sense-n-rm.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>var/log/sense-rm/sense-n-rm.%d{yyyy-MM-dd}.log</fileNamePattern>
 
       <!-- keep 30 days' worth of history capped at 3GB total size -->
       <maxHistory>30</maxHistory>

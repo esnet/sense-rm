@@ -24,12 +24,14 @@ import com.google.common.base.Strings;
 import java.net.MalformedURLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  *
  * @author hacksaw
  */
+@Slf4j
 public class UrlTransform {
 
   // Transform patterns.

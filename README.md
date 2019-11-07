@@ -64,6 +64,10 @@ $ mvn antrun:run@package-runtime
 
 Copy the contents of target/dist to the location you would like to use as the runtime directory for the SENSE-N-RM.  For example, if you are running under a dedicated sense user id then place in a location in the home directory `/home/sense/sense-rm`.  It is recommended that you do not run from the build directory as any new builds will overwrite the existing jar and configuration.
 
+```
+$ mv target/dist ~/sense-rm
+```
+
 ## Create a Postgres application account
 The SENSE-N-RM requires a dedicated Postgres user and database to be created for storage of MRML related model information, and other runtime data needed to map requests from the SENSE-O through to underlying resources.
 
@@ -106,7 +110,7 @@ Here is an example where we create the a `truststore.jks` file with a default pa
 
 ```
 $ cd certificates
-$ ./build_truststore.sh truststore.p12 changeit
+$ ./build_truststore.sh truststore.jks changeit
 Adding 179-132_research_maxgigapop_net.pem as alias 179-132_research_maxgigapop_net
 Certificate was added to keystore
 Adding agg_netherlight_net.pem as alias agg_netherlight_net
@@ -138,15 +142,114 @@ Usage: build_keystore.sh <keystorefile> <passwd> <keyfile> <certfile> <ca-file>
 Here is an example where we create the a `keystore.p12` file with a password of `changeit`.  Once created move the your SENSE-N-RM runtime `/config` directory, or somewhere it can be accessed.
 
 ```
-$ ./build_keystore.sh keystore.p12 changeit test.key test.crt test-ca.crt 
+$ ./build_keystore.sh keystore.jks changeit test.key test.crt test-ca.crt 
 Entry for alias 1 successfully imported.
 Import command completed:  1 entries successfully imported, 0 entries failed or cancelled
-[Storing keystore.p12]
+[Storing keystore.jks]
+```
+
+Now move these to the SENSE-N-RM runtime configuration directory.
+
+```
+$ mv keystore.jks truststore.jks ~/sense-rm/config
 ```
  
 ## Configuring the SENSE-N-RM
+There are two configuration files that will need to be modified before you can run your SENSE-N-RM instance.  We will start with the simple configuration file first.
 
-'sdjsjf';sldjfsd;fjsd';fjsfjsdjFK
+### Configuring the log subsystem (logback.xml)
+The SENSE-N-RM utilizes the java log4j logging subsystem to collect and maintain logs.  The `config/logback.xml` file can be modified to control the location of the generated log files.  By default logs will be written to the SENSE-N-RM home directory under `$HOME/var/log/sense-rm/`.  If you would like to change this location to somewhere more standard like `/var/log` then edit the following two lines in the `config/logback.xml` file to point to the desired location. 
+
+```
+...
+<file>var/log/sense-rm/sense-n-rm.log</file>
+...
+<fileNamePattern>var/log/sense-rm/sense-n-rm.%d{yyyy-MM-dd}.log</fileNamePattern>
+...
+```
+Also, if using the system `/var/log` directory you will need to create a dedicated directory for SENSE-N-RM to write logs and change owenership the the user underwhich you are running the java process.
+
+```
+$ sudo mkdir /var/log/sense-rm
+$ sudo chown sense.sense /var/log/sense-rm
+```
+
+### Configuring the SENSE-N-RM runtime (application.yaml)
+The SENSE-N-RM currently supports adaptation between the SENSE protocol and the standardized OGF NSI protocol.  To run an instance of the SENSE-N-RM we need to confiugure both attributes relating to operation within the SENSE environment, and attributes relating to operation within the NSI environment.  Also, the SENSE-N-RM can be deployed behind an HTTP reverse proxy to provide additional security.  All this configuration is specified through the `config/application.yaml` file.
+
+```
+#########################################
+# SENSE-N-RM specific configuration.    #
+#########################################
+#
+# sense.root - the root of our URL context for building REST URL.  If we are behind
+#        a proxy this is the URL of that proxy. [Not currently used]
+#
+# sense.proxy - A simple mechanism that allows for URL manupulation on returned
+#         resources to map any localized URL to URL externalized by a proxy.
+#         Proper configuration of the Spring-boot web environment should mean
+#         this proxy value is left empty.  Here is an example:
+#
+#             "(http://localhost:8401|https://nsi0.snvaca.pacificwave.net/sense-rm)"
+#
+#         This will change the URL:
+#
+#               http://localhost:8401/api/sense/v1/models
+#         to:
+#               https://nsi0.snvaca.pacificwave.net/sense-rm/api/sense/v1/models
+#
+#         Allowing for a reverse proxy with address "nsi0.snvaca.pacificwave.net"
+#         and component URI "sense-rm" to point to "localhost:8401/api".
+#
+# sense.driver - the RM driver to use for this runtime instance.  By default this is
+#          the NsiDriver class. [Should be left as is unless new southbound
+#          driver has been added.
+#
+sense:
+  root:
+  proxy:
+  driver: net.es.sense.rm.driver.nsi.NsiDriver
+```
+Now we need to configure the web server for our specific deployment.  If we are exposing the SENSE-N-RM directly then we will need to set up TLS with client authentication enabled.
+
+specifying both the key and trust stores.
+
+
+```
+#########################################
+# Spring HTTP server configuration      #
+#########################################
+#
+# server.address - The local IP address to bind the web server.  Use localhost if
+#          behind a reverse proxy on only local connectivity is required.
+#
+# server.port - The local TCP port to bind for the web server.
+#
+# server.contextPath - The URI underwhich to anchor all discoverd REST endpoints.
+#          If behind a reverse proxy then set this to the URI used to map though
+#          to this SENSE-N-RM instance, otherwise use "/".
+#
+# server.packageName - This is the java package name underwhich to search for
+#          exposed REST endpoints.  Do not change this value.
+#
+# server.ssl - If behind an HTTPS reverse proxy then disable the ssl configuration,
+#          otherwise set parameters as needed.
+server:
+  address: nsi0.snvaca.pacificwave.net
+  port: 8443
+  contextPath: /
+  packageName: net.es.sense.rm.driver.nsi
+  ssl:
+    enabled: true
+    protocol: TLS
+    enabled-protocols: TLSv1.2
+    client-auth: "NEED"
+    key-store: /home/sense/sense-rm/config/keystore.jks
+    key-store-password: changeit
+    trust-store: /home/sense/sense-rm/config/truststore.jks
+    trust-store-password: changeit
+
+```
 
 ## How-to install Java on CentOS 7
 If you decide to use the java runtime on CentOS 7 then we will need to install the Java 8 runtime to execute our SENSE-N-RM jar file.
@@ -191,7 +294,7 @@ $ sudo update-alternatives --config java
 Output will look like:
 
 ```
-$ update-alternatives --config java
+$ sudo update-alternatives --config java
 
 There is 1 program that provides 'java'.
 
@@ -202,7 +305,14 @@ There is 1 program that provides 'java'.
 Enter to keep the current selection[+], or type selection number: 
 ```
 
-Now copy this location into your `.bash_profile` using your favorite text editor.
+Finally, setup the JAVA_HOME environment variable for the system.  If you would rather restrict this to a single user then install in user's `.bash_profile`.
+
+```
+$ sudo echo "JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")" | sudo tee -a /etc/profile
+$ source /etc/profile
+```
+
+As stated, you could add this location to the "sense" runtime user by copying this location into the `.bash_profile` of the user using your favorite text editor.
 
 ```
 $ vim ~/.bash_profile
@@ -211,7 +321,7 @@ $ vim ~/.bash_profile
 Add the following line:
 
 ```
-$ export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.232.b09-0.el7_7.x86_64/jre/bin/java
+$ export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.232.b09-0.el7_7.x86_64/jre
 ```
 
 Load the new value into your environment"
@@ -224,14 +334,7 @@ Now we should see the following:
 
 ```
 $ echo $JAVA_HOME
-/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.232.b09-0.el7_7.x86_64/jre/bin/java
-```
-
-Finally, setup the JAVA_HOME environment variable for the system.  If you would rather restrict this to a single user then install in user's `.bash_profile`.
-
-```
-$ echo "JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")" | sudo tee -a /etc/profile
-$ source /etc/profile
+/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.232.b09-0.el7_7.x86_64/jre
 ```
 
 ## How-to install Maven on CentOS 7
@@ -263,7 +366,7 @@ $ sudo ln -s /opt/apache-maven-3.6.2 /opt/apache-maven
 Add the path /opt/apache-maven to the PATH environment variable.
 
 ```
-$ echo 'export PATH=$PATH:/opt/apache-maven/bin' | sudo tee -a /etc/profile
+$ sudo echo 'export PATH=$PATH:/opt/apache-maven/bin' | sudo tee -a /etc/profile
 $ source /etc/profile
 ```
 

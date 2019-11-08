@@ -153,7 +153,19 @@ Now move these to the SENSE-N-RM runtime configuration directory.
 ```
 $ mv keystore.jks truststore.jks ~/sense-rm/config
 ```
- 
+
+## Configuring OpenNSA
+If the SENSE-N-RM is being configured to use OpenNSA as am NSI Resource Manager then we need to configure OpenNSA to accept requests from the SENSE-N-RM.  This will require the SENSE-N-RM x.509 certificate to be added to the OpenNSA SSL certificate store, and the SENSE-N-RM host name added to the `/etc/opennsa.conf` file as follows:
+
+```
+sudo vi /etc/opennsa.conf 
+```
+
+Find the "allowedhosts=" configuration attribute and add the SENSE-N-RM host to the list of allowed hosts.  Now restart OpenNSA as follows:
+
+```
+$ sudo systemctl restart opennsa
+```
 ## Configuring the SENSE-N-RM
 There are two configuration files that will need to be modified before you can run your SENSE-N-RM instance.  We will start with the simple configuration file first.
 
@@ -428,6 +440,8 @@ Open the HBA configuration with your favorite text editor. We will use vi:
 $ sudo vi /var/lib/pgsql/data/pg_hba.conf
 ```
 
+If you cannot locate this file check under the specific version of Postgres you installed (i.e. `/var/lib/pgsql/9.6/data/pg_hba.conf`).
+
 Find the lines that looks like this, near the bottom of the file:
 
 **pg_hba.conf excerpt (original)**
@@ -455,8 +469,14 @@ $ sudo systemctl start postgresql
 $ sudo systemctl enable postgresql
 ```
 
-PostgreSQL is now ready to be used.
+or if already running:
 
+```
+$ systemctl list-units|grep postgresql
+  postgresql-9.6.service                                                                    loaded active running   PostgreSQL 9.6 database server
+$ sudo systemctl restart postgresql-9.6.service
+PostgreSQL is now ready to be used.
+```
 ## How-to install Docker on CentOS 7
 
 For this section we download the CentOS 7 installationb package from the Docker repository directly to get the most recent version.  (Liberated from https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-centos-7)

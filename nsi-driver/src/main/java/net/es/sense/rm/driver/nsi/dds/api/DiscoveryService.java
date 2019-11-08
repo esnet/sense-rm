@@ -87,6 +87,7 @@ public class DiscoveryService {
    *
    * @param host
    * @param encoding
+   * @param via
    * @param source
    * @param request
    * @return
@@ -101,13 +102,15 @@ public class DiscoveryService {
   @ResponseBody
   public ResponseEntity<?> notifications(
           @RequestHeader(value = HttpConstants.HOST) String host,
-          @RequestHeader(value = HttpConstants.FORWARD, required = false) String source,
+          @RequestHeader(value = HttpConstants.FORWARDED, required = false) String source,
+          @RequestHeader(value = HttpConstants.VIA, required = false) String via,
           @RequestHeader(
                   value = HttpConstants.ACCEPT_NAME,
                   defaultValue = Nsi.NSI_DDS_V1_XML) String encoding,
           InputStream request) throws WebApplicationException {
 
-    log.info("[notifications] Incoming notification from Host={}, X-Forwarded-For={}, Accept={}", host, source, encoding);
+    log.info("[notifications] Incoming notification for Host={}, Forwarded={}, Via={}, Accept={}",
+            host, source, via, encoding);
 
     // Parse the XML into JAXB objects.
     NotificationListType notifications;

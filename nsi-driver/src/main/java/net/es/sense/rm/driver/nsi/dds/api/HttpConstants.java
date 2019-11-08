@@ -11,7 +11,8 @@ public class HttpConstants {
 
   // Request header parameters.
   public static final String HOST = "Host";
-  public static final String FORWARD = "X-Forwarded-For";
+  public static final String FORWARDED = "Forwarded";
+  public static final String VIA = "Via";
 
   public static final String ACCEPT_NAME = "Accept";
   public static final String ACCEPT_MSG =

@@ -53,7 +53,7 @@ Into the `sense-rm` directory we go and build the source (skipping test cases).
 
 ```
 $ cd sense-rm
-$ mvn clean package -DskipTests=true
+$ mvn clean install -DskipTests=true
 ```
 
 Now we want to collect the pieces in `target/dist` directory:
@@ -550,4 +550,8 @@ $ docker run -it --rm --name sense-rm -v "$(pwd)":/usr/src/mymaven -v "$HOME/.m2
 
 ```
 $ openssl s_client -debug -connect nsi0.snvaca.pacificwave.net:9443 -no_ssl2 -no_ssl3 -no_tls1
+```
+
+```
+$ nohup ./run.sh </dev/null >/dev/null 2>&1 &
 ```

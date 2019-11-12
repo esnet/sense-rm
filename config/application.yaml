@@ -225,7 +225,7 @@ nsi:
       password: changeit
     trustStore:
       type: JKS
-      file: config/keystore.jks
+      file: config/truststore.jks
       password: changeit
 
   # Left over from DDS server access control enforcement.

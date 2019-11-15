@@ -477,6 +477,46 @@ $ systemctl list-units|grep postgresql
 $ sudo systemctl restart postgresql-9.6.service
 PostgreSQL is now ready to be used.
 ```
+
+## How-to install Apache HTTPD on CentOS 7
+If you would like to protect the SENSE-N-RM behind `httpd` as a reverse proxy then it will need to be installed and configured.  Start by installing the current version of `httpd`:
+
+```
+$ sudo yum clean all
+$ sudo yum -y update
+$ sudo yum -y install httpd
+```
+
+If you are running a host based firewall then open up the standard `httpd` ports:
+
+```
+$ sudo firewall-cmd --permanent --add-port=80/tcp
+$ sudo firewall-cmd --permanent --add-port=443/tcp
+$ sudo firewall-cmd --reload
+```
+
+Configure `httpd` for your specific needs then start the service:
+
+```
+$ sudo systemctl start httpd
+```
+
+Now we enable it across restarts:
+
+```
+$ sudo systemctl enable httpd
+```
+
+Similarly useful commands:
+
+  - Check the status `$ sudo systemctl status httpd`
+  - Stop the service `$ sudo systemctl stop httpd`
+  - Restart the service `$ sudo systemctl restart httpd`
+
+### Configuring HTTPD as a reverse proxy
+
+
+
 ## How-to install Docker on CentOS 7
 
 For this section we download the CentOS 7 installationb package from the Docker repository directly to get the most recent version.  (Liberated from https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-centos-7)

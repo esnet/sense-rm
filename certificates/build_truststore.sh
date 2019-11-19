@@ -18,6 +18,8 @@ do
 
   echo "Adding $file as alias $alias"
 
+  openssl x509 -in $file -text | grep -i "Subject: " | cut -d':' -f2- 
+
   keytool -importcert \
         -keystore $1 \
         -storepass "$2" \

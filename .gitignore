@@ -11,3 +11,4 @@
 *.jks
 /api/nbproject/
 /nsi-driver/nbproject/
+/target/

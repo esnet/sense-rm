@@ -186,6 +186,11 @@ public class RegistrationActor extends UntypedAbstractActor {
         break;
       default:
         log.error("[RegistrationActor] Subscription get failed, url={}, error={}", subscriptionURL, subscribe.getStatus());
+
+        // Remove the stored subscription since a new one will be created.
+        subscriptionService.delete(subscription.getDdsURL());
+        event.setEvent(Event.Register);
+        register(event);
         break;
     }
   }

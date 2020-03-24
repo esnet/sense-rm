@@ -2,7 +2,7 @@
 
 if [[ "$#" -ne 2 ]]; then
     echo "ERROR: Illegal number of parameters"
-    echo "Usage: $0 <filename> <password>"
+    echo "Usage: $0 <truststorefile> <password>"
     exit 2
 fi
 

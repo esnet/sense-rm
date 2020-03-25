@@ -1,9 +1,14 @@
 # SENSE-NSI-RM #
+
 The SENSE-NSI-RM acts in the roll of an uRA in the NSI architecture.  It uses the NSI DDS protocol to communicate with a nsi-dds server to retrieve NSA and topology files for use in building a topological view of the local NSI uPA.  It also uses the NSI CS protocol to communicate with the local NSI uPA to reserve assoicated network resources, and inventory existing reservation for completing topology.  For these reasons the SENSE-NSI-RM requires X.509 certificates to participate in the TLS secured NSA infrestructure.
 
 ## Certificates ##
 
 This directory contains the current set of certificates for NSI networking devices participating on the SENSE network.  There are two shell scripts provided to create Java key and trust stores for the SENSE-NSI-RM.
+
+### Prerequisites ###
+
+The two scripts provided here require ``openssl`` and the java ``keytool`` to be installed.  The ``keytool`` is installed as part of the Java JDK and will require having the ``$JAVA_HOME`` environment variable set to the proper Java installation location.
 
 ### Keystore ###
 The SENSE-NSI-RM is implemented in Java and therefore requires a Java keystore for secure TLS communications.  We can created the required keystore using the ``build_keystore.sh`` shell script contained in this directory.

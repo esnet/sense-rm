@@ -42,7 +42,7 @@ openssl pkcs12 -export \
     -certfile $5 \
     -passout pass:"$2"
 
-keytool -v -importkeystore \
+$JAVA_HOME/bin/keytool -v -importkeystore \
     -noprompt \
     -srcstorepass "$2" \
     -deststorepass "$2"  \

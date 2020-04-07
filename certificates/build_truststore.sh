@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#
+# A simple script to build a Java truststore from PEM files in the current directory.
+#
+
 if [[ "$#" -ne 2 ]]; then
     echo "ERROR: Illegal number of parameters"
     echo "Usage: $0 <truststorefile> <password>"

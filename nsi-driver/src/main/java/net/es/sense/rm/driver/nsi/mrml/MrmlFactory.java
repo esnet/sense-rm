@@ -11,6 +11,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import lombok.extern.slf4j.Slf4j;
+import net.es.nsi.common.util.XmlDate;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.jaxb.nml.NmlLocationType;
 import net.es.nsi.dds.lib.jaxb.nml.NmlLocationType.NmlAddress;
@@ -148,11 +149,20 @@ public class MrmlFactory {
     // Add the root topologyResource element.
     Resource nmlTopology = createResource(model, topology.getId(), Nml.Topology);
     model.add(model.createStatement(nmlTopology, Nml.name, getName()));
-    model.add(model.createStatement(nmlTopology, Nml.version, topology.getVersion().toXMLFormat()));
     model.add(model.createStatement(nmlTopology, Nml.existsDuring, createLifetime(model)));
     Resource location = createLocation(model, topology.getLocation());
     if (location != null) {
       model.add(model.createStatement(nmlTopology, Nml.locatedAt, location));
+    }
+
+    // Instead of using the NML document version we make our own based on the most recent of the topology
+    // document or connection discovery.
+    try {
+      long version = (nml.getLastDiscovered() < ssm.getVersion()) ? ssm.getVersion() : nml.getLastDiscovered();
+      model.add(model.createStatement(nmlTopology, Nml.version, XmlDate.longToXMLGregorianCalendar(version).toXMLFormat()));
+    } catch (DatatypeConfigurationException ex) {
+      log.error("createTopolgyResource: failed to convert internal version to XML.", ex);
+      model.add(model.createStatement(nmlTopology, Nml.version, topology.getVersion().toXMLFormat()));
     }
 
     return nmlTopology;

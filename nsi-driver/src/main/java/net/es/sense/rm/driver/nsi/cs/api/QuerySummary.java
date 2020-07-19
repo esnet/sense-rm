@@ -215,11 +215,17 @@ public class QuerySummary {
 
         // Now we need to get the P2PS structure (add other services here when defined).
         try {
-          if (!CsUtils.serializeP2PS(reservation.getServiceType(), criteria.getAny(), reservation)) {
-            log.error("[QuerySummary] unable to locate P2PS structure, cid = {}, serviceType = {}",
+          CsUtils.ResultEnum result = CsUtils.serializeP2PS(reservation.getServiceType(), criteria.getAny(), reservation);
+
+          if (CsUtils.ResultEnum.NOTFOUND == result) {
+            // We could not find a P2PS structure so
+            log.info("[QuerySummary] unable to locate P2PS structure, cid = {}, serviceType = {}",
                     cid, reservation.getServiceType());
-            throw new IllegalArgumentException("Unable to locate P2PS structure in cid = " +
-                    cid + " for serviceType = " + reservation.getServiceType());
+            continue;
+          } else if (CsUtils.ResultEnum.MISMATCH == result) {
+            log.info("[QuerySummary] STP with networkId mismatch in P2PS structure, cid = {}, serviceType = {}",
+                    cid, reservation.getServiceType());
+            continue;
           }
         } catch (JAXBException ex) {
           log.error("[QuerySummary] serializeP2PS failed for cid = {}", cid, ex);
@@ -267,16 +273,21 @@ public class QuerySummary {
 
           // Now we need to determine the network based on the STP used in the service.
           try {
-            if (!CsUtils.serializeP2PS(child.getServiceType(), child.getAny(), reservation)) {
-              log.error("[QuerySummary] processSummaryCriteria: serializeP2PS failed for reservation cid = {}",
+            CsUtils.ResultEnum result = CsUtils.serializeP2PS(child.getServiceType(), child.getAny(), reservation);
+            if (CsUtils.ResultEnum.NOTFOUND == result) {
+              log.info("[QuerySummary] processSummaryCriteria: serializeP2PS failed for reservation cid = {}",
                       reservation.getConnectionId());
+              continue;
+            } else if (CsUtils.ResultEnum.MISMATCH == result) {
+              log.info("[QuerySummary] processSummaryCriteria: STP with networkId mismatch in P2PS structure, cid = {}, serviceType = {}",
+                      cid, reservation.getServiceType());
               continue;
             }
 
             if (Strings.isNullOrEmpty(reservation.getTopologyId())) {
               reservation.setTopologyId(networkId);
             } else if (!networkId.equalsIgnoreCase(reservation.getTopologyId())) {
-              log.error("[QuerySummary] processSummaryCriteria: rejecting reservation cid = {}, for topologyId = {}",
+              log.info("[QuerySummary] processSummaryCriteria: rejecting reservation cid = {}, for topologyId = {}",
                       reservation.getConnectionId(), reservation.getTopologyId());
               continue;
             }

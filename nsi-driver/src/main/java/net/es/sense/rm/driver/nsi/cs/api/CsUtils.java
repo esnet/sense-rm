@@ -38,11 +38,17 @@ import org.w3c.dom.Node;
 @Slf4j
 public class CsUtils {
 
-  public static boolean serializeP2PS(String serviceType, List<Object> any,
+  public enum ResultEnum {
+    NOTFOUND,
+    FOUND,
+    MISMATCH
+  }
+
+  public static ResultEnum serializeP2PS(String serviceType, List<Object> any,
           Reservation reservation) throws JAXBException {
 
     // Indicate in the return if we found a P2P structure.
-    boolean found = false;
+    ResultEnum result = ResultEnum.NOTFOUND;
 
     if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType) ||
             Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(serviceType) ||
@@ -65,6 +71,7 @@ public class CsUtils {
             SimpleStp dstStp = new SimpleStp(p2ps.getDestSTP());
             if (!srcStp.getNetworkId().equalsIgnoreCase(dstStp.getNetworkId())) {
               log.error("[serializeP2PS]: source and destination networkId for STP do not match: {} != {}", srcStp, dstStp);
+              result = ResultEnum.MISMATCH;
               break;
             }
 
@@ -72,7 +79,7 @@ public class CsUtils {
             // later if this is not the networkId we are looking for.
             reservation.setTopologyId(srcStp.getNetworkId());
             reservation.setService(CsParser.getInstance().p2ps2xml(p2ps));
-            found = true;
+            result = ResultEnum.FOUND;
             break;
           }
         } else if (object instanceof org.w3c.dom.Element) {
@@ -86,6 +93,7 @@ public class CsUtils {
             SimpleStp dstStp = new SimpleStp(p2ps.getDestSTP());
             if (!srcStp.getNetworkId().equalsIgnoreCase(dstStp.getNetworkId())) {
               log.error("[serializeP2PS]: source and destination networkId for STP do not match: {} != {}", srcStp, dstStp);
+              result = ResultEnum.MISMATCH;
               break;
             }
 
@@ -93,7 +101,7 @@ public class CsUtils {
             // later if this is not the networkId we are looking for.
             reservation.setTopologyId(srcStp.getNetworkId());
             reservation.setService(CsParser.getInstance().p2ps2xml(p2ps));
-            found = true;
+            result = ResultEnum.FOUND;
             break;
           } 
         } else {
@@ -102,7 +110,7 @@ public class CsUtils {
       }
     }
 
-    return found;
+    return result;
   }
 
   public static long getStartTime(JAXBElement<XMLGregorianCalendar> time) {

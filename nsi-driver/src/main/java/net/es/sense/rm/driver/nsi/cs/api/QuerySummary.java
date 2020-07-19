@@ -267,12 +267,16 @@ public class QuerySummary {
 
           // Now we need to determine the network based on the STP used in the service.
           try {
-            CsUtils.serializeP2PS(child.getServiceType(), child.getAny(), reservation);
+            if (!CsUtils.serializeP2PS(child.getServiceType(), child.getAny(), reservation)) {
+              log.error("[QuerySummary] processSummaryCriteria: serializeP2PS failed for reservation cid = {}",
+                      reservation.getConnectionId());
+              continue;
+            }
 
             if (Strings.isNullOrEmpty(reservation.getTopologyId())) {
               reservation.setTopologyId(networkId);
             } else if (!networkId.equalsIgnoreCase(reservation.getTopologyId())) {
-              log.info("[QuerySummary] processSummaryCriteria: rejecting reservation cid = {}, for topologyId = {}",
+              log.error("[QuerySummary] processSummaryCriteria: rejecting reservation cid = {}, for topologyId = {}",
                       reservation.getConnectionId(), reservation.getTopologyId());
               continue;
             }

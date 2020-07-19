@@ -65,6 +65,7 @@ public class CsUtils {
             SimpleStp dstStp = new SimpleStp(p2ps.getDestSTP());
             if (!srcStp.getNetworkId().equalsIgnoreCase(dstStp.getNetworkId())) {
               log.error("[serializeP2PS]: source and destination networkId for STP do not match: {} != {}", srcStp, dstStp);
+              break;
             }
 
             // Set the topology based on the source STP for now.  We can reject
@@ -85,6 +86,7 @@ public class CsUtils {
             SimpleStp dstStp = new SimpleStp(p2ps.getDestSTP());
             if (!srcStp.getNetworkId().equalsIgnoreCase(dstStp.getNetworkId())) {
               log.error("[serializeP2PS]: source and destination networkId for STP do not match: {} != {}", srcStp, dstStp);
+              break;
             }
 
             // Set the topology based on the source STP for now.  We can reject

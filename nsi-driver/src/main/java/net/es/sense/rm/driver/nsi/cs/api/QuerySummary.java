@@ -182,8 +182,8 @@ public class QuerySummary {
     List<Reservation> results = new ArrayList<>();
 
     // There will be one criteria for each version of this reservation. We
-    // will check to see if there are any new versions than what is already
-    // stored.
+    // will check to see if there are any more recent versions than what has
+    // already been stored.
     for (QuerySummaryResultCriteriaType criteria : criteriaList) {
       log.info("[QuerySummary] processSummaryCriteria: cid = {}, version = {}, serviceType = {}",
               cid, criteria.getVersion(), criteria.getServiceType());
@@ -204,6 +204,7 @@ public class QuerySummary {
         reservation.setStartTime(CsUtils.getStartTime(criteria.getSchedule().getStartTime()));
         reservation.setEndTime(CsUtils.getEndTime(criteria.getSchedule().getEndTime()));
 
+        // There is a history of incorrect EVTS URN so we need to cover all of them.
         if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_1.equalsIgnoreCase(criteria.getServiceType()) ||
                 Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_2.equalsIgnoreCase(criteria.getServiceType()) ||
                 Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(criteria.getServiceType())) {
@@ -212,6 +213,7 @@ public class QuerySummary {
           reservation.setServiceType(criteria.getServiceType());
         }
 
+        // Now we need to get the P2PS structure (add other services here when defined).
         try {
           if (!CsUtils.serializeP2PS(reservation.getServiceType(), criteria.getAny(), reservation)) {
             log.error("[QuerySummary] unable to locate P2PS structure, cid = {}, serviceType = {}",
@@ -224,9 +226,18 @@ public class QuerySummary {
           continue;
         }
 
+        // Before we add this reservation to the results check to see if it is
+        // in the network we are managing.
+        if (!networkId.equalsIgnoreCase(reservation.getTopologyId())) {
+          log.info("[QuerySummary] processSummaryCriteria: rejecting reservation cid = {}, for topologyId = {}",
+                  reservation.getConnectionId(), reservation.getTopologyId());
+          continue;
+        }
+
         results.add(reservation);
       } else {
-        // We still have children so this must be an aggregator.
+        // We still have children so this must be an aggregator.  Build a list of
+        // child reservations matching our topology identifier.
         for (ChildSummaryType child : children.getChild()) {
           log.info("[QuerySummary] processSummaryCriteria: child cid = {}, gid = {}, decription = {}, rstate = {}, lstate = {}",
                   child.getConnectionId(), gid, description, reservationState, lifecycleState);
@@ -260,6 +271,10 @@ public class QuerySummary {
 
             if (Strings.isNullOrEmpty(reservation.getTopologyId())) {
               reservation.setTopologyId(networkId);
+            } else if (!networkId.equalsIgnoreCase(reservation.getTopologyId())) {
+              log.info("[QuerySummary] processSummaryCriteria: rejecting reservation cid = {}, for topologyId = {}",
+                      reservation.getConnectionId(), reservation.getTopologyId());
+              continue;
             }
           } catch (JAXBException ex) {
             log.error("[ConnectionService] processSummaryCriteria: failed for connectionId = {}",

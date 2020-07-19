@@ -57,9 +57,19 @@ public class CsUtils {
         if (object instanceof JAXBElement) {
           JAXBElement jaxb = (JAXBElement) object;
           if (jaxb.getValue() instanceof P2PServiceBaseType) {
+            // Found the P2PS service entry.
             P2PServiceBaseType p2ps = (P2PServiceBaseType) jaxb.getValue();
-            SimpleStp stp = new SimpleStp(p2ps.getSourceSTP());
-            reservation.setTopologyId(stp.getNetworkId());
+
+            // Determine if this is a single domain connection.
+            SimpleStp srcStp = new SimpleStp(p2ps.getSourceSTP());
+            SimpleStp dstStp = new SimpleStp(p2ps.getDestSTP());
+            if (!srcStp.getNetworkId().equalsIgnoreCase(dstStp.getNetworkId())) {
+              log.error("[serializeP2PS]: source and destination networkId for STP do not match: {} != {}", srcStp, dstStp);
+            }
+
+            // Set the topology based on the source STP for now.  We can reject
+            // later if this is not the networkId we are looking for.
+            reservation.setTopologyId(srcStp.getNetworkId());
             reservation.setService(CsParser.getInstance().p2ps2xml(p2ps));
             found = true;
             break;
@@ -67,9 +77,19 @@ public class CsUtils {
         } else if (object instanceof org.w3c.dom.Element) {
           org.w3c.dom.Element element = (org.w3c.dom.Element) object;
           if ("p2ps".equalsIgnoreCase(element.getLocalName())) {
+            // Found the P2PS service entry.
             P2PServiceBaseType p2ps = CsParser.getInstance().node2p2ps((Node) element);
-            SimpleStp stp = new SimpleStp(p2ps.getSourceSTP());
-            reservation.setTopologyId(stp.getNetworkId());
+
+            // Determine if this is a single domain connection.
+            SimpleStp srcStp = new SimpleStp(p2ps.getSourceSTP());
+            SimpleStp dstStp = new SimpleStp(p2ps.getDestSTP());
+            if (!srcStp.getNetworkId().equalsIgnoreCase(dstStp.getNetworkId())) {
+              log.error("[serializeP2PS]: source and destination networkId for STP do not match: {} != {}", srcStp, dstStp);
+            }
+
+            // Set the topology based on the source STP for now.  We can reject
+            // later if this is not the networkId we are looking for.
+            reservation.setTopologyId(srcStp.getNetworkId());
             reservation.setService(CsParser.getInstance().p2ps2xml(p2ps));
             found = true;
             break;

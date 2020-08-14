@@ -4,18 +4,29 @@
 # A simple script to build a Java truststore from PEM files in the current directory.
 #
 
-if [[ "$#" -ne 2 ]]; then
+if [[ "$#" -ne 3 ]]; then
     echo "ERROR: Illegal number of parameters"
-    echo "Usage: $0 <truststorefile> <password>"
+    echo "Usage: $0 <truststorefile> <password> <directory>"
     exit 2
 fi
 
 if [[ -f "$1" ]]; then
-    echo "ERROR: $1 exist"
+    echo "Deleting $1"
+    rm -f $1
+fi
+
+target="$(dirname "$1")"
+if [[ ! -d "$target" ]]; then
+    echo "Creating directory $target"
+    mkdir -p "$target"
+fi
+
+if [[ ! -d "$3" ]]; then
+    echo "ERROR: $3 not a directory"
     exit 2
 fi
 
-for file in `ls *.pem`
+for file in `ls $3/*.pem`
 do
   filename="${file##*/}"
   alias="${filename%.*}"
@@ -35,4 +46,6 @@ do
         #-deststoretype PKCS12
 
 done
+
+echo "COMPLETED: created truststore $1"
 

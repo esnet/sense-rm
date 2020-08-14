@@ -126,7 +126,7 @@ public class CsProvider {
 
   public void start() {
     // Initialize the actors.
-    log.info("[CsProvider] Starting NSI CS system initialization...");
+    log.info("[CsProvider] Starting NSI CS system...");
     ActorSystem actorSystem = nsiActorSystem.getActorSystem();
 
     try {
@@ -167,27 +167,27 @@ public class CsProvider {
 
     QueryType query = CS_FACTORY.createQueryType();
     try {
-      log.info("[CsProvider] Sending querySummarySync: providerNSA = {}, correlationId = {}",
+      log.info("[load] Sending querySummarySync: providerNSA = {}, correlationId = {}",
               header.value.getProviderNSA(), header.value.getCorrelationId());
       QuerySummaryConfirmedType querySummarySync = nsiClient.getProxy().querySummarySync(query, header);
-      log.info("[CsProvider] QuerySummaryConfirmed recieved, providerNSA = {}, correlationId = {}",
+      log.info("[load] QuerySummaryConfirmed recieved, providerNSA = {}, correlationId = {}",
               header.value.getProviderNSA(), header.value.getCorrelationId());
 
       QuerySummary q = new QuerySummary(nsiProperties.getNetworkId(), reservationService);
       q.process(querySummarySync, header);
     } catch (Error ex) {
-      log.error("[CsProvider] querySummarySync exception on operation - {} {}",
+      log.error("[load] querySummarySync exception on operation - {} {}",
               ex.getFaultInfo().getServiceException().getErrorId(),
               ex.getFaultInfo().getServiceException().getText());
     } catch (org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException ex) {
-      log.error("[CsProvider] querySummarySync exception processing - {} {}",
+      log.error("[load] querySummarySync exception processing - {} {}",
               ex.getFaultInfo().getErrorId(),
               ex.getFaultInfo().getText());
     } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-      log.error("[CsProvider] querySummarySync SOAPFaultException exception: {}", ex.getMessage());
+      log.error("[load] querySummarySync SOAPFaultException exception: {}", ex.getMessage());
       log.error("{}", ex);
     } catch (Exception ex) {
-      log.error("[CsProvider] querySummarySync exception processing results", ex);
+      log.error("[load] querySummarySync exception processing results", ex);
     }
   }
 
@@ -208,22 +208,26 @@ public class CsProvider {
           String deltaId,
           Optional<Model> reduction,
           Optional<Model> addition) throws Exception {
+    log.debug("[processDelta] start deltaId = {}", deltaId);
 
     DeltaConnection connectionIds = new DeltaConnection();
     connectionIds.setDeltaId(deltaId);
 
     // We process the reduction first.
     if (reduction.isPresent()) {
+      log.debug("[processDelta] processing reduction, deltaId = {}", deltaId);
       connectionIds.getTerminates().addAll(processDeltaReduction(reduction.get()));
     }
 
     // Now the addition.
     if (addition.isPresent()) {
+      log.debug("[processDelta] processing addition, deltaId = {}", deltaId);
       connectionIds.getCommits().addAll(processDeltaAddition(model, deltaId, addition.get()));
     }
 
     // Store the list of connection ids we will need to handle during commit phase.
     deltaMap.store(connectionIds);
+    log.debug("[processDelta] end deltaId = {}", deltaId);
   }
 
   /**
@@ -236,6 +240,7 @@ public class CsProvider {
    * @return
    */
   private List<String> processDeltaReduction(Model reduction) {
+    log.debug("[processDeltaReduction] start");
 
     // The list of connection ids we will need terminate in the delta commit.
     List<String> terminates = new ArrayList<>();
@@ -254,13 +259,14 @@ public class CsProvider {
       // a complete SwitchingSubnet, and not individual ports/vlans.
       String ssid = switchingSubnet.getURI();
 
-      log.debug("SwitchingSubnet: " + ssid);
+      log.debug("[processDeltaReduction] SwitchingSubnet: " + ssid);
 
       // Look up all the reservation segments associated with this SwitchingSubnet.
       terminates.addAll(reservationService.getByGlobalReservationId(ssid).stream()
               .filter(r -> (LifecycleStateEnumType.TERMINATED != r.getLifecycleState()
                       && LifecycleStateEnumType.TERMINATING != r.getLifecycleState()))
               .map(Reservation::getConnectionId).collect(Collectors.toList()));
+      log.debug("[processDeltaReduction] done");
     }
 
     return terminates;
@@ -268,6 +274,8 @@ public class CsProvider {
 
   private List<String> processDeltaAddition(net.es.sense.rm.driver.nsi.db.Model m, String deltaId, Model addition)
           throws DatatypeConfigurationException, ServiceException, IllegalArgumentException, TimeoutException {
+    log.debug("[processDeltaAddition] start deletaId = {}, model = {}", deltaId, m.toString());
+
     // This is a list of cid associated with reservations created
     // as part of the delta addition.
     List<String> commits = new ArrayList<>();
@@ -284,6 +292,10 @@ public class CsProvider {
     // We model connections as mrs:SwitchingSubnet objects so query the
     // addition model for all those provided.
     ResultSet ssSet = ModelUtil.getResourcesOfType(addition, Mrs.SwitchingSubnet);
+    if (!ssSet.hasNext()) {
+      log.debug("[processDeltaAddition] no SwitchingSubnet found in deletaId = {}", deltaId);
+      throw new IllegalArgumentException("No SwitchingSubnet found in deletaId = " + deltaId);
+    }
 
     // We will treat each mrs:SwitchingSubnet as an independent reservation in NSI.
     while (ssSet.hasNext()) {
@@ -291,7 +303,7 @@ public class CsProvider {
 
       // Get the SwitchingSubnet resource.
       Resource switchingSubnet = querySolution.get("resource").asResource();
-      log.debug("SwitchingSubnet: " + switchingSubnet.getURI());
+      log.debug("[processDeltaAddition] SwitchingSubnet: " + switchingSubnet.getURI());
 
       // Get the existDruing lifetime object if it exists so we can model a schedule.
       Optional<Statement> existsDuring = Optional.ofNullable(switchingSubnet.getProperty(Nml.existsDuring));
@@ -299,7 +311,7 @@ public class CsProvider {
       if (existsDuring.isPresent()) {
         // We have an existsDuring resource specifying the schedule time.
         Resource existsDuringRef = existsDuring.get().getResource();
-        log.debug("existsDuringRef: " + existsDuringRef.getURI());
+        log.debug("[processDeltaAddition] existsDuringRef: " + existsDuringRef.getURI());
 
         ssExistsDuring = new NmlExistsDuring(existsDuringRef);
       } else {
@@ -311,7 +323,7 @@ public class CsProvider {
       // the ServiceDefinition that holds the serviceType.
       Statement belongsTo = switchingSubnet.getProperty(Nml.belongsTo);
       Resource switchingServiceRef = belongsTo.getResource();
-      log.debug("SwitchingServiceRef: " + switchingServiceRef.getURI());
+      log.debug("[processDeltaAddition] SwitchingServiceRef: " + switchingServiceRef.getURI());
 
       // Get the full SwitchingService definition from the merged model.
       Resource switchingService = ModelUtil.getResourceOfType(model, switchingServiceRef, Nml.SwitchingService);
@@ -319,19 +331,19 @@ public class CsProvider {
         throw new IllegalArgumentException("Could not find referenced switching service "
                 + switchingServiceRef.getURI());
       }
-      log.debug("SwitchingService: " + switchingService.getURI());
+      log.debug("[processDeltaAddition] SwitchingService: " + switchingService.getURI());
 
       // Now we need the ServiceDefinition associated with this SwitchingService.
       Statement hasServiceDefinition = switchingService.getProperty(Sd.hasServiceDefinition);
       Resource serviceDefinitionRef = hasServiceDefinition.getResource();
-      log.debug("serviceDefinitionRef: " + serviceDefinitionRef.getURI());
+      log.debug("[processDeltaAddition] serviceDefinitionRef: " + serviceDefinitionRef.getURI());
 
       // Get the full ServiceDefinition definition from the merged model.
       Resource serviceDefinition = ModelUtil.getResourceOfType(model, serviceDefinitionRef, Sd.ServiceDefinition);
-      log.debug("ServiceDefinition: " + serviceDefinition.getURI());
+      log.debug("[processDeltaAddition] ServiceDefinition: " + serviceDefinition.getURI());
 
       Statement serviceTypeRef = serviceDefinition.getProperty(Sd.serviceType);
-      log.debug("serviceType: " + serviceTypeRef.getString());
+      log.debug("[processDeltaAddition] serviceType: " + serviceTypeRef.getString());
 
       // We currently know about the EVTS p2p service.
       List<StpHolder> stps = new ArrayList<>();
@@ -339,28 +351,28 @@ public class CsProvider {
       String serviceType = serviceTypeRef.getString();
       if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType) ||
               Nsi.NSI_SERVICETYPE_L2_LB_ES.equalsIgnoreCase(serviceType)) {
-        // Find the ports that ate part of this SwitchSubnet and build NSI STP
+        // Find the ports that are part of this SwitchSubnet and build NSI STP
         // identifiers for the service.
         StmtIterator listProperties = switchingSubnet.listProperties(Nml.hasBidirectionalPort);
         while (listProperties.hasNext()) {
           Statement hasBidirectionalPort = listProperties.next();
           Resource biRef = hasBidirectionalPort.getResource();
-          log.debug("bi member: " + biRef.getURI());
+          log.debug("[processDeltaAddition] bi member: " + biRef.getURI());
 
           Resource biChild = ModelUtil.getResourceOfType(addition, biRef, Nml.BidirectionalPort);
           if (biChild == null) {
-            log.error("Requested BidirectionalPort does not exist {}", biRef.getURI());
+            log.error("[processDeltaAddition] Requested BidirectionalPort does not exist {}", biRef.getURI());
             throw new IllegalArgumentException("Requested BidirectionalPort does not exist " + biRef.getURI());
           }
 
-          log.debug("biChild: " + biChild.getURI());
+          log.debug("[processDeltaAddition] biChild: " + biChild.getURI());
 
           MrsBandwidthService bws = new MrsBandwidthService(biChild, addition);
 
-          log.debug("BandwidthService: {}", bws.getId());
-          log.debug("type: {}", bws.getBandwidthType());
-          log.debug("maximumCapacity: {} {}", bws.getMaximumCapacity(), bws.getUnit());
-          log.debug("maximumCapacity: {} mbps", MrsUnits.normalize(bws.getMaximumCapacity(),
+          log.debug("[processDeltaAddition] BandwidthService: {}", bws.getId());
+          log.debug("[processDeltaAddition] type: {}", bws.getBandwidthType());
+          log.debug("[processDeltaAddition] maximumCapacity: {} {}", bws.getMaximumCapacity(), bws.getUnit());
+          log.debug("[processDeltaAddition] maximumCapacity: {} mbps", MrsUnits.normalize(bws.getMaximumCapacity(),
                   bws.getUnit(), MrsUnits.mbps));
 
           // The "guaranteedCapped" BandwidthService maps to the NSI_SERVICETYPE_EVTS service so
@@ -370,7 +382,7 @@ public class CsProvider {
             String error = "Requested BandwidthService type = " + bws.getBandwidthType() +
                     " not supported by SwitchingService = " + switchingService.getURI() +
                     " on portId = " + biRef.getURI();
-            log.error("[CsProvider] {}.", error);
+            log.error("[processDeltaAddition] {}.", error);
             throw new IllegalArgumentException(error);
           }
 
@@ -379,7 +391,7 @@ public class CsProvider {
           existsDuring = Optional.ofNullable(biChild.getProperty(Nml.existsDuring));
           if (existsDuring.isPresent()) {
             Resource childExistsDuringRef = existsDuring.get().getResource();
-            log.debug("childExistsDuringRef: " + childExistsDuringRef.getURI());
+            log.debug("[processDeltaAddition] childExistsDuringRef: " + childExistsDuringRef.getURI());
             if (!ssExistsDuring.getId().contentEquals(childExistsDuringRef.getURI())) {
               // We have a different existsDuring reference than our SwitchingSubnet.
               childExistsDuringId = childExistsDuringRef.getURI();
@@ -394,17 +406,17 @@ public class CsProvider {
           SimpleLabel simpleLabel = nmlLabel.getSimpleLabel();
 
           Resource parentBi = ModelUtil.getParentBidirectionalPort(model, biChild);
-          log.debug("parentBi: " + parentBi.getURI());
+          log.debug("[processDeltaAddition] parentBi: " + parentBi.getURI());
 
           SimpleStp stp = new SimpleStp(parentBi.getURI(), simpleLabel);
-          log.debug("stpId: {}", stp.getStpId());
+          log.debug("[processDeltaAddition] stpId: {}", stp.getStpId());
 
           stps.add(new StpHolder(biChild.getURI(), stp, bws, childExistsDuringId, label.getURI()));
         }
 
         // We need exactly two ports for our point-to-point connection.
         if (stps.size() != 2) {
-          log.error("SwitchingSubnet contained {} ports.", stps.size());
+          log.error("[processDeltaAddition] SwitchingSubnet contained {} ports.", stps.size());
           throw new IllegalArgumentException("SwitchingSubnet contained incorrect number of ports (" + stps.size() + ").");
         }
 
@@ -463,7 +475,7 @@ public class CsProvider {
 
         ConnectionMap stored = connectionMapService.store(cm);
 
-        log.debug("[SwitchingSubnet] storing connectionMap = {}", stored);
+        log.debug("[processDeltaAddition] storing connectionMap = {}", stored);
 
         String correlationId = Helper.getUUID();
         CommonHeaderType requestHeader = NsiHeader.builder()
@@ -488,31 +500,33 @@ public class CsProvider {
 
         // Issue the NSI reservation request.
         try {
+          log.debug("[processDeltaAddition] issuing reserve operation correlationId = {}",
+                  correlationId);
           ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
           ReserveResponseType response = nsiClient.getProxy().reserve(r, header);
 
           // Update the operation map with the new cid.
           commits.add(response.getConnectionId());
 
-          log.debug("[csProvider] issued reserve operation correlationId = {}, connectionId = {}",
+          log.debug("[processDeltaAddition] issued reserve operation correlationId = {}, connectionId = {}",
                   correlationId, response.getConnectionId());
         } catch (ServiceException ex) {
           //TODO: Consider whether we should unwrap any NSI reservations that were successful.
           // For now just delete the correlationId we added.
           operationMap.delete(correlationIds);
-          log.error("[csProvider] Failed to send NSI CS reserve message, correlationId = {}, errorId = {}, text = {}",
+          log.error("[processDeltaAddition] Failed to send NSI CS reserve message, correlationId = {}, errorId = {}, text = {}",
                   requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
           throw ex;
         } catch (SOAPFaultException ex) {
           //TODO: Consider whether we should unwrap any NSI reservations that were successful.
           // For now just delete the correlationId we added.
           operationMap.delete(correlationIds);
-          log.error("[csProvider] Failed to send NSI CS reserve message, correlationId = {}, SOAP Fault = {}",
+          log.error("[processDeltaAddition] Failed to send NSI CS reserve message, correlationId = {}, SOAP Fault = {}",
                   requestHeader.getCorrelationId(), ex.getFault().toString());
           throw ex;
         }
       } else {
-        log.error("[csProvider] serviceType not supported {}", serviceTypeRef.getString());
+        log.error("[processDeltaAddition] serviceType not supported {}", serviceTypeRef.getString());
         throw new IllegalArgumentException("serviceType not supported " + serviceTypeRef.getString());
       }
     }
@@ -530,7 +544,7 @@ public class CsProvider {
     // Look up the connection identifiers assoicated with this deltaId.
     DeltaConnection connectionIds = deltaMap.delete(deltaId);
     if (connectionIds == null) {
-      log.debug("[csProvider] commitDelta could not find connectionIds associated with deltaId = {}", deltaId);
+      log.debug("[processDeltaAddition] commitDelta could not find connectionIds associated with deltaId = {}", deltaId);
       throw new IllegalArgumentException("Could not find connections for deltaId = " + deltaId);
     }
 

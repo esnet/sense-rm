@@ -110,8 +110,10 @@ spring:
 
 # Possible ddl-auto options.
 #spring.jpa.hibernate.ddl-auto: create
+#spring.jpa.hibernate.ddl-auto: create-drop
 #spring.jpa.hibernate.ddl-auto: update
 #spring.jpa.hibernate.ddl-auto: validate
+#spring.jpa.hibernate.ddl-auto: none
 
 # If you would rather run an in-memory database for testing then use this
 # configuration.

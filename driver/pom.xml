@@ -102,6 +102,16 @@
           <compilerArgument>-Xlint:deprecation</compilerArgument>
         </configuration>
       </plugin>
+
+      <plugin>
+        <artifactId>exec-maven-plugin</artifactId>
+        <groupId>org.codehaus.mojo</groupId>
+        <version>3.0.0</version>
+        <configuration>
+          <skip>true</skip>
+          <executable>bash</executable>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

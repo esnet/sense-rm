@@ -108,15 +108,15 @@ public class CsOperations {
    */
   public boolean confirm() {
     for (String id : correlationIds) {
-      log.info("[CsProvider] waiting for completion of correlationId = {}", id);
+      log.info("[CsOperations] waiting for completion of correlationId = {}", id);
 
       Operation op = operationMap.get(id);
       if (op == null) {
-        log.error("[CsProvider] no operation in map for correlationId = {}", id);
+        log.error("[CsOperations] no operation in map for correlationId = {}", id);
         failed.add(id);
         exceptions.add(new IllegalArgumentException("no operation in map for correlationId = " + id));
       } else if (operationMap.wait(id)) {
-        log.info("[CsProvider] operation {} completed, correlationId = {}", op.getOperation(), id);
+        log.info("[CsOperations] operation {} completed, correlationId = {}", op.getOperation(), id);
 
         switch(op.getOperation()) {
           case reserve:
@@ -140,7 +140,7 @@ public class CsOperations {
             break;
         }
       } else {
-        log.error("[CsProvider] timeout, failed to get response for correlationId = {}", id);
+        log.error("[CsOperations] timeout, failed to get response for correlationId = {}", id);
         exceptions.add(new TimeoutException("Operation failed to reserve, correlationId = "
                   + id + ", state = " + op.getState()));
         failed.add(id);
@@ -152,7 +152,7 @@ public class CsOperations {
 
   private void check(Operation op, StateType st, String id) {
     if (op.getState() != st) {
-      log.error("[CsProvider] operation {} failed, correlationId = {}, state = {}",
+      log.error("[CsOperations] operation {} failed, correlationId = {}, state = {}",
               op.getOperation(), id, op.getState(), op.getException());
 
       if (op.getException() != null) {
@@ -185,18 +185,18 @@ public class CsOperations {
 
     QueryType query = CS_FACTORY.createQueryType();
     try {
-      log.debug("[CsProvider] Sending querySummarySync: providerNSA = {}, correlationId = {}",
+      log.debug("[CsOperations] Sending querySummarySync: providerNSA = {}, correlationId = {}",
               nsiProperties.getProviderNsaId(), correlationId);
 
       Client nsiClient = new Client(nsiProperties.getProviderConnectionURL());
       QuerySummaryConfirmedType querySummarySync = nsiClient.getProxy().querySummarySync(query, header);
 
-      log.debug("[CsProvider] QuerySummaryConfirmed recieved, providerNSA = {}, correlationId = {}",
+      log.debug("[CsOperations] QuerySummaryConfirmed received, providerNSA = {}, correlationId = {}",
               header.value.getProviderNSA(), header.value.getCorrelationId());
 
       return querySummarySync;
     } catch (Error ex) {
-      log.error("[CsProvider] querySummarySync exception on operation - {} {}",
+      log.error("[CsOperations] querySummarySync exception on operation - {} {}",
               ex.getFaultInfo().getServiceException().getErrorId(),
               ex.getFaultInfo().getServiceException().getText());
       throw ex;
@@ -219,7 +219,7 @@ public class CsOperations {
 
     // Issue the NSI reservation request.
     try {
-      log.debug("[csProvider] issuing reserve operation correlationId = {}", correlationId);
+      log.debug("[CsOperations] issuing reserve operation correlationId = {}", correlationId);
 
       ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
 
@@ -236,7 +236,7 @@ public class CsOperations {
 
       String connectionId =  response.getConnectionId();
 
-      log.debug("[csProvider] issued reserve operation correlationId = {}, connectionId = {}",
+      log.debug("[CsOperations] issued reserve operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
 
       connectionIds.add(connectionId);
@@ -244,13 +244,13 @@ public class CsOperations {
       return connectionId;
 
     } catch (ServiceException ex) {
-      log.error("[csProvider] Failed to send NSI CS reserve message, correlationId = {}, errorId = {}, text = {}",
+      log.error("[CsOperations] Failed to send NSI CS reserve message, correlationId = {}, errorId = {}, text = {}",
               requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
       throw ex;
     } catch (SOAPFaultException ex) {
       //TODO: Consider whether we should unwrap any NSI reservations that were successful.
       // For now just delete the correlationId we added.
-      log.error("[csProvider] Failed to send NSI CS reserve message, correlationId = {}, SOAP Fault = {}",
+      log.error("[CsOperations] Failed to send NSI CS reserve message, correlationId = {}, SOAP Fault = {}",
               requestHeader.getCorrelationId(), ex.getFault().toString());
       throw ex;
     }
@@ -272,26 +272,26 @@ public class CsOperations {
     commitBody.setConnectionId(connectionId);
 
     try {
-      log.debug("[csProvider] issuing reserveCommit operation correlationId = {}, connectionId = {}",
+      log.debug("[CsOperations] issuing reserveCommit operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
 
       ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
       nsiClient.getProxy().reserveCommit(commitBody, header);
 
-      log.debug("[csProvider] issued reserveCommit operation correlationId = {}, connectionId = {}",
+      log.debug("[CsOperations] issued reserveCommit operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
 
       return correlationId;
     } catch (ServiceException ex) {
-      log.error("[csProvider] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}, errorId = {}, text = {}",
+      log.error("[CsOperations] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}, errorId = {}, text = {}",
               requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
       throw ex;
     } catch (SOAPFaultException soap) {
-      log.error("[csProvider] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}, SOAP Fault {}",
+      log.error("[CsOperations] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}, SOAP Fault {}",
               requestHeader.getCorrelationId(), soap.getFault().toString());
       throw soap;
     } catch (Exception ex) {
-      log.error("[csProvider] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}",
+      log.error("[CsOperations] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}",
               requestHeader.getCorrelationId(), ex);
       throw ex;
     }
@@ -313,26 +313,26 @@ public class CsOperations {
     commitBody.setConnectionId(connectionId);
 
     try {
-      log.debug("[csProvider] issuing provision operation correlationId = {}, connectionId = {}",
+      log.debug("[CsOperations] issuing provision operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
 
       ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
       nsiClient.getProxy().provision(commitBody, header);
 
-      log.debug("[csProvider] issued provision operation correlationId = {}, connectionId = {}",
+      log.debug("[CsOperations] issued provision operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
 
       return correlationId;
     } catch (ServiceException ex) {
-      log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}, errorId = {}, text = {}",
+      log.error("[CsOperations] Failed to send NSI CS provision message, correlationId = {}, errorId = {}, text = {}",
               requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
       throw ex;
     } catch (SOAPFaultException soap) {
-      log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}, SOAP Fault {}",
+      log.error("[CsOperations] Failed to send NSI CS provision message, correlationId = {}, SOAP Fault {}",
               requestHeader.getCorrelationId(), soap.getFault().toString());
       throw soap;
     } catch (Exception ex) {
-      log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}",
+      log.error("[CsOperations] Failed to send NSI CS provision message, correlationId = {}",
               requestHeader.getCorrelationId(), ex);
       throw ex;
     }
@@ -354,26 +354,26 @@ public class CsOperations {
     commitBody.setConnectionId(connectionId);
 
     try {
-      log.debug("[csProvider] issuing release operation correlationId = {}, connectionId = {}",
+      log.debug("[CsOperations] issuing release operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
 
       ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
       nsiClient.getProxy().release(commitBody, header);
 
-      log.debug("[csProvider] issued release operation correlationId = {}, connectionId = {}",
+      log.debug("[CsOperations] issued release operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
 
       return correlationId;
     } catch (ServiceException ex) {
-      log.error("[csProvider] Failed to send NSI CS release message, correlationId = {}, errorId = {}, text = {}",
+      log.error("[CsOperations] Failed to send NSI CS release message, correlationId = {}, errorId = {}, text = {}",
               requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
       throw ex;
     } catch (SOAPFaultException soap) {
-      log.error("[csProvider] Failed to send NSI CS release message, correlationId = {}, SOAP Fault {}",
+      log.error("[CsOperations] Failed to send NSI CS release message, correlationId = {}, SOAP Fault {}",
               requestHeader.getCorrelationId(), soap.getFault().toString());
       throw soap;
     } catch (Exception ex) {
-      log.error("[csProvider] Failed to send NSI CS release message, correlationId = {}",
+      log.error("[CsOperations] Failed to send NSI CS release message, correlationId = {}",
               requestHeader.getCorrelationId(), ex);
       throw ex;
     }
@@ -396,28 +396,28 @@ public class CsOperations {
     GenericRequestType terminate = CS_FACTORY.createGenericRequestType();
     terminate.setConnectionId(connectionId);
 
-    // Issue the NSI reservation request.
+    // Issue the NSI terminate request.
     try {
-      log.debug("[csProvider] issuing terminate operation correlationId = {}, connectionId = {}",
+      log.debug("[CsOperations] issuing terminate operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
       ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
       nsiClient.getProxy().terminate(terminate, header);
-      log.debug("[csProvider] issued terminate operation correlationId = {}, connectionId = {}",
+      log.debug("[CsOperations] issued terminate operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
 
       return correlationId;
     } catch (ServiceException ex) {
       // Continue on this error but clean up this correlationId.
-      log.error("[csProvider] Failed to send NSI CS terminate message, correlationId = {}, errorId = {}, text = {}",
+      log.error("[CsOperations] Failed to send NSI CS terminate message, correlationId = {}, errorId = {}, text = {}",
               correlationId, ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
       throw ex;
     } catch (SOAPFaultException ex) {
       // Continue on this error but clean up this correlationId.
-      log.error("[csProvider] Failed to send NSI CS terminate message, correlationId = {}, SOAP Fault = {}",
+      log.error("[CsOperations] Failed to send NSI CS terminate message, correlationId = {}, SOAP Fault = {}",
               correlationId, ex.getFault().getFaultCode());
       throw ex;
     } catch (Exception ex) {
-      log.error("[csProvider] Failed to send NSI CS terminate message, correlationId = {}",
+      log.error("[CsOperations] Failed to send NSI CS terminate message, correlationId = {}",
               correlationId, ex);
       throw ex;
     }
@@ -426,10 +426,10 @@ public class CsOperations {
   public void unwind() {
     for (String connectionId : connectionIds) {
       try {
-        log.debug("Unwinding connectionId {}.", connectionId);
+        log.debug("[CsOperations] Unwinding connectionId {}.", connectionId);
         terminate(connectionId);
       } catch (Exception ex) {
-        log.error("Ignoring terminate exception", ex);
+        log.error("[CsOperations] Ignoring terminate exception", ex);
       }
     }
   }

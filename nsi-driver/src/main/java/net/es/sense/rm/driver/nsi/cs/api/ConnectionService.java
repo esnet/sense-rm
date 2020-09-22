@@ -229,7 +229,7 @@ public class ConnectionService {
         if (any instanceof JAXBElement) {
           JAXBElement jaxb = (JAXBElement) any;
           if (jaxb.getDeclaredType() == P2PServiceBaseType.class) {
-            log.debug("[getNetworkId] getNetworkId found P2PServiceBaseType");
+            log.info("[getNetworkId] getNetworkId found P2PServiceBaseType");
 
             // Get the network identifier from and STP
             P2PServiceBaseType p2p = (P2PServiceBaseType) jaxb.getValue();
@@ -497,7 +497,7 @@ public class ConnectionService {
   public GenericAcknowledgmentType queryRecursiveConfirmed(QueryRecursiveConfirmedType queryRecursiveConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
 
-    log.debug("[ConnectionService] queryRecursiveConfirmed: reservationService = {}", reservationService);
+    log.info("[ConnectionService] queryRecursiveConfirmed: reservationService = {}", reservationService);
 
     // Get the providerNSA identifier.
     String providerNsa = header.value.getProviderNSA();
@@ -614,11 +614,13 @@ public class ConnectionService {
           DataPlaneStateChangeRequestType dataPlaneStateChange,
           Holder<CommonHeaderType> header) throws ServiceException {
 
+    String providerNSA = header.value.getProviderNSA();
     String connectionId = dataPlaneStateChange.getConnectionId();
     DataPlaneStatusType dataPlaneStatus = dataPlaneStateChange.getDataPlaneStatus();
 
-    log.info("[ConnectionService] dataPlaneStateChange for connectionId = {}, notificationId = {}, "
-            + "active = {}, consistent = {}, time = {}",
+    log.info("[ConnectionService] dataPlaneStateChange for providerNSA = {}, connectionId = {},"
+            + " notificationId = {}, active = {}, consistent = {}, time = {}",
+            providerNSA,
             connectionId,
             dataPlaneStateChange.getNotificationId(),
             dataPlaneStatus.isActive(),
@@ -630,39 +632,53 @@ public class ConnectionService {
     // incoming event to the associated connection.  If we are connected to an
     // aggregator then the connectionId we want is actually a child connection.
     // Find the associated connection.
-    Reservation r = reservationService.get(header.value.getProviderNSA(), connectionId);
+    Reservation r = reservationService.get(providerNSA, connectionId);
     if (r == null) {
       log.error("[ConnectionService] dataPlaneStateChange could not find connectionId = {}", connectionId);
     } else {
+      log.info("[ConnectionService] updating connectionId = {}, reservation {}", connectionId, r.toString());
       r.setDataPlaneActive(dataPlaneStatus.isActive());
       r.setDiscovered(System.currentTimeMillis());
+      log.info("[ConnectionService] writing updated connectionId = {}, reservation {}", connectionId, r.toString());
       reservationService.store(r);
     }
     return FACTORY.createGenericAcknowledgmentType();
   }
 
-  public GenericAcknowledgmentType reserveTimeout(ReserveTimeoutRequestType reserveTimeout, Holder<CommonHeaderType> header) throws ServiceException {
-    String connectionId = reserveTimeout.getConnectionId();
+  public GenericAcknowledgmentType reserveTimeout(
+          ReserveTimeoutRequestType reserveTimeout,
+          Holder<CommonHeaderType> header) throws ServiceException {
+
+    // Need these to the look up the reservation in our database.
     String providerNSA = header.value.getProviderNSA();
+    String connectionId = reserveTimeout.getConnectionId();
 
-    log.error("[ConnectionService] reserveTimeout for correlationId = {}, connectionId = {}, providerNSA = {}",
-            header.value.getCorrelationId(), connectionId);
-
-    log.error("[ConnectionService] reserveTimeout from originatingNSA = {}, originatingConnectionId = {}, timeoutValue = {}",
-            reserveTimeout.getOriginatingNSA(), reserveTimeout.getOriginatingConnectionId(),
+    log.error("[ConnectionService] reserveTimeout for {\n" +
+            "    providerNSA = {},\n" +
+            "    correlationId = {},\n" +
+            "    connectionId = {},\n" +
+            "    notificationId = {},\n" +
+            "    timeStamp = {},\n" +
+            "    originatingNSA = {},\n" +
+            "    originatingConnectionId = {},\n" +
+            "    timeoutValue = {}\n",
+            providerNSA,
+            header.value.getCorrelationId(),
+            connectionId,
+            reserveTimeout.getNotificationId(),
+            reserveTimeout.getTimeStamp().toXMLFormat(),
+            reserveTimeout.getOriginatingNSA(),
+            reserveTimeout.getOriginatingConnectionId(),
             reserveTimeout.getTimeoutValue());
 
-    // We can fail the delta request based on this.  We do not have an outstanding
-    // operation (or may have one just starting) so no operation to correlate to.
     Reservation r = reservationService.get(providerNSA, connectionId);
     if (r == null) {
       log.error("[ConnectionService] reserveTimeout could not find connectionId = {}", connectionId);
     } else {
-      log.debug("[ConnectionService] reserveTimeout timing out reservation {}", r.toString());
+      log.info("[ConnectionService] reserveTimeout timing out reservation {}", r.toString());
       r.setReservationState(ReservationStateEnumType.RESERVE_TIMEOUT);
-      r.setLifecycleState(LifecycleStateEnumType.FAILED);
       r.setDiscovered(System.currentTimeMillis());
-      log.debug("[ConnectionService] writing updated reservation {}", r.toString());
+      log.info("[ConnectionService] writing updated connectionId = {}, reservation {}", connectionId, r.toString());
       reservationService.store(r);
     }
     return FACTORY.createGenericAcknowledgmentType();

@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
+import net.es.nsi.common.jaxb.JaxbParser;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationAudit;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
@@ -73,7 +74,7 @@ public class QuerySummary {
       LifecycleStateEnumType lifecycleState = reservation.getConnectionStates().getLifecycleState();
       DataPlaneStatusType dataPlaneStatus = reservation.getConnectionStates().getDataPlaneStatus();
 
-      log.debug("[QuerySummary] providerNSA = {}, {}", providerNsa, reservation.toString());
+      log.debug("[QuerySummary] incoming providerNSA = {}, {}", providerNsa, getQuerySummaryResultType(reservation));
 
       if (reservationState == null) {
         reservationState = ReservationStateEnumType.RESERVE_START;
@@ -127,13 +128,13 @@ public class QuerySummary {
         reservationService.store(reservation);
       } else if (r.getLifecycleState() == LifecycleStateEnumType.TERMINATED) {
         // We want to make sure we do not undo a terminated/failed state (OpenNSA bug).
-        log.debug("[QuerySummary] skipping reservation update for a terminated " +
-                "reservation, cid = {}, discovered = {}, update = {}, existing = {}",
-                reservation.getConnectionId(), reservation.getDiscovered(), reservation.toString(), r);
+        log.debug("[QuerySummary] skipping update for a terminated " +
+                "reservation, cid = {}, discovered = {},\n    update = {},\n    existing = {}",
+                reservation.getConnectionId(), reservation.getDiscovered(), reservation, r);
       } else if (r.getLifecycleState() == LifecycleStateEnumType.FAILED) {
-        log.debug("[QuerySummary] skipping reservation update for a failed " +
-                "reservation, cid = {}, discovered = {}, update = {}, existing = {}",
-                reservation.getConnectionId(), reservation.getDiscovered(), reservation.toString(), r);
+        log.debug("[QuerySummary] skipping update for a failed " +
+                "reservation, cid = {}, discovered = {},\n    update = {},\n    existing = {}",
+                reservation.getConnectionId(), reservation.getDiscovered(), reservation, r);
       } else if (r.diff(reservation)) {
         // We have to determine if the stored reservation needs to be updated.
         log.debug("[QuerySummary] storing updated reservation, cid = {}, discovered = {}",
@@ -353,4 +354,10 @@ public class QuerySummary {
     return results;
   }
 
+
+  public String getQuerySummaryResultType(QuerySummaryResultType query) {
+    StringBuilder result = new StringBuilder("QuerySummaryResultType: ");
+    result.append(JaxbParser.jaxb2String(QuerySummaryResultType.class, query));
+    return result.toString();
+  }
 }

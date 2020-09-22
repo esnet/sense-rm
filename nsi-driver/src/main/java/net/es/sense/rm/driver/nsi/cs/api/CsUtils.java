@@ -103,7 +103,7 @@ public class CsUtils {
             reservation.setService(CsParser.getInstance().p2ps2xml(p2ps));
             result = ResultEnum.FOUND;
             break;
-          } 
+          }
         } else {
           log.debug("[serializeP2PS] ignoring element = {}", object.getClass().getName());
         }

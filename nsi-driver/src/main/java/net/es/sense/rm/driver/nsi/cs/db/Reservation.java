@@ -92,6 +92,28 @@ public class Reservation implements Serializable {
   @Basic(fetch = FetchType.LAZY, optional = true)
   String service;
 
+  @Override
+  public String toString() {
+    return "Reservation{" +
+            "id=" + id +
+            ", discovered=" + discovered +
+            ", providerNsa='" + providerNsa + '\'' +
+            ", globalReservationId='" + globalReservationId + '\'' +
+            ", description='" + description + '\'' +
+            ", connectionId='" + connectionId + '\'' +
+            ", topologyId='" + topologyId + '\'' +
+            ", serviceType='" + serviceType + '\'' +
+            ", startTime=" + startTime +
+            ", endTime=" + endTime +
+            ", reservationState=" + reservationState +
+            ", provisionState=" + provisionState +
+            ", lifecycleState=" + lifecycleState +
+            ", dataPlaneActive=" + dataPlaneActive +
+            ", version=" + version +
+            ", service='" + service + '\'' +
+            '}';
+  }
+
   public boolean diff(Reservation r) {
     if (providerNsa != null && r.getProviderNsa() != null && !providerNsa.equals(r.getProviderNsa())) {
       return true;

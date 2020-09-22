@@ -71,6 +71,11 @@ public class ReservationServiceBean implements ReservationService {
     return reservationRepository.findByProviderNsaAndConnectionId(providerNsa, connectionId);
   }
 
+  @Override
+  public Collection<Reservation> getByProviderNsa(String providerNsa) {
+    return reservationRepository.findByProviderNsa(providerNsa);
+  }
+
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
   public Reservation store(Reservation reservation) {

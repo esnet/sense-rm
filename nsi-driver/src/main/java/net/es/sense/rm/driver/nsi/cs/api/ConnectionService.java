@@ -506,7 +506,7 @@ public class ConnectionService {
     List<QueryRecursiveResultType> reservations = queryRecursiveConfirmed.getReservation();
     log.info("[ConnectionService] queryRecursiveConfirmed: providerNSA = {}, # of reservations = {}",
             providerNsa, reservations.size());
-
+[ConnectionService] reserveTimeout for correlationId =
     // Process each reservation returned.
     for (QueryRecursiveResultType reservation : reservations) {
       // Get the parent reservation information to apply to child connections.
@@ -653,14 +653,16 @@ public class ConnectionService {
             reserveTimeout.getTimeoutValue());
 
     // We can fail the delta request based on this.  We do not have an outstanding
-    // operation (or may have one just starting) so no operation to correltate to.
+    // operation (or may have one just starting) so no operation to correlate to.
     Reservation r = reservationService.get(providerNSA, connectionId);
     if (r == null) {
       log.error("[ConnectionService] reserveTimeout could not find connectionId = {}", connectionId);
     } else {
+      log.debug("[ConnectionService] reserveTimeout timing out reservation {}", r.toString());
       r.setReservationState(ReservationStateEnumType.RESERVE_TIMEOUT);
       r.setLifecycleState(LifecycleStateEnumType.FAILED);
       r.setDiscovered(System.currentTimeMillis());
+      log.debug("[ConnectionService] writing updated reservation {}", r.toString());
       reservationService.store(r);
     }
     return FACTORY.createGenericAcknowledgmentType();

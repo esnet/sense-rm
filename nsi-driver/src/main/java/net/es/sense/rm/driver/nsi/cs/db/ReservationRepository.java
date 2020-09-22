@@ -45,6 +45,14 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
           @Param("connectionId") String connectionId);
 
   /**
+   *
+   * @param providerNsa
+   * @return
+   */
+  public Collection<Reservation> findByProviderNsa(
+          @Param ("providerNSA") String providerNsa);
+
+  /**
    * Get the discovered time of the newest reservation.
    *
    * @return

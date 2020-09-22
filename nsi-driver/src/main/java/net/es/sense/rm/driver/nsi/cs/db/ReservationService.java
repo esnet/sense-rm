@@ -49,6 +49,8 @@ public interface ReservationService {
 
   public Collection<Reservation> get(String connectionId);
 
+  public Collection<Reservation> getByProviderNsa(String providerNsa);
+
   public Reservation get(String providerNSA, String connectionId);
 
 }

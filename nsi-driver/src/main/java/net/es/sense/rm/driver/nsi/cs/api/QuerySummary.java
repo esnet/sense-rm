@@ -26,6 +26,7 @@ import javax.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
+import net.es.sense.rm.driver.nsi.cs.db.ReservationAudit;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import org.apache.jena.ext.com.google.common.base.Strings;
 import org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException;
@@ -72,10 +73,7 @@ public class QuerySummary {
       LifecycleStateEnumType lifecycleState = reservation.getConnectionStates().getLifecycleState();
       DataPlaneStatusType dataPlaneStatus = reservation.getConnectionStates().getDataPlaneStatus();
 
-      log.debug("[QuerySummary] cid = {}, gid = {}, decription = {}, rstate = {}, pstate = {}, "
-              + "lstate = {}, active = {}, providerNSA = {}",
-              reservation.getConnectionId(), reservation.getGlobalReservationId(), reservation.getDescription(),
-              reservationState, provisionState, lifecycleState, dataPlaneStatus.isActive(), providerNsa);
+      log.debug("[QuerySummary] providerNSA = {}, {}", providerNsa, reservation.toString());
 
       if (reservationState == null) {
         reservationState = ReservationStateEnumType.RESERVE_START;
@@ -118,13 +116,24 @@ public class QuerySummary {
     }
 
     // Determine if we need to update each reservation in the database.
+    ReservationAudit rAudit = new ReservationAudit(reservationService);
     for (Reservation reservation : results) {
+      rAudit.add(reservation.getProviderNsa() + ":" + reservation.getConnectionId(), reservation.getConnectionId());
       Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
       if (r == null) {
         // We have not seen this reservation before so store it.
         log.debug("[QuerySummary] storing new reservation, cid = {}, discovered = {}",
                 reservation.getConnectionId(), reservation.getDiscovered());
         reservationService.store(reservation);
+      } else if (r.getLifecycleState() == LifecycleStateEnumType.TERMINATED) {
+        // We want to make sure we do not undo a terminated/failed state (OpenNSA bug).
+        log.debug("[QuerySummary] skipping reservation update for a terminated " +
+                "reservation, cid = {}, discovered = {}, update = {}, existing = {}",
+                reservation.getConnectionId(), reservation.getDiscovered(), reservation.toString(), r);
+      } else if (r.getLifecycleState() == LifecycleStateEnumType.FAILED) {
+        log.debug("[QuerySummary] skipping reservation update for a failed " +
+                "reservation, cid = {}, discovered = {}, update = {}, existing = {}",
+                reservation.getConnectionId(), reservation.getDiscovered(), reservation.toString(), r);
       } else if (r.diff(reservation)) {
         // We have to determine if the stored reservation needs to be updated.
         log.debug("[QuerySummary] storing updated reservation, cid = {}, discovered = {}",
@@ -136,8 +145,26 @@ public class QuerySummary {
         log.debug("[QuerySummary] reservation no change, cid = {}", reservation.getConnectionId());
       }
     }
+
+    // We now know all the reservation we can see on this providerNSA.  Go
+    // through our reservation database a deleted any that are no longer
+    // present on the NSA.
+    rAudit.audit();
   }
 
+  /**
+   * Build a reservation object when no criteria was specified.
+   *
+   * @param providerNsa
+   * @param gid
+   * @param description
+   * @param cid
+   * @param reservationState
+   * @param provisionState
+   * @param lifecycleState
+   * @param dataPlaneStatus
+   * @return
+   */
   private Reservation processReservationNoCriteria(
           String providerNsa,
           String gid,
@@ -166,6 +193,22 @@ public class QuerySummary {
     return reservation;
   }
 
+  /**
+   * Build one or more reservation objects based on NSI reservation criteria.
+   * An aggregator may have many child reservations that we would like to
+   * track if it matches the topology we are interested in modelling.
+   *
+   * @param providerNsa
+   * @param gid
+   * @param description
+   * @param cid
+   * @param reservationState
+   * @param provisionState
+   * @param lifecycleState
+   * @param dataPlaneStatus
+   * @param criteriaList The list of zero or more child reservations.
+   * @return
+   */
   private List<Reservation> processSummaryCriteria(
           String providerNsa,
           String gid,
@@ -177,7 +220,8 @@ public class QuerySummary {
           DataPlaneStatusType dataPlaneStatus,
           List<QuerySummaryResultCriteriaType> criteriaList) {
 
-    log.info("[QuerySummary] processSummaryCriteria: connectionId = {}, providerNsa = {}", cid, providerNsa);
+    log.info("[QuerySummary] processSummaryCriteria: gid = {}, cid = {}, description = {}. providerNsa = {}",
+            gid, cid, description, providerNsa);
 
     List<Reservation> results = new ArrayList<>();
 
@@ -215,7 +259,8 @@ public class QuerySummary {
 
         // Now we need to get the P2PS structure (add other services here when defined).
         try {
-          CsUtils.ResultEnum result = CsUtils.serializeP2PS(reservation.getServiceType(), criteria.getAny(), reservation);
+          CsUtils.ResultEnum result = CsUtils.serializeP2PS(reservation.getServiceType(),
+                  criteria.getAny(), reservation);
 
           if (CsUtils.ResultEnum.NOTFOUND == result) {
             // We could not find a P2PS structure so
@@ -244,8 +289,11 @@ public class QuerySummary {
       } else {
         // We still have children so this must be an aggregator.  Build a list of
         // child reservations matching our topology identifier.
+        log.info("[QuerySummary] processSummaryCriteria: processing child criteria.");
+
         for (ChildSummaryType child : children.getChild()) {
-          log.info("[QuerySummary] processSummaryCriteria: child cid = {}, gid = {}, decription = {}, rstate = {}, lstate = {}",
+          log.info("[QuerySummary] processSummaryCriteria: child cid = {}, gid = {}, decription = {}, " +
+                          "rstate = {}, lstate = {}",
                   child.getConnectionId(), gid, description, reservationState, lifecycleState);
 
           Reservation reservation = new Reservation();

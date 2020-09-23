@@ -125,7 +125,7 @@ public class QuerySummary {
     // Determine if we need to update each reservation in the database.
     ReservationAudit rAudit = new ReservationAudit();
     for (Reservation reservation : results) {
-      rAudit.add(reservation.getProviderNsa() + ":" + reservation.getConnectionId(), reservation.getConnectionId());
+      rAudit.add(reservation.getProviderNsa(), reservation.getConnectionId());
       Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
       if (r == null) {
         // We have not seen this reservation before so store it.

@@ -21,6 +21,7 @@ package net.es.sense.rm.driver.nsi.cs.db;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 
 /**
@@ -29,6 +30,7 @@ import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
  *
  * @author hacksaw
  */
+@Slf4j
 public class ReservationAudit {
   private class Entry {
     String providerId;
@@ -65,18 +67,27 @@ public class ReservationAudit {
   public void audit() {
     for (Reservation reservation : reservationService.get()) {
       String cid = reservation.getProviderNsa() + ":" + reservation.getConnectionId();
+      log.debug("[ReservationAudit] audtiting {}", cid);
       if (auditable.get(cid) == null) {
-        // First trick is toidentify a change by setting this non-existing
+        log.debug("[ReservationAudit] not found {}", cid);
+        // First trick is to identify a change by setting this non-existing
         // reservation to a TERMINATED state and store it in hopes of
         // triggering an audit.
         if (reservation.getLifecycleState() != LifecycleStateEnumType.TERMINATED) {
+          log.debug("[ReservationAudit] transitioning cid = {}, from {} to {}",
+                  reservation.getConnectionId(), reservation.getLifecycleState(),
+                  LifecycleStateEnumType.TERMINATED);
           reservation.setLifecycleState(LifecycleStateEnumType.TERMINATED);
           reservation.setDiscovered(System.currentTimeMillis());
           reservationService.store(reservation);
         } else {
           // This is probably our second time through so we can just delete it now.
+          log.debug("[ReservationAudit] deleting cid = {}, lifecycleState = {}",
+                  reservation.getConnectionId(), reservation.getLifecycleState());
           reservationService.delete(reservation);
         }
+      } else {
+        log.debug("[ReservationAudit] found {}", cid);
       }
     }
   }

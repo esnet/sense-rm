@@ -46,12 +46,7 @@ public class ReservationAudit {
     }
   }
 
-  private final ReservationService reservationService;
   private Map<String, Entry> auditable = new HashMap<>();
-
-  public ReservationAudit(ReservationService reservationService) {
-    this.reservationService = reservationService;
-  }
 
   public void add(String providerId, String connectionId) {
     Entry entry = new Entry(providerId, connectionId);
@@ -60,16 +55,18 @@ public class ReservationAudit {
 
   /**
    * Find any NSI reservations in the database that are not in the current
-   * list returned from the NSA. We need to be tricky since removing a
+   * list returned from the NSA.We need to be tricky since removing a
    * reservation also removes our ability to indicated a change that requires
    * a new topology model to be generated.
+   *
+   * @param reservationService
    */
-  public void audit() {
+  public void audit(ReservationService reservationService) {
     for (Reservation reservation : reservationService.get()) {
       String cid = reservation.getProviderNsa() + ":" + reservation.getConnectionId();
       log.debug("[ReservationAudit] audtiting {}", cid);
       if (auditable.get(cid) == null) {
-        log.debug("[ReservationAudit] not found {}", cid);
+        log.debug("[ReservationAudit] not found in DB {}", cid);
         // First trick is to identify a change by setting this non-existing
         // reservation to a TERMINATED state and store it in hopes of
         // triggering an audit.
@@ -90,5 +87,16 @@ public class ReservationAudit {
         log.debug("[ReservationAudit] found {}", cid);
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder("ReservationAudit {\n");
+    for (String key : auditable.keySet()) {
+      result.append(key);
+      result.append(",\n");
+    }
+    result.append("}");
+    return result.toString();
   }
 }

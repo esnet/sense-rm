@@ -116,8 +116,14 @@ public class QuerySummary {
       }
     }
 
+    // TODO: Remove this once we fix the OpenNSA reservation issue.
+    log.debug("[QuerySummary] pre-add reservation database contents...");
+    for (Reservation reservation : reservationService.get()) {
+      log.debug("[QuerySummary] {}", reservation);
+    }
+
     // Determine if we need to update each reservation in the database.
-    ReservationAudit rAudit = new ReservationAudit(reservationService);
+    ReservationAudit rAudit = new ReservationAudit();
     for (Reservation reservation : results) {
       rAudit.add(reservation.getProviderNsa() + ":" + reservation.getConnectionId(), reservation.getConnectionId());
       Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
@@ -147,10 +153,25 @@ public class QuerySummary {
       }
     }
 
+    // TODO: Remove this once we fix the OpenNSA reservation issue.
+    log.debug("[QuerySummary] before audit reservation database contents...");
+    for (Reservation reservation : reservationService.get()) {
+      log.debug("[QuerySummary] {}", reservation);
+    }
+
+    // TODO: Remove this once we fix the OpenNSA reservation issue.
+    log.debug("[QuerySummary] audit connection contents {}", rAudit.toString());
+
     // We now know all the reservation we can see on this providerNSA.  Go
     // through our reservation database a deleted any that are no longer
     // present on the NSA.
-    rAudit.audit();
+    rAudit.audit(reservationService);
+
+    // TODO: Remove this once we fix the OpenNSA reservation issue.
+    log.debug("[QuerySummary] after audit reservation database contents...");
+    for (Reservation reservation : reservationService.get()) {
+      log.debug("[QuerySummary] {}", reservation);
+    }
   }
 
   /**

@@ -1,7 +1,10 @@
 package net.es.nsi.cs.lib;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 import net.es.nsi.common.jaxb.JaxbParser;
+import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryResultType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 import org.w3c.dom.Node;
 
@@ -24,6 +27,9 @@ public class CsParser extends JaxbParser {
   private final static org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory P2P_FACTORY =
       new org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory();
 
+  private final static org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory TYPES_FACTORY =
+          new org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory();
+
   private CsParser() {
     super(PACKAGES);
   }
@@ -42,6 +48,13 @@ public class CsParser extends JaxbParser {
 
   public String p2ps2xml(P2PServiceBaseType p2ps) throws JAXBException {
     return this.jaxb2Xml(P2P_FACTORY.createP2Ps(p2ps));
+  }
+
+  // QuerySummaryResultType
+  private final static QName _QuerySummaryResultType_QNAME = new QName("http://schemas.ogf.org/nsi/2013/12/connection/types", "QuerySummaryResultType");
+  public String qsrt2xml(QuerySummaryResultType query) throws JAXBException {
+    JAXBElement<QuerySummaryResultType> jaxb = new JAXBElement<QuerySummaryResultType>(_QuerySummaryResultType_QNAME, QuerySummaryResultType.class, null, query);
+    return this.jaxb2Xml(jaxb);
   }
 
   public P2PServiceBaseType xml2p2ps(String xml) throws JAXBException {

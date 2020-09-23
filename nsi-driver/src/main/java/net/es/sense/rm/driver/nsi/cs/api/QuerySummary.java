@@ -25,7 +25,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
-import net.es.nsi.common.jaxb.JaxbParser;
+import net.es.nsi.cs.lib.CsParser;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationAudit;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
@@ -354,10 +354,14 @@ public class QuerySummary {
     return results;
   }
 
-
   public String getQuerySummaryResultType(QuerySummaryResultType query) {
     StringBuilder result = new StringBuilder("QuerySummaryResultType: ");
-    result.append(JaxbParser.jaxb2String(QuerySummaryResultType.class, query));
+    try {
+      result.append(CsParser.getInstance().qsrt2xml(query));
+    } catch (JAXBException ex) {
+      log.error("[QuerySummary] exception formatting QuerySummaryResultType", ex);
+      result.append("<exception>");
+    }
     return result.toString();
   }
 }

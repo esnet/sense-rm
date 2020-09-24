@@ -10,11 +10,15 @@
     <file>var/log/sense-rm/sense-n-rm.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- daily rollover -->
-      <fileNamePattern>var/log/sense-rm/sense-n-rm.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>var/log/sense-rm/sense-n-rm.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
 
       <!-- keep 30 days' worth of history capped at 3GB total size -->
       <maxHistory>30</maxHistory>
       <totalSizeCap>3GB</totalSizeCap>
+      
+      <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+            <maxFileSize>100MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
 
     </rollingPolicy>
 

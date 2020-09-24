@@ -19,8 +19,8 @@
  */
 package net.es.sense.rm.driver.nsi.cs.db;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 
@@ -32,25 +32,10 @@ import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
  */
 @Slf4j
 public class ReservationAudit {
-  private class Entry {
-    String providerId;
-    String connectionId;
-
-    public Entry() {
-
-    }
-
-    public Entry(String providerId, String connectionId) {
-      this.providerId = providerId;
-      this.connectionId = connectionId;
-    }
-  }
-
-  private Map<String, Entry> auditable = new HashMap<>();
+  private List<String> auditable = new ArrayList<>();
 
   public void add(String providerId, String connectionId) {
-    Entry entry = new Entry(providerId, connectionId);
-    auditable.put(providerId + ":" + connectionId, entry);
+    auditable.add(providerId + ":" + connectionId);
   }
 
   /**
@@ -64,9 +49,11 @@ public class ReservationAudit {
   public void audit(ReservationService reservationService) {
     for (Reservation reservation : reservationService.get()) {
       String cid = reservation.getProviderNsa() + ":" + reservation.getConnectionId();
-      log.debug("[ReservationAudit] audtiting {}", cid);
-      if (auditable.get(cid) == null) {
-        log.debug("[ReservationAudit] not found in DB {}", cid);
+      log.debug("[ReservationAudit] audtiting cid = {}", cid);
+      if (auditable.contains(cid)) {
+        log.debug("[ReservationAudit] found cid = {}", cid);
+      } else {
+        log.debug("[ReservationAudit] not found in DB cid = {}", cid);
         // First trick is to identify a change by setting this non-existing
         // reservation to a TERMINATED state and store it in hopes of
         // triggering an audit.
@@ -83,8 +70,6 @@ public class ReservationAudit {
                   reservation.getConnectionId(), reservation.getLifecycleState());
           reservationService.delete(reservation);
         }
-      } else {
-        log.debug("[ReservationAudit] found {}", cid);
       }
     }
   }
@@ -92,7 +77,7 @@ public class ReservationAudit {
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder("ReservationAudit {\n");
-    for (String key : auditable.keySet()) {
+    for (String key : auditable) {
       result.append(key);
       result.append(",\n");
     }

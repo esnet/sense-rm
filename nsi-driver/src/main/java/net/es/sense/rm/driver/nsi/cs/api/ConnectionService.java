@@ -673,11 +673,18 @@ public class ConnectionService {
 
     Reservation r = reservationService.get(providerNSA, connectionId);
     if (r == null) {
-      log.error("[ConnectionService] reserveTimeout could not find connectionId = {}", connectionId);
+      log.error("[ConnectionService] reserveTimeout could not find cid = {}", connectionId);
     } else {
       log.info("[ConnectionService] reserveTimeout timing out reservation {}", r.toString());
+
+      // Transition this reservation to reserve timeout.
       r.setReservationState(ReservationStateEnumType.RESERVE_TIMEOUT);
       r.setDiscovered(System.currentTimeMillis());
+      
+      // TODO: When OpenNSA fixes their timeout notification state machine issue this
+      // failed hack can be removed.
+      r.setLifecycleState(LifecycleStateEnumType.FAILED);
+
       log.info("[ConnectionService] writing updated connectionId = {}, reservation {}", connectionId, r.toString());
       reservationService.store(r);
     }

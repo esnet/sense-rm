@@ -125,7 +125,10 @@ public class QuerySummary {
     // Determine if we need to update each reservation in the database.
     ReservationAudit rAudit = new ReservationAudit();
     for (Reservation reservation : results) {
+      // Save this reservation for the later database contents audit.
       rAudit.add(reservation.getProviderNsa(), reservation.getConnectionId());
+
+      // Look for this returned reservation in the existing reservation database.
       Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
       if (r == null) {
         // We have not seen this reservation before so store it.
@@ -143,8 +146,9 @@ public class QuerySummary {
                 reservation.getConnectionId(), reservation.getDiscovered(), reservation, r);
       } else if (r.diff(reservation)) {
         // We have to determine if the stored reservation needs to be updated.
-        log.debug("[QuerySummary] storing updated reservation, cid = {}, discovered = {}",
-                reservation.getConnectionId(), reservation.getDiscovered());
+        log.debug("[QuerySummary] storing updated reservation, " +
+                "cid = {}, discovered = {},\n    update = {},\n    existing = {}",
+                reservation.getConnectionId(), reservation.getDiscovered(), reservation, r);
         reservation.setId(r.getId());
         reservationService.store(reservation);
       }

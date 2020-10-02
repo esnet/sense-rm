@@ -214,13 +214,13 @@ public class CsProvider {
     connectionIds.setDeltaId(deltaId);
 
     // We process the reduction first.
-    if (reduction.isPresent()) {
+    if (reduction.isPresent() && !reduction.get().isEmpty()) {
       log.debug("[processDelta] processing reduction, deltaId = {}", deltaId);
       connectionIds.getTerminates().addAll(processDeltaReduction(reduction.get()));
     }
 
     // Now the addition.
-    if (addition.isPresent()) {
+    if (addition.isPresent() && !addition.get().isEmpty()) {
       log.debug("[processDelta] processing addition, deltaId = {}", deltaId);
       connectionIds.getCommits().addAll(processDeltaAddition(model, deltaId, addition.get()));
     }
@@ -293,8 +293,8 @@ public class CsProvider {
     // addition model for all those provided.
     ResultSet ssSet = ModelUtil.getResourcesOfType(addition, Mrs.SwitchingSubnet);
     if (!ssSet.hasNext()) {
-      log.debug("[processDeltaAddition] no SwitchingSubnet found in deletaId = {}", deltaId);
-      throw new IllegalArgumentException("No SwitchingSubnet found in deletaId = " + deltaId);
+      log.debug("[processDeltaAddition] no SwitchingSubnet found so ignoring addition, deletaId = {}", deltaId);
+      return commits;
     }
 
     // We will treat each mrs:SwitchingSubnet as an independent reservation in NSI.

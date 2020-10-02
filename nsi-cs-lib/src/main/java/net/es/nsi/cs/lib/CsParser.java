@@ -4,6 +4,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import net.es.nsi.common.jaxb.JaxbParser;
+import org.ogf.schemas.nsi._2013._12.connection.types.ErrorEventType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryResultType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 import org.w3c.dom.Node;
@@ -59,5 +60,10 @@ public class CsParser extends JaxbParser {
 
   public P2PServiceBaseType xml2p2ps(String xml) throws JAXBException {
     return this.xml2Jaxb(P2PServiceBaseType.class, xml);
+  }
+
+  public String errorEvent2xml(ErrorEventType errorEvent) throws JAXBException {
+    JAXBElement<ErrorEventType> jaxb = TYPES_FACTORY.createErrorEvent(errorEvent);
+    return this.jaxb2Xml(jaxb);
   }
 }

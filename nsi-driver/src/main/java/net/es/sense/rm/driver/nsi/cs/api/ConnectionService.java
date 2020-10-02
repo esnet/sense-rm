@@ -605,9 +605,28 @@ public class ConnectionService {
     return FACTORY.createGenericAcknowledgmentType();
   }
 
-  public GenericAcknowledgmentType errorEvent(ErrorEventType errorEvent, Holder<CommonHeaderType> header) throws ServiceException {
-    //TODO implement this method
-    throw new UnsupportedOperationException("Not implemented yet.");
+  public GenericAcknowledgmentType errorEvent(ErrorEventType errorEvent, Holder<CommonHeaderType> header) throws ServiceException, JAXBException {
+
+    // Something bad happened.  Dump the error and fail the operation.
+    CommonHeaderType value = header.value;
+
+    log.error("[ConnectionService] errorEvent received, providerNSA = {}, correlationId = {}, protocolVersion = {}",
+        value.getProviderNSA(), value.getCorrelationId(), value.getProtocolVersion());
+
+    log.error("[ConnectionService] errorEvent = {}", CsParser.getInstance().errorEvent2xml(errorEvent));
+
+    // We need to inform the requesting thread of the error.
+    Operation op = operationMap.get(value.getCorrelationId());
+    if (op == null) {
+      log.error("[ConnectionService] error can't find outstanding operation for correlationId = {}",
+              value.getCorrelationId());
+    } else {
+      op.setState(StateType.failed);
+      op.setException(errorEvent.getServiceException());
+      op.getCompleted().release();
+    }
+
+    return FACTORY.createGenericAcknowledgmentType();
   }
 
   public GenericAcknowledgmentType dataPlaneStateChange(
@@ -680,7 +699,7 @@ public class ConnectionService {
       // Transition this reservation to reserve timeout.
       r.setReservationState(ReservationStateEnumType.RESERVE_TIMEOUT);
       r.setDiscovered(System.currentTimeMillis());
-      
+
       // TODO: When OpenNSA fixes their timeout notification state machine issue this
       // failed hack can be removed.
       r.setLifecycleState(LifecycleStateEnumType.FAILED);

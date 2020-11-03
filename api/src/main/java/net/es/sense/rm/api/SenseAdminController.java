@@ -26,6 +26,10 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ResponseHeader;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -139,6 +143,59 @@ public class SenseAdminController {
     }
 
     return resources;
+  }
+
+  /**
+   * Returns build version information for the SENSE-NSI-RM.
+   *
+   * @return The build information in a JSON structure, or an Error if information cannot be found.
+   */
+  @RequestMapping(
+            value = "/version",
+            method = RequestMethod.GET,
+            produces = { MediaType.APPLICATION_JSON_VALUE })
+  @ResponseBody
+  @ResourceAnnotation(name = "version", version = "v1")
+  public ResponseEntity<?> getVersion() {
+    return readGitProperties();
+  }
+
+  /**
+   * Read the Git build information from properties file.
+   *
+   * @return HTTP Response structure containing results.
+   */
+  private ResponseEntity<?> readGitProperties() {
+    ClassLoader classLoader = getClass().getClassLoader();
+    InputStream inputStream = classLoader.getResourceAsStream("git.properties");
+    try {
+      return new ResponseEntity<>(readFromInputStream(inputStream), HttpStatus.OK);
+    } catch (IOException ex) {
+      log.error("[SenseAdminController] Version information could not be retrieved.", ex);
+      net.es.sense.rm.api.common.Error error = net.es.sense.rm.api.common.Error.builder()
+              .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+              .error_description(ex.getMessage())
+              .build();
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * Read String contents from InputStream.
+   *
+   * @param inputStream
+   * @return
+   * @throws IOException
+   */
+  private String readFromInputStream(InputStream inputStream) throws IOException {
+    StringBuilder resultStringBuilder = new StringBuilder();
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        resultStringBuilder.append(line).append("\n");
+      }
+    }
+    return resultStringBuilder.toString();
   }
 
   /**

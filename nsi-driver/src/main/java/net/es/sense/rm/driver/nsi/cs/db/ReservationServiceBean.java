@@ -72,6 +72,31 @@ public class ReservationServiceBean implements ReservationService {
   }
 
   @Override
+  public Collection<Reservation> getByParentConnectionId(String providerNsa, String parentConnectionId) {
+    return reservationRepository.findByProviderNsaAndParentConnectionId(providerNsa, parentConnectionId);
+  }
+
+  @Override
+  public Collection<Reservation> getByParentConnectionId(String parentConnectionId) {
+    return reservationRepository.findByParentConnectionId(parentConnectionId);
+  }
+
+  @Override
+  public Reservation getByAnyConnectionId(String providerNsa, String connectionId)  {
+    Reservation r = reservationRepository.findByProviderNsaAndConnectionId(providerNsa, connectionId);
+    if (r == null) {
+      Collection<Reservation> rc = reservationRepository.findByProviderNsaAndParentConnectionId(providerNsa, connectionId);
+      if (rc == null || rc.size() <= 0) {
+        return null;
+      } else {
+        r = rc.stream().findFirst().get();
+      }
+    }
+
+    return r;
+  }
+
+  @Override
   public Collection<Reservation> getByProviderNsa(String providerNsa) {
     return reservationRepository.findByProviderNsa(providerNsa);
   }

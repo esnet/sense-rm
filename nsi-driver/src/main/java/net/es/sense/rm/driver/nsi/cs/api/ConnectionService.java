@@ -26,7 +26,6 @@ import javax.jws.WebService;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.ws.Holder;
-import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.jaxb.JaxbParser;
 import net.es.nsi.cs.lib.CsParser;
@@ -60,18 +59,19 @@ import org.ogf.schemas.nsi._2013._12.connection.types.ReserveTimeoutRequestType;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 import org.ogf.schemas.nsi._2013._12.framework.types.ServiceExceptionType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This is the NSI CS 2.1 web service requester endpoint used to receive responses from our associated uPA.
- * Communication between the requester thread and this requester response endpoint is controlled using a semaphore
- * allowing the request thread to block on the returned response. Reservation state us updated through the
+ * Communication between the requester thread and this requester endpoint is controlled using a semaphore
+ * allowing the request thread to block on the returned response. Reservation state is updated through the
  * ReservationService which maintains reservations in the database.
  *
  * @author hacksaw
  */
-@Slf4j
 @Component
 @WebService(
         serviceName = "ConnectionServiceRequester",
@@ -80,6 +80,9 @@ import org.w3c.dom.Node;
         targetNamespace = "http://schemas.ogf.org/nsi/2013/12/connection/requester",
         wsdlLocation = "")
 public class ConnectionService {
+  // Trying to get logging to work in this class ....
+  private final Logger log = LoggerFactory.getLogger(getClass());
+
   // The runtime NSI configuration information.
   private final NsiProperties nsiProperties;
 
@@ -118,7 +121,9 @@ public class ConnectionService {
   public GenericAcknowledgmentType reserveConfirmed(
           ReserveConfirmedType reserveConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
+    // We have some attributes in the SOAP header.
     CommonHeaderType value = header.value;
+
     log.info("[ConnectionService] reserveConfirmed recieved for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), reserveConfirmed.getConnectionId());
 
@@ -128,6 +133,7 @@ public class ConnectionService {
     dataPlaneStatus.setActive(false);
     dataPlaneStatus.setVersionConsistent(true);
 
+    // Parse the associated criteria structure.
     Reservation reservation = processConfirmedCriteria(
             header.value.getProviderNSA(),
             nsiProperties.getNetworkId(),
@@ -140,8 +146,10 @@ public class ConnectionService {
             dataPlaneStatus,
             criteria);
 
+    // No reservation returned means.....
     if (reservation != null) {
-      Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
+      //Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
+      Reservation r = reservationService.getByAnyConnectionId(reservation.getProviderNsa(), reservation.getConnectionId());
       if (r == null) {
         // We have not seen this reservation before so store it.
         log.info("[ConnectionService] reserveConfirmed: storing new reservation, cid = {}",
@@ -171,6 +179,25 @@ public class ConnectionService {
     return FACTORY.createGenericAcknowledgmentType();
   }
 
+  /**
+   * Converts the ReservationConfirmCriteriaType into a reservation object
+   * for storage in the database.  ConfirmCriteria does not contain any
+   * information about child reservation created as a result of us issuing
+   * the reservation through an aggregator.  As a result, a NSI query later
+   * in process may have additional child connection details.
+   *
+   * @param providerNsa The providerNSA to which we issued the reservation.
+   * @param networkId The networkId this SENSE-NSI-RM instance is managing.
+   * @param gid The global identifier of the reservation.
+   * @param description The description of the reservation.
+   * @param cid The connection identifier associated with this reservation.
+   * @param reservationState Reservation state.
+   * @param provisionState Provision state.
+   * @param lifecycleState Life cycle state.
+   * @param dataPlaneStatus Dataplane state.
+   * @param criteria The reservation criteria.
+   * @return
+   */
   private Reservation processConfirmedCriteria(
           String providerNsa,
           String networkId,
@@ -186,8 +213,8 @@ public class ConnectionService {
     log.info("[ConnectionService] processConfirmedCriteria: connectionId = {}", cid);
 
     // We should look into the P2PS service for the connection endpoints to
-    // determine the networkId but we will shortcut and just use the
-    // configured id.
+    // determine the networkId but we will assume if we are recieving the
+    // confirmation we correctly sent the request.
     Reservation reservation = new Reservation();
     reservation.setGlobalReservationId(gid);
     reservation.setDescription(description);
@@ -219,6 +246,15 @@ public class ConnectionService {
     }
   }
 
+  /**
+   * A utility method to get the network identifier based on STP within he P2P
+   * service structure.
+   *
+   * @param serviceType The service type associated with the reservation.
+   * @param anyList The list of XML ANY extension objects from the reservation structure.
+   * @return Returns an Optional String containing the networkId if present.
+   * @throws JAXBException When the P2P structure cannot be parsed.
+   */
   public static Optional<String> getNetworkId(String serviceType, List<Object> anyList) throws JAXBException {
     // Now we need to determine the network based on the STP used in the service.
     if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType) ||
@@ -229,8 +265,6 @@ public class ConnectionService {
         if (any instanceof JAXBElement) {
           JAXBElement jaxb = (JAXBElement) any;
           if (jaxb.getDeclaredType() == P2PServiceBaseType.class) {
-            log.info("[getNetworkId] getNetworkId found P2PServiceBaseType");
-
             // Get the network identifier from and STP
             P2PServiceBaseType p2p = (P2PServiceBaseType) jaxb.getValue();
             SimpleStp stp = new SimpleStp(p2p.getSourceSTP());
@@ -250,6 +284,14 @@ public class ConnectionService {
     return Optional.empty();
   }
 
+  /**
+   * Endpoint receiving the NSI CS reserveFailed message.
+   *
+   * @param reserveFailed
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
   public GenericAcknowledgmentType reserveFailed(GenericFailedType reserveFailed,
           Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
@@ -289,13 +331,23 @@ public class ConnectionService {
     return FACTORY.createGenericAcknowledgmentType();
   }
 
+  /**
+   * Endpoint receiving the NSI CS reserveCommitConfirmed message.
+   *
+   * @param reserveCommitConfirmed
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
   public GenericAcknowledgmentType reserveCommitConfirmed(GenericConfirmedType reserveCommitConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
     log.info("[ConnectionService] reserveCommitConfirmed recieved for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), reserveCommitConfirmed.getConnectionId());
 
-    // First we update the corresponding reservation in the datbase.
+    // First we update the corresponding reservation in the database.  If we
+    // are talking to an aggregator this CID is the parent reservation the commit
+    // was done against. The child connections will get updated next querySummary.
     Reservation r = reservationService.get(value.getProviderNSA(), reserveCommitConfirmed.getConnectionId());
     if (r == null) {
       // We have not seen this reservation before so ignore it.
@@ -322,11 +374,22 @@ public class ConnectionService {
     return FACTORY.createGenericAcknowledgmentType();
   }
 
+  /**
+   * Endpoint receiving the NSI CS reserveCommitFailed message.
+   *
+   * @param reserveCommitFailed
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
   public GenericAcknowledgmentType reserveCommitFailed(GenericFailedType reserveCommitFailed, Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
     log.info("[ConnectionService] reserveCommitFailed recieved for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), reserveCommitFailed.getConnectionId());
 
+    // First we update the corresponding reservation in the database.  If we
+    // are talking to an aggregator this CID is the parent reservation the commit
+    // was done against. The child connections will get updated next querySummary.
     Reservation r = reservationService.get(value.getProviderNSA(), reserveCommitFailed.getConnectionId());
     if (r == null) {
       // We have not seen this reservation before so ignore it.
@@ -354,11 +417,22 @@ public class ConnectionService {
     return FACTORY.createGenericAcknowledgmentType();
   }
 
+  /**
+   * Endpoint receiving the NSI CS reserveAbortConfirmed message.
+   *
+   * @param reserveAbortConfirmed
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
   public GenericAcknowledgmentType reserveAbortConfirmed(GenericConfirmedType reserveAbortConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
     log.info("[ConnectionService] reserveAbortConfirmed recieved for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), reserveAbortConfirmed.getConnectionId());
 
+    // First we update the corresponding reservation in the database.  If we
+    // are talking to an aggregator this CID is the parent reservation the abort
+    // was done against. The child connections will get updated next querySummary.
     Reservation r = reservationService.get(value.getProviderNSA(), reserveAbortConfirmed.getConnectionId());
     if (r == null) {
       // We have not seen this reservation before so ignore it.
@@ -385,12 +459,22 @@ public class ConnectionService {
     return FACTORY.createGenericAcknowledgmentType();
   }
 
+  /**
+   * Endpoint receiving the NSI CS provisionConfirmed message.
+   *
+   * @param provisionConfirmed
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
   public GenericAcknowledgmentType provisionConfirmed(GenericConfirmedType provisionConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
     log.info("[ConnectionService] provisionConfirmed recieved for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), provisionConfirmed.getConnectionId());
 
-    // First we update the corresponding reservation in the datbase.
+    // First we update the corresponding reservation in the database.  If we
+    // are talking to an aggregator this CID is the parent reservation the provision
+    // was done against. The child connections will get updated next querySummary.
     Reservation r = reservationService.get(value.getProviderNSA(), provisionConfirmed.getConnectionId());
     if (r == null) {
       // We have not seen this reservation before so ignore it.
@@ -417,12 +501,22 @@ public class ConnectionService {
     return FACTORY.createGenericAcknowledgmentType();
   }
 
+  /**
+   * Endpoint receiving the NSI CS releaseConfirmed message.
+   *
+   * @param releaseConfirmed
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
   public GenericAcknowledgmentType releaseConfirmed(GenericConfirmedType releaseConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
     log.info("[ConnectionService] releaseConfirmed received for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), releaseConfirmed.getConnectionId());
 
-    // First we update the corresponding reservation in the datbase.
+    // First we update the corresponding reservation in the database.  If we
+    // are talking to an aggregator this CID is the parent reservation the release
+    // was done against. The child connections will get updated next querySummary.
     Reservation r = reservationService.get(header.value.getProviderNSA(), releaseConfirmed.getConnectionId());
     if (r == null) {
       // We have not seen this reservation before so ignore it.
@@ -449,12 +543,22 @@ public class ConnectionService {
     return FACTORY.createGenericAcknowledgmentType();
   }
 
+  /**
+   * Endpoint receiving the NSI CS terminateConfirmed message.
+   *
+   * @param terminateConfirmed
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
   public GenericAcknowledgmentType terminateConfirmed(GenericConfirmedType terminateConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
     log.info("[ConnectionService] terminateConfirmed received for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), terminateConfirmed.getConnectionId());
 
-    // First we update the corresponding reservation in the datbase.
+    // First we update the corresponding reservation in the database.  If we
+    // are talking to an aggregator this CID is the parent reservation the terminate
+    // was done against. The child connections will get updated next querySummary.
     Reservation r = reservationService.get(header.value.getProviderNSA(), terminateConfirmed.getConnectionId());
     if (r == null) {
       // We have not seen this reservation before so ignore it.
@@ -481,17 +585,44 @@ public class ConnectionService {
     return FACTORY.createGenericAcknowledgmentType();
   }
 
-  public GenericAcknowledgmentType querySummaryConfirmed(QuerySummaryConfirmedType querySummaryConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
+  /**
+   * Endpoint receiving the NSI CS querySummaryConfirmed message.  These results are used
+   * to create/update/delete reservations in the database.  The querySummaryConfirmed will
+   * contain reservations not created by the SENSE-NSI-RM, and if we are connected to an
+   * aggregator, then we will also have child connections.
+   *
+   * @param querySummaryConfirmed Structure containing the reservation information.
+   * @param header NSI protocol header.
+   * @return An acknowledgement indicating message has been accepted.
+   * @throws ServiceException
+   */
+  public GenericAcknowledgmentType querySummaryConfirmed(QuerySummaryConfirmedType querySummaryConfirmed,
+          Holder<CommonHeaderType> header) throws ServiceException {
+    log.info("[ConnectionService] processConfirmedCriteria: querySummaryConfirmed received.");
+
+    // We have a specific class to process the results from a QuerySummary operations.
     QuerySummary q = new QuerySummary(nsiProperties.getNetworkId(), reservationService);
     q.process(querySummaryConfirmed, header);
     return FACTORY.createGenericAcknowledgmentType();
   }
 
+  /**
+   * We are not using this message from the NSI protocol.
+   *
+   * @param queryRecursiveConfirmed
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
   public GenericAcknowledgmentType queryRecursiveConfirmed(QueryRecursiveConfirmedType queryRecursiveConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
     //TODO implement this method
     throw new UnsupportedOperationException("Not implemented yet.");
   }
+
+  // We have disabled support for queryRecursive and will rely on the
+  // aggregator NSA to maintain an accurate state if we are not connected
+  // directly to a uPA.
 
   /*
   public GenericAcknowledgmentType queryRecursiveConfirmed(QueryRecursiveConfirmedType queryRecursiveConfirmed,
@@ -574,28 +705,62 @@ public class ConnectionService {
 
 */
 
+  /**
+   * We are not using this message from the NSI protocol.
+   *
+   * @param queryNotificationConfirmed
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
   public GenericAcknowledgmentType queryNotificationConfirmed(QueryNotificationConfirmedType queryNotificationConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
     //TODO implement this method
     throw new UnsupportedOperationException("Not implemented yet.");
   }
 
+  /**
+   * We are not using this message from the NSI protocol.
+   *
+   * @param queryResultConfirmed
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
   public GenericAcknowledgmentType queryResultConfirmed(QueryResultConfirmedType queryResultConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
     //TODO implement this method
     throw new UnsupportedOperationException("Not implemented yet.");
   }
 
-  public GenericAcknowledgmentType error(GenericErrorType error, Holder<CommonHeaderType> header) throws ServiceException {
+  /**
+   * Endpoint receiving the NSI CS Error message.
+   *
+   * @param error
+   * @param header
+   * @return
+   * @throws ServiceException
+   * @throws JAXBException
+   */
+  public GenericAcknowledgmentType error(GenericErrorType error, Holder<CommonHeaderType> header) throws ServiceException, JAXBException {
     CommonHeaderType value = header.value;
-    String connectionId = error.getServiceException().getConnectionId();
 
-    log.info("[ConnectionService] error received for correlationId = {}, connectionId: {}",
-            value.getCorrelationId(), connectionId);
+    log.info("[ConnectionService] error() received for providerNSA = {}, correlationId = {}, protocolVersion = {}, error: \n{}",
+            value.getProviderNSA(), value.getCorrelationId(), value.getProtocolVersion(),
+            CsParser.getInstance().genericError2xml(error));
 
     // We need to inform the requesting thread of the error.
     Operation op = operationMap.get(value.getCorrelationId());
     if (op == null) {
-      log.error("[ConnectionService] error can't find outstanding operation for correlationId = {}",
+      log.error("[ConnectionService] error() can't find outstanding operation for correlationId = {}",
               value.getCorrelationId());
+
+      // Looks like this is a spontaneous event we need to handle.
+      ServiceExceptionType serviceException = error.getServiceException();
+      String connectionId = error.getServiceException().getConnectionId();
+      String errorId = serviceException.getErrorId();
+
+      log.error("[ConnectionService] error() add corrective action for condition, connectionId = {}, errorId = {}",
+              connectionId, errorId);
+
     } else {
       op.setState(StateType.failed);
       op.setException(error.getServiceException());
@@ -605,22 +770,48 @@ public class ConnectionService {
     return FACTORY.createGenericAcknowledgmentType();
   }
 
+  /**
+   * Endpoint receiving the autonomous NSI CS errorEvent message.
+   *
+   * @param errorEvent
+   * @param header
+   * @return
+   * @throws ServiceException
+   * @throws JAXBException
+   */
   public GenericAcknowledgmentType errorEvent(ErrorEventType errorEvent, Holder<CommonHeaderType> header) throws ServiceException, JAXBException {
 
     // Something bad happened.  Dump the error and fail the operation.
     CommonHeaderType value = header.value;
 
-    log.error("[ConnectionService] errorEvent received, providerNSA = {}, correlationId = {}, protocolVersion = {}",
-        value.getProviderNSA(), value.getCorrelationId(), value.getProtocolVersion());
-
-    log.error("[ConnectionService] errorEvent = {}", CsParser.getInstance().errorEvent2xml(errorEvent));
+    log.error("[ConnectionService] errorEvent received, providerNSA = {}, correlationId = {}, protocolVersion = {}, errorEvent: \n{}",
+        value.getProviderNSA(), value.getCorrelationId(), value.getProtocolVersion(),
+        CsParser.getInstance().errorEvent2xml(errorEvent));
 
     // We need to inform the requesting thread of the error.
     Operation op = operationMap.get(value.getCorrelationId());
     if (op == null) {
-      log.error("[ConnectionService] error can't find outstanding operation for correlationId = {}",
+      log.error("[ConnectionService] errorEvent can't find outstanding operation for correlationId = {}",
               value.getCorrelationId());
+
+      // Looks like this is a spontaneous event we need to handle.  These are
+      // all dataplane related events so we should terminate the reservation
+      // since there is no way to inform the SENSE orchestrator of the issue
+      // at the moment.
+      switch (errorEvent.getEvent()) {
+        case ACTIVATE_FAILED:
+        case DEACTIVATE_FAILED:
+        case DATAPLANE_ERROR:
+        case FORCED_END:
+        default:
+          log.error("[ConnectionService] errorEvent decision to terminate cid = {}, originating cid = {}",
+                  errorEvent.getConnectionId(), errorEvent.getOriginatingConnectionId());
+          break;
+      }
+
     } else {
+      // Is there a situation where we need to terminate the reservation or
+      // just let the requesting thread handle it?
       op.setState(StateType.failed);
       op.setException(errorEvent.getServiceException());
       op.getCompleted().release();
@@ -629,6 +820,14 @@ public class ConnectionService {
     return FACTORY.createGenericAcknowledgmentType();
   }
 
+  /**
+   * Endpoint receiving the autonomous NSI CS DataPlaneStateChange message.
+   *
+   * @param dataPlaneStateChange
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
   public GenericAcknowledgmentType dataPlaneStateChange(
           DataPlaneStateChangeRequestType dataPlaneStateChange,
           Holder<CommonHeaderType> header) throws ServiceException {
@@ -637,21 +836,22 @@ public class ConnectionService {
     String connectionId = dataPlaneStateChange.getConnectionId();
     DataPlaneStatusType dataPlaneStatus = dataPlaneStateChange.getDataPlaneStatus();
 
-    log.info("[ConnectionService] dataPlaneStateChange for providerNSA = {}, connectionId = {},"
-            + " notificationId = {}, active = {}, consistent = {}, time = {}",
-            providerNSA,
-            connectionId,
-            dataPlaneStateChange.getNotificationId(),
-            dataPlaneStatus.isActive(),
-            dataPlaneStatus.isVersionConsistent(),
-            dataPlaneStateChange.getTimeStamp());
+    try {
+      log.info("[ConnectionService] dataPlaneStateChange for providerNSA = {}, correlationId = {}, dataPlaneStateChange:\n{}",
+              providerNSA,
+              header.value.getCorrelationId(),
+              CsParser.getInstance().DataPlaneStateChange2xml(dataPlaneStateChange));
+    } catch (JAXBException ex) {
+      log.error("[ConnectionService] dataPlaneStateChange could not encode log message.", ex);
+    }
 
     // This state change is in the context of the local providerNSA so we must
     // assume we are directly connect to a uPA in order for us to map this
     // incoming event to the associated connection.  If we are connected to an
     // aggregator then the connectionId we want is actually a child connection.
     // Find the associated connection.
-    Reservation r = reservationService.get(providerNSA, connectionId);
+    //Reservation r = reservationService.get(providerNSA, connectionId);
+    Reservation r = reservationService.getByAnyConnectionId(providerNSA, connectionId);
     if (r == null) {
       log.error("[ConnectionService] dataPlaneStateChange could not find connectionId = {}", connectionId);
     } else {
@@ -664,31 +864,29 @@ public class ConnectionService {
     return FACTORY.createGenericAcknowledgmentType();
   }
 
-  public GenericAcknowledgmentType reserveTimeout(
-          ReserveTimeoutRequestType reserveTimeout,
+  /**
+   * Endpoint receiving the autonomous NSI CS ReserveTimeout message.
+   *
+   * @param reserveTimeout
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
+  public GenericAcknowledgmentType reserveTimeout(ReserveTimeoutRequestType reserveTimeout,
           Holder<CommonHeaderType> header) throws ServiceException {
 
     // Need these to the look up the reservation in our database.
     String providerNSA = header.value.getProviderNSA();
     String connectionId = reserveTimeout.getConnectionId();
 
-    log.error("[ConnectionService] reserveTimeout for {\n" +
-            "    providerNSA = {},\n" +
-            "    correlationId = {},\n" +
-            "    connectionId = {},\n" +
-            "    notificationId = {},\n" +
-            "    timeStamp = {},\n" +
-            "    originatingNSA = {},\n" +
-            "    originatingConnectionId = {},\n" +
-            "    timeoutValue = {}\n",
-            providerNSA,
-            header.value.getCorrelationId(),
-            connectionId,
-            reserveTimeout.getNotificationId(),
-            reserveTimeout.getTimeStamp().toXMLFormat(),
-            reserveTimeout.getOriginatingNSA(),
-            reserveTimeout.getOriginatingConnectionId(),
-            reserveTimeout.getTimeoutValue());
+    try {
+      log.error("[ConnectionService] reserveTimeout for providerNSA = {}, correlationId = {}, reserveTimeout:\n{}",
+              providerNSA,
+              header.value.getCorrelationId(),
+              CsParser.getInstance().ReserveTimeoutRequest2xml(reserveTimeout));
+    } catch (JAXBException ex) {
+      log.error("[ConnectionService] reserveTimeout could not encode log message.", ex);
+    }
 
     Reservation r = reservationService.get(providerNSA, connectionId);
     if (r == null) {
@@ -707,9 +905,18 @@ public class ConnectionService {
       log.info("[ConnectionService] writing updated connectionId = {}, reservation {}", connectionId, r.toString());
       reservationService.store(r);
     }
+
     return FACTORY.createGenericAcknowledgmentType();
   }
 
+  /**
+   * Endpoint receiving the autonomous NSI CS MessageDeliveryTimeout message.
+   *
+   * @param messageDeliveryTimeout
+   * @param header
+   * @return
+   * @throws ServiceException
+   */
   public GenericAcknowledgmentType messageDeliveryTimeout(MessageDeliveryTimeoutRequestType messageDeliveryTimeout, Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
     log.info("[ConnectionService] messageDeliveryTimeout recieved for correlationId = {}, connectionId: {}",

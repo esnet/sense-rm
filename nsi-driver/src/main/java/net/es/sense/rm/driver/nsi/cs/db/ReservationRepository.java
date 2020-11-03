@@ -45,6 +45,26 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
           @Param("connectionId") String connectionId);
 
   /**
+   * Lookup a reservation based on providerId and parentConnectionId.
+   *
+   * @param providerNsa
+   * @param parentConnectionId
+   * @return
+   */
+  public Collection<Reservation> findByProviderNsaAndParentConnectionId(
+          @Param ("providerNSA") String providerNsa,
+          @Param("parentConnectionId") String parentConnectionId);
+
+    /**
+   * Lookup a reservation based on parentConnectionId.
+   *
+   * @param parentConnectionId
+   * @return
+   */
+  public Collection<Reservation> findByParentConnectionId(
+          @Param("parentConnectionId") String parentConnectionId);
+
+  /**
    *
    * @param providerNsa
    * @return

@@ -58,8 +58,14 @@ public class Reservation implements Serializable {
   @Basic(optional = true)
   String globalReservationId;
 
+  // Description of the reservation.
   @Basic(optional = true)
   String description;
+
+  // Parent connection identifier of this connection if we are connected to an
+  // aggregator.  If we are connected to a UPA this will empty.
+  @Basic(optional = true)
+  String parentConnectionId;
 
   // Connection identifier of this connection on the uPA.
   @Basic(optional = false)
@@ -82,6 +88,7 @@ public class Reservation implements Serializable {
   ProvisionStateEnumType provisionState;
   LifecycleStateEnumType lifecycleState;
 
+  // True only when the database is active and state is consistent.
   boolean dataPlaneActive = false;
 
   // Version of the reservation on the uPA.
@@ -100,6 +107,7 @@ public class Reservation implements Serializable {
             ", providerNsa='" + providerNsa + '\'' +
             ", globalReservationId='" + globalReservationId + '\'' +
             ", description='" + description + '\'' +
+            ", parentConnectionId='" + parentConnectionId + '\'' +
             ", connectionId='" + connectionId + '\'' +
             ", topologyId='" + topologyId + '\'' +
             ", serviceType='" + serviceType + '\'' +
@@ -126,6 +134,11 @@ public class Reservation implements Serializable {
 
     if (description != null && r.getDescription() != null
             && !description.equals(r.getDescription())) {
+      return true;
+    }
+
+    if (parentConnectionId != null && r.getParentConnectionId() != null
+            && !parentConnectionId.equals(r.getParentConnectionId())) {
       return true;
     }
 

@@ -19,10 +19,18 @@
  */
 package net.es.sense.rm.driver.nsi.messages;
 
+import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 /**
  *
  * @author hacksaw
  */
-public enum ModelQueryType {
-  QUERY_MODEL, QUERY_MODELS, QUERY_RESULT, QUERY_ERROR;
+@Data
+@AllArgsConstructor
+public class TerminateRequest implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private String connectionId;
 }

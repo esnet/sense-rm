@@ -43,6 +43,8 @@ import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 
 /**
+ * This class provides logic for creating and storing reservation objects
+ * from the QuerySummaryConfirmedType.
  *
  * @author hacksaw
  */
@@ -51,16 +53,28 @@ public class QuerySummary {
   private final String networkId;
   private final ReservationService reservationService;
 
+  /**
+   * Constructor for class.
+   *
+   * @param networkId The network identifier for the topology this SENSE-NSI-RM is managing.
+   * @param reservationService The reservation database.
+   */
   public QuerySummary(String networkId, ReservationService reservationService) {
     this.networkId = networkId;
     this.reservationService = reservationService;
   }
 
+  /**
+   *
+   * @param querySummaryConfirmed
+   * @param header
+   * @throws ServiceException
+   */
   public void process(QuerySummaryConfirmedType querySummaryConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
     // Get the providerNSA identifier.
     String providerNsa = header.value.getProviderNSA();
 
-    // Extract the uPA connection segments associated with individual networks.
+    // Extract the uPA reservation (connection) segments associated with individual networks.
     List<QuerySummaryResultType> reservations = querySummaryConfirmed.getReservation();
     log.debug("[QuerySummary] providerNSA = {}, # of reservations = {}",
             providerNsa, reservations.size());
@@ -222,7 +236,7 @@ public class QuerySummary {
   /**
    * Build one or more reservation objects based on NSI reservation criteria.
    * An aggregator may have many child reservations that we would like to
-   * track if it matches the topology we are interested in modelling.
+   * track if it matches the topology we are interested in modeling.
    *
    * @param providerNsa
    * @param gid
@@ -327,6 +341,7 @@ public class QuerySummary {
           reservation.setGlobalReservationId(gid);
           reservation.setDescription(description);
           reservation.setProviderNsa(child.getProviderNSA());
+          reservation.setParentConnectionId(cid);          // We are a child connection so add the parent connectionId.
           reservation.setConnectionId(child.getConnectionId());
           reservation.setVersion(criteria.getVersion());
 

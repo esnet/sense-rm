@@ -1,7 +1,7 @@
 package net.es.sense.rm.driver.nsi.cs.db;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Data;
 
 /**
@@ -13,6 +13,6 @@ import lombok.Data;
 @Data
 public class DeltaConnection {
   private String deltaId;
-  private final List<String> commits = new ArrayList<>();
-  private final List<String> terminates = new ArrayList<>();
+  private final Set<String> commits = new HashSet<>();
+  private final Set<String> terminates = new HashSet<>();
 }

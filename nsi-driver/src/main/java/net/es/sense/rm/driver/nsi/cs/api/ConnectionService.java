@@ -598,6 +598,7 @@ public class ConnectionService {
    */
   public GenericAcknowledgmentType querySummaryConfirmed(QuerySummaryConfirmedType querySummaryConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
+
     log.info("[ConnectionService] processConfirmedCriteria: querySummaryConfirmed received.");
 
     // We have a specific class to process the results from a QuerySummary operations.
@@ -840,7 +841,7 @@ public class ConnectionService {
       log.info("[ConnectionService] dataPlaneStateChange for providerNSA = {}, correlationId = {}, dataPlaneStateChange:\n{}",
               providerNSA,
               header.value.getCorrelationId(),
-              CsParser.getInstance().DataPlaneStateChange2xml(dataPlaneStateChange));
+              CsParser.getInstance().dataPlaneStateChange2xml(dataPlaneStateChange));
     } catch (JAXBException ex) {
       log.error("[ConnectionService] dataPlaneStateChange could not encode log message.", ex);
     }
@@ -883,7 +884,7 @@ public class ConnectionService {
       log.error("[ConnectionService] reserveTimeout for providerNSA = {}, correlationId = {}, reserveTimeout:\n{}",
               providerNSA,
               header.value.getCorrelationId(),
-              CsParser.getInstance().ReserveTimeoutRequest2xml(reserveTimeout));
+              CsParser.getInstance().reserveTimeoutRequest2xml(reserveTimeout));
     } catch (JAXBException ex) {
       log.error("[ConnectionService] reserveTimeout could not encode log message.", ex);
     }

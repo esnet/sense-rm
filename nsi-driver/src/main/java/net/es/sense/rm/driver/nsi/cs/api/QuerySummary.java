@@ -76,10 +76,16 @@ public class QuerySummary {
 
     // Extract the uPA reservation (connection) segments associated with individual networks.
     List<QuerySummaryResultType> reservations = querySummaryConfirmed.getReservation();
-    log.debug("[QuerySummary] providerNSA = {}, # of reservations = {}",
-            providerNsa, reservations.size());
 
-    // Process each reservation returned.
+    try {
+      log.debug("[QuerySummary] providerNSA = {}, # of reservations = {}, querySummaryConfirmed:\n{}",
+              providerNsa, reservations.size(),
+              CsParser.getInstance().querySummaryConfirmed2xml(querySummaryConfirmed));
+    } catch (JAXBException ex) {
+      log.error("[QuerySummary] providerNSA = {} failed to encode QuerySummaryConfirmedType", providerNsa, ex);
+    }
+
+    // Process each reservation returned from the NSA.
     List<Reservation> results = new ArrayList<>();
     for (QuerySummaryResultType reservation : reservations) {
       // Get the parent reservation information to apply to child connections.
@@ -106,7 +112,6 @@ public class QuerySummary {
       // creation, then there will be no associated criteria.
       if (reservation.getCriteria().isEmpty()) {
         log.error("[QuerySummary] criteria is empty for cid = {}", reservation.getConnectionId());
-
         results.add(processReservationNoCriteria(
                 providerNsa,
                 reservation.getGlobalReservationId(),
@@ -271,6 +276,7 @@ public class QuerySummary {
     for (QuerySummaryResultCriteriaType criteria : criteriaList) {
       log.info("[QuerySummary] processSummaryCriteria: cid = {}, version = {}, serviceType = {}",
               cid, criteria.getVersion(), criteria.getServiceType());
+
       ChildSummaryListType children = criteria.getChildren();
       if (children == null || children.getChild().isEmpty()) {
         // We are at a leaf child so check to see if we need to store this reservation information.

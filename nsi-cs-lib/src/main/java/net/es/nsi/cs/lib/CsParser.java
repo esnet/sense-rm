@@ -7,6 +7,7 @@ import net.es.nsi.common.jaxb.JaxbParser;
 import org.ogf.schemas.nsi._2013._12.connection.types.DataPlaneStateChangeRequestType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ErrorEventType;
 import org.ogf.schemas.nsi._2013._12.connection.types.GenericErrorType;
+import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryResultType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReserveTimeoutRequestType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
@@ -54,6 +55,12 @@ public class CsParser extends JaxbParser {
     return this.jaxb2Xml(P2P_FACTORY.createP2Ps(p2ps));
   }
 
+  // querySummaryConfirmed
+  public String querySummaryConfirmed2xml(QuerySummaryConfirmedType value) throws JAXBException {
+    JAXBElement<QuerySummaryConfirmedType> jaxb = TYPES_FACTORY.createQuerySummaryConfirmed(value);
+    return this.jaxb2Xml(jaxb);
+  }
+
   // QuerySummaryResultType
   private final static QName _QuerySummaryResultType_QNAME = new QName("http://schemas.ogf.org/nsi/2013/12/connection/types", "QuerySummaryResultType");
   public String qsrt2xml(QuerySummaryResultType query) throws JAXBException {
@@ -65,7 +72,7 @@ public class CsParser extends JaxbParser {
     return this.xml2Jaxb(P2PServiceBaseType.class, xml);
   }
 
-    public String errorEvent2xml(ErrorEventType error) throws JAXBException {
+  public String errorEvent2xml(ErrorEventType error) throws JAXBException {
     JAXBElement<ErrorEventType> jaxb = TYPES_FACTORY.createErrorEvent(error);
     return this.jaxb2Xml(jaxb);
   }
@@ -75,12 +82,12 @@ public class CsParser extends JaxbParser {
     return this.jaxb2Xml(jaxb);
   }
 
-  public String ReserveTimeoutRequest2xml(ReserveTimeoutRequestType value) throws JAXBException {
+  public String reserveTimeoutRequest2xml(ReserveTimeoutRequestType value) throws JAXBException {
     JAXBElement<ReserveTimeoutRequestType> jaxb = TYPES_FACTORY.createReserveTimeout(value);
     return this.jaxb2Xml(jaxb);
   }
 
-  public String DataPlaneStateChange2xml(DataPlaneStateChangeRequestType value) throws JAXBException {
+  public String dataPlaneStateChange2xml(DataPlaneStateChangeRequestType value) throws JAXBException {
     JAXBElement<DataPlaneStateChangeRequestType> jaxb = TYPES_FACTORY.createDataPlaneStateChange(value);
     return this.jaxb2Xml(jaxb);
   }

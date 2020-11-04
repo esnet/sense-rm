@@ -22,8 +22,10 @@ package net.es.sense.rm.driver.nsi.cs;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
@@ -240,11 +242,11 @@ public class CsProvider {
    * @param reduction
    * @return
    */
-  private List<String> processDeltaReduction(Model reduction) {
+  private Set<String> processDeltaReduction(Model reduction) {
     log.debug("[processDeltaReduction] start");
 
     // The list of connection ids we will need terminate in the delta commit.
-    List<String> terminates = new ArrayList<>();
+    Set<String> terminates = new HashSet<>();
 
     // We model connections as mrs:SwitchingSubnet objects so query the
     // reduction model for all those provided.  We will just delete these.
@@ -299,13 +301,13 @@ public class CsProvider {
    * @throws IllegalArgumentException
    * @throws TimeoutException
    */
-  private List<String> processDeltaAddition(net.es.sense.rm.driver.nsi.db.Model m, String deltaId, Model addition)
+  private Set<String> processDeltaAddition(net.es.sense.rm.driver.nsi.db.Model m, String deltaId, Model addition)
           throws DatatypeConfigurationException, ServiceException, IllegalArgumentException, TimeoutException {
     log.debug("[processDeltaAddition] start deletaId = {}, model = {}", deltaId, m.toString());
 
     // This is a list of cid associated with reservations created
     // as part of the delta addition.
-    List<String> commits = new ArrayList<>();
+    Set<String> commits = new HashSet<>();
 
     // CorrelationId from NSI these reservation requests go in here.
     List<String> correlationIds = new ArrayList<>();
@@ -600,7 +602,7 @@ public class CsProvider {
    * @param reduction
    * @return
    */
-  private void commitDeltaReduction(List<String> connectionIds)
+  private void commitDeltaReduction(Set<String> connectionIds)
           throws ServiceException, IllegalArgumentException, TimeoutException {
 
     // CorrelationId from NSI termination request go in here.
@@ -692,7 +694,7 @@ public class CsProvider {
    * @throws IllegalArgumentException
    * @throws TimeoutException
    */
-  private void commitDeltaAddition(List<String> connectionIds)
+  private void commitDeltaAddition(Set<String> connectionIds)
           throws ServiceException, IllegalArgumentException, TimeoutException {
     // We store our outstanding operations here.
     List<String> correlationIds = new ArrayList<>();

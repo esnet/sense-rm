@@ -139,12 +139,11 @@ public class SwitchingSubnetModel {
     log.debug("processReservations: loading topologyId = {}", topologyId);
 
     for (Reservation reservation : reservationService.get()) {
-      log.debug("processReservations: topologyId = {}, connectionId = {}, discovered = {}", reservation.getTopologyId(), reservation.getConnectionId(), reservation.getDiscovered());
+      log.debug("processReservations: reservation:\n{}", reservation.toString());
     }
 
     for (Reservation reservation : reservationService.getByTopologyId(topologyId)) {
-      log.info("[SwitchingSubnetModel] processing reservation cid = {}, gid = {}, description={}",
-              reservation.getConnectionId(), reservation.getGlobalReservationId(), reservation.getDescription());
+      log.info("[SwitchingSubnetModel] processing reservation\n{}", reservation.toString());
 
       // If we had a model change then make sure to update our version.
       if (version < reservation.getDiscovered()) {

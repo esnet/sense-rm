@@ -279,8 +279,18 @@ public class QuerySummary {
       // If this reservation was created by us then we will have this stored in
       // the database so we will need to update.  This could create two entries
       // one for the parent and one for the child reservation.
-      Reservation parent = buildReservation(providerNsa, gid, description, cid, reservationState,
-          provisionState, lifecycleState, dataPlaneStatus, criteria.getServiceType(), criteria);
+      Reservation parent = buildReservation(
+              providerNsa,
+              gid,
+              description,
+              cid,
+              reservationState,
+              provisionState,
+              lifecycleState,
+              dataPlaneStatus,
+              criteria.getServiceType(),
+              criteria);
+
       if (parent != null) {
         results.add(parent);
       }
@@ -307,6 +317,7 @@ public class QuerySummary {
                   dataPlaneStatus,
                   child.getServiceType(),
                   criteria);
+
           if (reservation != null) {
             reservation.setParentConnectionId(cid); // We are a child connection so add the parent connectionId.
             results.add(reservation);
@@ -346,10 +357,9 @@ public class QuerySummary {
           QuerySummaryResultCriteriaType criteria) {
 
       Reservation reservation = new Reservation();
+      reservation.setProviderNsa(providerNsa);
       reservation.setGlobalReservationId(gid);
       reservation.setDescription(description);
-      reservation.setDiscovered(System.currentTimeMillis());
-      reservation.setProviderNsa(providerNsa);
       reservation.setConnectionId(cid);
       reservation.setReservationState(reservationState);
       reservation.setProvisionState(provisionState);
@@ -358,6 +368,8 @@ public class QuerySummary {
       reservation.setVersion(criteria.getVersion());
       reservation.setStartTime(CsUtils.getStartTime(criteria.getSchedule().getStartTime()));
       reservation.setEndTime(CsUtils.getEndTime(criteria.getSchedule().getEndTime()));
+      reservation.setDiscovered(System.currentTimeMillis());
+
 
       // There is a history of incorrect EVTS URN so we need to cover all of them.
       if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_1.equalsIgnoreCase(serviceType) ||

@@ -9,6 +9,7 @@ import org.ogf.schemas.nsi._2013._12.connection.types.ErrorEventType;
 import org.ogf.schemas.nsi._2013._12.connection.types.GenericErrorType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryResultType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReserveConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReserveTimeoutRequestType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 import org.w3c.dom.Node;
@@ -92,4 +93,8 @@ public class CsParser extends JaxbParser {
     return this.jaxb2Xml(jaxb);
   }
 
+  public String reserveConfirmedType2xml(ReserveConfirmedType value) throws JAXBException {
+    JAXBElement<ReserveConfirmedType> jaxb = TYPES_FACTORY.createReserveConfirmed(value);
+    return this.jaxb2Xml(jaxb);
+  }
 }

@@ -130,11 +130,17 @@ public class ConnectionService {
   public GenericAcknowledgmentType reserveConfirmed(
           ReserveConfirmedType reserveConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
+
     // We have some attributes in the SOAP header.
     CommonHeaderType value = header.value;
 
-    log.info("[ConnectionService] reserveConfirmed recieved for correlationId = {}, connectionId: {}",
-            value.getCorrelationId(), reserveConfirmed.getConnectionId());
+    try {
+      log.info("[ConnectionService] reserveConfirmed recieved for correlationId = {}, reserveConfirmed:\n{}",
+            value.getCorrelationId(), CsParser.getInstance().reserveConfirmedType2xml(reserveConfirmed));
+    } catch (JAXBException ex) {
+      log.error("[ConnectionService] reserveConfirmed could not encode log message, correlationId = {}",
+              value.getCorrelationId(), ex);
+    }
 
     ReservationConfirmCriteriaType criteria = reserveConfirmed.getCriteria();
     DataPlaneStatusType dataPlaneStatus = FACTORY.createDataPlaneStatusType();
@@ -160,8 +166,9 @@ public class ConnectionService {
       Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
       if (r == null) {
         // We have not seen this reservation before so store it.
-        log.info("[ConnectionService] reserveConfirmed: storing new reservation, cid = {}",
-                reservation.getConnectionId());
+        log.info("[ConnectionService] reserveConfirmed: storing new reservation, cid = {}, reservation:\n{}",
+                reservation.getConnectionId(),
+                reservation.toString());
         reservationService.store(reservation);
       } else if (r.diff(reservation)) {
         // We have to determine if the stored reservation needs to be updated.
@@ -224,10 +231,9 @@ public class ConnectionService {
     // determine the networkId but we will assume if we are recieving the
     // confirmation we correctly sent the request.
     Reservation reservation = new Reservation();
+    reservation.setProviderNsa(providerNsa);
     reservation.setGlobalReservationId(gid);
     reservation.setDescription(description);
-    reservation.setDiscovered(System.currentTimeMillis());
-    reservation.setProviderNsa(providerNsa);
     reservation.setConnectionId(cid);
     reservation.setReservationState(reservationState);
     reservation.setProvisionState(provisionState);
@@ -237,6 +243,7 @@ public class ConnectionService {
     reservation.setServiceType(criteria.getServiceType());
     reservation.setStartTime(CsUtils.getStartTime(criteria.getSchedule().getStartTime()));
     reservation.setEndTime(CsUtils.getEndTime(criteria.getSchedule().getEndTime()));
+    reservation.setDiscovered(System.currentTimeMillis());
 
     // Now we need to determine the network based on the STP used in the service.
     try {

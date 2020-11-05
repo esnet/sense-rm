@@ -142,6 +142,7 @@ public class ConnectionService {
               value.getCorrelationId(), ex);
     }
 
+    /**
     ReservationConfirmCriteriaType criteria = reserveConfirmed.getCriteria();
     DataPlaneStatusType dataPlaneStatus = FACTORY.createDataPlaneStatusType();
     dataPlaneStatus.setVersion(criteria.getVersion());
@@ -181,7 +182,8 @@ public class ConnectionService {
                 reservation.getConnectionId());
       }
     }
-
+    **/
+    
     Operation op = operationMap.get(value.getCorrelationId());
     if (op == null) {
       log.error("[ConnectionService] reserveConfirmed can't find outstanding operation for correlationId = {}",

@@ -409,25 +409,27 @@ public class CsOperations {
       nsiClient.getProxy().terminate(terminate, header);
       log.debug("[CsOperations] issued terminate operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
-
-      return correlationId;
     } catch (ServiceException ex) {
       // Continue on this error but clean up this correlationId.
       log.error("[CsOperations] Failed to send NSI CS terminate message, correlationId = {}, errorId = {}, text = {}",
               correlationId, ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+      operationMap.delete(correlationId);
       throw ex;
     } catch (SOAPFaultException ex) {
       // Continue on this error but clean up this correlationId.
       log.error("[CsOperations] Failed to send NSI CS terminate message, correlationId = {}, SOAP Fault = {}",
               correlationId, ex.getFault().getFaultCode());
+      operationMap.delete(correlationId);
       throw ex;
     } catch (Exception ex) {
       log.error("[CsOperations] Failed to send NSI CS terminate message, correlationId = {}",
               correlationId, ex);
+      operationMap.delete(correlationId);
       throw ex;
-    } finally {
-          operationMap.delete(correlationId);
     }
+
+    this.addCorrelationId(correlationId);
+    return correlationId;
   }
 
   public void unwind() {

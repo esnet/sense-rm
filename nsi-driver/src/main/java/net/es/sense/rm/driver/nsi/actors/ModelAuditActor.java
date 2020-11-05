@@ -96,7 +96,7 @@ public class ModelAuditActor extends UntypedAbstractActor {
       TerminateRequest req = (TerminateRequest) msg;
       try {
         CsOperations cs = new CsOperations(nsiProperties, operationMap);
-        cs.terminate(req.getConnectionId());
+        cs.addCorrelationId(cs.terminate(req.getConnectionId()));
         cs.confirm();
       } catch (Exception ex) {
         log.error("[ModelAuditActor] TerminateRequest failed, {}", ex);

@@ -156,7 +156,7 @@ public class ConnectionService {
       }
 
       if (Strings.isNullOrEmpty(reserveConfirmed.getDescription())) {
-        reserveConfirmed.setGlobalReservationId(op.getReservation().getDescription());
+        reserveConfirmed.setDescription(op.getReservation().getDescription());
       }
     }
 

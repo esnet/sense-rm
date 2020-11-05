@@ -22,6 +22,8 @@ package net.es.sense.rm.driver.nsi.cs.db;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -41,6 +43,15 @@ import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 @Entity
 @Table(name = "reservations")
 public class Reservation implements Serializable {
+  public enum ErrorState {
+    NONE,
+    NSIRESERVEFAILED,
+    NSIRESERVETIMEOUT,
+    NSIRESERVECOMMIT,
+    NSIPROVISION,
+    NSITERMINATE,
+    NSIERROR
+  }
 
   @Id
   @GeneratedValue
@@ -94,6 +105,13 @@ public class Reservation implements Serializable {
   // Version of the reservation on the uPA.
   long version;
 
+  // We track interaction errors here to help debug remotely.
+  @Enumerated(EnumType.STRING)
+  ErrorState errorState = ErrorState.NONE;
+
+  @Basic(optional = true)
+  String errorMessage;
+
   // The service element encoded in a string.
   @Lob
   @Basic(fetch = FetchType.LAZY, optional = true)
@@ -118,6 +136,8 @@ public class Reservation implements Serializable {
             ", lifecycleState=" + lifecycleState +
             ", dataPlaneActive=" + dataPlaneActive +
             ", version=" + version +
+            ", errorState=" + errorState +
+            ", errorMessage=" + errorMessage +
             ", service='" + service + '\'' +
             '}';
   }

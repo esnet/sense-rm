@@ -19,7 +19,9 @@
  */
 package net.es.sense.rm.driver.nsi.cs.api;
 
+import akka.actor.ActorRef;
 import com.google.common.base.Strings;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import javax.jws.WebService;
@@ -30,11 +32,13 @@ import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.jaxb.JaxbParser;
 import net.es.nsi.cs.lib.CsParser;
 import net.es.nsi.cs.lib.SimpleStp;
+import net.es.sense.rm.driver.nsi.RaController;
 import net.es.sense.rm.driver.nsi.cs.db.Operation;
 import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.cs.db.StateType;
+import net.es.sense.rm.driver.nsi.messages.TerminateRequest;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException;
 import org.ogf.schemas.nsi._2013._12.connection.types.DataPlaneStateChangeRequestType;
@@ -92,6 +96,9 @@ public class ConnectionService {
   // We synchronize with the requester thread using the operationMap that holds a semaphore.
   private final OperationMapRepository operationMap;
 
+  // AKKA actor system to route fire-and-forget operations.
+  private final RaController raController;
+
   // Our NSI CS object factory for creating protocol objects.
   private final static ObjectFactory FACTORY = new ObjectFactory();
 
@@ -102,12 +109,14 @@ public class ConnectionService {
    * @param nsiProperties The runtime NSI configuration information.
    * @param reservationService We store reservations using the reservation service.
    * @param operationMap We synchronize with the requester thread using the operationMap that holds a semaphore.
+   * @param raController Handle to the AKKA actor system.
    */
   public ConnectionService(NsiProperties nsiProperties, ReservationService reservationService,
-          OperationMapRepository operationMap) {
+          OperationMapRepository operationMap, RaController raController) {
     this.nsiProperties = nsiProperties;
     this.reservationService = reservationService;
     this.operationMap = operationMap;
+    this.raController = raController;
   }
 
   /**
@@ -148,8 +157,7 @@ public class ConnectionService {
 
     // No reservation returned means.....
     if (reservation != null) {
-      //Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
-      Reservation r = reservationService.getByAnyConnectionId(reservation.getProviderNsa(), reservation.getConnectionId());
+      Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
       if (r == null) {
         // We have not seen this reservation before so store it.
         log.info("[ConnectionService] reserveConfirmed: storing new reservation, cid = {}",
@@ -295,22 +303,25 @@ public class ConnectionService {
   public GenericAcknowledgmentType reserveFailed(GenericFailedType reserveFailed,
           Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
-    log.info("[ConnectionService] reserveFailed recieved for correlationId = {}, connectionId = {}",
-            value.getCorrelationId(), reserveFailed.getConnectionId());
+    String cid = reserveFailed.getConnectionId();
+    String error = JaxbParser.jaxb2String(ServiceExceptionType.class, reserveFailed.getServiceException());
+
+    log.info("[ConnectionService] reserveFailed recieved for correlationId = {}, connectionId = {}, error = {}",
+            value.getCorrelationId(), cid, error);
 
     // First we update the corresponding reservation in the datbase.  This
     // reservation should not exist based on the current code logic where we
     // add the reservation on the reserveConfirmed message.
-    Reservation r = reservationService.get(value.getProviderNSA(), reserveFailed.getConnectionId());
+    Reservation r = reservationService.get(value.getProviderNSA(), cid);
     if (r == null) {
       // We have not seen this reservation before so ignore it.
-      log.info("[ConnectionService] reserveFailed: no reference to reservation, cid = {}",
-              reserveFailed.getConnectionId());
+      log.info("[ConnectionService] reserveFailed: no reference to reservation, cid = {}", cid);
     } else {
       // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] reserveFailed: storing reservation update, cid = {}",
-              reserveFailed.getConnectionId());
+      log.info("[ConnectionService] reserveFailed: storing reservation update, cid = {}", cid);
       r.setReservationState(ReservationStateEnumType.RESERVE_FAILED);
+      r.setErrorState(Reservation.ErrorState.NSIRESERVEFAILED);
+      r.setErrorMessage(String.format("reserveFailed on cid = %s, serviceException = %s", cid, error));
       r.setDiscovered(System.currentTimeMillis());
       reservationService.store(r);
     }
@@ -324,9 +335,6 @@ public class ConnectionService {
       op.setException(reserveFailed.getServiceException());
       op.getCompleted().release();
     }
-
-    log.error("reserveFailed: connectionId = " + reserveFailed.getConnectionId() + ", serviceException = " +
-            JaxbParser.jaxb2String(ServiceExceptionType.class, reserveFailed.getServiceException()));
 
     return FACTORY.createGenericAcknowledgmentType();
   }
@@ -382,24 +390,29 @@ public class ConnectionService {
    * @return
    * @throws ServiceException
    */
-  public GenericAcknowledgmentType reserveCommitFailed(GenericFailedType reserveCommitFailed, Holder<CommonHeaderType> header) throws ServiceException {
+  public GenericAcknowledgmentType reserveCommitFailed(GenericFailedType reserveCommitFailed,
+          Holder<CommonHeaderType> header) throws ServiceException {
+
     CommonHeaderType value = header.value;
+    String cid = reserveCommitFailed.getConnectionId();
+    String error = JaxbParser.jaxb2String(ServiceExceptionType.class, reserveCommitFailed.getServiceException());
+
     log.info("[ConnectionService] reserveCommitFailed recieved for correlationId = {}, connectionId: {}",
-            value.getCorrelationId(), reserveCommitFailed.getConnectionId());
+            value.getCorrelationId(), cid);
 
     // First we update the corresponding reservation in the database.  If we
     // are talking to an aggregator this CID is the parent reservation the commit
     // was done against. The child connections will get updated next querySummary.
-    Reservation r = reservationService.get(value.getProviderNSA(), reserveCommitFailed.getConnectionId());
+    Reservation r = reservationService.get(value.getProviderNSA(), cid);
     if (r == null) {
       // We have not seen this reservation before so ignore it.
-      log.info("[ConnectionService] reserveCommitFailed: no reference to reservation, cid = {}",
-              reserveCommitFailed.getConnectionId());
+      log.info("[ConnectionService] reserveCommitFailed: no reference to reservation, cid = {}", cid);
     } else {
       // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] reserveCommitFailed: storing reservation update, cid = {}",
-              reserveCommitFailed.getConnectionId());
+      log.info("[ConnectionService] reserveCommitFailed: storing reservation update, cid = {}", cid);
       r.setReservationState(ReservationStateEnumType.RESERVE_FAILED);
+      r.setErrorState(Reservation.ErrorState.NSIRESERVECOMMIT);
+      r.setErrorMessage(String.format("reserveCommitFailed on cid = %s, serviceException = %s", cid, error));
       r.setDiscovered(System.currentTimeMillis());
       reservationService.store(r);
     }
@@ -425,8 +438,10 @@ public class ConnectionService {
    * @return
    * @throws ServiceException
    */
-  public GenericAcknowledgmentType reserveAbortConfirmed(GenericConfirmedType reserveAbortConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
+  public GenericAcknowledgmentType reserveAbortConfirmed(GenericConfirmedType reserveAbortConfirmed,
+          Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
+
     log.info("[ConnectionService] reserveAbortConfirmed recieved for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), reserveAbortConfirmed.getConnectionId());
 
@@ -467,7 +482,9 @@ public class ConnectionService {
    * @return
    * @throws ServiceException
    */
-  public GenericAcknowledgmentType provisionConfirmed(GenericConfirmedType provisionConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
+  public GenericAcknowledgmentType provisionConfirmed(GenericConfirmedType provisionConfirmed,
+          Holder<CommonHeaderType> header) throws ServiceException {
+
     CommonHeaderType value = header.value;
     log.info("[ConnectionService] provisionConfirmed recieved for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), provisionConfirmed.getConnectionId());
@@ -509,7 +526,9 @@ public class ConnectionService {
    * @return
    * @throws ServiceException
    */
-  public GenericAcknowledgmentType releaseConfirmed(GenericConfirmedType releaseConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
+  public GenericAcknowledgmentType releaseConfirmed(GenericConfirmedType releaseConfirmed,
+          Holder<CommonHeaderType> header) throws ServiceException {
+
     CommonHeaderType value = header.value;
     log.info("[ConnectionService] releaseConfirmed received for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), releaseConfirmed.getConnectionId());
@@ -599,7 +618,8 @@ public class ConnectionService {
   public GenericAcknowledgmentType querySummaryConfirmed(QuerySummaryConfirmedType querySummaryConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
 
-    log.info("[ConnectionService] processConfirmedCriteria: querySummaryConfirmed received.");
+    log.info("[ConnectionService] querySummaryConfirmed received, correlationId = %d",
+            header.value.getCorrelationId());
 
     // We have a specific class to process the results from a QuerySummary operations.
     QuerySummary q = new QuerySummary(nsiProperties.getNetworkId(), reservationService);
@@ -714,7 +734,9 @@ public class ConnectionService {
    * @return
    * @throws ServiceException
    */
-  public GenericAcknowledgmentType queryNotificationConfirmed(QueryNotificationConfirmedType queryNotificationConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
+  public GenericAcknowledgmentType queryNotificationConfirmed(
+          QueryNotificationConfirmedType queryNotificationConfirmed,
+          Holder<CommonHeaderType> header) throws ServiceException {
     //TODO implement this method
     throw new UnsupportedOperationException("Not implemented yet.");
   }
@@ -727,7 +749,9 @@ public class ConnectionService {
    * @return
    * @throws ServiceException
    */
-  public GenericAcknowledgmentType queryResultConfirmed(QueryResultConfirmedType queryResultConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
+  public GenericAcknowledgmentType queryResultConfirmed(
+          QueryResultConfirmedType queryResultConfirmed,
+          Holder<CommonHeaderType> header) throws ServiceException {
     //TODO implement this method
     throw new UnsupportedOperationException("Not implemented yet.");
   }
@@ -741,31 +765,43 @@ public class ConnectionService {
    * @throws ServiceException
    * @throws JAXBException
    */
-  public GenericAcknowledgmentType error(GenericErrorType error, Holder<CommonHeaderType> header) throws ServiceException, JAXBException {
-    CommonHeaderType value = header.value;
+  public GenericAcknowledgmentType error(GenericErrorType error,
+          Holder<CommonHeaderType> header) throws ServiceException, JAXBException {
 
-    log.info("[ConnectionService] error() received for providerNSA = {}, correlationId = {}, protocolVersion = {}, error: \n{}",
-            value.getProviderNSA(), value.getCorrelationId(), value.getProtocolVersion(),
-            CsParser.getInstance().genericError2xml(error));
+    String providerNSA = header.value.getProviderNSA();
+    String corrleationId = header.value.getCorrelationId();
+    ServiceExceptionType serviceException = error.getServiceException();
+    String cid = error.getServiceException().getConnectionId();
+    String encoded = JaxbParser.jaxb2String(ServiceExceptionType.class, serviceException);
+
+    log.info("[ConnectionService] error() received for providerNSA = {}, correlationId = {}, error: \n{}",
+            providerNSA, corrleationId, CsParser.getInstance().genericError2xml(error));
 
     // We need to inform the requesting thread of the error.
-    Operation op = operationMap.get(value.getCorrelationId());
+    Operation op = operationMap.get(corrleationId);
     if (op == null) {
-      log.error("[ConnectionService] error() can't find outstanding operation for correlationId = {}",
-              value.getCorrelationId());
-
-      // Looks like this is a spontaneous event we need to handle.
-      ServiceExceptionType serviceException = error.getServiceException();
-      String connectionId = error.getServiceException().getConnectionId();
-      String errorId = serviceException.getErrorId();
-
-      log.error("[ConnectionService] error() add corrective action for condition, connectionId = {}, errorId = {}",
-              connectionId, errorId);
-
+      log.error("[ConnectionService] error() add corrective action for condition, correlationId = {}, cid = {}, error:\n{}",
+              corrleationId, cid, encoded);
     } else {
       op.setState(StateType.failed);
       op.setException(error.getServiceException());
       op.getCompleted().release();
+    }
+
+    // Update any impacted reservations with error information.
+    Collection<Reservation> reservations = reservationService.getByAnyConnectionId(providerNSA, cid);
+    if (reservations == null || reservations.isEmpty()) {
+      // We have not seen this reservation before so ignore it.
+      log.error("[ConnectionService] error() could not find cid = {}", cid);
+    } else {
+      for (Reservation r : reservations) {
+        log.info("[ConnectionService] error() updating cid = {}, reservation {}", cid, r.toString());
+        r.setErrorState(Reservation.ErrorState.NSIERROR);
+        r.setErrorMessage(String.format("error, cid = %s, serviceException = %s", cid, encoded));
+        r.setDiscovered(System.currentTimeMillis());
+        log.info("[ConnectionService] writing updated cid = {}, reservation {}", cid, r.toString());
+        reservationService.store(r);
+      }
     }
 
     return FACTORY.createGenericAcknowledgmentType();
@@ -807,6 +843,10 @@ public class ConnectionService {
         default:
           log.error("[ConnectionService] errorEvent decision to terminate cid = {}, originating cid = {}",
                   errorEvent.getConnectionId(), errorEvent.getOriginatingConnectionId());
+
+          // TODO: Send a terminate for this reservation since it has gone bad.
+          TerminateRequest req = new TerminateRequest(errorEvent.getConnectionId());
+          raController.getModelAuditActor().tell(req, ActorRef.noSender());
           break;
       }
 
@@ -852,16 +892,25 @@ public class ConnectionService {
     // aggregator then the connectionId we want is actually a child connection.
     // Find the associated connection.
     //Reservation r = reservationService.get(providerNSA, connectionId);
-    Reservation r = reservationService.getByAnyConnectionId(providerNSA, connectionId);
-    if (r == null) {
+
+
+    Collection<Reservation> reservations = reservationService.getByAnyConnectionId(providerNSA, connectionId);
+    if (reservations == null || reservations.isEmpty()) {
+      // We have not seen this reservation before so ignore it.
       log.error("[ConnectionService] dataPlaneStateChange could not find connectionId = {}", connectionId);
     } else {
-      log.info("[ConnectionService] updating connectionId = {}, reservation {}", connectionId, r.toString());
-      r.setDataPlaneActive(dataPlaneStatus.isActive());
-      r.setDiscovered(System.currentTimeMillis());
-      log.info("[ConnectionService] writing updated connectionId = {}, reservation {}", connectionId, r.toString());
-      reservationService.store(r);
+      for (Reservation r : reservations) {
+        // The reservation commit failed so put it in the RESERVE_HELD.
+        // Maybe RESERVE_FAILED would have been better? At least they can
+        // terminte it this way.
+        log.info("[ConnectionService] updating connectionId = {}, reservation {}", connectionId, r.toString());
+        r.setDataPlaneActive(dataPlaneStatus.isActive());
+        r.setDiscovered(System.currentTimeMillis());
+        log.info("[ConnectionService] writing updated connectionId = {}, reservation {}", connectionId, r.toString());
+        reservationService.store(r);
+      }
     }
+
     return FACTORY.createGenericAcknowledgmentType();
   }
 
@@ -889,22 +938,26 @@ public class ConnectionService {
       log.error("[ConnectionService] reserveTimeout could not encode log message.", ex);
     }
 
-    Reservation r = reservationService.get(providerNSA, connectionId);
-    if (r == null) {
+    Collection<Reservation> reservations = reservationService.getByAnyConnectionId(providerNSA, connectionId);
+    if (reservations == null || reservations.isEmpty()) {
       log.error("[ConnectionService] reserveTimeout could not find cid = {}", connectionId);
     } else {
-      log.info("[ConnectionService] reserveTimeout timing out reservation {}", r.toString());
+      for (Reservation r : reservations) {
+        log.info("[ConnectionService] reserveTimeout timing out reservation {}", r.toString());
 
-      // Transition this reservation to reserve timeout.
-      r.setReservationState(ReservationStateEnumType.RESERVE_TIMEOUT);
-      r.setDiscovered(System.currentTimeMillis());
+        // Transition this reservation to reserve timeout.
+        r.setReservationState(ReservationStateEnumType.RESERVE_TIMEOUT);
 
-      // TODO: When OpenNSA fixes their timeout notification state machine issue this
-      // failed hack can be removed.
-      r.setLifecycleState(LifecycleStateEnumType.FAILED);
+        // TODO: When OpenNSA fixes their timeout notification state machine issue this
+        // failed hack can be removed.
+        r.setLifecycleState(LifecycleStateEnumType.FAILED);
+        r.setErrorState(Reservation.ErrorState.NSIRESERVETIMEOUT);
+        r.setErrorMessage(String.format("reserveTimeout on cid = %s", connectionId));
+        r.setDiscovered(System.currentTimeMillis());
 
-      log.info("[ConnectionService] writing updated connectionId = {}, reservation {}", connectionId, r.toString());
-      reservationService.store(r);
+        log.info("[ConnectionService] writing updated connectionId = {}, reservation {}", connectionId, r.toString());
+        reservationService.store(r);
+      }
     }
 
     return FACTORY.createGenericAcknowledgmentType();
@@ -918,10 +971,16 @@ public class ConnectionService {
    * @return
    * @throws ServiceException
    */
-  public GenericAcknowledgmentType messageDeliveryTimeout(MessageDeliveryTimeoutRequestType messageDeliveryTimeout, Holder<CommonHeaderType> header) throws ServiceException {
+  public GenericAcknowledgmentType messageDeliveryTimeout(
+          MessageDeliveryTimeoutRequestType messageDeliveryTimeout,
+          Holder<CommonHeaderType> header) throws ServiceException {
+
     CommonHeaderType value = header.value;
+    String cid = messageDeliveryTimeout.getConnectionId();
+
     log.info("[ConnectionService] messageDeliveryTimeout recieved for correlationId = {}, connectionId: {}",
-            value.getCorrelationId(), messageDeliveryTimeout.getConnectionId());
+            value.getCorrelationId(), cid);
+
     Operation op = operationMap.get(value.getCorrelationId());
     if (op == null) {
       log.error("[ConnectionService] messageDeliveryTimeout can't find outstanding operation for correlationId = {}",
@@ -931,9 +990,34 @@ public class ConnectionService {
       ServiceExceptionType sex = new ServiceExceptionType();
       sex.setNsaId(value.getProviderNSA());
       sex.setText("messageDeliveryTimeout received");
-      sex.setConnectionId(messageDeliveryTimeout.getConnectionId());
+      sex.setConnectionId(cid);
       op.setException(sex);
       op.getCompleted().release();
+    }
+
+    Collection<Reservation> reservations = reservationService.getByAnyConnectionId(value.getProviderNSA(), cid);
+
+    if (reservations == null || reservations.isEmpty()) {
+      log.error("[ConnectionService] messageDeliveryTimeout could not find cid = {}", cid);
+    } else {
+      for (Reservation r : reservations) {
+        log.info("[ConnectionService] messageDeliveryTimeout on reservation {}", r.toString());
+
+        // Transition this reservation to reserve timeout.
+        r.setReservationState(ReservationStateEnumType.RESERVE_TIMEOUT);
+
+        // TODO: When OpenNSA fixes their timeout notification state machine issue this
+        // failed hack can be removed.
+        r.setLifecycleState(LifecycleStateEnumType.FAILED);
+        r.setErrorState(Reservation.ErrorState.NSIRESERVETIMEOUT);
+        r.setErrorMessage(String.format("messageDeliveryTimeout on cid = %s, correlationId = %s",
+                cid, value.getCorrelationId()));
+        r.setDiscovered(System.currentTimeMillis());
+
+        log.info("[ConnectionService] messageDeliveryTimeout writing updated connectionId = {}, reservation {}",
+                cid, r.toString());
+        reservationService.store(r);
+      }
     }
 
     return FACTORY.createGenericAcknowledgmentType();

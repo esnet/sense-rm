@@ -3,7 +3,9 @@ package net.es.sense.rm.driver.nsi.cs.db;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,18 +84,19 @@ public class ReservationServiceBean implements ReservationService {
   }
 
   @Override
-  public Reservation getByAnyConnectionId(String providerNsa, String connectionId)  {
+  public Collection<Reservation> getByAnyConnectionId(String providerNsa, String connectionId)  {
+    Set<Reservation> reservations = new HashSet<>();
     Reservation r = reservationRepository.findByProviderNsaAndConnectionId(providerNsa, connectionId);
-    if (r == null) {
-      Collection<Reservation> rc = reservationRepository.findByProviderNsaAndParentConnectionId(providerNsa, connectionId);
-      if (rc == null || rc.size() <= 0) {
-        return null;
-      } else {
-        r = rc.stream().findFirst().get();
-      }
+    if (r != null) {
+      reservations.add(r);
     }
 
-    return r;
+    Collection<Reservation> rc = reservationRepository.findByProviderNsaAndParentConnectionId(providerNsa, connectionId);
+    if (rc != null) {
+      reservations.addAll(rc);
+    }
+
+    return reservations;
   }
 
   @Override

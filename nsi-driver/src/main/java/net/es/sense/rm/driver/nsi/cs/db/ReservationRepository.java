@@ -41,7 +41,7 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
    * @return
    */
   public Reservation findByProviderNsaAndConnectionId(
-          @Param ("providerNSA") String providerNsa,
+          @Param ("providerNsa") String providerNsa,
           @Param("connectionId") String connectionId);
 
   /**
@@ -52,7 +52,7 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
    * @return
    */
   public Collection<Reservation> findByProviderNsaAndParentConnectionId(
-          @Param ("providerNSA") String providerNsa,
+          @Param ("providerNsa") String providerNsa,
           @Param("parentConnectionId") String parentConnectionId);
 
     /**
@@ -70,7 +70,7 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
    * @return
    */
   public Collection<Reservation> findByProviderNsa(
-          @Param ("providerNSA") String providerNsa);
+          @Param ("providerNsa") String providerNsa);
 
   /**
    * Get the discovered time of the newest reservation.

@@ -57,6 +57,6 @@ public interface ReservationService {
 
   public Collection<Reservation> getByParentConnectionId(String providerNsa, String parentConnectionId);
 
-  public Reservation getByAnyConnectionId(String providerNsa, String connectionId);
+  public Collection<Reservation> getByAnyConnectionId(String providerNsa, String connectionId);
 
 }

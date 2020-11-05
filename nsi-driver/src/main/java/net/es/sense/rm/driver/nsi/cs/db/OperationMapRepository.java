@@ -49,7 +49,7 @@ public class OperationMapRepository {
     }
 
     try {
-      return op.getCompleted().tryAcquire(60, TimeUnit.SECONDS);
+      return op.getCompleted().tryAcquire(120, TimeUnit.SECONDS);
     } catch (InterruptedException ex) {
       log.error("[OperationMapRepository] Interupted so giving up", ex);
       return false;

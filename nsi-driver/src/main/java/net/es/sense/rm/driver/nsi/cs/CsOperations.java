@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPFaultException;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.cs.lib.Client;
 import net.es.nsi.cs.lib.ClientUtil;
@@ -50,7 +49,7 @@ import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
  */
 
 @Slf4j
-@Data
+//@Data
 public class CsOperations {
   private final NsiProperties nsiProperties;
   private final OperationMapRepository operationMap;
@@ -65,10 +64,10 @@ public class CsOperations {
   private static final org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory P2PS_FACTORY
           = new org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory();
 
-  /*public CsOperations(NsiProperties nsiProperties, OperationMapRepository operationMap) {
+  public CsOperations(NsiProperties nsiProperties, OperationMapRepository operationMap) {
     this.nsiProperties = nsiProperties;
     this.operationMap = operationMap;
-  }*/
+  }
 
   public boolean addCorrelationId(String correlationId) {
     return this.correlationIds.add(correlationId);
@@ -396,6 +395,12 @@ public class CsOperations {
     GenericRequestType terminate = CS_FACTORY.createGenericRequestType();
     terminate.setConnectionId(connectionId);
 
+    Operation op = new Operation();
+    op.setOperation(OperationType.terminate);
+    op.setState(StateType.terminating);
+    op.setCorrelationId(correlationId);
+    operationMap.store(op);
+
     // Issue the NSI terminate request.
     try {
       log.debug("[CsOperations] issuing terminate operation correlationId = {}, connectionId = {}",
@@ -420,6 +425,8 @@ public class CsOperations {
       log.error("[CsOperations] Failed to send NSI CS terminate message, correlationId = {}",
               correlationId, ex);
       throw ex;
+    } finally {
+          operationMap.delete(correlationId);
     }
   }
 

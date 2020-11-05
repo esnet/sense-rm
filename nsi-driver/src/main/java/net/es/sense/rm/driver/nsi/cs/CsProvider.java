@@ -22,6 +22,7 @@ package net.es.sense.rm.driver.nsi.cs;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -265,9 +266,11 @@ public class CsProvider {
       log.debug("[processDeltaReduction] SwitchingSubnet: " + ssid);
 
       // Look up all the reservation segments associated with this SwitchingSubnet.
+      // TODO: We can ignore any in the TERMINATED but due to an OpenNSA bug we let
+      // them try a reduction on a reservation in the TERMINATING state.
       List<Reservation> reservations = reservationService.getByGlobalReservationId(ssid).stream()
               .filter(r -> (LifecycleStateEnumType.TERMINATED != r.getLifecycleState()
-                      && LifecycleStateEnumType.TERMINATING != r.getLifecycleState()))
+                      /*&& LifecycleStateEnumType.TERMINATING != r.getLifecycleState()*/))
               .collect(Collectors.toList());
 
       // Terminate using the parent connectionId if one exists.
@@ -636,6 +639,7 @@ public class CsProvider {
 
       // Issue the NSI terminate request for the specified connection.
       boolean error = true;
+      String errorMessage = null;
       try {
         ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
         nsiClient.getProxy().terminate(terminate, header);
@@ -646,38 +650,51 @@ public class CsProvider {
         // Continue on this error but clean up this correlationId.
         operationMap.delete(correlationId);
         correlationIds.remove(correlationId);
+
         log.error("[csProvider] Failed to send NSI CS terminate message, correlationId = {}, SOAP Fault = {}",
                 correlationId, ex.getFault().toString());
+
+        errorMessage = String.format("Terminate failed, cid = %s, SOAP Fault = %s",
+                cid, ex.getFault().toString());
       } catch (ServiceException ex) {
         // Continue on this error but clean up this correlationId.
         operationMap.delete(correlationId);
         correlationIds.remove(correlationId);
+
         log.error("[csProvider] Failed to send NSI CS terminate message, correlationId = {}, errorId = {}, text = {}",
                 correlationId, ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+
+        errorMessage = String.format("Terminate failed, cid = %s, errorId = %s, text = %s",
+                cid, ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
       } catch (Exception ex) {
         operationMap.delete(correlationId);
         correlationIds.remove(correlationId);
+
         log.error("[csProvider] Failed to send NSI CS terminate message, correlationId = {}",
                 correlationId, ex);
+
+        errorMessage = String.format("Terminate failed, cid = %s, ex = %s",
+                cid, ex.getLocalizedMessage());
         throw ex;
       } finally {
         // Handle an error in reduction
         if (error) {
-          Reservation r = reservationService.getByAnyConnectionId(nsiProperties.getProviderNsaId(), cid);
-          if (r == null) {
+          Collection<Reservation> reservations =
+                  reservationService.getByAnyConnectionId(nsiProperties.getProviderNsaId(), cid);
+          if (reservations == null || reservations.isEmpty()) {
             // We have not seen this reservation before so ignore it.
             log.info("[CsProvider] commitDeltaReduction: no reference to reservation, cid = {}", cid);
-            continue;
+          } else {
+            for (Reservation r : reservations) {
+              // We tried to temrinate this reservation and it failed.  Should
+              // we leave it in the current state or manually set it to terminated?
+              log.error("[CsProvider] commitDeltaReduction: current errored reservation state:\n{}", r.toString());
+              r.setErrorState(Reservation.ErrorState.NSITERMINATE);
+              r.setErrorMessage(errorMessage);
+              r.setDiscovered(System.currentTimeMillis());
+              reservationService.store(r);
+            }
           }
-
-          // We tried to temrinate this reservation and it failed.  Should
-          // we leave it in the current state or manually set it to terminated?
-          log.info("[CsProvider] commitDeltaReduction: current reservation state:\n{}", r.toString());
-          r.setReservationState(ReservationStateEnumType.RESERVE_FAILED);
-          r.setLifecycleState(LifecycleStateEnumType.TERMINATED);
-          r.setDiscovered(System.currentTimeMillis());
-          log.info("[CsProvider] commitDeltaReduction: new reservation state:\n{}", r.toString());
-          reservationService.store(r);
         }
       }
     }
@@ -722,6 +739,7 @@ public class CsProvider {
       correlationIds.add(requestHeader.getCorrelationId());
 
       boolean error = true;
+      String errorMessage = null;
       try {
         ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
         nsiClient.getProxy().reserveCommit(commitBody, header);
@@ -729,39 +747,55 @@ public class CsProvider {
         log.debug("[csProvider] issued commitDeltaAddition operation correlationId = {}, connectionId = {}",
                 op.getCorrelationId(), cid);
         error = false;
+      } catch (SOAPFaultException soap) {
+        operationMap.delete(correlationIds);
+
+        log.error("[csProvider] commitDeltaAddition failed to send NSI CS reserveCommit message, correlationId = {}, SOAP Fault {}",
+                requestHeader.getCorrelationId(), soap.getFault().toString());
+
+        errorMessage = String.format("reserveCommit failed, cid = %s, SOAP Fault = %s",
+                cid, soap.getFault().toString());
+        throw soap;
       } catch (ServiceException ex) {
         //TODO: Consider whether we should unwrap any NSI reservations that were successful.
         // For now just delete the correlationId we added.
         operationMap.delete(correlationIds);
+
         log.error("[csProvider] commitDeltaAddition failed to send NSI CS reserveCommit message, correlationId = {}, errorId = {}, text = {}",
                 requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+
+        errorMessage = String.format("reserveCommit failed, cid = %s, errorId = %s, text = %s",
+                cid, ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
         throw ex;
-      } catch (SOAPFaultException soap) {
-        operationMap.delete(correlationIds);
-        log.error("[csProvider] commitDeltaAddition failed to send NSI CS reserveCommit message, correlationId = {}, SOAP Fault {}",
-                requestHeader.getCorrelationId(), soap.getFault().toString());
-        throw soap;
       } catch (Exception ex) {
         operationMap.delete(correlationIds);
+
         log.error("[csProvider] commitDeltaAddition failed to send NSI CS reserveCommit message, correlationId = {}",
                 requestHeader.getCorrelationId(), ex);
+
+        errorMessage = String.format("reserveCommit failed, cid = %s, ex = %s",
+                cid, ex.getLocalizedMessage());
         throw ex;
       } finally {
         if (error) {
-          Reservation r = reservationService.getByAnyConnectionId(nsiProperties.getProviderNsaId(), cid);
-          if (r == null) {
+          Collection<Reservation> reservations =
+                  reservationService.getByAnyConnectionId(nsiProperties.getProviderNsaId(), cid);
+          if (reservations == null || reservations.isEmpty()) {
             // We have not seen this reservation before so ignore it.
             log.info("[CsProvider] commitDeltaAddition: no reference to reservation, cid = {}", cid);
-            continue;
+          } else {
+            for (Reservation r : reservations) {
+              // The reservation commit failed so put it in the RESERVE_HELD.
+              // Maybe RESERVE_FAILED would have been better? At least they can
+              // terminte it this way.
+              log.error("[CsProvider] commitDeltaAddition: current errored during reserveCommit reservation state:\n{}", r.toString());
+              r.setReservationState(ReservationStateEnumType.RESERVE_HELD);
+              r.setErrorState(Reservation.ErrorState.NSIRESERVECOMMIT);
+              r.setErrorMessage(errorMessage);
+              r.setDiscovered(System.currentTimeMillis());
+              reservationService.store(r);
+            }
           }
-
-          // The reservation commit failed so put it in the RESERVE_HELD.
-          // Maybe RESERVE_FAILED would have been better? At least they can
-          // terminte it this way.
-          log.info("[CsProvider] commitDeltaAddition: storing reservation update, cid = {}", cid);
-          r.setReservationState(ReservationStateEnumType.RESERVE_HELD);
-          r.setDiscovered(System.currentTimeMillis());
-          reservationService.store(r);
         }
       }
     }
@@ -793,28 +827,65 @@ public class CsProvider {
       operationMap.store(op);
       correlationIds.add(correlationId);
 
+      boolean error = true;
+      String errorMessage = null;
       try {
         ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
         nsiClient.getProxy().provision(commitBody, header);
 
         log.debug("[csProvider] issued provision operation correlationId = {}, connectionId = {}",
                 correlationId, cid);
+
+        error = false;
+      } catch (SOAPFaultException soap) {
+        operationMap.delete(correlationIds);
+
+        log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}, SOAP Fault {}",
+                correlationId, soap.getFault().toString());
+
+        errorMessage = String.format("Provision failed, cid = %s, SOAP Fault = %s",
+                cid, soap.getFault().toString());
+        throw soap;
       } catch (ServiceException ex) {
         //TODO: Consider whether we should unwrap any NSI reservations that were successful.
         // For now just delete the correlationId we added.
         operationMap.delete(correlationIds);
+
         log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}, errorId = {}, text = {}",
                 correlationId, ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+
+        errorMessage = String.format("Provision failed, cid = %s, errorId = %s, text = %s",
+                cid, ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
         throw ex;
-      } catch (SOAPFaultException soap) {
-        operationMap.delete(correlationIds);
-        log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}, SOAP Fault {}",
-                correlationId, soap.getFault().toString());
-        throw soap;
       } catch (Exception ex) {
         operationMap.delete(correlationIds);
+
         log.error("[csProvider] Failed to send NSI CS provision message, correlationId = {}", correlationId, ex);
+
+        errorMessage = String.format("Provision failed, cid = %s, ex = %s",
+                cid, ex.getLocalizedMessage());
         throw ex;
+      } finally {
+        if (error) {
+          Collection<Reservation> reservations =
+                  reservationService.getByAnyConnectionId(nsiProperties.getProviderNsaId(), cid);
+          if (reservations == null || reservations.isEmpty()) {
+            // We have not seen this reservation before so ignore it.
+            log.info("[CsProvider] commitDeltaAddition: no reference to reservation, cid = {}", cid);
+          } else {
+            for (Reservation r : reservations) {
+              // The reservation commit failed so put it in the RESERVE_HELD.
+              // Maybe RESERVE_FAILED would have been better? At least they can
+              // terminte it this way.
+              log.error("[CsProvider] commitDeltaAddition: current errored during provision reservation state:\n{}", r.toString());
+              r.setReservationState(ReservationStateEnumType.RESERVE_START);
+              r.setErrorState(Reservation.ErrorState.NSIPROVISION);
+              r.setErrorMessage(errorMessage);
+              r.setDiscovered(System.currentTimeMillis());
+              reservationService.store(r);
+            }
+          }
+        }
       }
     }
 

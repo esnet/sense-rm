@@ -24,6 +24,8 @@ import akka.actor.UntypedAbstractActor;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.AuditService;
+import net.es.sense.rm.driver.nsi.cs.CsOperations;
+import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
 import net.es.sense.rm.driver.nsi.messages.AuditRequest;
 import net.es.sense.rm.driver.nsi.messages.TerminateRequest;
 import net.es.sense.rm.driver.nsi.messages.TimerMsg;
@@ -50,6 +52,9 @@ public class ModelAuditActor extends UntypedAbstractActor {
 
   @Autowired
   private AuditService auditService;
+
+  @Autowired
+  private OperationMapRepository operationMap;
 
   private Cancellable scheduled;
 
@@ -90,7 +95,9 @@ public class ModelAuditActor extends UntypedAbstractActor {
     } else if (msg instanceof TerminateRequest) {
       TerminateRequest req = (TerminateRequest) msg;
       try {
-        //auditService.audit(((AuditRequest) msg).getTopologyId());
+        CsOperations cs = new CsOperations(nsiProperties, operationMap);
+        cs.terminate(req.getConnectionId());
+        cs.confirm();
       } catch (Exception ex) {
         log.error("[ModelAuditActor] TerminateRequest failed, {}", ex);
       }

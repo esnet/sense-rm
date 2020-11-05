@@ -22,6 +22,7 @@ package net.es.sense.rm.driver.nsi.cs.api;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.ws.Endpoint;
+import net.es.sense.rm.driver.nsi.RaController;
 import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
@@ -46,9 +47,12 @@ public class ConnectionServiceConfig {
   @Autowired
   private OperationMapRepository operationMap;
 
+  @Autowired
+  private RaController raController;
+
   @Bean
   public Endpoint endpoint() {
-    EndpointImpl endpoint = new EndpointImpl(bus, new ConnectionService(nsiProperties, reservationService, operationMap));
+    EndpointImpl endpoint = new EndpointImpl(bus, new ConnectionService(nsiProperties, reservationService, operationMap, raController));
 
     Map<String, Object> props = endpoint.getProperties();
     if (props == null) {

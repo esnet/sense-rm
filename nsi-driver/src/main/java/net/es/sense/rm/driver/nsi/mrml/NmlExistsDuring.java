@@ -49,7 +49,7 @@ public class NmlExistsDuring {
 
   public NmlExistsDuring(String id) throws DatatypeConfigurationException {
     this.id = id;
-    this.start = null;
+    this.start = getPaddedStart();
     this.end = XmlUtilities.xmlGregorianCalendar();
     this.end.setYear(this.end.getYear() + 1);
   }
@@ -64,7 +64,7 @@ public class NmlExistsDuring {
 
   /**
    * OpenNSA will not accept a starTime in the past so we want to give
-   * ourselves a 10 second padding for a startTime in the future to
+   * ourselves a 60 second padding for a startTime in the future to
    * account for delay in propagation.  If the specified startTime is
    * in the past, or within 10 seconds from now, we return a startTime
    * of now just to be safe.
@@ -75,12 +75,12 @@ public class NmlExistsDuring {
   public XMLGregorianCalendar getPaddedStart() throws DatatypeConfigurationException {
     // We want pad the current date with 10 seconds before comparing.
     if (start != null) {
-      Date now = new Date(System.currentTimeMillis() + 1000 * 10);
+      Date now = new Date(System.currentTimeMillis() + 1000 * 60);
       if (now.before(XmlUtilities.xmlGregorianCalendarToDate(start))) {
         return start;
       }
     }
-    
+
     return null;
   }
 

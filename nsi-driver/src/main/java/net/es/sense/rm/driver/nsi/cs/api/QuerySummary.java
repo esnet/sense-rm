@@ -29,7 +29,6 @@ import net.es.nsi.cs.lib.CsParser;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationAudit;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
-import org.apache.jena.ext.com.google.common.base.Strings;
 import org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException;
 import org.ogf.schemas.nsi._2013._12.connection.types.ChildSummaryListType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ChildSummaryType;
@@ -277,62 +276,17 @@ public class QuerySummary {
       log.info("[QuerySummary] processSummaryCriteria: cid = {}, version = {}, serviceType = {}",
               cid, criteria.getVersion(), criteria.getServiceType());
 
+      // If this reservation was created by us then we will have this stored in
+      // the database so we will need to update.  This could create two entries
+      // one for the parent and one for the child reservation.
+      Reservation parent = buildReservation(providerNsa, gid, description, cid, reservationState,
+          provisionState, lifecycleState, dataPlaneStatus, criteria.getServiceType(), criteria);
+      if (parent != null) {
+        results.add(parent);
+      }
+
       ChildSummaryListType children = criteria.getChildren();
-      if (children == null || children.getChild().isEmpty()) {
-        // We are at a leaf child so check to see if we need to store this reservation information.
-        Reservation reservation = new Reservation();
-        reservation.setGlobalReservationId(gid);
-        reservation.setDescription(description);
-        reservation.setDiscovered(System.currentTimeMillis());
-        reservation.setProviderNsa(providerNsa);
-        reservation.setConnectionId(cid);
-        reservation.setReservationState(reservationState);
-        reservation.setProvisionState(provisionState);
-        reservation.setLifecycleState(lifecycleState);
-        reservation.setDataPlaneActive(dataPlaneStatus.isActive());
-        reservation.setVersion(criteria.getVersion());
-        reservation.setStartTime(CsUtils.getStartTime(criteria.getSchedule().getStartTime()));
-        reservation.setEndTime(CsUtils.getEndTime(criteria.getSchedule().getEndTime()));
-
-        // There is a history of incorrect EVTS URN so we need to cover all of them.
-        if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_1.equalsIgnoreCase(criteria.getServiceType()) ||
-                Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_2.equalsIgnoreCase(criteria.getServiceType()) ||
-                Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(criteria.getServiceType())) {
-          reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
-        } else {
-          reservation.setServiceType(criteria.getServiceType());
-        }
-
-        // Now we need to get the P2PS structure (add other services here when defined).
-        try {
-          CsUtils.ResultEnum result = CsUtils.serializeP2PS(reservation.getServiceType(),
-                  criteria.getAny(), reservation);
-
-          if (CsUtils.ResultEnum.NOTFOUND == result) {
-            // We could not find a P2PS structure so
-            log.info("[QuerySummary] unable to locate P2PS structure, cid = {}, serviceType = {}",
-                    cid, reservation.getServiceType());
-            continue;
-          } else if (CsUtils.ResultEnum.MISMATCH == result) {
-            log.info("[QuerySummary] STP with networkId mismatch in P2PS structure, cid = {}, serviceType = {}",
-                    cid, reservation.getServiceType());
-            continue;
-          }
-        } catch (JAXBException ex) {
-          log.error("[QuerySummary] serializeP2PS failed for cid = {}", cid, ex);
-          continue;
-        }
-
-        // Before we add this reservation to the results check to see if it is
-        // in the network we are managing.
-        if (!networkId.equalsIgnoreCase(reservation.getTopologyId())) {
-          log.info("[QuerySummary] processSummaryCriteria: rejecting reservation cid = {}, for topologyId = {}",
-                  reservation.getConnectionId(), reservation.getTopologyId());
-          continue;
-        }
-
-        results.add(reservation);
-      } else {
+      if (children != null || !children.getChild().isEmpty()) {
         // We still have children so this must be an aggregator.  Build a list of
         // child reservations matching our topology identifier.
         log.info("[QuerySummary] processSummaryCriteria: processing child criteria.");
@@ -342,62 +296,107 @@ public class QuerySummary {
                           "rstate = {}, lstate = {}",
                   child.getConnectionId(), gid, description, reservationState, lifecycleState);
 
-          Reservation reservation = new Reservation();
-          reservation.setDiscovered(System.currentTimeMillis());
-          reservation.setGlobalReservationId(gid);
-          reservation.setDescription(description);
-          reservation.setProviderNsa(child.getProviderNSA());
-          reservation.setParentConnectionId(cid);          // We are a child connection so add the parent connectionId.
-          reservation.setConnectionId(child.getConnectionId());
-          reservation.setVersion(criteria.getVersion());
-
-          if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_1.equalsIgnoreCase(child.getServiceType()) ||
-                  Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_2.equalsIgnoreCase(child.getServiceType()) ||
-                  Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(child.getServiceType())) {
-            reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
-          } else {
-            reservation.setServiceType(child.getServiceType());
+          Reservation reservation = buildReservation(
+                  providerNsa, // We will mark this child as if came from the aggregator.
+                  gid,
+                  description,
+                  child.getConnectionId(),
+                  reservationState,
+                  provisionState,
+                  lifecycleState,
+                  dataPlaneStatus,
+                  child.getServiceType(),
+                  criteria);
+          if (reservation != null) {
+            reservation.setParentConnectionId(cid); // We are a child connection so add the parent connectionId.
+            results.add(reservation);
           }
-
-          reservation.setReservationState(reservationState);
-          reservation.setProvisionState(provisionState);
-          reservation.setLifecycleState(lifecycleState);
-          reservation.setDataPlaneActive(dataPlaneStatus.isActive());
-          reservation.setStartTime(CsUtils.getStartTime(criteria.getSchedule().getStartTime()));
-          reservation.setEndTime(CsUtils.getEndTime(criteria.getSchedule().getEndTime()));
-
-          // Now we need to determine the network based on the STP used in the service.
-          try {
-            CsUtils.ResultEnum result = CsUtils.serializeP2PS(child.getServiceType(), child.getAny(), reservation);
-            if (CsUtils.ResultEnum.NOTFOUND == result) {
-              log.info("[QuerySummary] processSummaryCriteria: serializeP2PS failed for reservation cid = {}",
-                      reservation.getConnectionId());
-              continue;
-            } else if (CsUtils.ResultEnum.MISMATCH == result) {
-              log.info("[QuerySummary] processSummaryCriteria: STP with networkId mismatch in P2PS structure, cid = {}, serviceType = {}",
-                      cid, reservation.getServiceType());
-              continue;
-            }
-
-            if (Strings.isNullOrEmpty(reservation.getTopologyId())) {
-              reservation.setTopologyId(networkId);
-            } else if (!networkId.equalsIgnoreCase(reservation.getTopologyId())) {
-              log.info("[QuerySummary] processSummaryCriteria: rejecting reservation cid = {}, for topologyId = {}",
-                      reservation.getConnectionId(), reservation.getTopologyId());
-              continue;
-            }
-          } catch (JAXBException ex) {
-            log.error("[ConnectionService] processSummaryCriteria: failed for connectionId = {}",
-                    reservation.getConnectionId(), ex);
-            continue;
-          }
-
-          results.add(reservation);
         }
       }
     }
 
     return results;
+  }
+
+  /**
+   * Build the reservation storage object.
+   *
+   * @param providerNsa
+   * @param gid
+   * @param description
+   * @param cid
+   * @param reservationState
+   * @param provisionState
+   * @param lifecycleState
+   * @param dataPlaneStatus
+   * @param serviceType
+   * @param criteria
+   * @return
+   */
+  private Reservation buildReservation(
+          String providerNsa,
+          String gid,
+          String description,
+          String cid,
+          ReservationStateEnumType reservationState,
+          ProvisionStateEnumType provisionState,
+          LifecycleStateEnumType lifecycleState,
+          DataPlaneStatusType dataPlaneStatus,
+          String serviceType,
+          QuerySummaryResultCriteriaType criteria) {
+
+      Reservation reservation = new Reservation();
+      reservation.setGlobalReservationId(gid);
+      reservation.setDescription(description);
+      reservation.setDiscovered(System.currentTimeMillis());
+      reservation.setProviderNsa(providerNsa);
+      reservation.setConnectionId(cid);
+      reservation.setReservationState(reservationState);
+      reservation.setProvisionState(provisionState);
+      reservation.setLifecycleState(lifecycleState);
+      reservation.setDataPlaneActive(dataPlaneStatus.isActive());
+      reservation.setVersion(criteria.getVersion());
+      reservation.setStartTime(CsUtils.getStartTime(criteria.getSchedule().getStartTime()));
+      reservation.setEndTime(CsUtils.getEndTime(criteria.getSchedule().getEndTime()));
+
+      // There is a history of incorrect EVTS URN so we need to cover all of them.
+      if (Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_1.equalsIgnoreCase(serviceType) ||
+              Nsi.NSI_SERVICETYPE_EVTS_OPENNSA_2.equalsIgnoreCase(serviceType) ||
+              Nsi.NSI_SERVICETYPE_EVTS_OSCARS.equalsIgnoreCase(serviceType)) {
+        reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
+      } else {
+        reservation.setServiceType(serviceType);
+      }
+
+      // Now we need to get the P2PS structure (add other services here when defined).
+      try {
+        CsUtils.ResultEnum result = CsUtils.serializeP2PS(reservation.getServiceType(),
+                criteria.getAny(), reservation);
+
+        if (CsUtils.ResultEnum.NOTFOUND == result) {
+          // We could not find a P2PS structure so
+          log.info("[QuerySummary] unable to locate P2PS structure, cid = {}, serviceType = {}",
+                  cid, reservation.getServiceType());
+          return null;
+        } else if (CsUtils.ResultEnum.MISMATCH == result) {
+          log.info("[QuerySummary] STP with networkId mismatch in P2PS structure, cid = {}, serviceType = {}",
+                  cid, reservation.getServiceType());
+          return null;
+        }
+      } catch (JAXBException ex) {
+        log.error("[QuerySummary] serializeP2PS failed for cid = {}", cid, ex);
+        return null;
+      }
+
+      // Before we add this reservation to the results check to see if it is
+      // in the network we are managing.
+      if (!networkId.equalsIgnoreCase(reservation.getTopologyId())) {
+        log.info("[QuerySummary] processSummaryCriteria: rejecting reservation cid = {}, for topologyId = {}",
+                reservation.getConnectionId(), reservation.getTopologyId());
+        return null;
+      }
+
+      return reservation;
   }
 
   public String getQuerySummaryResultType(QuerySummaryResultType query) {

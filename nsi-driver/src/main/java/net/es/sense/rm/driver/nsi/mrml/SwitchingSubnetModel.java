@@ -165,10 +165,26 @@ public class SwitchingSubnetModel {
       }
 
       // We only need to model those reservations in the "created" state.
-      if (reservation.getLifecycleState() != LifecycleStateEnumType.CREATED) {
+      if (reservation.getLifecycleState() != LifecycleStateEnumType.CREATED &&
+              reservation.getLifecycleState() != LifecycleStateEnumType.TERMINATING) {
         log.info("[SwitchingSubnetModel] skipping reservation cid = {}, lifecycleState = {}",
                 reservation.getConnectionId(), reservation.getLifecycleState());
         continue;
+      }
+
+      // One last test before processing this reservation... if this is a child reservation,
+      // and the parent reservation is present in the database, then we skip the child
+      // reservation.  The oparent reservation will only be present if the src and dst STP
+      // are in our topology.  If either of the src or dst were not in out topology then we
+      // discarded the reservation.
+      if (!Strings.isNullOrEmpty(reservation.getParentConnectionId())) {
+        // We have a parent connection id so see if it is in the DB.
+        Reservation parent = reservationService.get(reservation.getProviderNsa(), reservation.getParentConnectionId());
+        if (parent != null) {
+          log.info("[SwitchingSubnetModel] skipping child reservation cid = {}, lifecycleState = {}, parentId = {}",
+                reservation.getConnectionId(), reservation.getLifecycleState(), parent.getConnectionId());
+          continue;
+        }
       }
 
       // The GlobalReservationId hold the original SwitchingSubnet name, while

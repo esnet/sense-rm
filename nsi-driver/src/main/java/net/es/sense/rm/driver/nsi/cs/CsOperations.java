@@ -119,23 +119,23 @@ public class CsOperations {
 
         switch(op.getOperation()) {
           case reserve:
-            check(op, StateType.reserved, id);
+            check(op, StateType.reserved);
             break;
 
           case reserveCommit:
-            check(op, StateType.committed, id);
+            check(op, StateType.committed);
             break;
 
           case provision:
-            check(op, StateType.provisioned, id);
+            check(op, StateType.provisioned);
             break;
 
           case terminate:
-            check(op, StateType.terminated, id);
+            check(op, StateType.terminated);
             break;
 
           default:
-            check(op, StateType.unknown, id);
+            check(op, StateType.unknown);
             break;
         }
       } else {
@@ -149,23 +149,25 @@ public class CsOperations {
     return failed.isEmpty();
   }
 
-  private void check(Operation op, StateType st, String id) {
+  private void check(Operation op, StateType st) {
     if (op.getState() != st) {
       log.error("[CsOperations] operation {} failed, correlationId = {}, state = {}",
-              op.getOperation(), id, op.getState(), op.getException());
+              op.getOperation(), op.getCorrelationId(), op.getState(), op.getException());
 
       if (op.getException() != null) {
         exceptions.add(new ServiceException("Operation " + op.getOperation() +
-                " failed, correlationId = " + id, op.getException()));
+                " failed, correlationId = " + op.getCorrelationId(), op.getException()));
       }
       else {
         exceptions.add(new IllegalArgumentException("Operation " + op.getOperation() +
-                " failed, correlationId = " + id + ", state = " + op.getState()));
+                " failed, correlationId = " + op.getCorrelationId() + ", state = " + op.getState()));
       }
 
-      failed.add(id);
+      failed.add(op.getCorrelationId());
     } else {
-      successful.add(id);
+      log.info("[CsOperations] operation {} successful, correlationId = {}, state = {}",
+              op.getOperation(), op.getCorrelationId(), op.getState(), op.getException());
+      successful.add(op.getCorrelationId());
     }
   }
 
@@ -395,11 +397,7 @@ public class CsOperations {
     GenericRequestType terminate = CS_FACTORY.createGenericRequestType();
     terminate.setConnectionId(connectionId);
 
-    Operation op = new Operation();
-    op.setOperation(OperationType.terminate);
-    op.setState(StateType.terminating);
-    op.setCorrelationId(correlationId);
-    operationMap.store(op);
+    this.store(OperationType.terminate, StateType.terminating, correlationId);
 
     // Issue the NSI terminate request.
     try {
@@ -413,23 +411,36 @@ public class CsOperations {
       // Continue on this error but clean up this correlationId.
       log.error("[CsOperations] Failed to send NSI CS terminate message, correlationId = {}, errorId = {}, text = {}",
               correlationId, ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
-      operationMap.delete(correlationId);
+      this.delete(correlationId);
       throw ex;
     } catch (SOAPFaultException ex) {
       // Continue on this error but clean up this correlationId.
       log.error("[CsOperations] Failed to send NSI CS terminate message, correlationId = {}, SOAP Fault = {}",
               correlationId, ex.getFault().getFaultCode());
-      operationMap.delete(correlationId);
+      this.delete(correlationId);
       throw ex;
     } catch (Exception ex) {
       log.error("[CsOperations] Failed to send NSI CS terminate message, correlationId = {}",
               correlationId, ex);
-      operationMap.delete(correlationId);
+      this.delete(correlationId);
       throw ex;
     }
-
-    this.addCorrelationId(correlationId);
+    
     return correlationId;
+  }
+
+  private void store(OperationType operation, StateType state, String correlationId) {
+    Operation op = new Operation();
+    op.setOperation(operation);
+    op.setState(state);
+    op.setCorrelationId(correlationId);
+    operationMap.store(op);
+    this.addCorrelationId(correlationId);
+  }
+
+  private void delete(String correlationId) {
+    operationMap.delete(correlationId);
+    this.removeCorrelationId(correlationId);
   }
 
   public void unwind() {

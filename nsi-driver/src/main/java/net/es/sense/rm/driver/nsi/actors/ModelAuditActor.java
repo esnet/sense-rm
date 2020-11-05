@@ -95,9 +95,14 @@ public class ModelAuditActor extends UntypedAbstractActor {
     } else if (msg instanceof TerminateRequest) {
       TerminateRequest req = (TerminateRequest) msg;
       try {
+        log.info("[ModelAuditActor] TerminateRequest for cid = {}", req.getConnectionId());
+
         CsOperations cs = new CsOperations(nsiProperties, operationMap);
-        cs.addCorrelationId(cs.terminate(req.getConnectionId()));
+        cs.terminate(req.getConnectionId());
         cs.confirm();
+
+        log.info("[ModelAuditActor] TerminateRequest completed for cid = {}, exceptions = {}",
+                req.getConnectionId(), cs.getExceptions().size());
       } catch (Exception ex) {
         log.error("[ModelAuditActor] TerminateRequest failed, {}", ex);
       }

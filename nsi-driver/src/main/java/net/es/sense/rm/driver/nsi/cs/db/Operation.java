@@ -24,6 +24,9 @@ public class Operation implements Serializable {
   private StateType state;
   private ServiceExceptionType exception;
 
+  // Hack around Safnari bug where gid and description not returned in
+  Reservation reservation;
+
   public Semaphore getCompleted() {
     return completed;
   }
@@ -88,5 +91,19 @@ public class Operation implements Serializable {
    */
   public void setException(ServiceExceptionType exception) {
     this.exception = exception;
+  }
+
+  /**
+   * @return the exception
+   */
+  public Reservation getReservation() {
+    return reservation;
+  }
+
+  /**
+   * @param exception the exception to set
+   */
+  public void setReservation(Reservation reservation) {
+    this.reservation = reservation;
   }
 }

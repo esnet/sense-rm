@@ -142,7 +142,24 @@ public class ConnectionService {
               value.getCorrelationId(), ex);
     }
 
-    /**
+    // If we are connected to NSI-SAFNARI there is a bug where gid and description
+    // are not returned in this message.  We have put a hack here to pass the
+    // original reservation information in the operation structure.
+    Operation op = operationMap.get(value.getCorrelationId());
+    if (op == null) {
+      log.error("[ConnectionService] reserveConfirmed can't find outstanding operation for correlationId = {}",
+              value.getCorrelationId());
+    } else {
+      // Bug: NSI-SAFNARI does not return these values.
+      if (Strings.isNullOrEmpty(reserveConfirmed.getGlobalReservationId())) {
+        reserveConfirmed.setGlobalReservationId(op.getReservation().getGlobalReservationId());
+      }
+
+      if (Strings.isNullOrEmpty(reserveConfirmed.getDescription())) {
+        reserveConfirmed.setGlobalReservationId(op.getReservation().getDescription());
+      }
+    }
+
     ReservationConfirmCriteriaType criteria = reserveConfirmed.getCriteria();
     DataPlaneStatusType dataPlaneStatus = FACTORY.createDataPlaneStatusType();
     dataPlaneStatus.setVersion(criteria.getVersion());
@@ -182,13 +199,8 @@ public class ConnectionService {
                 reservation.getConnectionId());
       }
     }
-    **/
-    
-    Operation op = operationMap.get(value.getCorrelationId());
-    if (op == null) {
-      log.error("[ConnectionService] reserveConfirmed can't find outstanding operation for correlationId = {}",
-              value.getCorrelationId());
-    } else {
+
+    if (op != null) {
       op.setState(StateType.reserved);
       op.getCompleted().release();
     }
@@ -358,16 +370,16 @@ public class ConnectionService {
    */
   public GenericAcknowledgmentType reserveCommitConfirmed(GenericConfirmedType reserveCommitConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
+
     CommonHeaderType value = header.value;
     log.info("[ConnectionService] reserveCommitConfirmed recieved for correlationId = {}, connectionId: {}",
             value.getCorrelationId(), reserveCommitConfirmed.getConnectionId());
 
-    // First we update the corresponding reservation in the database.  If we
-    // are talking to an aggregator this CID is the parent reservation the commit
-    // was done against. The child connections will get updated next querySummary.
+    // The reservation should not yet be in the database, but if it is then we update it,
+    // otherwise we need to kickoff and audit.
     Reservation r = reservationService.get(value.getProviderNSA(), reserveCommitConfirmed.getConnectionId());
     if (r == null) {
-      // We have not seen this reservation before so ignore it.
+      // We have not seen this reservation before so kick off the audit.
       log.info("[ConnectionService] reserveCommitConfirmed: no reference to reservation, cid = {}",
               reserveCommitConfirmed.getConnectionId());
     } else {
@@ -901,7 +913,6 @@ public class ConnectionService {
     // aggregator then the connectionId we want is actually a child connection.
     // Find the associated connection.
     //Reservation r = reservationService.get(providerNSA, connectionId);
-
 
     Collection<Reservation> reservations = reservationService.getByAnyConnectionId(providerNSA, connectionId);
     if (reservations == null || reservations.isEmpty()) {

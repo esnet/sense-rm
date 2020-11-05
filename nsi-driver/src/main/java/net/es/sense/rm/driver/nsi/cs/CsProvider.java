@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
@@ -44,6 +45,7 @@ import net.es.nsi.cs.lib.SimpleLabel;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.sense.rm.driver.api.mrml.ModelUtil;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
+import net.es.sense.rm.driver.nsi.cs.api.CsUtils;
 import net.es.sense.rm.driver.nsi.cs.api.QuerySummary;
 import net.es.sense.rm.driver.nsi.cs.db.ConnectionMap;
 import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
@@ -78,6 +80,7 @@ import org.ogf.schemas.nsi._2013._12.connection.provider.Error;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException;
 import org.ogf.schemas.nsi._2013._12.connection.types.GenericRequestType;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QueryType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationRequestCriteriaType;
@@ -526,6 +529,7 @@ public class CsProvider {
         op.setOperation(OperationType.reserve);
         op.setState(StateType.reserving);
         op.setCorrelationId(correlationId);
+        op.setReservation(createReservation(r));
         operationMap.store(op);
 
         correlationIds.add(correlationId);
@@ -569,6 +573,38 @@ public class CsProvider {
 
     // Return the list of connections ids that will need to be commited.
     return commits;
+  }
+
+
+  private Reservation createReservation(ReserveType r) {
+    // Build a reservation database object for this reservation.
+    Reservation reservation = new Reservation();
+    reservation.setProviderNsa(nsiProperties.getProviderNsaId());
+    reservation.setGlobalReservationId(r.getGlobalReservationId());
+    reservation.setDescription(r.getDescription());
+    reservation.setTopologyId(nsiProperties.getNetworkId());
+    reservation.setServiceType(r.getCriteria().getServiceType());
+    reservation.setStartTime(CsUtils.getStartTime(r.getCriteria().getSchedule().getStartTime()));
+    reservation.setEndTime(CsUtils.getEndTime(r.getCriteria().getSchedule().getEndTime()));
+    reservation.setReservationState(ReservationStateEnumType.RESERVE_CHECKING);
+    reservation.setProvisionState(ProvisionStateEnumType.RELEASED);
+    reservation.setLifecycleState(LifecycleStateEnumType.INITIAL);
+    reservation.setDataPlaneActive(false);
+    reservation.setVersion(0);
+
+        // Now we need to determine the network based on the STP used in the service.
+    try {
+      CsUtils.serializeP2PS(r.getCriteria().getServiceType(), r.getCriteria().getAny(), reservation);
+
+      if (com.google.common.base.Strings.isNullOrEmpty(reservation.getTopologyId())) {
+        reservation.setTopologyId(nsiProperties.getNetworkId());
+      }
+    } catch (JAXBException ex) {
+      log.error("[CsProvider] createReservation failed for connectionId = {}",
+              reservation.getConnectionId(), ex);
+    }
+
+    return reservation;
   }
 
   /**

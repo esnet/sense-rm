@@ -1,4 +1,4 @@
-<configuration>
+<configuration debug="true">
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
@@ -7,14 +7,18 @@
   </appender>
 
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>sense-rm.log</file>
+    <file>var/log/sense-rm/sense-n-rm.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- daily rollover -->
-      <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>var/log/sense-rm/sense-n-rm.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
 
-      <!-- keep 30 days' worth of history capped at 3GB total size -->
-      <maxHistory>30</maxHistory>
-      <totalSizeCap>3GB</totalSizeCap>
+      <!-- keep 5 days worth of history capped at 1GB total size -->
+      <maxHistory>5</maxHistory>
+      <totalSizeCap>1GB</totalSizeCap>
+      
+      <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+            <maxFileSize>150MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
 
     </rollingPolicy>
 
@@ -23,7 +27,7 @@
     </encoder>
   </appender> 
 
-  <root level="INFO">
+  <root level="DEBUG">
     <appender-ref ref="FILE" />
     <appender-ref ref="STDOUT" />
   </root>

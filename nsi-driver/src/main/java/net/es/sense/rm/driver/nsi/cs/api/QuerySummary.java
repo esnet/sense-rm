@@ -69,7 +69,9 @@ public class QuerySummary {
    * @param header
    * @throws ServiceException
    */
-  public void process(QuerySummaryConfirmedType querySummaryConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
+  public void process(QuerySummaryConfirmedType querySummaryConfirmed,
+          Holder<CommonHeaderType> header) throws ServiceException {
+    
     // Get the providerNSA identifier.
     String providerNsa = header.value.getProviderNSA();
 
@@ -413,7 +415,7 @@ public class QuerySummary {
 
   /**
    * Encodes the query results into a string for debug.
-   * 
+   *
    * @param query
    * @return
    */

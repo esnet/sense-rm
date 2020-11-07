@@ -44,6 +44,9 @@ import org.ogf.schemas.nsi._2013._12.connection.types.ReserveType;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 
 /**
+ * This is a refactoring error in progress - attempting to gather NSI CS operations
+ * into a single class with associated semaphore locking for async callback
+ * handling.
  *
  * @author hacksaw
  */

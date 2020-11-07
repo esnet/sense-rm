@@ -50,7 +50,9 @@ public class Reservation implements Serializable {
     NSIRESERVECOMMIT,
     NSIPROVISION,
     NSITERMINATE,
-    NSIERROR
+    NSIERROR,
+    NSIERROREVENT,
+    NSIMESSAGEDELIVERYTIMEOUT
   }
 
   @Id

@@ -576,6 +576,11 @@ public class CsProvider {
   }
 
 
+  /**
+   * 
+   * @param r
+   * @return
+   */
   private Reservation createReservation(ReserveType r) {
     // Build a reservation database object for this reservation.
     Reservation reservation = new Reservation();

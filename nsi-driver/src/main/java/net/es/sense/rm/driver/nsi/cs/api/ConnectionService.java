@@ -837,20 +837,23 @@ public class ConnectionService {
    * @throws ServiceException
    * @throws JAXBException
    */
-  public GenericAcknowledgmentType errorEvent(ErrorEventType errorEvent, Holder<CommonHeaderType> header) throws ServiceException, JAXBException {
+  public GenericAcknowledgmentType errorEvent(ErrorEventType errorEvent, Holder<CommonHeaderType> header) throws ServiceException {
 
     // Something bad happened.  Dump the error and fail the operation.
     CommonHeaderType value = header.value;
+    String providerNSA = value.getProviderNSA();
+    String correlationId = value.getCorrelationId();
+    String cid = errorEvent.getConnectionId();
+    String error = errorEvent2xml(errorEvent);
 
-    log.error("[ConnectionService] errorEvent received, providerNSA = {}, correlationId = {}, protocolVersion = {}, errorEvent: \n{}",
-        value.getProviderNSA(), value.getCorrelationId(), value.getProtocolVersion(),
-        CsParser.getInstance().errorEvent2xml(errorEvent));
+    log.error("[ConnectionService] errorEvent received, providerNSA = {}, correlationId = {}, errorEvent:\n{}",
+        providerNSA, correlationId, errorEvent2xml(errorEvent));
 
     // We need to inform the requesting thread of the error.
     Operation op = operationMap.get(value.getCorrelationId());
     if (op == null) {
       log.error("[ConnectionService] errorEvent can't find outstanding operation for correlationId = {}",
-              value.getCorrelationId());
+              correlationId);
 
       // Looks like this is a spontaneous event we need to handle.  These are
       // all dataplane related events so we should terminate the reservation
@@ -863,7 +866,7 @@ public class ConnectionService {
         case FORCED_END:
         default:
           log.error("[ConnectionService] errorEvent decision to terminate cid = {}, originating cid = {}",
-                  errorEvent.getConnectionId(), errorEvent.getOriginatingConnectionId());
+                  cid, errorEvent.getOriginatingConnectionId());
 
           // TODO: Send a terminate for this reservation since it has gone bad.
           TerminateRequest req = new TerminateRequest(errorEvent.getConnectionId());
@@ -878,6 +881,24 @@ public class ConnectionService {
       op.setException(errorEvent.getServiceException());
       op.getCompleted().release();
     }
+
+     // Update any impacted reservations with error information.
+    Collection<Reservation> reservations = reservationService.getByAnyConnectionId(providerNSA, cid);
+    if (reservations == null || reservations.isEmpty()) {
+      // We have not seen this reservation before so ignore it.
+      log.error("[ConnectionService] errorEvent() could not find cid = {}", cid);
+    } else {
+      for (Reservation r : reservations) {
+        log.info("[ConnectionService] errorEvent() updating cid = {}, reservation {}", cid, r.toString());
+        r.setErrorState(Reservation.ErrorState.NSIERROREVENT);
+        r.setErrorMessage(String.format("errorEvent, cid = %s, errorEvent = %s", cid, error));
+        r.setDiscovered(System.currentTimeMillis());
+        log.info("[ConnectionService] errorEvent() writing updated cid = {}, reservation {}", cid, r.toString());
+        reservationService.store(r);
+      }
+    }
+
+
 
     return FACTORY.createGenericAcknowledgmentType();
   }
@@ -948,15 +969,12 @@ public class ConnectionService {
     // Need these to the look up the reservation in our database.
     String providerNSA = header.value.getProviderNSA();
     String connectionId = reserveTimeout.getConnectionId();
+    String xml = reserveTimeoutRequest2xml(reserveTimeout);
 
-    try {
-      log.error("[ConnectionService] reserveTimeout for providerNSA = {}, correlationId = {}, reserveTimeout:\n{}",
+    log.error("[ConnectionService] reserveTimeout for providerNSA = {}, correlationId = {}, reserveTimeout:\n{}",
               providerNSA,
               header.value.getCorrelationId(),
-              CsParser.getInstance().reserveTimeoutRequest2xml(reserveTimeout));
-    } catch (JAXBException ex) {
-      log.error("[ConnectionService] reserveTimeout could not encode log message.", ex);
-    }
+              xml);
 
     Collection<Reservation> reservations = reservationService.getByAnyConnectionId(providerNSA, connectionId);
     if (reservations == null || reservations.isEmpty()) {
@@ -972,9 +990,8 @@ public class ConnectionService {
         // failed hack can be removed.
         r.setLifecycleState(LifecycleStateEnumType.FAILED);
         r.setErrorState(Reservation.ErrorState.NSIRESERVETIMEOUT);
-        r.setErrorMessage(String.format("reserveTimeout on cid = %s", connectionId));
+        r.setErrorMessage(String.format("reserveTimeout on cid = %s, %s", connectionId, xml));
         r.setDiscovered(System.currentTimeMillis());
-
         log.info("[ConnectionService] writing updated connectionId = {}, reservation {}", connectionId, r.toString());
         reservationService.store(r);
       }
@@ -1029,7 +1046,7 @@ public class ConnectionService {
         // TODO: When OpenNSA fixes their timeout notification state machine issue this
         // failed hack can be removed.
         r.setLifecycleState(LifecycleStateEnumType.FAILED);
-        r.setErrorState(Reservation.ErrorState.NSIRESERVETIMEOUT);
+        r.setErrorState(Reservation.ErrorState.NSIMESSAGEDELIVERYTIMEOUT);
         r.setErrorMessage(String.format("messageDeliveryTimeout on cid = %s, correlationId = %s",
                 cid, value.getCorrelationId()));
         r.setDiscovered(System.currentTimeMillis());
@@ -1041,5 +1058,33 @@ public class ConnectionService {
     }
 
     return FACTORY.createGenericAcknowledgmentType();
+  }
+
+  /**
+   *
+   * @param error
+   * @return
+   */
+  public String errorEvent2xml(ErrorEventType error) {
+    try {
+      return CsParser.getInstance().errorEvent2xml(error);
+    } catch (JAXBException ex) {
+      log.error("[getErrorEventType] exception formatting ErrorEventType", ex);
+      return "<exception/>";
+    }
+  }
+
+  /**
+   *
+   * @param reserveTimeout
+   * @return
+   */
+  public String reserveTimeoutRequest2xml(ReserveTimeoutRequestType reserveTimeout) {
+    try {
+      return CsParser.getInstance().reserveTimeoutRequest2xml(reserveTimeout);
+    } catch (JAXBException ex) {
+      log.error("[reserveTimeoutRequest2xml] exception formatting ReserveTimeoutRequestType", ex);
+      return "<exception/>";
+    }
   }
 }

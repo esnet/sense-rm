@@ -411,6 +411,12 @@ public class QuerySummary {
       return reservation;
   }
 
+  /**
+   * Encodes the query results into a string for debug.
+   * 
+   * @param query
+   * @return
+   */
   public String getQuerySummaryResultType(QuerySummaryResultType query) {
     StringBuilder result = new StringBuilder("QuerySummaryResultType: ");
     try {

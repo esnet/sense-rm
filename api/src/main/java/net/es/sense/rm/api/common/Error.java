@@ -93,4 +93,11 @@ public class Error {
   public void setError_uri(String error_uri) {
     this.error_uri = error_uri;
   }
+
+  @Override
+  public String toString() {
+    return String.format(
+            "{ \n    \"error\" = \"%s\",\n     \"error_description\" = \"%s\",\n    \"error_uri\" = \"%s\"\n}",
+            this.error, this.error_description, this.error_uri);
+  }
 }

@@ -174,6 +174,7 @@ public class SenseRmController {
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
                 .error_description(ex.getMessage())
                 .build();
+        log.error("[SenseRmController] getResources returning error:\n{}", error);
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
       }
 
@@ -209,6 +210,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] getResources returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -373,6 +375,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] getModels returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -454,6 +457,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] getModels returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -623,6 +627,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] getModel returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -667,6 +672,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] getModel returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -837,6 +843,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] getModelDeltas returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -903,11 +910,12 @@ public class SenseRmController {
       return new ResponseEntity<>(deltas, headers, HttpStatus.OK);
     } catch (InterruptedException | IOException | DatatypeConfigurationException | IllegalArgumentException |
             ExecutionException ex) {
-      log.error("[SenseRmController] getDeltas failed, ex = {}", ex);
+      log.error("[SenseRmController] getModelDeltas failed, ex = {}", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] getModelDeltas returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1072,6 +1080,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] getModelDelta returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -1116,6 +1125,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] getModelDelta returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1279,6 +1289,7 @@ public class SenseRmController {
     } catch (URISyntaxException ex) {
       Error error = new Error(HttpStatus.INTERNAL_SERVER_ERROR.toString(),
               ex.getLocalizedMessage(), null);
+      log.error("[SenseRmController] propagateModelDelta returning error:\n{}", error);
       return new ResponseEntity<>(error, null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -1448,6 +1459,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] getDeltas returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -1519,6 +1531,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] getDeltas returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1673,6 +1686,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] getDelta returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -1731,7 +1745,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
-
+      log.error("[SenseRmController] getDelta returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1892,6 +1906,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] propagateDelta returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -1970,6 +1985,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] propagateDelta returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -2071,6 +2087,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] commitDelta returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -2108,6 +2125,7 @@ public class SenseRmController {
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
               .build();
+      log.error("[SenseRmController] commitDelta returning error:\n{}", error);
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

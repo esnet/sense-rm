@@ -64,23 +64,48 @@ public class CsOperations {
   private static final org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory P2PS_FACTORY
           = new org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory();
 
+  /**
+   *
+   * @param nsiProperties
+   * @param operationMap
+   */
   public CsOperations(NsiProperties nsiProperties, OperationMapRepository operationMap) {
     this.nsiProperties = nsiProperties;
     this.operationMap = operationMap;
   }
 
+  /**
+   *
+   * @param correlationId
+   * @return
+   */
   public boolean addCorrelationId(String correlationId) {
     return this.correlationIds.add(correlationId);
   }
 
+  /**
+   *
+   * @param correlationId
+   * @return
+   */
   public boolean removeCorrelationId(String correlationId) {
     return this.correlationIds.remove(correlationId);
   }
 
+  /**
+   *
+   * @param connectionId
+   * @return
+   */
   public boolean addConnectionId(String connectionId) {
     return this.connectionIds.add(connectionId);
   }
 
+  /**
+   *
+   * @param connectionId
+   * @return
+   */
   public boolean removeConnectionId(String connectionId) {
     return this.connectionIds.remove(connectionId);
   }
@@ -130,6 +155,10 @@ public class CsOperations {
             check(op, StateType.provisioned);
             break;
 
+          case release:
+            check(op, StateType.releasing);
+            break;
+
           case terminate:
             check(op, StateType.terminated);
             break;
@@ -149,6 +178,11 @@ public class CsOperations {
     return failed.isEmpty();
   }
 
+  /**
+   *
+   * @param op
+   * @param st
+   */
   private void check(Operation op, StateType st) {
     if (op.getState() != st) {
       log.error("[CsOperations] operation {} failed, correlationId = {}, state = {}",
@@ -171,6 +205,11 @@ public class CsOperations {
     }
   }
 
+  /**
+   *
+   * @return
+   * @throws Error
+   */
   public QuerySummaryConfirmedType query() throws Error {
     String correlationId = Helper.getUUID();
     CommonHeaderType requestHeader = NsiHeader.builder()
@@ -204,6 +243,13 @@ public class CsOperations {
     }
   }
 
+  /**
+   *
+   * @param r
+   * @return
+   * @throws ServiceException
+   * @throws SOAPFaultException
+   */
   public String reserve(ReserveType r) throws ServiceException, SOAPFaultException {
     String correlationId = Helper.getUUID();
 
@@ -218,45 +264,44 @@ public class CsOperations {
     Holder<CommonHeaderType> header = new Holder<>();
     header.value = requestHeader;
 
+    this.store(OperationType.reserve, StateType.reserving, correlationId);
+
     // Issue the NSI reservation request.
     try {
       log.debug("[CsOperations] issuing reserve operation correlationId = {}", correlationId);
 
       ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
-
-      // Add this to the operation map to track progress.  We add it before
-      // sending the NSI CS message so it will be available for the callback
-      // thread to received and avoid timing issues.
-      Operation op = new Operation();
-      op.setOperation(OperationType.reserve);
-      op.setState(StateType.reserving);
-      op.setCorrelationId(correlationId);
-      operationMap.store(op);
-
       ReserveResponseType response = nsiClient.getProxy().reserve(r, header);
 
       String connectionId =  response.getConnectionId();
+      connectionIds.add(connectionId);
 
       log.debug("[CsOperations] issued reserve operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
 
-      connectionIds.add(connectionId);
-
-      return connectionId;
-
     } catch (ServiceException ex) {
       log.error("[CsOperations] Failed to send NSI CS reserve message, correlationId = {}, errorId = {}, text = {}",
               requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+      this.delete(correlationId);
       throw ex;
     } catch (SOAPFaultException ex) {
       //TODO: Consider whether we should unwrap any NSI reservations that were successful.
       // For now just delete the correlationId we added.
       log.error("[CsOperations] Failed to send NSI CS reserve message, correlationId = {}, SOAP Fault = {}",
               requestHeader.getCorrelationId(), ex.getFault().toString());
+      this.delete(correlationId);
       throw ex;
     }
+
+    return correlationId;
   }
 
+  /**
+   *
+   * @param connectionId
+   * @return
+   * @throws Exception
+   */
   public String reserveCommit(String connectionId) throws Exception {
     String correlationId = Helper.getUUID();
 
@@ -272,6 +317,8 @@ public class CsOperations {
     GenericRequestType commitBody = CS_FACTORY.createGenericRequestType();
     commitBody.setConnectionId(connectionId);
 
+    this.store(OperationType.reserveCommit, StateType.committing, correlationId);
+
     try {
       log.debug("[CsOperations] issuing reserveCommit operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
@@ -282,22 +329,32 @@ public class CsOperations {
       log.debug("[CsOperations] issued reserveCommit operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
 
-      return correlationId;
     } catch (ServiceException ex) {
       log.error("[CsOperations] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}, errorId = {}, text = {}",
               requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+      this.delete(correlationId);
       throw ex;
     } catch (SOAPFaultException soap) {
       log.error("[CsOperations] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}, SOAP Fault {}",
               requestHeader.getCorrelationId(), soap.getFault().toString());
+      this.delete(correlationId);
       throw soap;
     } catch (Exception ex) {
       log.error("[CsOperations] commitDelta failed to send NSI CS reserveCommit message, correlationId = {}",
               requestHeader.getCorrelationId(), ex);
+      this.delete(correlationId);
       throw ex;
     }
+
+    return correlationId;
   }
 
+  /**
+   *
+   * @param connectionId
+   * @return
+   * @throws Exception
+   */
   public String provision(String connectionId) throws Exception {
     String correlationId = Helper.getUUID();
 
@@ -313,6 +370,8 @@ public class CsOperations {
     GenericRequestType commitBody = CS_FACTORY.createGenericRequestType();
     commitBody.setConnectionId(connectionId);
 
+    this.store(OperationType.provision, StateType.provisioning, correlationId);
+
     try {
       log.debug("[CsOperations] issuing provision operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
@@ -323,22 +382,32 @@ public class CsOperations {
       log.debug("[CsOperations] issued provision operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
 
-      return correlationId;
     } catch (ServiceException ex) {
       log.error("[CsOperations] Failed to send NSI CS provision message, correlationId = {}, errorId = {}, text = {}",
               requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+      this.delete(correlationId);
       throw ex;
     } catch (SOAPFaultException soap) {
       log.error("[CsOperations] Failed to send NSI CS provision message, correlationId = {}, SOAP Fault {}",
               requestHeader.getCorrelationId(), soap.getFault().toString());
+      this.delete(correlationId);
       throw soap;
     } catch (Exception ex) {
       log.error("[CsOperations] Failed to send NSI CS provision message, correlationId = {}",
               requestHeader.getCorrelationId(), ex);
+      this.delete(correlationId);
       throw ex;
     }
+
+    return correlationId;
   }
 
+  /**
+   *
+   * @param connectionId
+   * @return
+   * @throws Exception
+   */
   public String release(String connectionId) throws Exception {
     String correlationId = Helper.getUUID();
 
@@ -354,6 +423,8 @@ public class CsOperations {
     GenericRequestType commitBody = CS_FACTORY.createGenericRequestType();
     commitBody.setConnectionId(connectionId);
 
+    this.store(OperationType.release, StateType.releasing, correlationId);
+
     try {
       log.debug("[CsOperations] issuing release operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
@@ -364,22 +435,32 @@ public class CsOperations {
       log.debug("[CsOperations] issued release operation correlationId = {}, connectionId = {}",
               correlationId, connectionId);
 
-      return correlationId;
     } catch (ServiceException ex) {
       log.error("[CsOperations] Failed to send NSI CS release message, correlationId = {}, errorId = {}, text = {}",
               requestHeader.getCorrelationId(), ex.getFaultInfo().getErrorId(), ex.getFaultInfo().getText());
+      this.delete(correlationId);
       throw ex;
     } catch (SOAPFaultException soap) {
       log.error("[CsOperations] Failed to send NSI CS release message, correlationId = {}, SOAP Fault {}",
               requestHeader.getCorrelationId(), soap.getFault().toString());
+      this.delete(correlationId);
       throw soap;
     } catch (Exception ex) {
       log.error("[CsOperations] Failed to send NSI CS release message, correlationId = {}",
               requestHeader.getCorrelationId(), ex);
+      this.delete(correlationId);
       throw ex;
     }
+
+    return correlationId;
   }
 
+  /**
+   *
+   * @param connectionId
+   * @return
+   * @throws Exception
+   */
   public String terminate(String connectionId) throws Exception {
     // If we have some changes apply them into the network.
     String correlationId = Helper.getUUID();
@@ -425,10 +506,16 @@ public class CsOperations {
       this.delete(correlationId);
       throw ex;
     }
-    
+
     return correlationId;
   }
 
+  /**
+   *
+   * @param operation
+   * @param state
+   * @param correlationId
+   */
   private void store(OperationType operation, StateType state, String correlationId) {
     Operation op = new Operation();
     op.setOperation(operation);
@@ -438,11 +525,18 @@ public class CsOperations {
     this.addCorrelationId(correlationId);
   }
 
+  /**
+   *
+   * @param correlationId
+   */
   private void delete(String correlationId) {
     operationMap.delete(correlationId);
     this.removeCorrelationId(correlationId);
   }
 
+  /**
+   *
+   */
   public void unwind() {
     for (String connectionId : connectionIds) {
       try {

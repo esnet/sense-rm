@@ -308,7 +308,7 @@ public class CsProvider {
    * @throws TimeoutException
    */
   private Set<String> processDeltaAddition(net.es.sense.rm.driver.nsi.db.Model m, String deltaId, Model addition)
-          throws DatatypeConfigurationException, ServiceException, IllegalArgumentException, TimeoutException {
+          throws DatatypeConfigurationException, ServiceException, IllegalArgumentException, TimeoutException, Exception {
     log.debug("[processDeltaAddition] start deletaId = {}, model = {}", deltaId, m.toString());
 
     // This is a list of cid associated with reservations created
@@ -321,8 +321,12 @@ public class CsProvider {
     // Get the associated model.
     Model model = ModelUtil.unmarshalModel(m.getBase());
 
+    log.debug("[processDeltaAddition] current model: " + m.getBase());
+
     // Apply the delta to our reference model so we can search with proposed changes.
     ModelUtil.applyDeltaAddition(model, addition);
+
+    log.debug("[processDeltaAddition] addition model: " + ModelUtil.marshalModel(model));
 
     // We model connections as mrs:SwitchingSubnet objects so query the
     // addition model for all those provided.
@@ -386,7 +390,7 @@ public class CsProvider {
       String serviceType = serviceTypeRef.getString();
       if (Nsi.NSI_SERVICETYPE_EVTS.equalsIgnoreCase(serviceType) ||
               Nsi.NSI_SERVICETYPE_L2_LB_ES.equalsIgnoreCase(serviceType)) {
-        // Find the ports that are part of this SwitchSubnet and build NSI STP
+        // Find the ports that are part of this SwitchingSubnet and build NSI STP
         // identifiers for the service.
         StmtIterator listProperties = switchingSubnet.listProperties(Nml.hasBidirectionalPort);
         while (listProperties.hasNext()) {
@@ -577,7 +581,7 @@ public class CsProvider {
 
 
   /**
-   * 
+   *
    * @param r
    * @return
    */

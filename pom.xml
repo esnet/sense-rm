@@ -46,7 +46,7 @@
         <plugin>
           <groupId>org.apache.jena</groupId>
           <artifactId>jena-maven-tools</artifactId>
-          <version>3.4.0</version>
+          <version>3.6.0</version>
         </plugin>
         <plugin>
           <groupId>org.springframework.boot</groupId>
@@ -60,7 +60,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.6.2</version>
+          <version>3.8.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

@@ -639,7 +639,7 @@ public class ConnectionService {
   public GenericAcknowledgmentType querySummaryConfirmed(QuerySummaryConfirmedType querySummaryConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
 
-    log.info("[ConnectionService] querySummaryConfirmed received, correlationId = %d",
+    log.info("[ConnectionService] querySummaryConfirmed received, correlationId = {}",
             header.value.getCorrelationId());
 
     // We have a specific class to process the results from a QuerySummary operations.

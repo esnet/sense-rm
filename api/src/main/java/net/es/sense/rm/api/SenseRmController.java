@@ -690,7 +690,7 @@ public class SenseRmController {
    * creationTime after the specified date. The date must be specified in RFC 1123 format.
    * @param summary If summary=true then a summary collection of delta resources will be returned including the delta
  meta-data while excluding the addition, reduction, and m elements. Default value is summary=true.
- *
+   *
    * @param encode Transfer size of the model element contents can be optimized by gzip/base64
    *    encoding the contained model.  If encode=true then returned model will be gzipped
    *    (contentType="application/x-gzip") and base64 encoded (contentTransferEncoding= "base64")
@@ -1134,7 +1134,8 @@ public class SenseRmController {
    * ***********************************************************************
    * POST /api/sense/v1/models/{id}/deltas
    *
-   * *********************************************************************** @param accept
+   * ***********************************************************************
+   * @param accept
    * @param accept
    * @param deltaRequest
    * @param model

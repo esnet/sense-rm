@@ -23,7 +23,7 @@ USER_ID=sense
 GROUP_ID=sense
 
 do_start() {
-    /usr/bin/java \
+    daemon --user="$USER_ID" /usr/bin/java \
         -Xmx1024m -Djava.net.preferIPv4Stack=true  \
         -Dcom.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot=true \
         -Dbasedir="$HOME" \

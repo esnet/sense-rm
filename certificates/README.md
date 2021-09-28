@@ -6,6 +6,11 @@ The SENSE-NSI-RM acts in the roll of an uRA in the NSI architecture.  It uses th
 
 This directory contains the current set of certificates for NSI networking devices participating on the SENSE network.  There are two shell scripts provided to create Java key and trust stores for the SENSE-NSI-RM.
 
+There is an assumption that any leaf X.509 certificate allocated to an NSA must be present here, in PEM format, with the subject DN contained in the file using the following string format:
+``
+ 0 s:/OU=Domain Control Validated/CN=nsi-aggr-west.es.net
+``
+
 ### Prerequisites ###
 
 The two scripts provided here require ``openssl`` and the java ``keytool`` to be installed.  The ``keytool`` is installed as part of the Java JDK and will require having the ``$JAVA_HOME`` environment variable set to the proper Java installation location.

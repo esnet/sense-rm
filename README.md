@@ -324,6 +324,18 @@ $ sudo echo "JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")" | sudo
 $ source /etc/profile
 ```
 
+New modify to this:
+
+~/.bash_profile
+```
+export JAVA_HOME=/etc/alternatives/jre_openjdk
+```
+~/.cshrc
+
+```
+setenv JAVA_HOME /etc/alternatives/jre_openjdk
+```
+
 As stated, you could add this location to the "sense" runtime user by copying this location into the `.bash_profile` of the user using your favorite text editor.
 
 ```
@@ -352,27 +364,27 @@ $ echo $JAVA_HOME
 ## How-to install Maven on CentOS 7
 The SENSE-N-RM requires Maven to download, build, and package all dependencies.  See "Using Docker tools" if you would rather use a Docker image for Maven instead of a loacl install.
 
-### Step 1: Download Apache Maven 3.6.2
-First, download and extract the Apache Maven 3.6.2 archive.
+### Step 1: Download Apache Maven 3.8.3
+First, download and extract the Apache Maven 3.8.3 archive.
 
 ```
 $ cd /tmp
-$ wget http://www-us.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz
-$ tar -zxvf apache-maven-3.6.2-bin.tar.gz
+$ wget https://dlcdn.apache.org/maven/maven-3/3.8.3/binaries/apache-maven-3.8.3-bin.tar.gz
+$ tar -zxvf apache-maven-3.8.3-bin.tar.gz
 ```
 
 ### Step 2: Install Maven in a common location
 Move all Apache Maven 3.6.2 files to a reasonable location and change their ownership to `root:root`.
 
 ```
-$ sudo mv /tmp/apache-maven-3.6.2 /opt
-$ sudo chown -R root:root /opt/apache-maven-3.6.2
+$ sudo mv /tmp/apache-maven-3.8.3 /opt
+$ sudo chown -R root:root /opt/apache-maven-3.8.3
 ```
 
 Create a version-irrelevant symbolic link pointing to the original Apache Maven 3.6.2 directory.
 
 ```
-$ sudo ln -s /opt/apache-maven-3.6.2 /opt/apache-maven
+$ sudo ln -s /opt/apache-maven-3.8.3 /opt/apache-maven
 ```
 
 Add the path /opt/apache-maven to the PATH environment variable.
@@ -403,7 +415,7 @@ OS name: "linux", version: "3.10.0-514.26.2.el7.x86_64", arch: "amd64", family: 
 Finally we clean up.
 
 ```
-$ rm /tmp/apache-maven-3.6.2-bin.tar.gz
+$ rm /tmp/apache-maven-3.8.3-bin.tar.gz
 ```
 ## How-to install Postrges on CentOS 7
 The default CentOS repository contain a postgresql package we can install using the yum package system.  If you require a specific version then follow published instructions.

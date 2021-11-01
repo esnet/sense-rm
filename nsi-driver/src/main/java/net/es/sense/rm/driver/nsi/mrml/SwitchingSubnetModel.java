@@ -186,26 +186,34 @@ public class SwitchingSubnetModel {
         }
       }
 
-      // The GlobalReservationId hold the original SwitchingSubnet name, while
+      // The GlobalReservationId holds the original SwitchingSubnet name, while
       // the description holds a unique identifier for the connection created by
       // us before the connectionId is assigned by the PA.
-      log.info("Testing for stored connection, gid = {}, decription = {}",
-              reservation.getGlobalReservationId(), reservation.getDescription());
+      log.info("Testing for stored connection, gid = {}, cid = {}, description = {}",
+              reservation.getGlobalReservationId(), reservation.getConnectionId(), reservation.getDescription());
 
       Optional<ConnectionMap> connMap = Optional.empty();
       if (!Strings.isNullOrEmpty(reservation.getDescription())) {
         connMap = Optional.ofNullable(connectionMapService.getByDescription(reservation.getDescription()));
       }
 
-      // We may have a mapping to a different serviceType so us it if available.
+      // We may have a mapping to a different serviceType so use it if available.
       String serviceType;
       if (connMap.isPresent()) {
         serviceType = connMap.get().getServiceType();
+        log.info("[SwitchingSubnetModel] we created this reservation serviceType = {}, connMap = {}",
+                serviceType, connMap);
       } else {
         serviceType = reservation.getServiceType();
+        log.info("[SwitchingSubnetModel] we did not created this reservation serviceType = {}", serviceType);
       }
 
-      log.info("[SwitchingSubnetModel] connMap = {}", connMap);
+      // ServiceType will be missing if the reservation does not contain reservation criteria.
+      if (serviceType == null) {
+        log.error("[SwitchingSubnetModel] skipping reservation due to missing serviceType cid = {}",
+                reservation.getConnectionId());
+        continue;
+      }
 
       // We only know about the EVTS service at this point so ignore anything
       // else.
@@ -219,6 +227,13 @@ public class SwitchingSubnetModel {
         reservation.setServiceType(Nsi.NSI_SERVICETYPE_EVTS);
 
         log.info("[SwitchingSubnetModel] processing EVTS service");
+
+        if (reservation.getService() == null) {
+          log.error("[SwitchingSubnetModel] skipping reservation due to missing service criteria cid = {}",
+                  reservation.getConnectionId());
+          continue;
+        }
+
         try {
           // We have two tasks here: 1. We need to create child bidirectional
           // ports to identify the resources used by this reservation. 2. We

@@ -111,7 +111,8 @@ public class Reservation implements Serializable {
   @Enumerated(EnumType.STRING)
   ErrorState errorState = ErrorState.NONE;
 
-  @Basic(optional = true)
+  @Lob
+  @Basic(fetch = FetchType.LAZY, optional = true)
   String errorMessage;
 
   // The service element encoded in a string.

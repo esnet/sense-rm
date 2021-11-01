@@ -89,11 +89,7 @@ public class AuditServiceBean implements AuditService {
       return;
     }
 
-    // Save these values for the next audit.
-    lastDds = dds;
-    lastCon = con;
-
-    log.debug("[AuditService] generating NML topology model, new lastDds = {}, lastCon = {}", lastDds, lastCon);
+    log.debug("[AuditService] generating NML topology model, new dds = {}, con = {}", dds, con);
 
     // Get the new document context.
     NmlModel nml = new NmlModel(documentReader);
@@ -104,44 +100,54 @@ public class AuditServiceBean implements AuditService {
 
     log.debug("[AuditService] processing topologyId = {}", topologyId);
 
-    // Generate a SwitchingSubnet model based off of the NSI connections and
-    // discovered NML model.
-    SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, connectionMapService, nml, topologyId);
+    try {
+      // Generate a SwitchingSubnet model based off of the NSI connections and
+      // discovered NML model.
+      SwitchingSubnetModel ssm = new SwitchingSubnetModel(reservationService, connectionMapService, nml, topologyId);
 
-    // Now generate an MRML model based on the combined NSI and NML information.
-    log.debug("[AuditService] generating MRML model.");
-    MrmlFactory mrml = new MrmlFactory(nml, ssm, topologyId);
+      // Now generate an MRML model based on the combined NSI and NML information.
+      log.debug("[AuditService] generating MRML model.");
+      MrmlFactory mrml = new MrmlFactory(nml, ssm, topologyId);
 
-    // Check to see if this is a new version.
-    if (modelService.isPresent(topologyId, mrml.getVersion())) {
-      log.info("[AuditService] found matching model topologyId = {}, version = {}.", topologyId, mrml.getVersion());
-    } else {
-      log.info("[AuditService] adding new topology version, topologyId = {}, version = {}", topologyId, mrml.getVersion());
-      String modelAsString = mrml.getModelAsString(Lang.TURTLE);
-
-      UUID uuid = UUID.randomUUID();
-      Model model = new Model();
-      model.setTopologyId(topologyId);
-      model.setModelId(uuid.toString());
-      model.setVersion(mrml.getVersion());
-      model.setBase(modelAsString);
-
-      Model create = modelService.create(model);
-      if (create != null) {
-        log.debug("[AuditService] created modelId = {} for topology {}",
-                create.getModelId(), create.getTopologyId());
+      // Check to see if this is a new version.
+      if (modelService.isPresent(topologyId, mrml.getVersion())) {
+        log.info("[AuditService] found matching model topologyId = {}, version = {}.", topologyId, mrml.getVersion());
       } else {
-        log.error("[AuditService] failed to create modelId = {} for topology {}",
-                model.getModelId(), model.getTopologyId());
-      }
+        log.info("[AuditService] adding new topology version, topologyId = {}, version = {}", topologyId, mrml.getVersion());
+        String modelAsString = mrml.getModelAsString(Lang.TURTLE);
 
-      measurementController.add(
-              MeasurementType.MODEL_AUDIT,
-              uuid.toString(),
-              MetricType.DURATION,
-              String.valueOf(System.currentTimeMillis() - start));
+        UUID uuid = UUID.randomUUID();
+        Model model = new Model();
+        model.setTopologyId(topologyId);
+        model.setModelId(uuid.toString());
+        model.setVersion(mrml.getVersion());
+        model.setBase(modelAsString);
+
+        Model create = modelService.create(model);
+        if (create != null) {
+          log.debug("[AuditService] created modelId = {} for topology {}",
+                  create.getModelId(), create.getTopologyId());
+        } else {
+          log.error("[AuditService] failed to create modelId = {} for topology {}",
+                  model.getModelId(), model.getTopologyId());
+        }
+
+        measurementController.add(
+                MeasurementType.MODEL_AUDIT,
+                uuid.toString(),
+                MetricType.DURATION,
+                String.valueOf(System.currentTimeMillis() - start));
+      }
+    } catch (Exception ex) {
+      log.error("[AuditService] caught an unexpected exception so aborting model generation", ex);
+      throw ex;
     }
 
+    // Save the updated values for the next audit.
+    lastDds = dds;
+    lastCon = con;
+    log.debug("[AuditService] generated NML topology model, new lastDds = {}, lastCon = {}", lastDds, lastCon);
+    
     // Delete older models (keep last 5).
     modelService.purge(topologyId, nsiProperties.getModelPruneSize());
 

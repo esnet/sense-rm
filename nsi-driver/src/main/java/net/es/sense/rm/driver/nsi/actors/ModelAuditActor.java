@@ -90,7 +90,7 @@ public class ModelAuditActor extends UntypedAbstractActor {
       try {
         auditService.audit(((AuditRequest) msg).getTopologyId());
       } catch (Exception ex) {
-        log.error("[ModelAuditActor] audit failed, {}", ex);
+        log.error("[ModelAuditActor] audit failed", ex);
       }
     } else if (msg instanceof TerminateRequest) {
       TerminateRequest req = (TerminateRequest) msg;
@@ -104,7 +104,7 @@ public class ModelAuditActor extends UntypedAbstractActor {
         log.info("[ModelAuditActor] TerminateRequest completed for cid = {}, exceptions = {}",
                 req.getConnectionId(), cs.getExceptions().size());
       } catch (Exception ex) {
-        log.error("[ModelAuditActor] TerminateRequest failed, {}", ex);
+        log.error("[ModelAuditActor] TerminateRequest failed", ex);
       }
     } else {
       unhandled(msg);

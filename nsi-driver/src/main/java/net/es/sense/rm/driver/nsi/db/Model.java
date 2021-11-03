@@ -65,6 +65,6 @@ public class Model implements Serializable {
   @Override
   public String toString() {
     return "idx: " + this.idx + ", modelId: " + this.modelId + ", topologyId: "
-            + this.topologyId + ", version: " + this.getVersion() + "base: " + this.getBase();
+            + this.topologyId + ", version: " + this.getVersion() + ", base:\n" + this.getBase();
   }
 }

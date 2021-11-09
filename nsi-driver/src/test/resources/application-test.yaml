@@ -1,3 +1,4 @@
+
 nsi:
   ddsUrl: https://example.net:8401/dds
   proxy: (http://localhost:8080|http://localhost:8999/poop)
@@ -54,16 +55,22 @@ nsi:
         nsaId:
           - "urn:ogf:network:es.net:2013:nsa:nsi-aggr-west"
 spring:
+  session:
+    store-type: jdbc
   jpa:
+    show-sql: on
     generate-ddl: true
     hibernate:
       ddl-auto: create
+      show-sql: on
+      format_sql: true
   datasource:
     url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
     username: sense-n-rm
     password: bubbles
 
-logging.level.org.springframework.web: DEBUG
-logging.level.org.hibernate: ERROR
+logging.level.org.springframework.web: debug
+logging.level.org.hibernate: debug
+logging.level.sql: debug
 

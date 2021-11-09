@@ -30,6 +30,7 @@ import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -44,6 +45,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { ReservationRepository.class, Reservation.class, DbUnitTestConfiguration.class })
 @DataJpaTest
+@EnableAutoConfiguration
 @ActiveProfiles("test")
 public class ReservationRepositoryTest {
   @Autowired

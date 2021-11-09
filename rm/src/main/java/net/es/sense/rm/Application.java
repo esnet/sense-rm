@@ -7,6 +7,7 @@ import java.lang.management.RuntimeMXBean;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -15,6 +16,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Slf4j
 @SpringBootApplication
 @EnableSwagger2
+@EnableAutoConfiguration
 @EnableTransactionManagement
 public class Application {
 

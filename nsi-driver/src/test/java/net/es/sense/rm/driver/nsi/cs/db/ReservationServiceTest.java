@@ -22,6 +22,7 @@ package net.es.sense.rm.driver.nsi.cs.db;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -35,6 +36,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { ReservationService.class, ReservationServiceBean.class, ReservationRepository.class, Reservation.class, DbUnitTestConfiguration.class })
 @DataJpaTest
+@EnableAutoConfiguration
 @ActiveProfiles("test")
 public class ReservationServiceTest {
 

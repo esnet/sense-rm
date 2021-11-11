@@ -340,11 +340,19 @@ public class ConnectionService {
     } else {
       // We have to determine if the stored reservation needs to be updated.
       log.info("[ConnectionService] reserveFailed: storing reservation update, cid = {}", cid);
-      r.setReservationState(ReservationStateEnumType.RESERVE_FAILED);
-      r.setErrorState(Reservation.ErrorState.NSIRESERVEFAILED);
-      r.setErrorMessage(String.format("reserveFailed on cid = %s, serviceException = %s", cid, error));
-      r.setDiscovered(System.currentTimeMillis());
-      reservationService.store(r);
+
+      if (reservationService.setReserveFailed(r.getId(), ReservationStateEnumType.RESERVE_FAILED,
+              Reservation.ErrorState.NSIRESERVEFAILED,
+              String.format("reserveFailed on cid = %s, serviceException = %s", cid, error),
+              System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] error updating cid = {}", cid);
+      }
+
+      //r.setReservationState(ReservationStateEnumType.RESERVE_FAILED);
+      //r.setErrorState(Reservation.ErrorState.NSIRESERVEFAILED);
+      //r.setErrorMessage(String.format("reserveFailed on cid = %s, serviceException = %s", cid, error));
+      //r.setDiscovered(System.currentTimeMillis());
+      //reservationService.store(r);
     }
 
     Operation op = operationMap.get(value.getCorrelationId());
@@ -372,23 +380,29 @@ public class ConnectionService {
           Holder<CommonHeaderType> header) throws ServiceException {
 
     CommonHeaderType value = header.value;
-    log.info("[ConnectionService] reserveCommitConfirmed recieved for correlationId = {}, connectionId: {}",
-            value.getCorrelationId(), reserveCommitConfirmed.getConnectionId());
+    String cid = reserveCommitConfirmed.getConnectionId();
+
+    log.info("[ConnectionService] reserveCommitConfirmed recieved for correlationId = {}, cid = {}",
+            value.getCorrelationId(), cid);
 
     // The reservation should not yet be in the database, but if it is then we update it,
     // otherwise we need to kickoff and audit.
-    Reservation r = reservationService.get(value.getProviderNSA(), reserveCommitConfirmed.getConnectionId());
+    Reservation r = reservationService.get(value.getProviderNSA(), cid);
     if (r == null) {
       // We have not seen this reservation before so kick off the audit.
-      log.info("[ConnectionService] reserveCommitConfirmed: no reference to reservation, cid = {}",
-              reserveCommitConfirmed.getConnectionId());
+      log.info("[ConnectionService] reserveCommitConfirmed: no reference to reservation, cid = {}", cid);
     } else {
       // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] reserveCommitConfirmed: storing reservation update, cid = {}",
-              reserveCommitConfirmed.getConnectionId());
-      r.setReservationState(ReservationStateEnumType.RESERVE_START);
-      r.setDiscovered(System.currentTimeMillis());
-      reservationService.store(r);
+      log.info("[ConnectionService] reserveCommitConfirmed: storing reservation update, cid = {}", cid);
+
+      if (reservationService.setReservationState(r.getId(), ReservationStateEnumType.RESERVE_START,
+              System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] error updating cid = {}", cid);
+      }
+
+      //r.setReservationState(ReservationStateEnumType.RESERVE_START);
+      //r.setDiscovered(System.currentTimeMillis());
+      //reservationService.store(r);
     }
 
     Operation op = operationMap.get(value.getCorrelationId());
@@ -418,8 +432,8 @@ public class ConnectionService {
     String cid = reserveCommitFailed.getConnectionId();
     String error = JaxbParser.jaxb2String(ServiceExceptionType.class, reserveCommitFailed.getServiceException());
 
-    log.info("[ConnectionService] reserveCommitFailed recieved for correlationId = {}, connectionId: {}",
-            value.getCorrelationId(), cid);
+    log.info("[ConnectionService] reserveCommitFailed recieved for correlationId = {}, cid = {}, error = {}",
+            value.getCorrelationId(), cid, error);
 
     // First we update the corresponding reservation in the database.  If we
     // are talking to an aggregator this CID is the parent reservation the commit
@@ -431,11 +445,19 @@ public class ConnectionService {
     } else {
       // We have to determine if the stored reservation needs to be updated.
       log.info("[ConnectionService] reserveCommitFailed: storing reservation update, cid = {}", cid);
-      r.setReservationState(ReservationStateEnumType.RESERVE_FAILED);
-      r.setErrorState(Reservation.ErrorState.NSIRESERVECOMMIT);
-      r.setErrorMessage(String.format("reserveCommitFailed on cid = %s, serviceException = %s", cid, error));
-      r.setDiscovered(System.currentTimeMillis());
-      reservationService.store(r);
+
+      if (reservationService.setReserveFailed(r.getId(), ReservationStateEnumType.RESERVE_FAILED,
+              Reservation.ErrorState.NSIRESERVECOMMIT,
+              String.format("reserveCommitFailed on cid = %s, serviceException = %s", cid, error),
+              System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] error updating cid = {}", cid);
+      }
+
+      //r.setReservationState(ReservationStateEnumType.RESERVE_FAILED);
+      //r.setErrorState(Reservation.ErrorState.NSIRESERVECOMMIT);
+      //r.setErrorMessage(String.format("reserveCommitFailed on cid = %s, serviceException = %s", cid, error));
+      //r.setDiscovered(System.currentTimeMillis());
+      //reservationService.store(r);
     }
 
     Operation op = operationMap.get(value.getCorrelationId());
@@ -461,26 +483,32 @@ public class ConnectionService {
    */
   public GenericAcknowledgmentType reserveAbortConfirmed(GenericConfirmedType reserveAbortConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
-    CommonHeaderType value = header.value;
 
-    log.info("[ConnectionService] reserveAbortConfirmed recieved for correlationId = {}, connectionId: {}",
-            value.getCorrelationId(), reserveAbortConfirmed.getConnectionId());
+    CommonHeaderType value = header.value;
+    String cid = reserveAbortConfirmed.getConnectionId();
+
+    log.info("[ConnectionService] reserveAbortConfirmed recieved for correlationId = {}, cid = {}",
+            value.getCorrelationId(), cid);
 
     // First we update the corresponding reservation in the database.  If we
     // are talking to an aggregator this CID is the parent reservation the abort
     // was done against. The child connections will get updated next querySummary.
-    Reservation r = reservationService.get(value.getProviderNSA(), reserveAbortConfirmed.getConnectionId());
+    Reservation r = reservationService.get(value.getProviderNSA(), cid);
     if (r == null) {
       // We have not seen this reservation before so ignore it.
-      log.info("[ConnectionService] reserveAbortConfirmed: no reference to reservation, cid = {}",
-              reserveAbortConfirmed.getConnectionId());
+      log.info("[ConnectionService] reserveAbortConfirmed: no reference to reservation, cid = {}", cid);
     } else {
       // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] reserveAbortConfirmed: storing reservation update, cid = {}",
-              reserveAbortConfirmed.getConnectionId());
-      r.setReservationState(ReservationStateEnumType.RESERVE_START);
-      r.setDiscovered(System.currentTimeMillis());
-      reservationService.store(r);
+      log.info("[ConnectionService] reserveAbortConfirmed: storing reservation update, cid = {}", cid);
+
+      if (reservationService.setReservationState(r.getId(), ReservationStateEnumType.RESERVE_START,
+              System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] error updating cid = {}", cid);
+      }
+
+      //r.setReservationState(ReservationStateEnumType.RESERVE_START);
+      //r.setDiscovered(System.currentTimeMillis());
+      //reservationService.store(r);
     }
 
     Operation op = operationMap.get(value.getCorrelationId());
@@ -507,24 +535,34 @@ public class ConnectionService {
           Holder<CommonHeaderType> header) throws ServiceException {
 
     CommonHeaderType value = header.value;
+    String cid = provisionConfirmed.getConnectionId();
+
     log.info("[ConnectionService] provisionConfirmed recieved for correlationId = {}, connectionId: {}",
-            value.getCorrelationId(), provisionConfirmed.getConnectionId());
+            value.getCorrelationId(), cid);
 
     // First we update the corresponding reservation in the database.  If we
     // are talking to an aggregator this CID is the parent reservation the provision
     // was done against. The child connections will get updated next querySummary.
-    Reservation r = reservationService.get(value.getProviderNSA(), provisionConfirmed.getConnectionId());
+    Reservation r = reservationService.get(value.getProviderNSA(), cid);
     if (r == null) {
       // We have not seen this reservation before so ignore it.
-      log.info("[ConnectionService] provisionConfirmed: no reference to reservation, cid = {}",
-              provisionConfirmed.getConnectionId());
+      log.info("[ConnectionService] provisionConfirmed: no reference to reservation, cid = {}", cid);
+    } else if (r.getLifecycleState() != LifecycleStateEnumType.CREATED) {
+      // Timing issue - reservation is terminated.
+      log.info("[ConnectionService] provisionConfirmed: reservation not in CREATED state = {}, cid = {}",
+              r.getLifecycleState(), cid);
     } else {
       // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] provisionConfirmed: storing reservation update, cid = {}",
-              provisionConfirmed.getConnectionId());
-      r.setProvisionState(ProvisionStateEnumType.PROVISIONED);
-      r.setDiscovered(System.currentTimeMillis());
-      reservationService.store(r);
+      log.info("[ConnectionService] provisionConfirmed: storing reservation update, cid = {}", cid);
+
+      if (reservationService.setProvisionState(r.getId(), ProvisionStateEnumType.PROVISIONED,
+              System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] error updating cid = {}", cid);
+      }
+
+      //r.setProvisionState(ProvisionStateEnumType.PROVISIONED);
+      //r.setDiscovered(System.currentTimeMillis());
+      //reservationService.store(r);
     }
 
     Operation op = operationMap.get(value.getCorrelationId());
@@ -551,24 +589,34 @@ public class ConnectionService {
           Holder<CommonHeaderType> header) throws ServiceException {
 
     CommonHeaderType value = header.value;
+    String cid = releaseConfirmed.getConnectionId();
+
     log.info("[ConnectionService] releaseConfirmed received for correlationId = {}, connectionId: {}",
-            value.getCorrelationId(), releaseConfirmed.getConnectionId());
+            value.getCorrelationId(), cid);
 
     // First we update the corresponding reservation in the database.  If we
     // are talking to an aggregator this CID is the parent reservation the release
     // was done against. The child connections will get updated next querySummary.
-    Reservation r = reservationService.get(header.value.getProviderNSA(), releaseConfirmed.getConnectionId());
+    Reservation r = reservationService.get(header.value.getProviderNSA(), cid);
     if (r == null) {
       // We have not seen this reservation before so ignore it.
-      log.info("[ConnectionService] releaseConfirmed: no reference to reservation, cid = {}",
-              releaseConfirmed.getConnectionId());
+      log.info("[ConnectionService] releaseConfirmed: no reference to reservation, cid = {}", cid);
+    } else if (r.getLifecycleState() != LifecycleStateEnumType.CREATED) {
+      // Timing issue - reservation is terminated.
+      log.info("[ConnectionService] releaseConfirmed: reservation not in CREATED state = {}, cid = {}",
+              r.getLifecycleState(), cid);
     } else {
       // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] releaseConfirmed: storing reservation update, cid = {}",
-              releaseConfirmed.getConnectionId());
-      r.setProvisionState(ProvisionStateEnumType.RELEASED);
-      r.setDiscovered(System.currentTimeMillis());
-      reservationService.store(r);
+      log.info("[ConnectionService] releaseConfirmed: storing reservation update, cid = {}", cid);
+
+      if (reservationService.setProvisionState(r.getId(), ProvisionStateEnumType.RELEASED,
+              System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] error updating cid = {}", cid);
+      }
+
+      //r.setProvisionState(ProvisionStateEnumType.RELEASED);
+      //r.setDiscovered(System.currentTimeMillis());
+      //reservationService.store(r);
     }
 
     Operation op = operationMap.get(value.getCorrelationId());
@@ -593,24 +641,30 @@ public class ConnectionService {
    */
   public GenericAcknowledgmentType terminateConfirmed(GenericConfirmedType terminateConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
     CommonHeaderType value = header.value;
+    String cid = terminateConfirmed.getConnectionId();
+
     log.info("[ConnectionService] terminateConfirmed received for correlationId = {}, connectionId: {}",
-            value.getCorrelationId(), terminateConfirmed.getConnectionId());
+            value.getCorrelationId(), cid);
 
     // First we update the corresponding reservation in the database.  If we
     // are talking to an aggregator this CID is the parent reservation the terminate
     // was done against. The child connections will get updated next querySummary.
-    Reservation r = reservationService.get(header.value.getProviderNSA(), terminateConfirmed.getConnectionId());
+    Reservation r = reservationService.get(header.value.getProviderNSA(), cid);
     if (r == null) {
       // We have not seen this reservation before so ignore it.
-      log.info("[ConnectionService] terminateConfirmed: no reference to reservation, cid = {}",
-              terminateConfirmed.getConnectionId());
+      log.info("[ConnectionService] terminateConfirmed: no reference to reservation, cid = {}", cid);
     } else {
       // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] terminateConfirmed: storing reservation update, cid = {}",
-              terminateConfirmed.getConnectionId());
-      r.setLifecycleState(LifecycleStateEnumType.TERMINATED);
-      r.setDiscovered(System.currentTimeMillis());
-      reservationService.store(r);
+      log.info("[ConnectionService] terminateConfirmed: storing reservation update, cid = {}", cid);
+
+      if (reservationService.setLifecycleState(r.getId(), LifecycleStateEnumType.TERMINATED,
+              System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] error updating cid = {}", cid);
+      }
+
+      //r.setLifecycleState(LifecycleStateEnumType.TERMINATED);
+      //r.setDiscovered(System.currentTimeMillis());
+      //reservationService.store(r);
     }
 
     Operation op = operationMap.get(value.getCorrelationId());
@@ -817,11 +871,17 @@ public class ConnectionService {
     } else {
       for (Reservation r : reservations) {
         log.info("[ConnectionService] error() updating cid = {}, reservation {}", cid, r.toString());
-        r.setErrorState(Reservation.ErrorState.NSIERROR);
-        r.setErrorMessage(String.format("error, cid = %s, serviceException = %s", cid, encoded));
-        r.setDiscovered(System.currentTimeMillis());
-        log.info("[ConnectionService] writing updated cid = {}, reservation {}", cid, r.toString());
-        reservationService.store(r);
+
+        if (reservationService.setErrorState(r.getId(), Reservation.ErrorState.NSIERROR,
+            String.format("error, cid = %s, serviceException = %s", cid, encoded), System.currentTimeMillis()) != 1) {
+          log.info("[ConnectionService] error updating cid = {}", cid);
+        }
+
+        //r.setErrorState(Reservation.ErrorState.NSIERROR);
+        //r.setErrorMessage(String.format("error, cid = %s, serviceException = %s", cid, encoded));
+        //r.setDiscovered(System.currentTimeMillis());
+        //log.info("[ConnectionService] writing updated cid = {}, reservation {}", cid, r.toString());
+        //reservationService.store(r);
       }
     }
 
@@ -890,15 +950,19 @@ public class ConnectionService {
     } else {
       for (Reservation r : reservations) {
         log.info("[ConnectionService] errorEvent() updating cid = {}, reservation {}", cid, r.toString());
-        r.setErrorState(Reservation.ErrorState.NSIERROREVENT);
-        r.setErrorMessage(String.format("errorEvent, cid = %s, errorEvent = %s", cid, error));
-        r.setDiscovered(System.currentTimeMillis());
-        log.info("[ConnectionService] errorEvent() writing updated cid = {}, reservation {}", cid, r.toString());
-        reservationService.store(r);
+
+        if (reservationService.setErrorState(r.getId(), Reservation.ErrorState.NSIERROREVENT,
+            String.format("errorEvent, cid = %s, errorEvent = %s", cid, error), System.currentTimeMillis()) != 1) {
+          log.info("[ConnectionService] error updating cid = {}", cid);
+        }
+
+        //r.setErrorState(Reservation.ErrorState.NSIERROREVENT);
+        //r.setErrorMessage(String.format("errorEvent, cid = %s, errorEvent = %s", cid, error));
+        //r.setDiscovered(System.currentTimeMillis());
+        //log.info("[ConnectionService] errorEvent() writing updated cid = {}, reservation {}", cid, r.toString());
+        //reservationService.store(r);
       }
     }
-
-
 
     return FACTORY.createGenericAcknowledgmentType();
   }
@@ -941,14 +1005,17 @@ public class ConnectionService {
       log.error("[ConnectionService] dataPlaneStateChange could not find connectionId = {}", connectionId);
     } else {
       for (Reservation r : reservations) {
-        // The reservation commit failed so put it in the RESERVE_HELD.
-        // Maybe RESERVE_FAILED would have been better? At least they can
-        // terminte it this way.
-        log.info("[ConnectionService] updating connectionId = {}, reservation {}", connectionId, r.toString());
-        r.setDataPlaneActive(dataPlaneStatus.isActive());
-        r.setDiscovered(System.currentTimeMillis());
-        log.info("[ConnectionService] writing updated connectionId = {}, reservation {}", connectionId, r.toString());
-        reservationService.store(r);
+        log.info("[ConnectionService] updating connectionId = {}, dataPlaneStatus = {}", connectionId, dataPlaneStatus.isActive());
+        if (reservationService.setDataPlaneActive(r.getId(), dataPlaneStatus.isActive(),
+                System.currentTimeMillis()) != 1) {
+          log.error("[ConnectionService] failed to update connectionId = {}, id = {}", connectionId, r.getId());
+        }
+
+        // TODO: Enable this once properly dataplane state is modelled in MRML.
+        // We just did something successfully so invoke a model audit to
+        // generate an updated version.
+        // AuditRequest req = new AuditRequest(networkId);
+        // raController.getModelAuditActor().tell(req, ActorRef.noSender());
       }
     }
 
@@ -981,19 +1048,24 @@ public class ConnectionService {
       log.error("[ConnectionService] reserveTimeout could not find cid = {}", connectionId);
     } else {
       for (Reservation r : reservations) {
-        log.info("[ConnectionService] reserveTimeout timing out reservation {}", r.toString());
+        log.info("[ConnectionService] reserveTimeout cid = {}, reservation {}", connectionId, r.toString());
 
         // Transition this reservation to reserve timeout.
-        r.setReservationState(ReservationStateEnumType.RESERVE_TIMEOUT);
+        if (reservationService.setFailedState(r.getId(), ReservationStateEnumType.RESERVE_TIMEOUT,
+            LifecycleStateEnumType.FAILED, Reservation.ErrorState.NSIRESERVETIMEOUT,
+            String.format("reserveTimeout on cid = %s, %s", connectionId, xml), System.currentTimeMillis()) != 1) {
+          log.info("[ConnectionService] error updating cid = {}", connectionId);
+        }
 
         // TODO: When OpenNSA fixes their timeout notification state machine issue this
         // failed hack can be removed.
-        r.setLifecycleState(LifecycleStateEnumType.FAILED);
-        r.setErrorState(Reservation.ErrorState.NSIRESERVETIMEOUT);
-        r.setErrorMessage(String.format("reserveTimeout on cid = %s, %s", connectionId, xml));
-        r.setDiscovered(System.currentTimeMillis());
-        log.info("[ConnectionService] writing updated connectionId = {}, reservation {}", connectionId, r.toString());
-        reservationService.store(r);
+        //r.setReservationState(ReservationStateEnumType.RESERVE_TIMEOUT);
+        //r.setLifecycleState(LifecycleStateEnumType.FAILED); <--- HACK
+        //r.setErrorState(Reservation.ErrorState.NSIRESERVETIMEOUT);
+        //r.setErrorMessage(String.format("reserveTimeout on cid = %s, %s", connectionId, xml));
+        //r.setDiscovered(System.currentTimeMillis());
+        //log.info("[ConnectionService] writing updated connectionId = {}, reservation {}", connectionId, r.toString());
+        //reservationService.store(r);
       }
     }
 
@@ -1038,22 +1110,28 @@ public class ConnectionService {
       log.error("[ConnectionService] messageDeliveryTimeout could not find cid = {}", cid);
     } else {
       for (Reservation r : reservations) {
-        log.info("[ConnectionService] messageDeliveryTimeout on reservation {}", r.toString());
+        log.info("[ConnectionService] messageDeliveryTimeout on cid = {}, reservation {}", cid, r.toString());
 
         // Transition this reservation to reserve timeout.
-        r.setReservationState(ReservationStateEnumType.RESERVE_TIMEOUT);
+        if (reservationService.setFailedState(r.getId(), ReservationStateEnumType.RESERVE_TIMEOUT,
+            LifecycleStateEnumType.FAILED, Reservation.ErrorState.NSIMESSAGEDELIVERYTIMEOUT,
+            String.format("messageDeliveryTimeout on cid = %s, correlationId = %s", cid, value.getCorrelationId()),
+            System.currentTimeMillis()) != 1) {
+          log.info("[ConnectionService] error updating cid = {}", cid);
+        }
 
         // TODO: When OpenNSA fixes their timeout notification state machine issue this
         // failed hack can be removed.
-        r.setLifecycleState(LifecycleStateEnumType.FAILED);
-        r.setErrorState(Reservation.ErrorState.NSIMESSAGEDELIVERYTIMEOUT);
-        r.setErrorMessage(String.format("messageDeliveryTimeout on cid = %s, correlationId = %s",
-                cid, value.getCorrelationId()));
-        r.setDiscovered(System.currentTimeMillis());
-
-        log.info("[ConnectionService] messageDeliveryTimeout writing updated connectionId = {}, reservation {}",
-                cid, r.toString());
-        reservationService.store(r);
+        //r.setReservationState(ReservationStateEnumType.RESERVE_TIMEOUT);
+        //r.setLifecycleState(LifecycleStateEnumType.FAILED);
+        //r.setErrorState(Reservation.ErrorState.NSIMESSAGEDELIVERYTIMEOUT);
+        //r.setErrorMessage(String.format("messageDeliveryTimeout on cid = %s, correlationId = %s",
+        //        cid, value.getCorrelationId()));
+        //r.setDiscovered(System.currentTimeMillis());
+        //
+        //log.info("[ConnectionService] messageDeliveryTimeout writing updated connectionId = {}, reservation {}",
+        //        cid, r.toString());
+        //reservationService.store(r);
       }
     }
 

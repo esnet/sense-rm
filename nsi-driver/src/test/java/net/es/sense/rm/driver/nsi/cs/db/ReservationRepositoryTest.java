@@ -49,7 +49,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles("test")
 public class ReservationRepositoryTest {
   @Autowired
-  private ReservationRepository reservations;
+  private ReservationRepository reservationRepository;
 
   static final String R1_CONNID = "1234";
   static final long R1_DISCOVERED = 1000000;
@@ -71,7 +71,7 @@ public class ReservationRepositoryTest {
     r1.setTopologyId(R1_TOPOLOGY);
     r1.setProviderNsa("Bobby");
     r1.setErrorState(Reservation.ErrorState.NSIERROREVENT);
-    reservations.save(r1);
+    reservationRepository.save(r1);
 
     Reservation r2 = new Reservation();
     r2.setConnectionId(R2_CONNID);
@@ -80,7 +80,7 @@ public class ReservationRepositoryTest {
     r2.setDiscovered(R2_DISCOVERED);
     r2.setTopologyId(R2_TOPOLOGY);
     r2.setProviderNsa("Boogy");
-    reservations.save(r2);
+    reservationRepository.save(r2);
 
     Reservation r3 = new Reservation();
     r3.setDiscovered(1635365303428L);
@@ -97,8 +97,122 @@ public class ReservationRepositoryTest {
     r3.setLifecycleState(LifecycleStateEnumType.CREATED);
     r3.setDataPlaneActive(false);
     r3.setVersion(0);
-    r3.setErrorState(Reservation.ErrorState.NSIERROREVENT);
-    r3.setErrorMessage("errorEvent, \n" +
+    r3.setService("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+        "<ns7:p2ps xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" " +
+        "xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n" +
+        "    <capacity>1000</capacity>\n" +
+        "    <directionality>Bidirectional</directionality>\n" +
+        "    <symmetricPath>true</symmetricPath>\n" +
+        "    <sourceSTP>urn:ogf:network:surf.nl:2020:production:netherlight.cern-1?vlan=2025</sourceSTP>\n" +
+        "    <destSTP>urn:ogf:network:surf.nl:2020:production:netherlight.canarie-1?vlan=2025</destSTP>\n" +
+        "</ns7:p2ps>");
+    reservationRepository.save(r3);
+  }
+
+  /**
+   * Do a set of empty database tests.
+   */
+  @Test
+  public void emptyTest() {
+    assertEquals(0, reservationRepository.count());
+
+    Long discovered = reservationRepository.findNewestDiscovered();
+    assertNull(discovered);
+
+    Collection<Reservation> reserves = reservationRepository.findFirst1ByOrderByDiscoveredDesc();
+    assertEquals(0, reserves.size());
+
+    reserves = reservationRepository.findByConnectionId(R1_CONNID);
+    assertNotNull(reserves);
+    assertEquals(0, reserves.size());
+
+    reserves = reservationRepository.findByTopologyId(R2_TOPOLOGY);
+    assertNotNull(reserves);
+    assertEquals(0, reserves.size());
+  }
+
+  /**
+   * Do various get tests.
+   */
+  @Test
+  public void getTests() {
+    buildSmallDatabase();
+
+    assertEquals(reservationRepository.count(), 3);
+
+    Long discovered = reservationRepository.findNewestDiscovered();
+    assertNotNull(discovered);
+    assertEquals(R2_DISCOVERED, (long) discovered);
+
+    Collection<Reservation> reserves = reservationRepository.findFirst1ByOrderByDiscoveredDesc();
+    assertEquals(1, reserves.size());
+    assertEquals(R2_CONNID, reserves.stream().findFirst().get().getConnectionId());
+
+    reserves = reservationRepository.findAllNewer(R1_DISCOVERED);
+    assertEquals(((Collection<?>) reserves).size(), 2);
+    assertEquals(R2_CONNID, reserves.iterator().next().getConnectionId());
+
+    reserves = reservationRepository.findByConnectionId(R1_CONNID);
+    assertNotNull(reserves);
+    assertEquals(1, reserves.size());
+
+    reserves = reservationRepository.findByTopologyId(R2_TOPOLOGY);
+    assertNotNull(reserves);
+    assertEquals(1, reserves.size());
+    assertEquals(R2_CONNID, reserves.iterator().next().getConnectionId());
+
+    // Test retrieval of large error message.
+    reserves = reservationRepository.findByConnectionId("85ca15f6-5232-47bc-8cfe-3883cf1cb241");
+    assertNotNull(reserves);
+    assertEquals(1, reserves.size());
+    Reservation reservation = reserves.iterator().next();
+    assertEquals("85ca15f6-5232-47bc-8cfe-3883cf1cb241", reservation.getConnectionId());
+
+    reservationRepository.deleteAll();
+    assertEquals(0, reservationRepository.count());
+  }
+
+
+  /**
+   * Do a set of tests over a small number of database entries.
+   */
+  @Test
+  public void transactionTest() {
+    buildSmallDatabase();
+
+    // Check to make sure the defaults are correct.
+    Collection<Reservation> reserves = reservationRepository.findByConnectionId("85ca15f6-5232-47bc-8cfe-3883cf1cb241");
+    assertNotNull(reserves);
+    assertEquals(1, reserves.size());
+    Reservation reservation = reserves.iterator().next();
+    assertEquals("85ca15f6-5232-47bc-8cfe-3883cf1cb241", reservation.getConnectionId());
+    assertEquals(ReservationStateEnumType.RESERVE_START, reservation.getReservationState());
+    assertEquals(ProvisionStateEnumType.RELEASED, reservation.getProvisionState());
+    assertEquals(LifecycleStateEnumType.CREATED, reservation.getLifecycleState());
+    assertEquals(false, reservation.isDataPlaneActive());
+    assertEquals(Reservation.ErrorState.NONE, reservation.errorState);
+
+    // Update dataplaneStateChange
+    long current = System.currentTimeMillis();
+    int count = reservationRepository.setDataPlaneActive(reservation.getId(), true, current);
+    assertEquals(1, count);
+
+    // Check to see if the update was completed.
+    reserves = reservationRepository.findByConnectionId("85ca15f6-5232-47bc-8cfe-3883cf1cb241");
+    assertNotNull(reserves);
+    assertEquals(1, reserves.size());
+    reservation = reserves.iterator().next();
+    assertEquals("85ca15f6-5232-47bc-8cfe-3883cf1cb241", reservation.getConnectionId());
+    assertEquals(true, reservation.isDataPlaneActive());
+    assertEquals(current, reservation.getDiscovered());
+
+    // Now test big adding a big error message.
+    current = System.currentTimeMillis();
+    count = reservationRepository.setFailedState(reservation.getId(),
+            ReservationStateEnumType.RESERVE_FAILED,
+            LifecycleStateEnumType.FAILED,
+            Reservation.ErrorState.NSIERROREVENT,
+            "errorEvent, \n" +
 "    cid = 85ca15f6-5232-47bc-8cfe-3883cf1cb241, \n" +
 "    errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
 "<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n" +
@@ -108,80 +222,71 @@ public class ReservationRepositoryTest {
 "    <event>activateFailed</event>\n" +
 "    <originatingConnectionId></originatingConnectionId>\n" +
 "    <originatingNSA>None</originatingNSA>\n" +
-"</ns2:errorEvent>");
-    r3.setService("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-"<ns7:p2ps xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n" +
-"    <capacity>1000</capacity>\n" +
-"    <directionality>Bidirectional</directionality>\n" +
-"    <symmetricPath>true</symmetricPath>\n" +
-"    <sourceSTP>urn:ogf:network:surf.nl:2020:production:netherlight.cern-1?vlan=2025</sourceSTP>\n" +
-"    <destSTP>urn:ogf:network:surf.nl:2020:production:netherlight.canarie-1?vlan=2025</destSTP>\n" +
-"</ns7:p2ps>");
-    reservations.save(r3);
-  }
-
-  /**
-   * Do a set of empty database tests.
-   */
-  @Test
-  public void emptyTest() {
-    assertEquals(reservations.count(), 0);
-
-    Long discovered = reservations.findNewestDiscovered();
-    assertNull(discovered);
-
-    Collection<Reservation> reserves = reservations.findFirst1ByOrderByDiscoveredDesc();
-    assertEquals(0, reserves.size());
-
-    reserves = reservations.findByConnectionId(R1_CONNID);
-    assertNotNull(reserves);
-    assertEquals(0, reserves.size());
-
-    reserves = reservations.findByTopologyId(R2_TOPOLOGY);
-    assertNotNull(reserves);
-    assertEquals(0, reserves.size());
-  }
-
-  /**
-   * Do a set of tests over a small number of database entries.
-   */
-  @Test
-  public void basicTest() {
-    buildSmallDatabase();
-
-    assertEquals(reservations.count(), 3);
-
-    Long discovered = reservations.findNewestDiscovered();
-    assertNotNull(discovered);
-    assertEquals(R2_DISCOVERED, (long) discovered);
-
-    Collection<Reservation> reserves = reservations.findFirst1ByOrderByDiscoveredDesc();
-    assertEquals(1, reserves.size());
-    assertEquals(R2_CONNID, reserves.stream().findFirst().get().getConnectionId());
-
-    reserves = reservations.findAllNewer(R1_DISCOVERED);
-    assertEquals(((Collection<?>) reserves).size(), 2);
-    assertEquals(R2_CONNID, reserves.iterator().next().getConnectionId());
-
-    reserves = reservations.findByConnectionId(R1_CONNID);
-    assertNotNull(reserves);
-    assertEquals(1, reserves.size());
-
-    reserves = reservations.findByTopologyId(R2_TOPOLOGY);
-    assertNotNull(reserves);
-    assertEquals(1, reserves.size());
-    assertEquals(R2_CONNID, reserves.iterator().next().getConnectionId());
+"</ns2:errorEvent>",
+            current);
+    assertEquals(1, count);
 
     // Test retrieval of large error message.
-    reserves = reservations.findByConnectionId("85ca15f6-5232-47bc-8cfe-3883cf1cb241");
+    reserves = reservationRepository.findByConnectionId("85ca15f6-5232-47bc-8cfe-3883cf1cb241");
     assertNotNull(reserves);
     assertEquals(1, reserves.size());
-    Reservation reservation = reserves.iterator().next();
+    reservation = reserves.iterator().next();
     assertEquals("85ca15f6-5232-47bc-8cfe-3883cf1cb241", reservation.getConnectionId());
     assertEquals(Reservation.ErrorState.NSIERROREVENT, reservation.errorState);
     assertEquals(868, reservation.getErrorMessage().length());
+    assertEquals(current, reservation.getDiscovered());
 
-    reservations.deleteAll();
-    assertEquals(0, reservations.count());
+    // setErrorState
+    current = System.currentTimeMillis();
+    count = reservationRepository.setErrorState(reservation.getId(), Reservation.ErrorState.NSIERROR,
+            "BobbyBoogie", current);
+    assertEquals(1, count);
+
+    reservation = reservationRepository.findNewest();
+    assertNotNull(reservation);
+    assertEquals("85ca15f6-5232-47bc-8cfe-3883cf1cb241", reservation.getConnectionId());
+    assertEquals(Reservation.ErrorState.NSIERROR, reservation.getErrorState());
+    assertEquals("BobbyBoogie", reservation.getErrorMessage());
+    assertEquals(current, reservation.getDiscovered());
+
+    // setReservationState
+    current = System.currentTimeMillis();
+    count = reservationRepository.setReservationState(reservation.getId(),
+            ReservationStateEnumType.RESERVE_CHECKING, current);
+    assertEquals(1, count);
+
+    reservation = reservationRepository.findNewest();
+    assertNotNull(reservation);
+    assertEquals("85ca15f6-5232-47bc-8cfe-3883cf1cb241", reservation.getConnectionId());
+    assertEquals(ReservationStateEnumType.RESERVE_CHECKING, reservation.getReservationState());
+    assertEquals(current, reservation.getDiscovered());
+
+    // setProvisionState
+    current = System.currentTimeMillis();
+    count = reservationRepository.setProvisionState(reservation.getId(),
+            ProvisionStateEnumType.PROVISIONING, current);
+    assertEquals(1, count);
+
+    reservation = reservationRepository.findNewest();
+    assertNotNull(reservation);
+    assertEquals("85ca15f6-5232-47bc-8cfe-3883cf1cb241", reservation.getConnectionId());
+    assertEquals(ProvisionStateEnumType.PROVISIONING, reservation.getProvisionState());
+    assertEquals(current, reservation.getDiscovered());
+
+    // setLifecycleState
+    current = System.currentTimeMillis();
+    count = reservationRepository.setLifecycleState(reservation.getId(),
+            LifecycleStateEnumType.PASSED_END_TIME, current);
+    assertEquals(1, count);
+
+    reservation = reservationRepository.findNewest();
+    assertNotNull(reservation);
+    assertEquals("85ca15f6-5232-47bc-8cfe-3883cf1cb241", reservation.getConnectionId());
+    assertEquals(LifecycleStateEnumType.PASSED_END_TIME, reservation.getLifecycleState());
+    assertEquals(current, reservation.getDiscovered());
+
+    // Delete the database entries.
+    reservationRepository.deleteAll();
+    assertEquals(0, reservationRepository.count());
   }
 }

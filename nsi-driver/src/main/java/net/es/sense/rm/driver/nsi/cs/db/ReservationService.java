@@ -20,6 +20,9 @@
 package net.es.sense.rm.driver.nsi.cs.db;
 
 import java.util.Collection;
+import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 
 /**
  *
@@ -32,6 +35,23 @@ public interface ReservationService {
   public Reservation getNewest();
 
   public Reservation store(Reservation reservation);
+
+  public int setDataPlaneActive(long id, boolean dataPlaneActive, long discovered);
+
+  public int setFailedState(long id, ReservationStateEnumType reservationState,
+        LifecycleStateEnumType lifecycleState, Reservation.ErrorState errorState,
+        String errorMessage, long discovered);
+
+  public int setErrorState(long id, Reservation.ErrorState errorState, String errorMessage, long discovered);
+
+  public int setReservationState(long id, ReservationStateEnumType reservationState, long discovered);
+
+  public int setProvisionState(long id, ProvisionStateEnumType provisionState, long discovered);
+
+  public int setLifecycleState(long id, LifecycleStateEnumType lifecycleState, long discovered);
+
+  public int setReserveFailed(long id, ReservationStateEnumType reservationState,
+          Reservation.ErrorState errorState, String errorMessage, long discovered);
 
   public void delete(Reservation reservation);
 
@@ -59,4 +79,5 @@ public interface ReservationService {
 
   public Collection<Reservation> getByAnyConnectionId(String providerNsa, String connectionId);
 
+  public Reservation findNewest();
 }

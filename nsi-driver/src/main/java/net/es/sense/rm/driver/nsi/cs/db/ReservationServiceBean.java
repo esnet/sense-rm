@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -132,5 +135,55 @@ public class ReservationServiceBean implements ReservationService {
     for (Reservation reservation : reservationRepository.findAll()) {
       reservationRepository.delete(reservation);
     }
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public int setDataPlaneActive(long id, boolean dataPlaneActive, long discovered) {
+    return reservationRepository.setDataPlaneActive(id, dataPlaneActive, discovered);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public int setFailedState(long id, ReservationStateEnumType reservationState,
+        LifecycleStateEnumType lifecycleState, Reservation.ErrorState errorState,
+        String errorMessage, long discovered) {
+    return reservationRepository.setFailedState(id, reservationState,
+            lifecycleState, errorState, errorMessage, discovered);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public int setErrorState(long id, Reservation.ErrorState errorState, String errorMessage, long discovered) {
+    return reservationRepository.setErrorState(id, errorState, errorMessage, discovered);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public int setReservationState(long id, ReservationStateEnumType reservationState, long discovered) {
+    return reservationRepository.setReservationState(id, reservationState, discovered);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public int setProvisionState(long id, ProvisionStateEnumType provisionState, long discovered) {
+    return reservationRepository.setProvisionState(id, provisionState, discovered);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public int setLifecycleState(long id, LifecycleStateEnumType lifecycleState, long discovered) {
+    return reservationRepository.setLifecycleState(id, lifecycleState, discovered);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public int setReserveFailed(long id, ReservationStateEnumType reservationState,
+        Reservation.ErrorState errorState, String errorMessage, long discovered) {
+    return reservationRepository.setReserveFailed(id, reservationState, errorState, errorMessage, discovered);
+  }
+
+  public Reservation findNewest() {
+    return reservationRepository.findNewest();
   }
 }

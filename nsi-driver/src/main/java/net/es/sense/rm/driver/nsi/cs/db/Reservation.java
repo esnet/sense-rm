@@ -63,6 +63,9 @@ public class Reservation implements Serializable {
   @Basic(optional = false)
   long discovered;
 
+  // Is this entry flagged for deletion.
+  boolean dirty = false;
+
   // The providerNSA hosting this conenction.
   @Basic(optional = false)
   String providerNsa;
@@ -125,6 +128,7 @@ public class Reservation implements Serializable {
     return "Reservation{" +
             "id=" + id +
             ", discovered=" + discovered +
+            ", dirty=" + dirty +
             ", providerNsa='" + providerNsa + '\'' +
             ", globalReservationId='" + globalReservationId + '\'' +
             ", description='" + description + '\'' +

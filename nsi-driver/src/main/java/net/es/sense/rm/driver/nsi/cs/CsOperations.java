@@ -247,6 +247,7 @@ public class CsOperations {
   }
 
   /**
+   * Issue an NSI reservation to the target NSA for the requested interface.
    *
    * @param r
    * @return

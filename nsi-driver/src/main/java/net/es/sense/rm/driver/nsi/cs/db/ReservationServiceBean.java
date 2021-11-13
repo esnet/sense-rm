@@ -48,6 +48,11 @@ public class ReservationServiceBean implements ReservationService {
   }
 
   @Override
+  public Reservation findNewest() {
+    return reservationRepository.findNewest();
+  }
+
+  @Override
   public Collection<Reservation> get() {
     return Lists.newArrayList(reservationRepository.findAll());
   }
@@ -178,12 +183,21 @@ public class ReservationServiceBean implements ReservationService {
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
+  public int setReservationAndLifecycleState(long id, ReservationStateEnumType reservationState,
+          LifecycleStateEnumType lifecycleState, long discovered) {
+    return reservationRepository.setReservationAndLifecycleState(id, reservationState, lifecycleState, discovered);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
   public int setReserveFailed(long id, ReservationStateEnumType reservationState,
         Reservation.ErrorState errorState, String errorMessage, long discovered) {
     return reservationRepository.setReserveFailed(id, reservationState, errorState, errorMessage, discovered);
   }
 
-  public Reservation findNewest() {
-    return reservationRepository.findNewest();
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public int setDirty(long id, boolean dirty) {
+    return reservationRepository.setDirty(id, dirty);
   }
 }

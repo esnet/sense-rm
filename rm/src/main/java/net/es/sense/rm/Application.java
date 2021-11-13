@@ -4,6 +4,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
@@ -38,6 +39,12 @@ public class Application {
     // Dump some runtime information.
     RuntimeMXBean mxBean = ManagementFactory.getRuntimeMXBean();
     log.info("Name: " + mxBean.getName());
+    try {
+      log.info("Pid: " + getProcessId(mxBean));
+    } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException |
+            NoSuchMethodException | InvocationTargetException ex) {
+      log.error("[SENSE-N-RM] Could not determine Pid", ex);
+    }
     log.info("Uptime: " + mxBean.getUptime() + " ms");
     log.info("BootClasspath: " + mxBean.getBootClassPath());
     log.info("Classpath: " + mxBean.getClassPath());
@@ -73,6 +80,25 @@ public class Application {
     long maxMemory = heapUsage.getMax() / MEGABYTE;
     long usedMemory = heapUsage.getUsed() / MEGABYTE;
     return "Memory use :" + usedMemory + "M/" + maxMemory + "M";
+  }
+
+  /**
+   *
+   * @return
+   * @throws NoSuchFieldException
+   * @throws IllegalArgumentException
+   * @throws IllegalAccessException
+   * @throws NoSuchMethodException
+   * @throws InvocationTargetException
+   */
+  private static int getProcessId(RuntimeMXBean mxBean) throws NoSuchFieldException, IllegalArgumentException,
+          IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    java.lang.reflect.Field jvm = mxBean.getClass().getDeclaredField("jvm");
+    jvm.setAccessible(true);
+    Object mgmt = jvm.get(mxBean);
+    java.lang.reflect.Method pid_method = mgmt.getClass().getDeclaredMethod("getProcessId");
+    pid_method.setAccessible(true);
+    return (int) pid_method.invoke(mgmt);
   }
 
   /**

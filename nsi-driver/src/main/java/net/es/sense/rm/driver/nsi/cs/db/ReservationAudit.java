@@ -32,7 +32,7 @@ import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
  */
 @Slf4j
 public class ReservationAudit {
-  private List<String> auditable = new ArrayList<>();
+  private final List<String> auditable = new ArrayList<>();
 
   public void add(String providerId, String connectionId) {
     auditable.add(providerId + ":" + connectionId);
@@ -40,7 +40,7 @@ public class ReservationAudit {
 
   /**
    * Find any NSI reservations in the database that are not in the current
-   * list returned from the NSA.We need to be tricky since removing a
+   * list returned from the NSA.  We need to be tricky since removing a
    * reservation also removes our ability to indicated a change that requires
    * a new topology model to be generated.
    *
@@ -54,18 +54,27 @@ public class ReservationAudit {
         log.debug("[ReservationAudit] found cid = {}", cid);
       } else {
         log.debug("[ReservationAudit] not found in DB cid = {}", cid);
-        // First trick is to identify a change by setting this non-existing
-        // reservation to a TERMINATED state and store it in hopes of
-        // triggering an audit.
-        if (reservation.getLifecycleState() != LifecycleStateEnumType.TERMINATED) {
+        // First thing we do is mark this missing reservation as dirty just
+        // in case this is a race condition and the reservation was created
+        // but not yet in the query results.
+        if (!reservation.isDirty()) {
+          log.debug("[ReservationAudit] marking dirty cid = {}", reservation.getConnectionId());
+          reservationService.setDirty(reservation.getId(), true);
+        } else if (reservation.getLifecycleState() != LifecycleStateEnumType.TERMINATED) {
+          /// Now change the dirty non-existing reservation to a TERMINATED
+          // state and store it in hopes of triggering an audit.
           log.debug("[ReservationAudit] transitioning cid = {}, from {} to {}",
                   reservation.getConnectionId(), reservation.getLifecycleState(),
                   LifecycleStateEnumType.TERMINATED);
-          reservation.setLifecycleState(LifecycleStateEnumType.TERMINATED);
-          reservation.setDiscovered(System.currentTimeMillis());
-          reservationService.store(reservation);
+
+          reservationService.setLifecycleState(reservation.getId(), LifecycleStateEnumType.TERMINATED,
+                  System.currentTimeMillis());
+
+          //reservation.setLifecycleState(LifecycleStateEnumType.TERMINATED);
+          //reservation.setDiscovered(System.currentTimeMillis());
+          //reservationService.store(reservation);
         } else {
-          // This is probably our second time through so we can just delete it now.
+          // This is probably our third time through so we can just delete it now.
           log.debug("[ReservationAudit] deleting cid = {}, lifecycleState = {}",
                   reservation.getConnectionId(), reservation.getLifecycleState());
           reservationService.delete(reservation);

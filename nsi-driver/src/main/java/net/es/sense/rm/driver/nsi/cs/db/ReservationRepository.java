@@ -1,3 +1,22 @@
+/*
+ * SENSE Resource Manager (SENSE-RM) Copyright (c) 2016, The Regents
+ * of the University of California, through Lawrence Berkeley National
+ * Laboratory (subject to receipt of any required approvals from the
+ * U.S. Dept. of Energy).  All rights reserved.
+ *
+ * If you have questions about your rights to use or distribute this
+ * software, please contact Berkeley Lab's Innovation & Partnerships
+ * Office at IPO@lbl.gov.
+ *
+ * NOTICE.  This Software was developed under funding from the
+ * U.S. Department of Energy and the U.S. Government consequently retains
+ * certain rights. As such, the U.S. Government has been granted for
+ * itself and others acting on its behalf a paid-up, nonexclusive,
+ * irrevocable, worldwide license in the Software to reproduce,
+ * distribute copies to the public, prepare derivative works, and perform
+ * publicly and display publicly, and to permit other to do so.
+ *
+ */
 package net.es.sense.rm.driver.nsi.cs.db;
 
 import java.util.Collection;
@@ -124,6 +143,7 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
    */
   @Modifying(clearAutomatically=true, flushAutomatically = true)
   @Query("update #{#entityName} r set r.reservationState = :reservationState, "
+          + "r.dirty = false, "
           + "r.discovered = :discovered "
           + "where r.id = :id")
   public int setReservationState(
@@ -160,6 +180,25 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
           + "where r.id = :id")
   public int setLifecycleState(
           @Param("id") long id,
+          @Param("lifecycleState") LifecycleStateEnumType lifecycleState,
+          @Param("discovered") long discovered);
+
+  /**
+   *
+   * @param id
+   * @param reservationState
+   * @param lifecycleState
+   * @param discovered
+   * @return
+   */
+  @Modifying(clearAutomatically=true, flushAutomatically = true)
+  @Query("update #{#entityName} r set r.reservationState = :reservationState, "
+          + "r.lifecycleState = :lifecycleState, "
+          + "r.discovered = :discovered "
+          + "where r.id = :id")
+  public int setReservationAndLifecycleState(
+          @Param("id") long id,
+          @Param("reservationState") ReservationStateEnumType reservationState,
           @Param("lifecycleState") LifecycleStateEnumType lifecycleState,
           @Param("discovered") long discovered);
 
@@ -239,4 +278,15 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
           @Param("errorState") Reservation.ErrorState errorState,
           @Param("errorMessage") String errorMessage,
           @Param("discovered") long discovered);
+
+  /**
+   *
+   * @param id
+   * @param dirty
+   * @return
+   */
+  @Modifying(clearAutomatically=true, flushAutomatically = true)
+  @Query("update #{#entityName} r set r.dirty = :dirty where r.id = :id")
+  public int setDirty(@Param("id") long id, @Param("dirty") boolean dirty);
+
 }

@@ -34,6 +34,8 @@ public interface ReservationService {
 
   public Reservation getNewest();
 
+  public Reservation findNewest();
+
   public Reservation store(Reservation reservation);
 
   public int setDataPlaneActive(long id, boolean dataPlaneActive, long discovered);
@@ -50,6 +52,9 @@ public interface ReservationService {
 
   public int setLifecycleState(long id, LifecycleStateEnumType lifecycleState, long discovered);
 
+  public int setReservationAndLifecycleState(long id, ReservationStateEnumType reservationState,
+          LifecycleStateEnumType lifecycleState, long discovered);
+
   public int setReserveFailed(long id, ReservationStateEnumType reservationState,
           Reservation.ErrorState errorState, String errorMessage, long discovered);
 
@@ -58,6 +63,8 @@ public interface ReservationService {
   public void delete(long id);
 
   public void delete();
+
+  public int setDirty(long id, boolean dirty);
 
   public Collection<Reservation> get();
 
@@ -78,6 +85,4 @@ public interface ReservationService {
   public Collection<Reservation> getByParentConnectionId(String providerNsa, String parentConnectionId);
 
   public Collection<Reservation> getByAnyConnectionId(String providerNsa, String connectionId);
-
-  public Reservation findNewest();
 }

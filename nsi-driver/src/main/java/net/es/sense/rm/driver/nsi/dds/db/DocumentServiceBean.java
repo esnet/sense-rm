@@ -22,7 +22,8 @@ public class DocumentServiceBean implements DocumentService {
 
   @Override
   public long getLastDiscovered() {
-    return documentRepository.findLastDiscovered();
+    Long result = documentRepository.findLastDiscovered();
+    return result != null ? result : 0;
   }
 
   @Override

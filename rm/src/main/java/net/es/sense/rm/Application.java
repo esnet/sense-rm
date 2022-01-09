@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Slf4j
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages={"net.es.sense.rm"})
 @EnableSwagger2
 @EnableAutoConfiguration
 @EnableTransactionManagement
@@ -38,19 +38,19 @@ public class Application {
 
     // Dump some runtime information.
     RuntimeMXBean mxBean = ManagementFactory.getRuntimeMXBean();
-    log.info("Name: " + mxBean.getName());
+    log.info("Name: {}, {}", context.getApplicationName(), mxBean.getName());
     try {
-      log.info("Pid: " + getProcessId(mxBean));
+      log.info("Pid: {}", getProcessId(mxBean));
     } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException |
             NoSuchMethodException | InvocationTargetException ex) {
       log.error("[SENSE-N-RM] Could not determine Pid", ex);
     }
-    log.info("Uptime: " + mxBean.getUptime() + " ms");
-    log.info("BootClasspath: " + mxBean.getBootClassPath());
-    log.info("Classpath: " + mxBean.getClassPath());
-    log.info("Library Path: " + mxBean.getLibraryPath());
+    log.info("Uptime: {} ms", mxBean.getUptime());
+    log.info("BootClasspath: {}", mxBean.getBootClassPath());
+    log.info("Classpath: {}", mxBean.getClassPath());
+    log.info("Library Path: {}", mxBean.getLibraryPath());
     for (String argument : mxBean.getInputArguments()) {
-      log.info("Input Argument: " + argument);
+      log.info("Input Argument: {}", argument);
     }
     // Listen for a shutdown event so we can clean up.
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -69,7 +69,7 @@ public class Application {
       Thread.sleep(10000);
     }
 
-    log.info("[SENSE-N-RM] Shutdown complete with uptime: " + mxBean.getUptime() + " ms");
+    log.info("[SENSE-N-RM] Shutdown complete with uptime: {} ms", mxBean.getUptime());
     System.exit(0);
   }
 

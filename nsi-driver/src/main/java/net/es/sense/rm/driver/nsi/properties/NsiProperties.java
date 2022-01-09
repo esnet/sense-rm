@@ -3,11 +3,11 @@ package net.es.sense.rm.driver.nsi.properties;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import net.es.nsi.dds.lib.dao.AccessControlType;
+import net.es.nsi.dds.lib.dao.ClientType;
 import net.es.nsi.dds.lib.dao.SecureType;
 import net.es.nsi.dds.lib.dao.ServerType;
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
@@ -20,12 +20,12 @@ import org.springframework.validation.annotation.Validated;
 @JsonRootName(value = "nsi")
 public class NsiProperties {
   // The URL of the local container runtime.
-  @NotNull
+  @NotBlank(message = "ddsUrl cannot be null or empty")
   private String ddsUrl;
   private String proxy;
 
   // The NSA identifier of this RA in URN format.
-  @NotNull
+  @NotBlank(message = "nsaId cannot be null or empty")
   private String nsaId;
 
   // How often the we will audit out subscription to peer DDS servers.
@@ -44,7 +44,7 @@ public class NsiProperties {
   private int connectionAuditTimer = 100;
 
   // The NSA identifier of the target aggregator for our connection requests.
-  @NotNull
+  @NotBlank(message = "providerNsaId cannot be null or empty")
   private String providerNsaId;
   private String providerConnectionURL = "http://localhost:9000/nsi-v2/ConnectionServiceProvider";
   private String requesterConnectionURL = "http://localhost:8080/nsi-v2/ConnectionServiceRequester";
@@ -64,17 +64,14 @@ public class NsiProperties {
   private int modelPruneSize = 10;
 
   // Configuration for web server and client.
-  //@Value ("${server}")
-  @Valid
-  private ServerType server; // = new ServerType();
+  private ServerType server;
 
   // Configuration for client.
-  //@Value ("${client}")
-  @Valid
-  private SecureType client; // = new SecureType();
+  private ClientType client;
+
+  // Configuration for TLS/SSL settings.
+  private SecureType secure;
 
   // I do not believe this is need for a DDS client.
-  //@Value ("${accessControl}")
-  @Valid
   private AccessControlType accessControl = new AccessControlType();
 }

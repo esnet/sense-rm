@@ -10,7 +10,7 @@ import net.es.nsi.dds.lib.client.DdsClient;
 import net.es.nsi.dds.lib.client.SubscriptionResult;
 import net.es.nsi.dds.lib.client.SubscriptionsResult;
 import net.es.nsi.dds.lib.jaxb.dds.SubscriptionType;
-import net.es.sense.rm.driver.nsi.dds.DdsClientProvider;
+import net.es.sense.rm.driver.nsi.dds.DdsProvider;
 import net.es.sense.rm.driver.nsi.dds.db.Subscription;
 import net.es.sense.rm.driver.nsi.dds.db.SubscriptionService;
 import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent;
@@ -39,7 +39,7 @@ public class RegistrationActor extends UntypedAbstractActor {
   private SubscriptionService subscriptionService;
 
   @Autowired
-  private DdsClientProvider ddsClientProvider;
+  private DdsProvider ddsProvider;
 
   @Override
   public void preStart() {
@@ -104,7 +104,7 @@ public class RegistrationActor extends UntypedAbstractActor {
     }
 
     // Send a subscription request.
-    final DdsClient client = ddsClientProvider.get();
+    final DdsClient client = ddsProvider.getDdsClient();
 
     // We will register for all events on all documents.
     SubscriptionResult subscribe = client.subscribe(remoteDdsURL, nsiProperties.getNsaId(), notificationURL);
@@ -153,7 +153,7 @@ public class RegistrationActor extends UntypedAbstractActor {
               subscriptionURL, lastModified, subscription.getLastModified());
 
     // Read the remote subscription to determine if it exists and last update time.
-    final DdsClient client = ddsClientProvider.get();
+    final DdsClient client = ddsProvider.getDdsClient();
     SubscriptionResult subscribe = client.getSubscription(remoteDdsURL, subscriptionURL, lastModified);
 
     switch (subscribe.getStatus()) {
@@ -202,7 +202,7 @@ public class RegistrationActor extends UntypedAbstractActor {
 
     Subscription subscription = subscriptionService.get(event.getUrl());
     if (subscription != null) {
-      final DdsClient client = ddsClientProvider.get();
+      final DdsClient client = ddsProvider.getDdsClient();
       client.unsubscribe(event.getUrl(), subscription.getHref());
     }
   }

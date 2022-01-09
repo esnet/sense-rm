@@ -14,8 +14,10 @@ import java.util.Map;
 public class KeyStoreType {
   private String file;
   private String password;
+
   @lombok.Builder.Default
   private String type = "JKS";
+  
   @lombok.Singular
   private final Map<String, Object> otherProperties = new HashMap<>();
 }

@@ -51,6 +51,8 @@ public class NsiPropertiesTest {
     Assert.assertTrue(nsi.getPeers().containsAll(config.getPeers()));
     Assert.assertEquals(nsi.getProviderNsaId(), config.getProviderNsaId());
     Assert.assertEquals(nsi.getNetworkId(), config.getNetworkId());
-    Assert.assertFalse(config.getServer().getSecure().isProduction());
+    Assert.assertEquals(nsi.getServer().isSecure(), config.getServer().isSecure());
+    Assert.assertEquals(nsi.getSecure().isProduction(), config.getSecure().isProduction());
+    Assert.assertEquals(nsi.getSecure().getKeyStore().getFile(), config.getSecure().getKeyStore().getFile());
   }
 }

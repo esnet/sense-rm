@@ -2,6 +2,11 @@ package net.es.nsi.dds.lib.client;
 
 import com.google.common.base.Strings;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,6 +19,7 @@ import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.util.UrlHelper;
+import net.es.nsi.dds.lib.dao.ClientType;
 import net.es.nsi.dds.lib.jaxb.DdsParser;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentEventType;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentListType;
@@ -35,6 +41,20 @@ import org.apache.http.client.utils.DateUtils;
 public class DdsClient extends RestClient {
 
   private final ObjectFactory FACTORY = new ObjectFactory();
+
+  public DdsClient() {
+    super();
+  }
+
+  public DdsClient(ClientType ct) {
+    super(ct);
+  }
+
+  public DdsClient(ClientType ct, HttpsContext hc) throws KeyStoreException, IOException,
+          NoSuchAlgorithmException, CertificateException, KeyManagementException,
+          UnrecoverableKeyException, IllegalArgumentException {
+    super(ct, hc);
+  }
 
   public DocumentsResult getDocuments(String baseURL) {
     DocumentsResult result = new DocumentsResult();

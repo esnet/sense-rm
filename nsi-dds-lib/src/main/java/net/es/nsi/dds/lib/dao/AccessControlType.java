@@ -14,15 +14,4 @@ public class AccessControlType {
   @lombok.Builder.Default
   protected boolean enabled = false;
   protected List<RuleType> rules;
-
-
-  /**
-   * Gets the value of the enabled property.
-   *
-   * @return possible object is {@link Boolean }
-   *
-   */
-  public boolean isEnabled() {
-    return enabled;
-  }
 }

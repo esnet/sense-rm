@@ -10,7 +10,6 @@ import java.security.cert.CertificateException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.ClientRequestContext;
@@ -22,6 +21,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import net.es.nsi.common.constants.Nsi;
+import net.es.nsi.dds.lib.dao.ClientType;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -44,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Provides REST client for communication with remote DDS servers.
  *
  * @author hacksaw
  */
@@ -64,30 +65,44 @@ public class RestClient {
   private static final String TCP_CONNECT_REQUEST_TIMEOUT = "tcpConnectRequestTimeout";
   private static final int CONNECT_REQUEST_TIMEOUT = 30 * 1000;
 
+  // Connection provider pool configuration defaults.
+  private final static int MAX_CONNECTION_PER_ROUTE = 10;
+  private final static int MAX_CONNECTION_TOTAL = 80;
+
   public RestClient() {
-    ClientConfig clientConfig = configureClient();
+    PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+    ClientConfig clientConfig = getClientConfig(connectionManager, MAX_CONNECTION_PER_ROUTE, MAX_CONNECTION_TOTAL);
     client = ClientBuilder.newBuilder().withConfig(clientConfig).build();
     client.property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL_CLIENT, Level.FINEST.getName());
+    client.property(LoggingFeature.LOGGING_FEATURE_VERBOSITY_CLIENT, LoggingFeature.Verbosity.PAYLOAD_ANY);
   }
 
-  public RestClient(HttpsConfig config) throws KeyStoreException, IOException,
+  public RestClient(ClientType ct) {
+    PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+    ClientConfig clientConfig = getClientConfig(connectionManager, ct.getMaxConnPerRoute(), ct.getMaxConnTotal());
+    client = ClientBuilder.newBuilder().withConfig(clientConfig).build();
+    client.property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL_CLIENT, Level.FINEST.getName());
+    client.property(LoggingFeature.LOGGING_FEATURE_VERBOSITY_CLIENT, LoggingFeature.Verbosity.PAYLOAD_ANY);
+  }
+
+  public RestClient(ClientType ct, HttpsContext hc) throws KeyStoreException, IOException,
           NoSuchAlgorithmException, CertificateException, KeyManagementException,
-          UnrecoverableKeyException {
-    ClientConfig clientConfig = configureSecureClient(config);
-    client = ClientBuilder.newBuilder().withConfig(clientConfig).build();
-    client.property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL_CLIENT, Level.FINEST.getName());
-  }
+          UnrecoverableKeyException, IllegalArgumentException {
 
-  public static ClientConfig configureSecureClient(HttpsConfig config) {
+    // Check to see if the client should be configured with a secure context.
+    if (!ct.isSecure()) {
+      // Looks like they meant to invoke the insecure version of this constructor.
+      throw new IllegalArgumentException("Client context must be set to secure, but is set " + ct.isSecure());
+    }
+
     HostnameVerifier hostnameVerifier;
-    if (config.isProduction()) {
+    if (hc.isProduction()) {
       hostnameVerifier = new DefaultHostnameVerifier();
     } else {
       hostnameVerifier = new NoopHostnameVerifier();
     }
 
-    SSLContext sslContext = config.getSSLContext();
-    LayeredConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
+    LayeredConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(hc.getSSLContext(), hostnameVerifier);
     PlainConnectionSocketFactory socketFactory = PlainConnectionSocketFactory.getSocketFactory();
 
     final Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
@@ -96,26 +111,35 @@ public class RestClient {
             .build();
 
     PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(registry);
-    return getClientConfig(connectionManager);
+    ClientConfig clientConfig = getClientConfig(connectionManager, ct.getMaxConnPerRoute(), ct.getMaxConnTotal());
+    client = ClientBuilder.newBuilder().withConfig(clientConfig).build();
+    client.property(LoggingFeature.LOGGING_FEATURE_LOGGER_LEVEL_CLIENT, Level.FINEST.getName());
+    client.property(LoggingFeature.LOGGING_FEATURE_VERBOSITY_CLIENT, LoggingFeature.Verbosity.PAYLOAD_ANY);
   }
 
-  public static ClientConfig configureClient() {
-    PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-    return getClientConfig(connectionManager);
-  }
-
-  public static ClientConfig getClientConfig(PoolingHttpClientConnectionManager connectionManager) {
+  /**
+   * Creates a client configuration based on the provided configuration.
+   *
+   * @param connectionManager Connection manager used to configure the client configuration.
+   * @param maxPerRoute The max connections per destination.
+   * @param maxTotal The max connection total across all destinations.
+   * @return The new client configuration.
+   */
+  private ClientConfig getClientConfig(PoolingHttpClientConnectionManager connectionManager,
+          int maxPerRoute, int maxTotal) {
     ClientConfig clientConfig = new ClientConfig();
 
     // We want to use the Apache connector for chunk POST support.
     clientConfig.connectorProvider(new ApacheConnectorProvider());
-    connectionManager.setDefaultMaxPerRoute(20);
-    connectionManager.setMaxTotal(80);
+    connectionManager.setDefaultMaxPerRoute(maxPerRoute);
+    connectionManager.setMaxTotal(maxTotal);
     connectionManager.closeIdleConnections(30, TimeUnit.SECONDS);
     clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
 
     clientConfig.register(GZipEncoder.class);
     clientConfig.register(new MoxyXmlFeature());
+    clientConfig.register(new LoggingFeature(java.util.logging.Logger.getGlobal(), Level.ALL,
+            LoggingFeature.Verbosity.PAYLOAD_ANY, 10000));
     clientConfig.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
 
     // Apache specific configuration.
@@ -140,8 +164,6 @@ public class RestClient {
   }
 
   private static class FollowRedirectFilter implements ClientResponseFilter {
-
-    private final static Logger log = LoggerFactory.getLogger(FollowRedirectFilter.class);
 
     @Override
     public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException {

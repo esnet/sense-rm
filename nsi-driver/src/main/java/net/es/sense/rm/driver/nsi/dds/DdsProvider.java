@@ -7,6 +7,12 @@ import akka.util.Timeout;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.ws.rs.NotFoundException;
@@ -19,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.client.DdsClient;
 import net.es.nsi.dds.lib.client.DocumentsResult;
+import net.es.nsi.dds.lib.client.HttpsContext;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentType;
 import net.es.nsi.dds.lib.jaxb.dds.FilterType;
 import net.es.nsi.dds.lib.jaxb.dds.NotificationType;
@@ -31,6 +38,7 @@ import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQuery;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQueryResult;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
+import net.es.sense.rm.driver.nsi.spring.SpringApplicationContext;
 import net.es.sense.rm.driver.nsi.spring.SpringExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -59,14 +67,32 @@ public class DdsProvider implements DdsProviderI {
   @Autowired
   private NsiActorSystem nsiActorSystem;
 
-  @Autowired
-  private DdsClientProvider ddsClientProvider;
-
   private ActorRef localDocumentActor;
   private ActorRef documentExpiryActor;
   private ActorRef registrationRouter;
+  private DdsClient ddsClient;
 
-  public void start() {
+  /**
+   *
+   * @return
+   */
+  public static DdsProvider getInstance() {
+    DdsProvider instance = SpringApplicationContext.getBean("ddsProvider", DdsProvider.class);
+    return instance;
+  }
+
+  /**
+   *
+   * @throws KeyManagementException
+   * @throws NoSuchAlgorithmException
+   * @throws NoSuchProviderException
+   * @throws KeyStoreException
+   * @throws IOException
+   * @throws CertificateException
+   * @throws UnrecoverableKeyException
+   */
+  public void start() throws KeyManagementException, NoSuchAlgorithmException,NoSuchProviderException,
+          KeyStoreException, IOException, CertificateException, UnrecoverableKeyException {
     // Initialize the actors.
     log.info("[DdsProvider] Starting DDS system initialization...");
     ActorSystem actorSystem = nsiActorSystem.getActorSystem();
@@ -79,48 +105,28 @@ public class DdsProvider implements DdsProviderI {
       log.error("[DdsProvider] Failed to initialize actor", ex);
     }
 
+    // If there is a secure SSL context specified then we process it.
+    if (nsiProperties.getSecure() != null) {
+      HttpsContext.getInstance().load(nsiProperties.getSecure());
+    }
+
+
+    // We need to initialize the DDS client with specified configuration.
+
+    if (nsiProperties.getClient().isSecure()) {
+      ddsClient = new DdsClient(nsiProperties.getClient(), HttpsContext.getInstance());
+    } else {
+      ddsClient = new DdsClient(nsiProperties.getClient());
+    }
+
     // Do a one time load of documents from remote DDS service since the web
     // server may not yet be servicing requests.  From this point on it is
     // controlled through the notification process.
-    load();
 
-    log.info("[DdsProvider] Completed DDS system initialization.");
-  }
 
-  public ActorRef GetLocalDocumentActor() {
-    return localDocumentActor;
-  }
-
-  public ActorRef GetDocumentExpiryActor() {
-    return documentExpiryActor;
-  }
-
-  public ActorRef GetRegistrationRouter() {
-    return registrationRouter;
-  }
-
-  public long getLastDiscovered() {
-    return documentService.getLastDiscovered();
-  }
-
-  public void terminate() {
-    // Unsubscribe from our peer DDS servers.
-    RegistrationEvent event = new RegistrationEvent();
-    event.setEvent(RegistrationEvent.Event.Delete);
-    registrationRouter.tell(event, registrationRouter);
-    try { Thread.sleep(4000); } catch (Exception ex) {}
-
-    // We need to kill each of our actors but not touch the actorSystem.
-    nsiActorSystem.shutdown(localDocumentActor);
-    nsiActorSystem.shutdown(documentExpiryActor);
-    nsiActorSystem.shutdown(registrationRouter);
-  }
-
-  public void load() {
-    final DdsClient client = ddsClientProvider.get();
     for (String url : nsiProperties.getPeers()) {
       log.debug("[load] registering url={}", url);
-      DocumentsResult results = client.getDocuments(url);
+      DocumentsResult results = ddsClient.getDocuments(url);
       if (results.getStatus() != Status.OK) {
         log.error("[DdsProvider] could not not load documents from peer = {}, status = {}", url, results.getStatus());
         continue;
@@ -147,6 +153,44 @@ public class DdsProvider implements DdsProviderI {
         }
       });
     }
+
+    log.info("[DdsProvider] Completed DDS system initialization.");
+  }
+
+  public ActorRef GetLocalDocumentActor() {
+    return localDocumentActor;
+  }
+
+  public ActorRef GetDocumentExpiryActor() {
+    return documentExpiryActor;
+  }
+
+  public ActorRef GetRegistrationRouter() {
+    return registrationRouter;
+  }
+
+  public long getLastDiscovered() {
+    return documentService.getLastDiscovered();
+  }
+
+  /**
+   * @return the ddsClient
+   */
+  public DdsClient getDdsClient() {
+    return ddsClient;
+  }
+
+  public void terminate() {
+    // Unsubscribe from our peer DDS servers.
+    RegistrationEvent event = new RegistrationEvent();
+    event.setEvent(RegistrationEvent.Event.Delete);
+    registrationRouter.tell(event, registrationRouter);
+    try { Thread.sleep(4000); } catch (Exception ex) {}
+
+    // We need to kill each of our actors but not touch the actorSystem.
+    nsiActorSystem.shutdown(localDocumentActor);
+    nsiActorSystem.shutdown(documentExpiryActor);
+    nsiActorSystem.shutdown(registrationRouter);
   }
 
   @Override

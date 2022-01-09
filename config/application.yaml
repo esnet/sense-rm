@@ -61,8 +61,10 @@ server:
 #    client-auth: "NEED"
 #    key-store: /home/sense/sense-rm/config/keystore.jks
 #    key-store-password: changeit
+#    key-store-type: JKS
 #    trust-store: /home/sense/sense-rm/config/truststore.jks
 #    trust-store-password: changeit
+#    trust-store-type: JKS
 
 #########################################
 # Swagger documentation configuration   #
@@ -199,28 +201,22 @@ nsi:
   # This was for the DDS HTTP server configuation for incoming requests but now
   # springboot handles this.
   #server:
+    #path:
+    #  path:
+    #  relative:
     #address: nsi0.snvaca.pacificwave.net
     #port: 8443
     #packageName: net.es.sense.rm.driver.nsi
-    #ssl:
-      #enabled: true
-    #secure:
-      #production: false
-      #keyStore:
-        ##type: PKCS12
-        ##file: /home/sense/sense-rm/config/keystore.pfx
-        #type: JKS
-        #file: /home/sense/sense-rm/config/keystore.jks
-        #password: changeit
-      #trustStore:
-        ##type: PKCS12
-        ##file: /home/sense/sense-rm/config/keystore.pfx
-        #type: JKS
-        #file: /home/sense/sense-rm/config/truststore.jks
-        #password: changeit
+    #secure: true
 
   # This configures the local HTTP client (currently within DDS code).
   client:
+    maxConnPerRoute: 10
+    maxConnTotal: 80
+    secure: true
+
+  # This configures the local HTTP client (currently within DDS code).
+  secure:
     production: false
     keyStore:
       type: JKS

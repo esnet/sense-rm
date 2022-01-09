@@ -69,19 +69,15 @@ nsi:
     address: example.net
     port: 8401
     packageName: net.es.sense.rm.driver.nsi
-    secure:
-      production: false
-      keyStore:
-        type: JKS
-        file: config/keystore.jks
-        password: changeit
-      trustStore:
-        type: JKS
-        file: config/keystore.jks
-        password: changeit
+    secure: true
 
   # This configures the local HTTP client (currently within DDS code).
   client:
+    maxConnPerRoute: 10
+    maxConnTotal: 80
+    secure: true
+
+  secure:
     production: false
     keyStore:
       type: JKS

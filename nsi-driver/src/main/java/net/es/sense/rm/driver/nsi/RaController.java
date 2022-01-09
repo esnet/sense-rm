@@ -24,6 +24,13 @@ import akka.actor.ActorSystem;
 import akka.actor.PoisonPill;
 import akka.actor.Terminated;
 import akka.testkit.TestProbe;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -89,8 +96,17 @@ public class RaController {
 
   /**
    * Start the RaController's participation in an NSI network.
+   * 
+   * @throws java.security.KeyManagementException
+   * @throws java.security.NoSuchAlgorithmException
+   * @throws java.security.NoSuchProviderException
+   * @throws java.security.KeyStoreException
+   * @throws java.security.UnrecoverableKeyException
+   * @throws java.io.IOException
+   * @throws java.security.cert.CertificateException
    */
-  public void start() throws IllegalArgumentException {
+  public void start() throws IllegalArgumentException, KeyManagementException, NoSuchAlgorithmException,
+          NoSuchProviderException, KeyStoreException, IOException, CertificateException, UnrecoverableKeyException {
     log.info("[RaController] Starting RA...");
 
     if (nsiProperties == null) {

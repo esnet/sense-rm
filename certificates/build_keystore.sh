@@ -46,7 +46,7 @@ openssl pkcs12 -export \
     -certfile $5 \
     -passout pass:"$2"
 
-# Conver the temporary pkcs12 keystore to JKS.
+# Convert the temporary pkcs12 keystore to JKS.
 $JAVA_HOME/bin/keytool -v -importkeystore \
     -noprompt \
     -srcstorepass "$2" \

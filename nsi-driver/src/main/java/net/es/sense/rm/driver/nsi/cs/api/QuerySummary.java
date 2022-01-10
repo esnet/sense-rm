@@ -71,7 +71,7 @@ public class QuerySummary {
    */
   public void process(QuerySummaryConfirmedType querySummaryConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
-    
+
     // Get the providerNSA identifier.
     String providerNsa = header.value.getProviderNSA();
 
@@ -298,7 +298,7 @@ public class QuerySummary {
       }
 
       ChildSummaryListType children = criteria.getChildren();
-      if (children != null || !children.getChild().isEmpty()) {
+      if (children != null && !children.getChild().isEmpty()) {
         // We still have children so this must be an aggregator.  Build a list of
         // child reservations matching our topology identifier.
         log.info("[QuerySummary] processSummaryCriteria: processing child criteria.");

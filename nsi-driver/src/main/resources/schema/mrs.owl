@@ -863,47 +863,47 @@
         DatatypeProperty added as part of SENSE features.
     -->
     <owl:DatatypeProperty rdf:about="http://schemas.ogf.org/mrs/2013/12/topology#type">
-        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwithService"/>
+        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>
 
     <owl:DatatypeProperty rdf:about="http://schemas.ogf.org/mrs/2013/12/topology#unit">
-        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwithService"/>
+        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>
 
     <owl:DatatypeProperty rdf:about="http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity">
-        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwithService"/>
+        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#long"/>
     </owl:DatatypeProperty>
 
     <owl:DatatypeProperty rdf:about="http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity">
-        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwithService"/>
+        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#long"/>
     </owl:DatatypeProperty>
 
     <owl:DatatypeProperty rdf:about="http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity">
-        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwithService"/>
+        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#long"/>
     </owl:DatatypeProperty>
 
     <owl:DatatypeProperty rdf:about="http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity">
-        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwithService"/>
+        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#long"/>
     </owl:DatatypeProperty>
 
     <owl:DatatypeProperty rdf:about="http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity">
-        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwithService"/>
+        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#long"/>
     </owl:DatatypeProperty>
 
     <owl:DatatypeProperty rdf:about="http://schemas.ogf.org/mrs/2013/12/topology#granularity">
-        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwithService"/>
+        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#long"/>
     </owl:DatatypeProperty>
 
     <owl:DatatypeProperty rdf:about="http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity">
-        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwithService"/>
+        <rdfs:domain rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#long"/>
     </owl:DatatypeProperty>
 

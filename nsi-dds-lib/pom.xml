@@ -1,284 +1,289 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
+    <parent>
+        <groupId>net.es.sense</groupId>
+        <artifactId>sense-n-rm</artifactId>
+        <version>0.1.0</version>
+    </parent>
+
     <groupId>net.es.sense</groupId>
-    <artifactId>sense-n-rm</artifactId>
+    <artifactId>nsi-dds-lib</artifactId>
     <version>0.1.0</version>
-  </parent>
+    <packaging>jar</packaging>
 
-  <artifactId>nsi-dds-lib</artifactId>
-  <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>net.es.sense</groupId>
+            <artifactId>common</artifactId>
+            <version>0.1.0</version>
+        </dependency>
 
-  <dependencies>
-    <dependency>
-      <groupId>net.es.sense</groupId>
-      <artifactId>common</artifactId>
-      <version>0.1.0</version>
-    </dependency>
+        <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jaxp-api</artifactId>
+            <version>1.4.2</version>
+        </dependency>
 
-    <dependency>
-      <groupId>javax.xml</groupId>
-      <artifactId>jaxp-api</artifactId>
-      <version>1.4.2</version>
-    </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+            <version>2.3.0</version>
+        </dependency>
 
-    <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-xjc</artifactId>
-      <version>2.3.0</version>
-    </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.0</version>
+        </dependency>
 
-    <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-      <version>2.3.0</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/xerces/xercesImpl -->
-    <dependency>
-      <groupId>xerces</groupId>
-      <artifactId>xercesImpl</artifactId>
-      <version>[2.12.0,)</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-    </dependency>
-
-    <!-- Google JSON parsers perform better than Moxy. -->
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>${guava.version}</version>
-    </dependency>
-
-    <!-- For FileUtils -->
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>[2.8.0,]</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.glassfish.jersey.ext</groupId>
-      <artifactId>jersey-proxy-client</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.glassfish.jersey.connectors</groupId>
-      <artifactId>jersey-apache-connector</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.glassfish.jersey.media</groupId>
-      <artifactId>jersey-media-moxy</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.glassfish.jersey.bundles</groupId>
-      <artifactId>jaxrs-ri</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.glassfish.jersey.core</groupId>
-      <artifactId>jersey-common</artifactId>
-    </dependency>
-
-
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-    </dependency>
-
-    <!-- Needed for certificate DN manipulation. -->
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
-      <version>1.70</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpkix-jdk15on</artifactId>
-      <version>1.70</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bctls-jdk15on</artifactId>
-      <version>1.70</version>
-    </dependency>
-
-    <!-- SLF and Log4j for logging infrestructure. -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>log4j-over-slf4j</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-    </dependency>
-
-    <!-- To handle XML dateTime manipulation. -->
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.1</version>
-        <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-          <testSource>${java.version}</testSource>
-          <testTarget>${java.version}</testTarget>
-          <compilerArgument>-Xlint:unchecked</compilerArgument>
-          <compilerArgument>-Xlint:deprecation</compilerArgument>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <!-- We use this plugin to ensure that our usage of the
-        maven-jaxb2-plugin is JDK 8 compatible in absence of a fix
-        for https://java.net/jira/browse/MAVEN_JAXB2_PLUGIN-80. -->
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>properties-maven-plugin</artifactId>
-        <version>1.0.0</version>
-        <executions>
-          <execution>
-            <id>set-additional-system-properties</id>
-            <goals>
-              <goal>set-system-properties</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <properties>
-            <property>
-              <name>javax.xml.accessExternalSchema</name>
-              <value>file,http</value>
-            </property>
-          </properties>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jaxb2-maven-plugin</artifactId>
-        <version>1.6</version>
-        <dependencies>
-          <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-            <version>1.4.01</version>
-          </dependency>
-          <dependency>
+        <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
-            <version>2.12.2</version>
-          </dependency>
-        </dependencies>
-        <executions>
-          <execution>
-            <id>dds</id>
-            <goals>
-              <goal>xjc</goal>
-            </goals>
-            <configuration>
-              <bindingDirectory>${basedir}/src/main/resources/xsd</bindingDirectory>
-              <bindingFiles>dds.xjb</bindingFiles>
-              <schemaDirectory>${basedir}/src/main/resources/xsd</schemaDirectory>
-              <schemaFiles>ogf_nsi_discovery_protocol_v1_0.xsd</schemaFiles>
-              <packageName>net.es.nsi.dds.lib.jaxb.dds</packageName>
-              <clearOutputDir>false</clearOutputDir>
-            </configuration>
-          </execution>
-          <execution>
-            <id>nml</id>
-            <goals>
-              <goal>xjc</goal>
-            </goals>
-            <configuration>
-              <bindingDirectory>${basedir}/src/main/resources/xsd</bindingDirectory>
-              <bindingFiles>nml.xjb</bindingFiles>
-              <schemaDirectory>${basedir}/src/main/resources/xsd</schemaDirectory>
-              <schemaFiles>nmlbase.xsd, nml-ethernet.xsd, ogf_nsi_services_definition_v2_0.xsd, nsi-ext.xsd</schemaFiles>
-              <packageName>net.es.nsi.dds.lib.jaxb.nml</packageName>
-              <clearOutputDir>false</clearOutputDir>
-            </configuration>
-          </execution>
-          <execution>
-            <id>nsa</id>
-            <goals>
-              <goal>xjc</goal>
-            </goals>
-            <configuration>
-              <bindingDirectory>${basedir}/src/main/resources/xsd</bindingDirectory>
-              <bindingFiles>nsa.xjb</bindingFiles>
-              <schemaDirectory>${basedir}/src/main/resources/xsd</schemaDirectory>
-              <schemaFiles>ogf_nsi_discovery_nsa_v1_0.xsd, xCard.xsd, gnsbod.xsd</schemaFiles>
-              <packageName>net.es.nsi.dds.lib.jaxb.nsa</packageName>
-              <clearOutputDir>false</clearOutputDir>
-            </configuration>
-          </execution>
-          <execution>
-            <id>nmwg</id>
-            <goals>
-              <goal>xjc</goal>
-            </goals>
-            <configuration>
-              <bindingDirectory>${basedir}/src/main/resources/xsd</bindingDirectory>
-              <bindingFiles>nmwg.xjb</bindingFiles>
-              <schemaDirectory>${basedir}/src/main/resources/xsd</schemaDirectory>
-              <schemaFiles>nmtopo-ctrlp.xsd</schemaFiles>
-              <packageName>net.es.nsi.dds.lib.jaxb.nmwg</packageName>
-              <clearOutputDir>false</clearOutputDir>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+            <version>[2.12.0,)</version>
+        </dependency>
 
-      <plugin>
-        <artifactId>exec-maven-plugin</artifactId>
-        <groupId>org.codehaus.mojo</groupId>
-        <version>3.0.0</version>
-        <configuration>
-          <skip>true</skip>
-          <executable>bash</executable>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <!-- Google JSON parsers perform better than Moxy. -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+
+        <!-- For FileUtils -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>[2.8.0,]</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.ext</groupId>
+            <artifactId>jersey-proxy-client</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.connectors</groupId>
+            <artifactId>jersey-apache-connector</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-moxy</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.bundles</groupId>
+            <artifactId>jaxrs-ri</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-common</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+
+        <!-- Needed for certificate DN manipulation. -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.70</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>1.70</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bctls-jdk15on</artifactId>
+            <version>1.70</version>
+        </dependency>
+
+        <!-- SLF and Log4j for logging infrestructure. -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+        </dependency>
+
+        <!-- To handle XML dateTime manipulation. -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <testSource>${java.version}</testSource>
+                    <testTarget>${java.version}</testTarget>
+                    <compilerArgument>-Xlint:unchecked</compilerArgument>
+                    <compilerArgument>-Xlint:deprecation</compilerArgument>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <!-- We use this plugin to ensure that our usage of the
+                maven-jaxb2-plugin is JDK 8 compatible in absence of a fix
+                for https://java.net/jira/browse/MAVEN_JAXB2_PLUGIN-80. -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <id>set-additional-system-properties</id>
+                        <goals>
+                            <goal>set-system-properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <properties>
+                        <property>
+                            <name>javax.xml.accessExternalSchema</name>
+                            <value>file,http</value>
+                        </property>
+                    </properties>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>1.6</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                        <version>1.4.01</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>xerces</groupId>
+                        <artifactId>xercesImpl</artifactId>
+                        <version>2.12.2</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.activation</groupId>
+                        <artifactId>activation</artifactId>
+                        <version>1.1.1</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>dds</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <bindingDirectory>${basedir}/src/main/resources/xsd</bindingDirectory>
+                            <bindingFiles>dds.xjb</bindingFiles>
+                            <schemaDirectory>${basedir}/src/main/resources/xsd</schemaDirectory>
+                            <schemaFiles>ogf_nsi_discovery_protocol_v1_0.xsd</schemaFiles>
+                            <packageName>net.es.nsi.dds.lib.jaxb.dds</packageName>
+                            <clearOutputDir>false</clearOutputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>nml</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <bindingDirectory>${basedir}/src/main/resources/xsd</bindingDirectory>
+                            <bindingFiles>nml.xjb</bindingFiles>
+                            <schemaDirectory>${basedir}/src/main/resources/xsd</schemaDirectory>
+                            <schemaFiles>nmlbase.xsd, nml-ethernet.xsd, ogf_nsi_services_definition_v2_0.xsd, nsi-ext.xsd</schemaFiles>
+                            <packageName>net.es.nsi.dds.lib.jaxb.nml</packageName>
+                            <clearOutputDir>false</clearOutputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>nsa</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <bindingDirectory>${basedir}/src/main/resources/xsd</bindingDirectory>
+                            <bindingFiles>nsa.xjb</bindingFiles>
+                            <schemaDirectory>${basedir}/src/main/resources/xsd</schemaDirectory>
+                            <schemaFiles>ogf_nsi_discovery_nsa_v1_0.xsd, xCard.xsd, gnsbod.xsd</schemaFiles>
+                            <packageName>net.es.nsi.dds.lib.jaxb.nsa</packageName>
+                            <clearOutputDir>false</clearOutputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>nmwg</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <bindingDirectory>${basedir}/src/main/resources/xsd</bindingDirectory>
+                            <bindingFiles>nmwg.xjb</bindingFiles>
+                            <schemaDirectory>${basedir}/src/main/resources/xsd</schemaDirectory>
+                            <schemaFiles>nmtopo-ctrlp.xsd</schemaFiles>
+                            <packageName>net.es.nsi.dds.lib.jaxb.nmwg</packageName>
+                            <clearOutputDir>false</clearOutputDir>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>exec-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <version>3.0.0</version>
+                <configuration>
+                    <skip>true</skip>
+                    <executable>bash</executable>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
 

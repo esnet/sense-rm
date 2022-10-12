@@ -66,22 +66,23 @@ public class NmlExistsDuring {
    * OpenNSA will not accept a starTime in the past so we want to give
    * ourselves a 60 second padding for a startTime in the future to
    * account for delay in propagation.  If the specified startTime is
-   * in the past, or within 10 seconds from now, we return a startTime
+   * in the past, or within 60 seconds from now, we return a startTime
    * of now just to be safe.
+   *
+   * Update: we also need to return a time 60 seconds in the future if
+   * a startTime is not present to help with a new OpenNSA bug.
    *
    * @return
    * @throws DatatypeConfigurationException
    */
   public XMLGregorianCalendar getPaddedStart() throws DatatypeConfigurationException {
-    // We want pad the current date with 10 seconds before comparing.
-    if (start != null) {
-      Date now = new Date(System.currentTimeMillis() + 1000 * 60);
-      if (now.before(XmlUtilities.xmlGregorianCalendarToDate(start))) {
+    // We want pad the current date with 60 seconds before comparing.
+    Date now = new Date(System.currentTimeMillis() + 1000 * 60);
+    if (start != null && now.before(XmlUtilities.xmlGregorianCalendarToDate(start))) {
         return start;
-      }
     }
 
-    return null;
+    return XmlUtilities.xmlGregorianCalendar(now);
   }
 
   public XMLGregorianCalendar getEnd() {

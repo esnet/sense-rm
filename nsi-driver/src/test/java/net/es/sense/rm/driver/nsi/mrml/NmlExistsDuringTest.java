@@ -86,7 +86,7 @@ public class NmlExistsDuringTest {
     // Create a new NmlExistsDuring and verify proper creation.
     NmlExistsDuring ed = new NmlExistsDuring(URN);
     assertEquals(URN, ed.getId());
-    assertNotNull(ed.getStart());
+    assertNull(ed.getStart());
     assertNotNull(ed.getEnd());
 
     // Verify correct behavior for embedded ExistsDuring resource.
@@ -104,7 +104,7 @@ public class NmlExistsDuringTest {
   @Test
   public void testGetStart() throws DatatypeConfigurationException {
     NmlExistsDuring ed = new NmlExistsDuring(URN);
-    assertNotNull(ed.getStart());
+    assertNull(ed.getStart());
   }
 
   /**
@@ -114,7 +114,7 @@ public class NmlExistsDuringTest {
   @Test
   public void testGetPaddedStart() throws DatatypeConfigurationException {
     NmlExistsDuring ed = new NmlExistsDuring(URN);
-    assertNotNull(ed.getPaddedStart());
+    assertNull(ed.getPaddedStart());
   }
 
   /**

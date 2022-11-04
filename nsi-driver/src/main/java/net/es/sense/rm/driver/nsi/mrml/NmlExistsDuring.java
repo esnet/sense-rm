@@ -77,12 +77,16 @@ public class NmlExistsDuring {
    */
   public XMLGregorianCalendar getPaddedStart() throws DatatypeConfigurationException {
     // We want pad the current date with 60 seconds before comparing.
-    Date now = new Date(System.currentTimeMillis() + 1000 * 60);
-    if (start != null && now.before(XmlUtilities.xmlGregorianCalendarToDate(start))) {
+    if (start != null) {
+      Date now = new Date(System.currentTimeMillis() + 1000 * 60);
+      if (now.before(XmlUtilities.xmlGregorianCalendarToDate(start))) {
         return start;
+      }
+
+      return XmlUtilities.xmlGregorianCalendar(now);
     }
 
-    return XmlUtilities.xmlGregorianCalendar(now);
+    return null;
   }
 
   public XMLGregorianCalendar getEnd() {

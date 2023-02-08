@@ -1,5 +1,6 @@
 package net.es.nsi.cs.lib;
 
+import java.util.List;
 import java.util.Map;
 import javax.xml.ws.BindingProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,11 @@ public class Client {
     proxy = provider.getConnectionServiceProviderPort();
     BindingProvider bp = (BindingProvider) proxy;
     Map<String, Object> context = bp.getRequestContext();
+
+    List handlers = bp.getBinding().getHandlerChain();
+    handlers.add(new SoapLogger());
+    bp.getBinding().setHandlerChain(handlers);
+
     context.put("jaxb.additionalContextClasses",
             new Class[]{
               org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory.class,

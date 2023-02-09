@@ -19,9 +19,9 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
     <swagger.version>2.7.0</swagger.version>
-    <guava.version>18.0</guava.version>
+    <guava.version>31.1-jre</guava.version>
     <log4j.version>1.2.17</log4j.version>
-    <jersey.version>2.25.1</jersey.version>
+    <jersey.version>2.38</jersey.version>
 
     <host.key>${basedir}/certificates/host.key</host.key>
     <host.cer>${basedir}/certificates/host.cer</host.cer>

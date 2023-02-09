@@ -91,7 +91,7 @@ public class MeasurementServiceBean implements MeasurementService {
 
   @Override
   public MeasurementResource get(String id) {
-    return measurementRepository.findOne(id);
+    return measurementRepository.findOneById(id);
   }
 
   @Override
@@ -114,7 +114,7 @@ public class MeasurementServiceBean implements MeasurementService {
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
   public void delete(String id) {
-    measurementRepository.delete(id);
+    measurementRepository.deleteById(id);
   }
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)

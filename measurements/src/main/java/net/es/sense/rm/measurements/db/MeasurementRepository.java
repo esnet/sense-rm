@@ -13,9 +13,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MeasurementRepository extends CrudRepository<MeasurementResource, String> {
 
-  public MeasurementResource findOne(@Param("id") String id);
+  public MeasurementResource findOneById(@Param("id") String id);
 
-  public void delete(@Param("id") String id);
+  public void deleteById(@Param("id") String id);
 
   /**
    * Find all measurements newer than the specified lastModified time.

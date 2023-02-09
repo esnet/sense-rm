@@ -26,11 +26,15 @@ import java.util.Collection;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @Service
-@Transactional(propagation=Propagation.REQUIRED, readOnly=true)
+@Transactional(propagation=Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE, readOnly=true)
 public class ModelServiceBean implements ModelService {
 
   @Autowired
@@ -88,8 +92,8 @@ public class ModelServiceBean implements ModelService {
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
-  public void delete(String id) {
-    modelRepository.delete(id);
+  public void delete(String modelId) {
+    modelRepository.deleteByModelId(modelId);
   }
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
@@ -151,7 +155,7 @@ public class ModelServiceBean implements ModelService {
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
   public void purge(String topologyId, int size) {
-    Pageable newest = new PageRequest(0, size, Direction.DESC, "created");
+    Pageable newest = PageRequest.of(0, size, Sort.by(Direction.DESC, "created"));
     Page<Model> top = modelRepository.findByTopologyId(topologyId, newest);
     List<Long> list = top.map((m)-> m.getCreated()).getContent();
     Long last = list.get(list.size() - 1);

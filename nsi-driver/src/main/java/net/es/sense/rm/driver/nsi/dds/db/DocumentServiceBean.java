@@ -36,7 +36,7 @@ public class DocumentServiceBean implements DocumentService {
     if (Strings.isNullOrEmpty(id)) {
       return null;
     }
-    return documentRepository.findOne(id);
+    return documentRepository.findOneById(id);
   }
 
   @Override
@@ -127,8 +127,7 @@ public class DocumentServiceBean implements DocumentService {
   @Modifying
   @Override
   public Document update(Document document) {
-    Document findOne = documentRepository.findOne(document.getId());
-    if (findOne == null) {
+    if (documentRepository.findOneById(document.getId()) == null) {
       return null;
     }
     return documentRepository.save(document);
@@ -143,6 +142,6 @@ public class DocumentServiceBean implements DocumentService {
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
   @Override
   public void delete(String id) {
-    documentRepository.delete(id);
+    documentRepository.deleteById(id);
   }
 }

@@ -16,10 +16,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -28,8 +29,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { DocumentRepository.class, Document.class, DbUnitTestConfiguration.class })
-@DataJpaTest
+@AutoConfigureTestDatabase
 @ActiveProfiles("test")
+@Transactional
 public class DocumentRepositoryTest {
   @Autowired
   private DocumentRepository documents;
@@ -106,7 +108,7 @@ public class DocumentRepositoryTest {
 
     // Verify the first document exists.
     String id = Document.documentId(d1.getDocumentFull());
-    Document findOne = documents.findOne(id);
+    Document findOne = documents.findOneById(id);
     Assert.assertEquals(id, findOne.getId());
 
     // Verify the document contents were not truncated.
@@ -114,7 +116,7 @@ public class DocumentRepositoryTest {
 
     // Verify the second document exists.
     id = Document.documentId(d2.getDocumentFull());
-    findOne = documents.findOne(id);
+    findOne = documents.findOneById(id);
     Assert.assertEquals(id, findOne.getId());
 
     // Verify the document contents were not truncated.
@@ -127,7 +129,7 @@ public class DocumentRepositoryTest {
     buildDatabase();
 
     String id = Document.documentId(d1.getDocumentFull());
-    Document findOne = documents.findOne(id);
+    Document findOne = documents.findOneById(id);
 
     long now = System.currentTimeMillis();
     Assert.assertNotEquals(now, findOne.getLastDiscovered());
@@ -141,7 +143,7 @@ public class DocumentRepositoryTest {
     findOne.setDocumentType(documentT);
     documents.save(findOne);
 
-    findOne = documents.findOne(id);
+    findOne = documents.findOneById(id);
     Assert.assertEquals(now, findOne.getLastDiscovered());
     documentT = findOne.getDocumentFull();
     Assert.assertEquals(currentDate, documentT.getVersion());
@@ -161,7 +163,7 @@ public class DocumentRepositoryTest {
     Assert.assertEquals(0, count);
 
     String id = Document.documentId(d1.getDocumentFull());
-    Document findOne = documents.findOne(id);
+    Document findOne = documents.findOneById(id);
 
     long now = System.currentTimeMillis();
     findOne.setLastDiscovered(now);
@@ -209,7 +211,7 @@ public class DocumentRepositoryTest {
     Assert.assertEquals(2, expired.size());
 
     for (Document document : expired) {
-      documents.delete(document.getId());
+      documents.deleteById(document.getId());
     }
 
     expired = Lists.newArrayList(documents.findExpired(expires.getTime()));

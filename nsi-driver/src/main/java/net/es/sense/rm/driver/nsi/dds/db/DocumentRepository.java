@@ -1,5 +1,6 @@
 package net.es.sense.rm.driver.nsi.dds.db;
 
+import net.es.sense.rm.driver.nsi.cs.db.ConnectionMap;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface DocumentRepository extends CrudRepository<Document, String> {
+
+  public Document findOneById(@Param("id") String id);
+  public void deleteById(@Param("id") String id);
 
   @Query("select d from #{#entityName} d where d.lastDiscovered > :lastDiscovered")
   public Iterable<Document> findNewer(@Param("lastDiscovered") long lastDiscovered);

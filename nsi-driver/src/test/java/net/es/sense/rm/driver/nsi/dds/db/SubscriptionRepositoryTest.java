@@ -26,8 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -39,12 +38,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { SubscriptionRepository.class, Subscription.class, DbUnitTestConfiguration.class })
-@DataJpaTest
+@AutoConfigureTestDatabase
 @ActiveProfiles("test")
 public class SubscriptionRepositoryTest {
-  @Autowired
-  private TestEntityManager entityManager;
-
   @Autowired
   private SubscriptionRepository subscriptions;
 
@@ -94,12 +90,12 @@ public class SubscriptionRepositoryTest {
 
   @Test
   public void testValues() {
-    Subscription findOne = subscriptions.findOne(DDSURL_1);
+    Subscription findOne = subscriptions.findOneByDdsURL(DDSURL_1);
     Assert.assertEquals(HREF_1, findOne.getHref());
     Assert.assertEquals(CREATEDATE_1, findOne.getCreated());
     Assert.assertEquals(LASTAUDIT, findOne.getLastAudit());
 
-    findOne = subscriptions.findOne(DDSURL_2);
+    findOne = subscriptions.findOneByDdsURL(DDSURL_2);
     Assert.assertEquals(HREF_2, findOne.getHref());
     Assert.assertEquals(CREATEDATE_2, findOne.getCreated());
     Assert.assertEquals(LASTAUDIT, findOne.getLastAudit());

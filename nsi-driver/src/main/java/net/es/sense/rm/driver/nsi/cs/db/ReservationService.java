@@ -20,14 +20,18 @@
 package net.es.sense.rm.driver.nsi.cs.db;
 
 import java.util.Collection;
+import net.es.sense.rm.driver.nsi.dds.db.Document;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author hacksaw
  */
+@Service
 public interface ReservationService {
 
   public long getLastDiscovered();
@@ -60,7 +64,7 @@ public interface ReservationService {
 
   public void delete(Reservation reservation);
 
-  public void delete(long id);
+  public void delete(@Param("id") long id);
 
   public void delete();
 

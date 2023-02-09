@@ -1,11 +1,13 @@
 package net.es.sense.rm.driver.nsi.cs.db;
 
 import java.util.Collection;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author hacksaw
  */
+@Service
 public interface ConnectionMapService {
 
   public ConnectionMap store(ConnectionMap reservation);

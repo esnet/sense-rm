@@ -31,10 +31,12 @@ import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.annotation.Order;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Some unit tests for the ReservationRepository class.
@@ -44,9 +46,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { ReservationRepository.class, Reservation.class, DbUnitTestConfiguration.class })
-@DataJpaTest
+@AutoConfigureTestDatabase
 @EnableAutoConfiguration
 @ActiveProfiles("test")
+@Transactional
 public class ReservationRepositoryTest {
   @Autowired
   private ReservationRepository reservationRepository;
@@ -63,6 +66,8 @@ public class ReservationRepositoryTest {
    * Build a small database for the unit tests.
    */
   public void buildSmallDatabase() {
+    assertEquals(0, reservationRepository.count());
+
     Reservation r1 = new Reservation();
     r1.setConnectionId(R1_CONNID);
     //r1.setDiscovered(10000);
@@ -107,12 +112,15 @@ public class ReservationRepositoryTest {
         "    <destSTP>urn:ogf:network:surf.nl:2020:production:netherlight.canarie-1?vlan=2025</destSTP>\n" +
         "</ns7:p2ps>");
     reservationRepository.save(r3);
+
+    assertEquals(3, reservationRepository.count());
   }
 
   /**
    * Do a set of empty database tests.
    */
   @Test
+  @Order(1)
   public void emptyTest() {
     assertEquals(0, reservationRepository.count());
 
@@ -135,10 +143,11 @@ public class ReservationRepositoryTest {
    * Do various get tests.
    */
   @Test
+  @Order(2)
   public void getTests() {
     buildSmallDatabase();
 
-    assertEquals(reservationRepository.count(), 3);
+    assertEquals(3, reservationRepository.count());
 
     Long discovered = reservationRepository.findNewestDiscovered();
     assertNotNull(discovered);
@@ -177,6 +186,7 @@ public class ReservationRepositoryTest {
    * Do a set of tests over a small number of database entries.
    */
   @Test
+  @Order(3)
   public void transactionTest() {
     buildSmallDatabase();
 

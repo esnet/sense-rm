@@ -15,7 +15,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -27,7 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { DocumentService.class, DocumentServiceBean.class, DocumentRepository.class, Document.class, DbUnitTestConfiguration.class })
-@DataJpaTest
+@AutoConfigureTestDatabase
 @ActiveProfiles("test")
 public class DocumentServiceTest {
   @Autowired
@@ -172,7 +172,7 @@ public class DocumentServiceTest {
     Assert.assertEquals(0, findNewer.size());
 
     String id = Document.documentId(d1.getDocumentFull());
-    Document findOne = documents.findOne(id);
+    Document findOne = documents.findOneById(id);
 
     long now = System.currentTimeMillis();
     findOne.setLastDiscovered(now);

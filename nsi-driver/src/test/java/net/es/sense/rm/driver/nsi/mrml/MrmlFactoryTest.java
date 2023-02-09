@@ -18,7 +18,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.junit.Test;
-import static org.mockito.Matchers.anyString;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 /**
@@ -54,7 +54,7 @@ public class MrmlFactoryTest {
     Mockito.when(drMock.getTopologyById(NEWORK_ID)).thenReturn(Lists.newArrayList(nml));
 
     ConnectionMapService cmMock = Mockito.mock(ConnectionMapService.class);
-    Mockito.when(cmMock.getByDeltaId(anyString())).thenReturn(null);
+    Mockito.when(cmMock.getByDeltaId(ArgumentMatchers.anyString())).thenReturn(null);
 
     log.info("[testCreateOntologyModel] building NML model");
     NmlModel model = new NmlModel(drMock);
@@ -81,7 +81,7 @@ public class MrmlFactoryTest {
     Mockito.when(drMock.getTopologyById(NEWORK_ID)).thenReturn(Lists.newArrayList(nml));
 
     ConnectionMapService cmMock = Mockito.mock(ConnectionMapService.class);
-    Mockito.when(cmMock.getByDeltaId(anyString())).thenReturn(null);
+    Mockito.when(cmMock.getByDeltaId(ArgumentMatchers.anyString())).thenReturn(null);
 
     log.info("[testWidlcardSwitchingService] building NML model");
     NmlModel model = new NmlModel(drMock);
@@ -110,7 +110,7 @@ public class MrmlFactoryTest {
     Mockito.when(drMock.getTopologyById(NEWORK_ID)).thenReturn(Lists.newArrayList(nml));
 
     ConnectionMapService cmMock = Mockito.mock(ConnectionMapService.class);
-    Mockito.when(cmMock.getByDeltaId(anyString())).thenReturn(null);
+    Mockito.when(cmMock.getByDeltaId(ArgumentMatchers.anyString())).thenReturn(null);
 
     log.info("[testLargeTopology] building NML model");
     NmlModel model = new NmlModel(drMock);

@@ -3,7 +3,6 @@ package net.es.nsi.cs.lib;
 import java.util.List;
 import java.util.Map;
 import javax.xml.ws.BindingProvider;
-import lombok.extern.slf4j.Slf4j;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionProviderPort;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionServiceProvider;
 
@@ -11,12 +10,14 @@ import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionServiceProvid
  *
  * @author hacksaw
  */
-@Slf4j
 public class Client {
+
+  org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
 
   private final ConnectionProviderPort proxy;
 
   public Client(String providerUrl) {
+    logger.info("Client: created client for " + providerUrl);
     ConnectionServiceProvider provider = new ConnectionServiceProvider();
     proxy = provider.getConnectionServiceProviderPort();
     BindingProvider bp = (BindingProvider) proxy;
@@ -36,7 +37,7 @@ public class Client {
     context.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, providerUrl);
     context.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
 
-    log.debug("Client: created client for " + providerUrl);
+    logger.info("Client: created client for " + providerUrl);
   }
 
   public ConnectionProviderPort getProxy() {

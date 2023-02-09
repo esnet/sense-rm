@@ -3,8 +3,11 @@ package net.es.sense.rm.driver.nsi.cs.db;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import java.util.Collection;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -29,7 +32,7 @@ public class ConnectionMapServiceBean implements ConnectionMapService {
 
   @Override
   public ConnectionMap get(long id) {
-    return connectionMapRepository.findOne(id);
+    return connectionMapRepository.findOneById(id);
   }
 
   @Override
@@ -78,7 +81,9 @@ public class ConnectionMapServiceBean implements ConnectionMapService {
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
   public void delete(long id) {
-    connectionMapRepository.delete(id);
+    Optional.ofNullable(connectionMapRepository.findOneById(id)).ifPresent(conn -> {
+      connectionMapRepository.delete(conn);
+    });
   }
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)

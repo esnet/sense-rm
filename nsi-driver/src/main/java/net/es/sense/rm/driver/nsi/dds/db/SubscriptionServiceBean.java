@@ -35,7 +35,7 @@ public class SubscriptionServiceBean implements SubscriptionService {
     if (Strings.isNullOrEmpty(ddsurl)) {
       return null;
     }
-    return subscriptionRepository.findOne(ddsurl);
+    return subscriptionRepository.findOneByDdsURL(ddsurl);
   }
 
   @Override
@@ -58,7 +58,7 @@ public class SubscriptionServiceBean implements SubscriptionService {
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
   @Override
   public Subscription update(Subscription subscription) {
-    Subscription findOne = subscriptionRepository.findOne(subscription.getDdsURL());
+    Subscription findOne = subscriptionRepository.findOneByDdsURL(subscription.getDdsURL());
     if (findOne == null) {
       return null;
     }
@@ -74,6 +74,6 @@ public class SubscriptionServiceBean implements SubscriptionService {
   @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
   @Override
   public void delete(String ddsUrl) {
-    subscriptionRepository.delete(ddsUrl);
+    subscriptionRepository.deleteByddsURL(ddsUrl);
   }
 }

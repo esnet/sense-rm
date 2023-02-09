@@ -36,6 +36,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReservationRepository extends CrudRepository<Reservation, Long> {
 
+  public Reservation findOneById(@Param("id") long id);
+  public void deleteById(@Param("id") long id);
+
   /**
    *
    * @param connectionId

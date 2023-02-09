@@ -11,6 +11,9 @@ import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -69,7 +72,7 @@ public class ReservationServiceBean implements ReservationService {
 
   @Override
   public Reservation get(long id) {
-    return reservationRepository.findOne(id);
+    return reservationRepository.findOneById(id);
   }
 
   @Override
@@ -131,7 +134,7 @@ public class ReservationServiceBean implements ReservationService {
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
   public void delete(long id) {
-    reservationRepository.delete(id);
+    reservationRepository.deleteById(id);
   }
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)

@@ -101,19 +101,19 @@
     <dependency>
       <groupId>com.typesafe.akka</groupId>
       <artifactId>akka-actor_2.12</artifactId>
-      <version>${akka-version}</version>
+      <version>2.7.0</version>
     </dependency>
 
     <dependency>
       <groupId>com.typesafe.akka</groupId>
       <artifactId>akka-slf4j_2.12</artifactId>
-      <version>${akka-version}</version>
+      <version>2.7.0</version>
     </dependency>
 
     <dependency>
       <groupId>com.typesafe.akka</groupId>
       <artifactId>akka-testkit_2.12</artifactId>
-      <version>${akka-version}</version>
+      <version>2.7.0</version>
     </dependency>
 
     <dependency>
@@ -157,8 +157,15 @@
     </dependency>
 
     <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>2.0.1.Final</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
+      <version>6.2.5.Final</version>
     </dependency>
 
     <dependency>
@@ -209,6 +216,19 @@
       <artifactId>gson</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>5.9.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -240,7 +260,8 @@
           <testSource>${java.version}</testSource>
           <testTarget>${java.version}</testTarget>
           <compilerArgument>-Xlint:unchecked</compilerArgument>
-          <compilerArgument>-Xlint:deprecation</compilerArgument>
+          <compilerArgument>-Xlint:unchecked</compilerArgument>
+          <compilerArgument>-Xdiags:verbose</compilerArgument>
         </configuration>
       </plugin>
 
@@ -257,5 +278,3 @@
   </build>
 
 </project>
-
-

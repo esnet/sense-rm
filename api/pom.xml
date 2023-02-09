@@ -94,6 +94,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
+      <version>6.2.5.Final</version>
       <scope>test</scope>
     </dependency>
 
@@ -150,5 +151,3 @@
     </plugins>
   </build>
 </project>
-
-

@@ -1,11 +1,12 @@
 package net.es.sense.rm.driver.nsi.dds.actors;
 
 import akka.actor.UntypedAbstractActor;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 import javax.ws.rs.core.Response.Status;
-import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.dds.lib.client.DdsClient;
 import net.es.nsi.dds.lib.client.SubscriptionResult;
 import net.es.nsi.dds.lib.client.SubscriptionsResult;
@@ -25,10 +26,10 @@ import org.springframework.stereotype.Component;
  *
  * @author hacksaw
  */
-@Slf4j
 @Component
 @Scope("prototype")
 public class RegistrationActor extends UntypedAbstractActor {
+  LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
   private static final String NOTIFICATIONS_URL = "notifications";
 

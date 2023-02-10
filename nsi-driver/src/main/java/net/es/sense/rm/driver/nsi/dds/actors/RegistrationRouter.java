@@ -4,6 +4,8 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.Terminated;
 import akka.actor.UntypedAbstractActor;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import akka.routing.ActorRefRoutee;
 import akka.routing.RoundRobinRoutingLogic;
 import akka.routing.Routee;
@@ -12,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.dds.db.Subscription;
 import net.es.sense.rm.driver.nsi.dds.db.SubscriptionService;
@@ -31,10 +32,10 @@ import scala.concurrent.duration.Duration;
  *
  * @author hacksaw
  */
-@Slf4j
 @Component
 @Scope("prototype")
 public class RegistrationRouter extends UntypedAbstractActor {
+  LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
   @Autowired
   private SpringExtension springExtension;

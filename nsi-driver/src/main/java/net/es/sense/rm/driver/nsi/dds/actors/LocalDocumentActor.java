@@ -1,8 +1,9 @@
 package net.es.sense.rm.driver.nsi.dds.actors;
 
 import akka.actor.UntypedAbstractActor;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import java.util.concurrent.TimeUnit;
-import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.dds.messages.TimerMsg;
@@ -21,10 +22,10 @@ import scala.concurrent.duration.Duration;
  *
  * @author hacksaw
  */
-@Slf4j
 @Component
 @Scope("prototype")
 public class LocalDocumentActor extends UntypedAbstractActor {
+  LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
   @Autowired
   private NsiActorSystem nsiActorSystem;

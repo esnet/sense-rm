@@ -21,8 +21,9 @@ package net.es.sense.rm.driver.nsi.actors;
 
 import akka.actor.Cancellable;
 import akka.actor.UntypedAbstractActor;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import java.util.concurrent.TimeUnit;
-import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.AuditService;
 import net.es.sense.rm.driver.nsi.cs.CsOperations;
 import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
@@ -39,10 +40,10 @@ import scala.concurrent.duration.Duration;
  *
  * @author hacksaw
  */
-@Slf4j
 @Component
 @Scope("prototype")
 public class ModelAuditActor extends UntypedAbstractActor {
+  LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
   @Autowired
   private NsiActorSystem nsiActorSystem;

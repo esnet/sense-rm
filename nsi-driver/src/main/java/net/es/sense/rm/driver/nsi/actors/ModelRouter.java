@@ -21,13 +21,14 @@ package net.es.sense.rm.driver.nsi.actors;
 
 import akka.actor.ActorRef;
 import akka.actor.UntypedAbstractActor;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import akka.routing.ActorRefRoutee;
 import akka.routing.RoundRobinRoutingLogic;
 import akka.routing.Routee;
 import akka.routing.Router;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.messages.ModelQueryRequest;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.spring.SpringExtension;
@@ -39,10 +40,10 @@ import org.springframework.stereotype.Component;
  *
  * @author hacksaw
  */
-@Slf4j
 @Component
 @Scope("prototype")
 public class ModelRouter extends UntypedAbstractActor {
+  LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
   @Autowired
   private SpringExtension springExtension;

@@ -21,7 +21,7 @@ public class SoapLogger implements SOAPHandler<SOAPMessageContext> {
 
     @Override
     public Set getHeaders() {
-        logger.info("SoapLogger.getHeaders: entering...");
+        logger.debug("SoapLogger.getHeaders: entering...");
         Set headers = new HashSet<>();
         headers.add(NsiHeader_QNAME);
         return headers;
@@ -29,12 +29,12 @@ public class SoapLogger implements SOAPHandler<SOAPMessageContext> {
 
     @Override
     public void close(MessageContext arg0) {
-        logger.info("SoapLogger.close: entering...");
+        logger.debug("SoapLogger.close: entering...");
     }
 
     @Override
     public boolean handleFault(SOAPMessageContext context) {
-        logger.info("SoapLogger.handleFault: entering...");
+        logger.debug("SoapLogger.handleFault: entering...");
         SOAPMessage soapMessage = context.getMessage();
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -49,7 +49,7 @@ public class SoapLogger implements SOAPHandler<SOAPMessageContext> {
 
     @Override
     public boolean handleMessage(SOAPMessageContext context) {
-        logger.info("SoapLogger.handleMessage: entering...");
+        logger.debug("SoapLogger.handleMessage: entering...");
         SOAPMessage soapMessage = context.getMessage();
         if (soapMessage != null) {
             try {
@@ -58,19 +58,19 @@ public class SoapLogger implements SOAPHandler<SOAPMessageContext> {
 
                 boolean isOutboundMessage = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
                 if (isOutboundMessage) {
-                    logger.info("SoapLogger.handleMessage: OUTBOUND MESSAGE");
+                    logger.debug("SoapLogger.handleMessage: OUTBOUND MESSAGE");
 
                 } else {
-                    logger.info("SoapLogger.handleMessage: INBOUND MESSAGE");
+                    logger.debug("SoapLogger.handleMessage: INBOUND MESSAGE");
                 }
 
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 soapMessage.writeTo(out);
-                logger.info(out.toString());
+                logger.debug(out.toString());
                 System.out.println(out);
                 out.close();
             } catch (Exception ex) {
-                logger.error("SoapLogger: Failed to process SOAP message", ex);
+                logger.debug("SoapLogger: Failed to process SOAP message", ex);
             }
         }
         return true;

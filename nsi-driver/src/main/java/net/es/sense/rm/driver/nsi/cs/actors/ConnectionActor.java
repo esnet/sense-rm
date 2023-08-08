@@ -3,8 +3,7 @@ package net.es.sense.rm.driver.nsi.cs.actors;
 import akka.actor.UntypedAbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import java.util.concurrent.TimeUnit;
-import javax.xml.ws.Holder;
+import jakarta.xml.ws.Holder;
 import net.es.nsi.common.jaxb.JaxbParser;
 import net.es.nsi.cs.lib.Client;
 import net.es.nsi.cs.lib.Helper;
@@ -22,6 +21,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -59,7 +60,7 @@ public class ConnectionActor extends UntypedAbstractActor {
       try {
         connectionSummaryAudit();
       } catch (ServiceException ex) {
-        log.error("[ConnectionActor] onReceive eating service exception");
+        log.error("[ConnectionActor] onReceive received service exception", ex);
       }
 
       // Schedule next audit.

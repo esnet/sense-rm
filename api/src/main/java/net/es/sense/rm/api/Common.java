@@ -5,13 +5,14 @@
  */
 package net.es.sense.rm.api;
 
-import java.util.Date;
+import com.google.common.base.Strings;
 import net.es.sense.rm.driver.api.ResourceResponse;
 import org.apache.http.client.utils.DateUtils;
-import org.apache.jena.ext.com.google.common.base.Strings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.util.Date;
 
 /**
  *

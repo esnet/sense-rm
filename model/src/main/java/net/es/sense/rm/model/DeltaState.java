@@ -19,15 +19,15 @@
  */
 package net.es.sense.rm.model;
 
-import io.swagger.annotations.ApiModel;
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  *
  * @author hacksaw
  */
-@ApiModel(value="state", description="The state of the delta resource.")
+@Schema(implementation = DeltaState.class, name = "state", description = "The state of the delta resource.")
 @XmlType(name = "state")
 @XmlEnum
 public enum DeltaState {

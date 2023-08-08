@@ -7,7 +7,7 @@ import net.es.nsi.dds.lib.dao.AccessControlType;
 import net.es.nsi.dds.lib.dao.ClientType;
 import net.es.nsi.dds.lib.dao.SecureType;
 import net.es.nsi.dds.lib.dao.ServerType;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;

@@ -19,15 +19,10 @@
  */
 package net.es.sense.rm.driver.nsi.db;
 
-import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
+import jakarta.persistence.*;
 import net.es.sense.rm.model.DeltaState;
+
+import java.io.Serializable;
 
 /**
  * A delta object for storage.

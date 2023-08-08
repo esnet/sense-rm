@@ -21,26 +21,10 @@ package net.es.sense.rm.driver.nsi;
 
 import akka.actor.ActorRef;
 import com.google.common.base.Strings;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeoutException;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
-import net.es.sense.rm.driver.api.DeltaResponse;
-import net.es.sense.rm.driver.api.DeltasResponse;
-import net.es.sense.rm.driver.api.Driver;
-import net.es.sense.rm.driver.api.ModelResponse;
-import net.es.sense.rm.driver.api.ModelsResponse;
-import net.es.sense.rm.driver.api.ResourceResponse;
+import net.es.sense.rm.driver.api.*;
 import net.es.sense.rm.driver.api.mrml.ModelUtil;
 import net.es.sense.rm.driver.nsi.db.Delta;
 import net.es.sense.rm.driver.nsi.db.DeltaService;
@@ -57,6 +41,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
+import jakarta.annotation.PreDestroy;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import javax.xml.datatype.DatatypeConfigurationException;
+import jakarta.xml.ws.soap.SOAPFaultException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 
 /**
  *

@@ -71,8 +71,10 @@ server:
 #########################################
 
 # This is the path to expose the swagger generated documentation.
-springfox.documentation.swagger.v2.path: /v2/api-docs
-springfox.documentation.swagger.v1.path: /v1/api-docs
+springdoc.api-docs.enabled: true
+springdoc.swagger-ui.enabled: true
+springdoc.api-docs.path: /v3/api-docs
+springdoc.swagger-ui.path: /v3/swagger-ui
 
 #########################################
 # Logging configuration.                #
@@ -242,3 +244,34 @@ nsi:
         nsaId:
           - "urn:ogf:network:es.net:2013:nsa:nsi-aggr-west"
 
+  akka:
+
+    # Loggers to register at boot time (akka.event.Logging$DefaultLogger logs
+    # to STDOUT)
+    loggers:
+       - "akka.event.slf4j.Slf4jLogger"
+    logging-filter: "akka.event.slf4j.Slf4jLoggingFilter"
+    event-handlers:
+      - "akka.event.slf4j.Slf4jEventHandler"
+
+    # Log level used by the configured loggers (see "loggers") as soon
+    # as they have been started; before that, see "stdout-loglevel"
+    # Options: OFF, ERROR, WARNING, INFO, DEBUG
+    loglevel: "DEBUG"
+
+    log-config-on-start: on
+
+    # Log level for the very basic logger activated during ActorSystem startup.
+    # This logger prints the log messages to stdout (System.out).
+    # Options: OFF, ERROR, WARNING, INFO, DEBUG
+    stdout-loglevel: "OFF"
+
+    actor:
+      debug:  {
+        # enable DEBUG logging of all AutoReceiveMessages (Kill, PoisonPill et.c.)
+        autoreceive = on
+        lifecycle = on
+        unhandled = on
+    }
+}
+}

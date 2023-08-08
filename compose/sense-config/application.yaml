@@ -1,0 +1,274 @@
+#########################################
+# SENSE-N-RM specific configuration.    #
+#########################################
+#
+# sense.root - the root of our URL context for building REST URL.  If we are behind
+#        a proxy this is the URL of that proxy. [Not currently used]
+#
+# sense.proxy - A simple mechanism that allows for URL manupulation on returned
+#         resources to map any localized URL to URL externalized by a proxy.
+#         Proper configuration of the Spring-boot web environment should mean
+#         this proxy value is left empty.  Here is an example:
+#
+#             "(http://localhost:8401|https://nsi0.snvaca.pacificwave.net/sense-rm)"
+#
+#         This will change the URL:
+#
+#               http://localhost:8401/api/sense/v1/models
+#         to:
+#               https://nsi0.snvaca.pacificwave.net/sense-rm/api/sense/v1/models
+#
+#         Allowing for a reverse proxy with address "nsi0.snvaca.pacificwave.net"
+#         and component URI "sense-rm" to point to "localhost:8401/api".
+#
+# sense.driver - the RM driver to use for this runtime instance.  By default this is
+#          the NsiDriver class. [Should be left as is unless new southbound
+#          driver has been added.
+#
+sense:
+  root: http://sense-rm:8080/
+  proxy:
+  driver: net.es.sense.rm.driver.nsi.NsiDriver
+
+#########################################
+# Spring HTTP server configuration      #
+#########################################
+#
+# server.address - The local IP address to bind the web server.  Use localhost if
+#          behind a reverse proxy on only local connectivity is required.
+#
+# server.port - The local TCP port to bind for the web server.
+#
+# server.contextPath - The URI underwhich to anchor all discoverd REST endpoints.
+#          If behind a reverse proxy then set this to the URI used to map though
+#          to this SENSE-N-RM instance, otherwise use "/".
+#
+# server.packageName - This is the java package name underwhich to search for
+#          exposed REST endpoints.  Do not change this value.
+#
+# server.ssl - If behind an HTTPS reverse proxy then disable the ssl configuration,
+#          otherwise set parameters as needed.
+server:
+  address: 127.0.0.1
+  port: 8080
+  contextPath: /
+  packageName: net.es.sense.rm.driver.nsi
+  
+#  ssl:
+#    enabled: true
+#    protocol: TLS
+#    enabled-protocols: TLSv1.2
+#    client-auth: "NEED"
+#    key-store: /home/sense/sense-rm/config/keystore.jks
+#    key-store-password: changeit
+#    key-store-type: JKS
+#    trust-store: /home/sense/sense-rm/config/truststore.jks
+#    trust-store-password: changeit
+#    trust-store-type: JKS
+
+#########################################
+# Swagger documentation configuration   #
+#########################################
+
+# This is the path to expose the swagger generated documentation.
+springdoc.api-docs.enabled: true
+springdoc.swagger-ui.enabled: true
+springdoc.api-docs.path: /v3/api-docs
+springdoc.swagger-ui.path: /v3/swagger-ui
+
+#########################################
+# Logging configuration.                #
+#########################################
+
+# I will be totally honest - I don't think this does anything at all.
+# Spring-boot and logback configuration is black magic.  Instead edit the
+# logback.xml to control logging.
+logging:
+  config: file:./config/logback.xml
+  level:
+    ROOT: INFO
+    org.springframework: INFO
+    org.springframework.data: INFO
+    net.es.sense.rm: DEBUG
+  file: "var/log/sense-n-rm.log"
+
+#########################################
+# Database configuration.               #
+#########################################
+
+# We use standard Spring JPA configuration for the database.  When first
+# running use the "ddl-auto: create" so that Spring will generate all the
+# needed SQL schema and create in the database.  Once you have verified your
+# setup is correct change this to "ddl-auto: update" to maintain data within
+# the database.
+spring:
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: jdbc:postgresql://sense-db:5432/sense
+    driver-class-name: org.postgresql.Driver
+    username: sense
+    password: sense
+    continue-on-error: true
+
+# Possible ddl-auto options.
+#spring.jpa.hibernate.ddl-auto: create
+#spring.jpa.hibernate.ddl-auto: create-drop
+#spring.jpa.hibernate.ddl-auto: update
+#spring.jpa.hibernate.ddl-auto: validate
+#spring.jpa.hibernate.ddl-auto: none
+
+# If you would rather run an in-memory database for testing then use this
+# configuration.
+#spring:
+# jpa:
+#   generate-ddl: true
+#   hibernate:
+#     ddl-auto: create
+# datasource:
+#   url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+#   driver-class-name: org.h2.Driver
+#   username: sense
+#   password: bubbles
+
+#########################################
+# NSI CS related configuration.         #
+#########################################
+
+# This is URI path used for the NSI CS protocol endpoint.
+cxf.path: /nsi
+
+nsi:
+  # For NSI interactions we must have a designated NSA id.
+  nsaId: urn:ogf:network:dockertest.net:2013:nsa:application
+
+  #########################################
+  # DDS related configuration.            #
+  #########################################
+
+  # The DDS notification endpoint we will expose for callbacks.
+  ddsUrl: http://sense-rm:8080/api/dds/v1
+
+  # How often (in seconds) we query our remote subscription to see if it is still valid.
+  ddsAuditTimer: 600
+
+  # How long (in seconds) we wait to delete a document after it has expired.
+  ddsExpiryInterval: 600
+
+  # How many actors to instantiate in the DDS pool.
+  ddsPoolSize: 4
+
+  # The DDS server endpoint we will connect to.
+  peers:
+    - http://nsi-dds:8401/dds
+
+  #########################################
+  # NSI Connection Service configuration. #
+  #########################################
+
+  # The associated NSA we will connect to for connection services.
+  providerNsaId: urn:ogf:network:dockertest.net:2021:nsa
+  providerConnectionURL: "http://opennsa:9080/NSI/services/CS2"
+
+  # Our requester connection service endpoint.
+  requesterConnectionURL : "http://sense-rm:8080/nsi/nsi-v2/ConnectionServiceRequester"
+
+  # How often we audit our associated NSA for new connections.
+  connectionAuditTimer: 50
+
+  #########################################
+  # NML/MRML generation configuration.    #
+  #########################################
+
+  # The topology exposed through the SENSE-N-RM.
+  networkId: urn:ogf:network:dockertest.net:2021:topology
+
+  # The default serviceDefinition if one is not specified.
+  defaultServiceType: http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE
+
+  # The default bandwidth unit.
+  defaultUnits: "bps"
+
+  # The default bandwidth granularity.
+  defaultGranularity: 1
+
+  # Control the polling of change within the network.
+  modelAuditTimer: 60
+
+  # How small should we prune the model database.
+  modelPruneSize: 10
+
+  # This was for the DDS HTTP server configuation for incoming requests but now
+  # springboot handles this.
+  #server:
+    #path:
+    #  path:
+    #  relative:
+    #address: nsi0.snvaca.pacificwave.net
+    #port: 8443
+    #packageName: net.es.sense.rm.driver.nsi
+    #secure: true
+
+  # This configures the local HTTP client (currently within DDS code).
+  client:
+    maxConnPerRoute: 10
+    maxConnTotal: 80
+    secure: true
+
+  # This configures the local HTTP client (currently within DDS code).
+  #secure:
+  #  production: false
+  #  keyStore:
+  #    type: JKS
+  #    file: config/keystore.jks
+  #    password: changeit
+  #  trustStore:
+  #    type: JKS
+  #    file: config/truststore.jks
+  #    password: changeit
+
+  # Left over from DDS server access control enforcement.
+  accessControl:
+    enabled: true
+    rules:
+      - access: READ
+        dn:
+          - "EMAILADDRESS=bob@example.com, CN=Bobby Boogie, OU=Sciences Network, O=Example Networks, L=New York, ST=NY, C=US"
+        nsaId:
+          - "urn:ogf:network:example.com:2013:nsa:aggr"
+      - access: WRITE
+        dn:
+          - "CN=nsi-aggr-west.es.net, OU=Domain Control Validated"
+        nsaId:
+          - "urn:ogf:network:es.net:2013:nsa:nsi-aggr-west"
+
+  akka:
+
+    # Loggers to register at boot time (akka.event.Logging$DefaultLogger logs
+    # to STDOUT)
+    loggers:
+       - "akka.event.slf4j.Slf4jLogger"
+    logging-filter: "akka.event.slf4j.Slf4jLoggingFilter"
+    event-handlers:
+      - "akka.event.slf4j.Slf4jEventHandler"
+
+    # Log level used by the configured loggers (see "loggers") as soon
+    # as they have been started; before that, see "stdout-loglevel"
+    # Options: OFF, ERROR, WARNING, INFO, DEBUG
+    loglevel: "DEBUG"
+
+    log-config-on-start: on
+
+    # Log level for the very basic logger activated during ActorSystem startup.
+    # This logger prints the log messages to stdout (System.out).
+    # Options: OFF, ERROR, WARNING, INFO, DEBUG
+    stdout-loglevel: "OFF"
+
+    actor:
+      debug:
+        # enable DEBUG logging of all AutoReceiveMessages (Kill, PoisonPill et.c.)
+        autoreceive: on
+        lifecycle: on
+        unhandled: on

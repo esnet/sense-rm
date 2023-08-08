@@ -21,7 +21,7 @@ package net.es.sense.rm.driver.nsi.cs.api;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 import net.es.sense.rm.driver.nsi.RaController;
 import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
@@ -66,6 +66,6 @@ public class ConnectionServiceConfig {
     endpoint.setProperties(props);
     endpoint.publish("/nsi-v2");
 
-    return endpoint;
+    return (Endpoint) endpoint;
   }
 }

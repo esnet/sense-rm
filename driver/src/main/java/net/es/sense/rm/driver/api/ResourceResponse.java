@@ -1,8 +1,9 @@
 package net.es.sense.rm.driver.api;
 
-import java.util.Optional;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 import lombok.Data;
+
+import java.util.Optional;
 
 /**
  *

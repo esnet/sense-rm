@@ -21,51 +21,51 @@ package net.es.sense.rm.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author hacksaw
  */
-@ApiModel(value = "model", description = "This is a topology model resource.")
+@Schema(implementation = ModelResource.class, name = "model", description = "This is a topology model resource.")
 @XmlRootElement(name = "model")
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonInclude(Include.NON_NULL)
 public class ModelResource {
-
+  @Schema(name = "id",
+      description = "Unique identifier for the resource.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   @XmlElement(required = true)
   private String id;                      // Unique identifier for the resource.
+
+  @Schema(name = "href",
+      description = "A URI reference to the resource.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   @XmlElement(required = true)
   private String href;                    // A URI reference to the resource.
+
+  @Schema(name = "creationTime",
+      description = "The time the resource was created/modified.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   @XmlElement(required = true)
-  private String creationTime;            // The time the resource was created/modifed.
+  private String creationTime;            // The time the resource was created/modified.
+
+  @Schema(name = "model",
+      description = "The gzipped and base64 encoded model.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   @XmlElement(required = true)
   private String model;                   // The gzipped and base64 encoded model.
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder("{ id: \"");
-    sb.append(this.getId());
-    sb.append("\"\n  href: \"");
-    sb.append(this.getHref());
-    sb.append("\"\n  creationTime: \"");
-    sb.append(this.getCreationTime());
-    sb.append("\"\n  model: \"");
-    sb.append(this.getModel());
-    sb.append("\"/n}");
-
-    return sb.toString();
-  }
 
   /**
    * @return the id
    */
-  @ApiModelProperty(value = "Unique identifier for the topology model resource.", required = true)
+  @Schema(name = "getId",
+      description = "Unique identifier for the topology model resource.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   public String getId() {
     return id;
   }
@@ -80,7 +80,9 @@ public class ModelResource {
   /**
    * @return the href
    */
-  @ApiModelProperty(value = "A URI reference to the resource.", required = true)
+  @Schema(name = "getHref",
+      description = "A URI reference to the resource.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   public String getHref() {
     return href;
   }
@@ -95,7 +97,9 @@ public class ModelResource {
   /**
    * @return the creationTime
    */
-  @ApiModelProperty(value = "The time the resource was created/modifed.", required = true)
+  @Schema(name = "getCreationTime",
+      description = "The time the resource was created/modified.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   public String getCreationTime() {
     return creationTime;
   }
@@ -110,7 +114,9 @@ public class ModelResource {
   /**
    * @return the model
    */
-  @ApiModelProperty(value = "The gzipped and base64 encoded topology model resource.", required = false)
+  @Schema(name = "getModel",
+      description = "The gzipped and base64 encoded topology model resource.",
+      requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getModel() {
     return model;
   }
@@ -120,5 +126,20 @@ public class ModelResource {
    */
   public void setModel(String model) {
     this.model = model;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder("{ id: \"");
+    sb.append(this.getId());
+    sb.append("\"\n  href: \"");
+    sb.append(this.getHref());
+    sb.append("\"\n  creationTime: \"");
+    sb.append(this.getCreationTime());
+    sb.append("\"\n  model: \"");
+    sb.append(this.getModel());
+    sb.append("\"/n}");
+
+    return sb.toString();
   }
 }

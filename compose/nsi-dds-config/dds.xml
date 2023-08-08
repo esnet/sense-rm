@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:dds xmlns:tns="http://schemas.es.net/nsi/2014/03/dds/configuration"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <nsaId>urn:ogf:network:es.net:2013:nsa:nsi-aggr-west</nsaId>
+    <documents>/nsi-dds/config/documents</documents>
+    <cache>/nsi-dds/config/cache</cache>
+    <repository>/nsi-dds/config/repository</repository>
+    <expiryInterval>600</expiryInterval>
+    <baseURL>http://nsi-dds:8401/dds</baseURL>
+
+    <server address="nsi-dds" port="8401" packageName="net.es.nsi.dds" />
+
+    <!-- DDS service interfaces. -->
+    <!-- <peerURL type="application/vnd.ogf.nsi.dds.v1+xml">https://agg.netherlight.net/dds</peerURL> -->
+    <!-- <peerURL type="application/vnd.ogf.nsi.dds.v1+xml">https://nsi-aggr-west.es.net/discovery</peerURL> -->
+
+    <!-- SURFnet configuration for discovery on production network. -->
+    <!-- <peerURL type="application/vnd.ogf.nsi.nsa.v1+xml">https://bod2.surfnet.nl/nsa-discovery</peerURL> -->
+    <!-- <peerURL type="application/vnd.ogf.nsi.nsa.v1+xml">https://nsi.nordu.net:9443/NSI/discovery.xml</peerURL> -->
+    <!-- <peerURL type="application/vnd.ogf.nsi.nsa.v1+xml">http://62.217.124.244:8080/nsi_discovery_geant.xml</peerURL> -->
+
+    <!-- ESnet configuration for GEANT as a gateway to Europe. -->
+    <!-- <peerURL type="application/vnd.ogf.nsi.nsa.v1+xml">http://62.217.124.244:8080/nsi_discovery_geant_all.xml</peerURL> -->
+    <!-- <peerURL type="application/vnd.ogf.nsi.nsa.v1+xml">http://idc.cipo.rnp.br/rnp-nsa.xml</peerURL> -->
+
+    <!-- Old AutoGOLE github discovery mechanism. -->
+    <!-- <peerURL type="application/vnd.ogf.nsi.topology.v1+xml">https://raw.githubusercontent.com/jeroenh/AutoGOLE-Topologies/master/master.xml</peerURL> -->
+
+    <peerURL type="application/vnd.ogf.nsi.nsa.v1+xml">http://opennsa:9080/NSI/discovery.xml</peerURL>
+</tns:dds>

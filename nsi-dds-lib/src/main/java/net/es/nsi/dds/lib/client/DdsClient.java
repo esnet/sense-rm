@@ -1,6 +1,20 @@
 package net.es.nsi.dds.lib.client;
 
 import com.google.common.base.Strings;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.xml.bind.JAXBException;
+import lombok.extern.slf4j.Slf4j;
+import net.es.nsi.common.constants.Nsi;
+import net.es.nsi.common.util.UrlHelper;
+import net.es.nsi.dds.lib.dao.ClientType;
+import net.es.nsi.dds.lib.jaxb.DdsParser;
+import net.es.nsi.dds.lib.jaxb.dds.*;
+import org.apache.http.client.utils.DateUtils;
+
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -10,27 +24,6 @@ import java.security.cert.CertificateException;
 import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.xml.bind.JAXBException;
-import lombok.extern.slf4j.Slf4j;
-import net.es.nsi.common.constants.Nsi;
-import net.es.nsi.common.util.UrlHelper;
-import net.es.nsi.dds.lib.dao.ClientType;
-import net.es.nsi.dds.lib.jaxb.DdsParser;
-import net.es.nsi.dds.lib.jaxb.dds.DocumentEventType;
-import net.es.nsi.dds.lib.jaxb.dds.DocumentListType;
-import net.es.nsi.dds.lib.jaxb.dds.ErrorType;
-import net.es.nsi.dds.lib.jaxb.dds.FilterCriteriaType;
-import net.es.nsi.dds.lib.jaxb.dds.FilterType;
-import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
-import net.es.nsi.dds.lib.jaxb.dds.SubscriptionListType;
-import net.es.nsi.dds.lib.jaxb.dds.SubscriptionRequestType;
-import net.es.nsi.dds.lib.jaxb.dds.SubscriptionType;
-import org.apache.http.client.utils.DateUtils;
 
 /**
  * TODO: Instantiate this client in the context of a DDS service.

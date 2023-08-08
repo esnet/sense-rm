@@ -1,8 +1,8 @@
 package net.es.nsi.cs.lib;
 
+import jakarta.ws.rs.WebApplicationException;
 import java.util.HashSet;
 import java.util.Set;
-import javax.ws.rs.WebApplicationException;
 
 /**
  *

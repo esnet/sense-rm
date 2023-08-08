@@ -1,9 +1,9 @@
 package net.es.sense.rm.driver.nsi.dds.api;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.GenericEntity;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.JAXBElement;
 import net.es.nsi.dds.lib.jaxb.dds.ErrorType;
 import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
 import net.es.sense.rm.driver.nsi.dds.InvalidVersionException;

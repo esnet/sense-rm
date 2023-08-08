@@ -1,13 +1,14 @@
 package net.es.sense.rm.driver.nsi.dds.db;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import java.util.Collection;
-import java.util.Set;
-import org.apache.jena.ext.com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
  *

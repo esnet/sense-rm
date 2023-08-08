@@ -19,10 +19,8 @@
  */
 package net.es.sense.rm.driver.nsi.cs.api;
 
-import java.util.List;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.datatype.XMLGregorianCalendar;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.cs.lib.CsParser;
@@ -30,6 +28,8 @@ import net.es.nsi.cs.lib.SimpleStp;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 import org.w3c.dom.Node;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.List;
 
 /**
  *

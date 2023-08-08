@@ -2,7 +2,7 @@ package net.es.nsi.cs.lib;
 
 import java.util.List;
 import java.util.Map;
-import javax.xml.ws.BindingProvider;
+import jakarta.xml.ws.BindingProvider;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionProviderPort;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionServiceProvider;
 

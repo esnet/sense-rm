@@ -1,32 +1,16 @@
 package net.es.nsi.dds.lib.client;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import javax.net.ssl.HostnameVerifier;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientResponseContext;
-import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
+import jakarta.ws.rs.client.*;
+import jakarta.ws.rs.core.GenericEntity;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.JAXBElement;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.dds.lib.dao.ClientType;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -42,6 +26,17 @@ import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.moxy.xml.MoxyXmlFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.HostnameVerifier;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 /**
  * Provides REST client for communication with remote DDS servers.
@@ -92,7 +87,7 @@ public class RestClient {
     // Check to see if the client should be configured with a secure context.
     if (!ct.isSecure()) {
       // Looks like they meant to invoke the insecure version of this constructor.
-      throw new IllegalArgumentException("Client context must be set to secure, but is set " + ct.isSecure());
+      throw new IllegalArgumentException("Client context must be set to secure, but is set to false.");
     }
 
     HostnameVerifier hostnameVerifier;
@@ -102,13 +97,15 @@ public class RestClient {
       hostnameVerifier = new NoopHostnameVerifier();
     }
 
-    LayeredConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(hc.getSSLContext(), hostnameVerifier);
     PlainConnectionSocketFactory socketFactory = PlainConnectionSocketFactory.getSocketFactory();
-
-    final Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
-            .register("http", socketFactory)
-            .register("https", sslSocketFactory)
-            .build();
+    RegistryBuilder<ConnectionSocketFactory> rb = RegistryBuilder.create();
+    if (socketFactory != null) {
+      rb.register("http", socketFactory);
+    }
+    if (hc.getSSLContext() != null) {
+      rb.register("https", new SSLConnectionSocketFactory(hc.getSSLContext(), hostnameVerifier));
+    }
+    final Registry<ConnectionSocketFactory> registry = rb.build();
 
     PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(registry);
     ClientConfig clientConfig = getClientConfig(connectionManager, ct.getMaxConnPerRoute(), ct.getMaxConnTotal());
@@ -167,11 +164,13 @@ public class RestClient {
 
     @Override
     public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException {
-      if (requestContext == null || responseContext == null || responseContext.getStatus() != Response.Status.FOUND.getStatusCode()) {
+      if (requestContext == null || responseContext == null ||
+          responseContext.getStatus() != Response.Status.FOUND.getStatusCode()) {
         return;
       }
 
-      log.debug("Processing redirect for " + requestContext.getMethod() + " " + requestContext.getUri().toASCIIString() + " to " + responseContext.getLocation().toASCIIString());
+      log.debug("Processing redirect for {} {} to {}", requestContext.getMethod(),
+          requestContext.getUri().toASCIIString(), responseContext.getLocation().toASCIIString());
 
       Client inClient = requestContext.getClient();
       Object entity = requestContext.getEntity();
@@ -195,8 +194,9 @@ public class RestClient {
       responseContext.setStatusInfo(resp.getStatusInfo());
       responseContext.setStatus(resp.getStatus());
       responseContext.getHeaders().putAll(resp.getStringHeaders());
+      resp.close();
 
-      log.debug("Processing redirect with result " + resp.getStatus());
+      log.debug("Processing redirect with result {}", resp.getStatus());
     }
   }
 }

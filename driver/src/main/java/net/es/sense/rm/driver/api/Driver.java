@@ -1,11 +1,12 @@
 package net.es.sense.rm.driver.api;
 
-import java.util.concurrent.Future;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
 import net.es.sense.rm.model.DeltaRequest;
 import org.springframework.scheduling.annotation.Async;
+
+import java.util.concurrent.Future;
 
 /**
  *

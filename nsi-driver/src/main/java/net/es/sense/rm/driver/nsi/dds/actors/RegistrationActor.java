@@ -3,10 +3,7 @@ package net.es.sense.rm.driver.nsi.dds.actors;
 import akka.actor.UntypedAbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 import net.es.nsi.dds.lib.client.DdsClient;
 import net.es.nsi.dds.lib.client.SubscriptionResult;
 import net.es.nsi.dds.lib.client.SubscriptionsResult;
@@ -20,6 +17,9 @@ import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
 
 /**
  * The Registration Actor handles local DDS subscription registrations to peer DDS services.

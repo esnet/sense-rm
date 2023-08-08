@@ -20,25 +20,31 @@
 package net.es.sense.rm.api.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author hacksaw
  */
 @lombok.Builder
-@ApiModel(value = "error", description = "Error structure for REST interface.")
+@Schema(implementation = Error.class, name = "error", description = "Error structure for REST interface.")
 @XmlRootElement(name = "error")
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Error {
 
+  @Schema(name = "error", description = "A short error description.", accessMode = Schema.AccessMode.READ_ONLY)
   private String error;               // A short error description.
+
+  @Schema(name = "error_description", description = "Longer error description, human-readable.",
+      accessMode = Schema.AccessMode.READ_ONLY)
   private String error_description;   // longer description, human-readable.
+
+  @Schema(name = "error_uri", description = "URI to a detailed error description on the API developer website.",
+      accessMode = Schema.AccessMode.READ_ONLY)
   private String error_uri;           // URI to a detailed error description on the API developer website.
 
   public Error() {}
@@ -52,7 +58,7 @@ public class Error {
   /**
    * @return the error
    */
-  @ApiModelProperty(value = "A short error description.", required = true)
+  @Schema(description = "A short error description.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getError() {
     return error;
   }
@@ -67,7 +73,7 @@ public class Error {
   /**
    * @return the error_description
    */
-  @ApiModelProperty(value = "A Longer human-readable description of error.", required = true)
+  @Schema(description = "A Longer human-readable description of error.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getError_description() {
     return error_description;
   }
@@ -82,7 +88,8 @@ public class Error {
   /**
    * @return the error_uri
    */
-  @ApiModelProperty(value = "URI to a detailed error description on the API developer website.", required = false)
+  @Schema(description = "URI to a detailed error description on the API developer website.",
+      requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getError_uri() {
     return error_uri;
   }

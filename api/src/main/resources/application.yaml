@@ -3,10 +3,14 @@ sense:
   proxy:
   driver: net.es.sense.rm.driver.nsi.NsiDriver
 
-logging.level.org.springframework.web: INFO
-logging.level.org.hibernate: ERROR
-
-springfox.documentation.swagger.v2.path: /v2/api-docs
-springfox.documentation.swagger.v1.path: /v1/api-docs
+logging:
+  level:
+    org.springframework.web: INFO
+    org.hibernate: ERROR
 
 server.contextPath: /
+
+springdoc.api-docs.enabled: true
+springdoc.swagger-ui.enabled: true
+springdoc.api-docs.path: /v3/api-docs
+springdoc.swagger-ui.path: /v3/swagger-ui

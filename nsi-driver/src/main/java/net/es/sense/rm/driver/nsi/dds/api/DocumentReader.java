@@ -1,10 +1,6 @@
 package net.es.sense.rm.driver.nsi.dds.api;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.util.Decoder;
@@ -16,6 +12,11 @@ import net.es.sense.rm.driver.nsi.dds.DdsProvider;
 import net.es.sense.rm.driver.nsi.dds.db.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *

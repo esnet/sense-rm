@@ -25,9 +25,7 @@ import akka.actor.PoisonPill;
 import akka.actor.Terminated;
 import akka.testkit.TestProbe;
 import com.typesafe.config.ConfigFactory;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.spring.SpringApplicationContext;
@@ -37,6 +35,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  *

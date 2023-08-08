@@ -20,35 +20,13 @@
 package net.es.sense.rm.driver.nsi.mrml;
 
 import com.twitter.common.base.Either;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.dds.lib.jaxb.Relationships;
-import net.es.nsi.dds.lib.jaxb.nml.NmlBidirectionalPortType;
-import net.es.nsi.dds.lib.jaxb.nml.NmlLabelGroupType;
-import net.es.nsi.dds.lib.jaxb.nml.NmlLabelType;
-import net.es.nsi.dds.lib.jaxb.nml.NmlNetworkObject;
-import net.es.nsi.dds.lib.jaxb.nml.NmlPortGroupRelationType;
-import net.es.nsi.dds.lib.jaxb.nml.NmlPortGroupType;
-import net.es.nsi.dds.lib.jaxb.nml.NmlPortRelationType;
-import net.es.nsi.dds.lib.jaxb.nml.NmlPortType;
-import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceRelationType;
-import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
-import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyRelationType;
-import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyType;
-import net.es.nsi.dds.lib.jaxb.nml.ObjectFactory;
-import net.es.nsi.dds.lib.jaxb.nml.ServiceDefinitionType;
+import net.es.nsi.dds.lib.jaxb.nml.*;
 import net.es.sense.rm.driver.nsi.dds.api.DocumentReader;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *

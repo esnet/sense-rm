@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  opennsa-db:
+    image: postgres:14.1-alpine
+    container_name: opennsa-db
+    restart: always
+    environment:
+      - POSTGRES_USER=opennsa
+      - POSTGRES_PASSWORD=opennsa
+      - POSTGRES_DB=opennsa
+    ports:
+      - '5432:5432'
+    volumes: 
+      - ./compose/02-schema.sql:/docker-entrypoint-initdb.d/02-schema.sql:ro
+      - opennsa-db:/var/lib/postgresql/data
+
+  sense-db:
+    image: postgres:14.1-alpine
+    container_name: sense-db
+    restart: always
+    environment:
+      - POSTGRES_USER=sense
+      - POSTGRES_PASSWORD=sense
+      - POSTGRES_DB=sense
+    ports:
+      - '5433:5432'
+    volumes:
+      - sense-db:/var/lib/postgresql/data
+
+  #opennsa:
+    #image: jghnordunet/opennsa:latest
+    ##build:
+      #context: .
+      #dockerfile: docker/Dockerfile
+    #env_file: .env
+    #depends_on:
+      #- db
+    #ports:
+      #- 9080:9080
+      #- 9443:9443
+    #volumes:
+      #- ./compose/opennsa.conf:/home/opennsa/opennsa/config/opennsa.conf:ro
+      #- ./compose/opennsa.nrm:/home/opennsa/opennsa/opennsa.nrm:ro
+
+volumes:
+  opennsa-db:
+    driver: local
+  sense-db:
+    driver: local

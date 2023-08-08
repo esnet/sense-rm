@@ -20,44 +20,73 @@
 package net.es.sense.rm.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 import java.util.Calendar;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author hacksaw
  */
-@ApiModel(value="delta", description="This is a topology model delta resource.")
+@Schema(implementation = DeltaResource.class, name = "delta", description = "This is a topology model delta resource.")
 @XmlRootElement(name="delta")
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeltaResource {
+    @Schema(name = "id", description = "A UUID uniquely identifying the topology model delta resource.",
+        requiredMode = Schema.RequiredMode.REQUIRED)
     @XmlElement(required=true)
     private String id;                      // A UUID uniquely identifying the topology model delta resource.
+
+    @Schema(name = "href", description = "A URI reference to the resource.",
+        requiredMode = Schema.RequiredMode.REQUIRED)
     @XmlElement(required=true)
     private String href;                    // A URI reference to the resource.
+
+    @Schema(name = "lastModified",
+        description = "The xsd:dateTime formatted date and time (ISO 8601) with time zone specified "
+            + "representing the time of the creation, last modification, or state transition of the delta resource.",
+        requiredMode = Schema.RequiredMode.REQUIRED)
     @XmlElement(required=true)
     private String lastModified = "1970-01-01T00:00:00Z"; // The xsd:dateTime formatted date and time (ISO 8601) with time zone specified representing the time of the creation, last modification, or state transition of the delta resource.
+
+    @Schema(name = "modelId", description = "The UUID of the root model version to which this delta has been applied.",
+        requiredMode = Schema.RequiredMode.REQUIRED)
     @XmlElement(required=true)
     private String modelId;                 // The UUID of the root model version to which this delta has been applied.
+
+    @Schema(name = "state", description = "The current state of the delta resource.",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        allowableValues = "Accepting, Accepted, Committing, Committed, Activating, Activated, Failed")
     @XmlElement(required=true)
     private DeltaState state;               // The current state of the delta resource. Will contain one of Accepting, Accepted, Committing, Committed, Activating, Activated, or Failed.
+
+    @Schema(name = "reduction",
+        description = "The gzipped and base64 encoded delta reduction for topology model resource specified by modelId.",
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @XmlElement(required=false)
     private String reduction;               // The gzipped and base64 encoded delta reduction for topology model resource specified by modelId.
+
+    @Schema(name = "addition",
+        description = "The gzipped and base64 encoded delta addition for topology model resource specified by modelId.",
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @XmlElement(required=false)
     private String addition;                // The gzipped and base64 encoded delta addition for topology model resource specified by modelId.
+
+    @Schema(name = "result",
+        description = "The gzipped and base64 encoded resulting topology model that will be created by this delta resource.",
+        requiredMode = Schema.RequiredMode.REQUIRED)
     @XmlElement(required=true)
     private String result;                  // The gzipped and base64 encoded resulting topology model that will be created by this delta resource.
 
     /**
      * @return the id
      */
-    @ApiModelProperty(value = "Unique identifier for the topology model delta resource.", required=true)
+    @Schema(description = "Unique identifier for the topology model delta resource.", requiredMode = Schema.RequiredMode.REQUIRED)
     public String getId() {
         return id;
     }
@@ -72,7 +101,9 @@ public class DeltaResource {
     /**
      * @return the lastModified
      */
-    @ApiModelProperty(value = "The xsd:dateTime formatted date and time (ISO 8601) with time zone specified representing the time of the creation, last modification, or state transition of the delta resource.", required=true)
+    @Schema(description = "The xsd:dateTime formatted date and time (ISO 8601) with time zone specified "
+        + "representing the time of the creation, last modification, or state transition of the delta resource.",
+        requiredMode = Schema.RequiredMode.REQUIRED)
     public String getLastModified() {
         return lastModified;
     }
@@ -89,15 +120,15 @@ public class DeltaResource {
      * @return Calendar representing the stored lastModified string.
      * @throws IllegalArgumentException if string parameter does not conform to lexical value space defined in XML Schema Part 2: Datatypes for xsd:dateTime.
      */
-    @ApiModelProperty(hidden=true)
+    @Schema(hidden=true)
     public Calendar getLastModifiedAsCalendar() throws IllegalArgumentException {
-        return javax.xml.bind.DatatypeConverter.parseDateTime(this.lastModified);
+        return jakarta.xml.bind.DatatypeConverter.parseDateTime(this.lastModified);
     }
 
     /**
      * @return the href
      */
-    @ApiModelProperty(value = "A direct URI reference to the delta resource.", required=true)
+    @Schema(description = "A direct URI reference to the delta resource.", requiredMode = Schema.RequiredMode.REQUIRED)
     public String getHref() {
         return href;
     }
@@ -112,7 +143,8 @@ public class DeltaResource {
     /**
      * @return the modelId
      */
-    @ApiModelProperty(value = "The UUID of the root model version to which this delta has been applied.", required=true)
+    @Schema(description = "The UUID of the root model version to which this delta has been applied.",
+        requiredMode = Schema.RequiredMode.REQUIRED)
     public String getModelId() {
         return modelId;
     }
@@ -127,7 +159,8 @@ public class DeltaResource {
     /**
      * @return the state
      */
-    @ApiModelProperty(value = "The current state of the delta resource.", required=true, allowableValues = "Accepting, Accepted, Committing, Committed, Activating, Activated, Failed")
+    @Schema(description = "The current state of the delta resource.", requiredMode = Schema.RequiredMode.REQUIRED,
+        allowableValues = "Accepting, Accepted, Committing, Committed, Activating, Activated, Failed")
     public DeltaState getState() {
         return state;
     }
@@ -146,7 +179,8 @@ public class DeltaResource {
     /**
      * @return the reduction
      */
-    @ApiModelProperty(value = "The gzipped and base64 encoded delta reduction for topology model resource specified by modelId.", required=false)
+    @Schema(description = "The gzipped and base64 encoded delta reduction for topology model resource "
+        + "specified by modelId.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     public String getReduction() {
         return reduction;
     }
@@ -161,7 +195,8 @@ public class DeltaResource {
     /**
      * @return the addition
      */
-    @ApiModelProperty(value = "The gzipped and base64 encoded delta addition for topology model resource specified by modelId.", required=false)
+    @Schema(description = "The gzipped and base64 encoded delta addition for topology model resource "
+        + "specified by modelId.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     public String getAddition() {
         return addition;
     }
@@ -176,7 +211,8 @@ public class DeltaResource {
     /**
      * @return the result
      */
-    @ApiModelProperty(value = "The gzipped and base64 encoded resulting topology model that will be created by this delta resource.", required=false)
+    @Schema(description = "The gzipped and base64 encoded resulting topology model that will be created "
+        + "by this delta resource.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     public String getResult() {
         return result;
     }

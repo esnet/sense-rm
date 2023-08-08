@@ -49,7 +49,7 @@ public class ReservationAudit {
   public void audit(ReservationService reservationService) {
     for (Reservation reservation : reservationService.get()) {
       String cid = reservation.getProviderNsa() + ":" + reservation.getConnectionId();
-      log.debug("[ReservationAudit] audtiting cid = {}", cid);
+      log.debug("[ReservationAudit] auditing cid = {}", cid);
       if (auditable.contains(cid)) {
         log.debug("[ReservationAudit] found cid = {}", cid);
       } else {

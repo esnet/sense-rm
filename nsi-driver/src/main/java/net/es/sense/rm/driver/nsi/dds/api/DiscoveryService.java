@@ -1,20 +1,13 @@
 package net.es.sense.rm.driver.nsi.dds.api;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import javax.ws.rs.WebApplicationException;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.jaxb.DdsParser;
-import net.es.nsi.dds.lib.jaxb.dds.DocumentListType;
-import net.es.nsi.dds.lib.jaxb.dds.ErrorType;
-import net.es.nsi.dds.lib.jaxb.dds.NotificationListType;
-import net.es.nsi.dds.lib.jaxb.dds.NotificationType;
-import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
+import net.es.nsi.dds.lib.jaxb.dds.*;
 import net.es.sense.rm.driver.nsi.dds.DdsProvider;
 import net.es.sense.rm.driver.nsi.dds.db.Document;
 import org.apache.http.client.utils.DateUtils;
@@ -24,12 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
 
 /**
  *

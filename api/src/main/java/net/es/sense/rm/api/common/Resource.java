@@ -19,22 +19,23 @@
  */
 package net.es.sense.rm.api.common;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  *
  * @author hacksaw
  */
-@ApiModel(value="resource", description="This is a simple API version resource.")
+@Schema(implementation = Resource.class, name="resource", description="This is a simple API version resource.")
 public class Resource {
-    @ApiModelProperty(value = "The API name identifier.", required=true)
+    @Schema(name = "id", description = "The API name identifier.", requiredMode = Schema.RequiredMode.REQUIRED)
     private String id;                      // The API name identifier.
 
-    @ApiModelProperty(value = "A URI reference to the resource.", required=true)
+    @Schema(name = "href", description = "A URI reference to the resource.",
+        requiredMode = Schema.RequiredMode.REQUIRED)
     private String href;                    // A URI reference to the resource.
 
-    @ApiModelProperty(value = "Version of the resource.", required=true)
+    @Schema(name = "version", description = "Version of the resource.", requiredMode = Schema.RequiredMode.REQUIRED)
     private String version;                 // Version of the resource.
 
     @Override
@@ -53,6 +54,8 @@ public class Resource {
     /**
      * @return the id
      */
+    @Schema(name = "getId", description = "Returns the resource identifier.",
+        requiredMode = Schema.RequiredMode.REQUIRED)
     public String getId() {
         return id;
     }
@@ -67,6 +70,8 @@ public class Resource {
     /**
      * @return the href
      */
+    @Schema(name = "getHref", description = "Returns the resource URL.",
+        requiredMode = Schema.RequiredMode.REQUIRED)
     public String getHref() {
         return href;
     }
@@ -81,6 +86,8 @@ public class Resource {
     /**
      * @return the version
      */
+    @Schema(name = "getVersion", description = "Returns the version of the resource.",
+        requiredMode = Schema.RequiredMode.REQUIRED)
     public String getVersion() {
         return version;
     }

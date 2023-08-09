@@ -19,24 +19,21 @@
  */
 package net.es.sense.rm.measurements.db;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -94,14 +91,8 @@ public class MeasurementServiceTest {
     assertNull(measurementService.first());
     assertNull(measurementService.last());
 
-    boolean error = false;
-    try {
-      // This should error.
-      measurementService.delete("12345");
-    } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
-      error = true;
-    }
-    assertTrue(error);
+    // Delete of non-existent id should now be silent.
+    measurementService.delete("12345");
 
     assertEquals(measurementService.prune().size(), 0);
 
@@ -133,14 +124,8 @@ public class MeasurementServiceTest {
     Optional<MeasurementResource> findFirst = m.stream().findFirst();
     assertEquals("742e978a-586c-4332-84ae-693762c6a202", findFirst.get().getResource());
 
-    boolean error = false;
-    try {
-      // This should not error.
-      measurementService.delete(findFirst.get());
-    } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
-      error = true;
-    }
-    assertFalse(error);
+    // This should not error.
+    measurementService.delete(findFirst.get());
 
     // Should be empty.
     m = measurementService.get();
@@ -154,7 +139,7 @@ public class MeasurementServiceTest {
 @Test
   public void makeSomeTest() {
     // Add a list of entries to the database.
-    DATA.stream().forEach(m -> measurementService.store(m));
+    DATA.forEach(m -> measurementService.store(m));
     assertEquals(measurementService.size(), DATA.size());
 
     Collection<MeasurementResource> m = measurementService.get();

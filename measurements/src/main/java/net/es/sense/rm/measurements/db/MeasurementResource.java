@@ -40,7 +40,7 @@ import java.util.UUID;
  */
 @Schema(implementation = MeasurementResource.class,
     name = "measurement",
-    description = "This is an operational measurment resource.")
+    description = "This is an operational measurement resource.")
 @XmlRootElement(name = "measurement")
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonInclude(Include.NON_NULL)

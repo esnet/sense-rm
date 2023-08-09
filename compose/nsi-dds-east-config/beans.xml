@@ -125,7 +125,7 @@
         <constructor-arg index="1" ref="ddsConfiguration"/>
         <constructor-arg index="2" ref="remoteSubscriptionCache"/>
         <property name="poolSize" value="5"/>
-        <property name="interval" value="600"/>
+        <property name="interval" value="180"/>
     </bean>
 
     <!-- 

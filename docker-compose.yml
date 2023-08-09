@@ -42,9 +42,9 @@ services:
       - ./compose/opennsa-config/opennsa.conf:/home/opennsa/opennsa/config/opennsa.conf:ro
       - ./compose/opennsa-config/opennsa.nrm:/home/opennsa/opennsa/config/opennsa.nrm:ro
 
-  nsi-dds:
+  nsi-dds-east:
     image: nsi-dds:latest
-    container_name: nsi-dds
+    container_name: nsi-dds-east
     build:
       context: github.com/bandwidthondemand/nsi-dds
       dockerfile: Dockerfile
@@ -55,7 +55,23 @@ services:
     ports:
       - 8401:8401
     volumes:
-      - ./compose/nsi-dds-config:/nsi-dds/config
+      - ./compose/nsi-dds-east-config:/nsi-dds/config
+      - /tmp:/nsi-dds/var/log
+
+  nsi-dds-west:
+    image: nsi-dds:latest
+    container_name: nsi-dds-west
+    build:
+      context: github.com/bandwidthondemand/nsi-dds
+      dockerfile: Dockerfile
+      args:
+        BUILDKIT_CONTEXT_KEEP_GIT_DIR: 1
+    depends_on:
+      - nsi-dds-east
+    ports:
+      - 8402:8402
+    volumes:
+      - ./compose/nsi-dds-west-config:/nsi-dds/config
       - /tmp:/nsi-dds/var/log
 
   sense-rm:
@@ -67,7 +83,7 @@ services:
       args:
         BUILDKIT_CONTEXT_KEEP_GIT_DIR: 1
     depends_on:
-      - nsi-dds
+      - nsi-dds-west
       - opennsa
       - sense-db
     ports:

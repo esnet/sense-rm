@@ -48,8 +48,7 @@ public class RegistrationActor extends UntypedAbstractActor {
 
   @Override
   public void onReceive(Object msg) {
-    if (msg instanceof RegistrationEvent) {
-      RegistrationEvent event = (RegistrationEvent) msg;
+    if (msg instanceof RegistrationEvent event) {
       log.debug("[RegistrationActor] event={}, url={}", event.getEvent().name(), event.getUrl());
 
       switch (event.getEvent()) {

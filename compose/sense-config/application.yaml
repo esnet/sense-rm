@@ -49,7 +49,7 @@ sense:
 # server.ssl - If behind an HTTPS reverse proxy then disable the ssl configuration,
 #          otherwise set parameters as needed.
 server:
-  address: 127.0.0.1
+  address: sense-rm
   port: 8080
   contextPath: /
   packageName: net.es.sense.rm.driver.nsi
@@ -152,7 +152,7 @@ nsi:
   ddsUrl: http://sense-rm:8080/api/dds/v1
 
   # How often (in seconds) we query our remote subscription to see if it is still valid.
-  ddsAuditTimer: 600
+  ddsAuditTimer: 120
 
   # How long (in seconds) we wait to delete a document after it has expired.
   ddsExpiryInterval: 600
@@ -162,7 +162,7 @@ nsi:
 
   # The DDS server endpoint we will connect to.
   peers:
-    - http://nsi-dds:8401/dds
+    - http://nsi-dds-west:8402/dds
 
   #########################################
   # NSI Connection Service configuration. #

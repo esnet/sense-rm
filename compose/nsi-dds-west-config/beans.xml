@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- `<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" /> -->
+
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer" />
+
+    <bean id="springApplicationContext" class="net.es.nsi.dds.spring.SpringApplicationContext" scope="singleton" />
+
+    <bean id="ddsConfiguration" class="net.es.nsi.dds.dao.DdsConfiguration" init-method="load" scope="singleton">
+        <property name="filename" value="#{ systemProperties['ddsConfigFile'] }"/>
+    </bean>
+    
+    <bean id="restClient" class="net.es.nsi.dds.client.RestClient" scope="singleton">
+        <constructor-arg index="0" ref="ddsConfiguration"/>
+    </bean>
+
+    <bean id="authorizationProvider" class="net.es.nsi.dds.authorization.DnAuthorizationProvider" scope="singleton">
+        <constructor-arg index="0" ref="ddsConfiguration"/>
+    </bean>
+
+    <bean id="ddsServer" class="net.es.nsi.dds.server.DdsServer" scope="singleton" depends-on="authorizationProvider">
+        <constructor-arg index="0" ref="ddsConfiguration"/>
+    </bean>
+
+    <bean id="cacheProfile" class="net.es.nsi.dds.dao.CacheProfile" scope="singleton">
+        <constructor-arg index="0" ref="ddsConfiguration"/>
+    </bean>
+
+    <bean id="repositoryProfile" class="net.es.nsi.dds.dao.RepositoryProfile" scope="singleton">
+        <constructor-arg index="0" ref="ddsConfiguration"/>
+    </bean>
+
+    <bean id="documentCache" class="net.es.nsi.dds.dao.DocumentCache" init-method="load" scope="singleton">
+        <constructor-arg index="0" ref="cacheProfile"/>
+    </bean>
+
+    <bean id="documentRepository" class="net.es.nsi.dds.dao.DocumentCache" init-method="load" scope="singleton">
+        <constructor-arg index="0" ref="repositoryProfile"/>
+    </bean>
+
+    <bean id="remoteSubscriptionCache" class="net.es.nsi.dds.dao.RemoteSubscriptionCache" scope="singleton" />
+
+    <bean id="agoleManifestReader" class="net.es.nsi.dds.agole.AgoleManifestReader" scope="prototype" lazy-init="true">
+        <constructor-arg index="0" ref="restClient"/>
+    </bean>
+
+    <!-- ddsActorSystem - initializes the AKKA actor framework. -->
+    <bean id="ddsActorSystem" class="net.es.nsi.dds.actors.DdsActorSystem" scope="singleton" />
+
+    <!-- 
+        localDocumentActor - Actor monitoring the document directory for any new or updated
+		documents to load.
+	interval is time in seconds that the local document repo will be checked for new documents.
+    -->
+    <bean id="localDocumentActor" class="net.es.nsi.dds.actors.LocalDocumentActor" scope="singleton" lazy-init="true">
+        <constructor-arg index="0" ref="ddsActorSystem"/>
+        <constructor-arg index="1" ref="ddsConfiguration"/>
+        <property name="interval" value="300"/>
+    </bean>
+
+    <!--
+	documentExpiryActor - actor monitoring the space for expired documents.
+ 
+	interval is time in seconds that the document space will be checked for expired documents.
+    -->
+    <bean id="documentExpiryActor" class="net.es.nsi.dds.actors.DocumentExpiryActor" scope="singleton" lazy-init="true">
+        <constructor-arg index="0" ref="ddsActorSystem"/>
+        <constructor-arg index="1" ref="documentCache"/>
+        <property name="interval" value="600"/>
+    </bean>
+
+    <!--
+	configurationActor - Actor monitoring the configuration file for changes.
+
+	interval is time in seconds that the configuration file will be checked for changes.
+    -->
+    <bean id="configurationActor" class="net.es.nsi.dds.actors.ConfigurationActor" scope="singleton" lazy-init="true">
+        <constructor-arg index="0" ref="ddsActorSystem"/>
+        <constructor-arg index="1" ref="ddsConfiguration"/>
+        <property name="interval" value="300"/>
+    </bean>
+
+    <!--
+	agoleDiscoveryRouter - this router support the legacy Github based discover use on the AutomatedGOLE.
+   
+	interval is time in seconds that Github will be checked for AutomatedGOLE topology updates.
+        poolSize is the number of threads to spawn for supporting this discovery process.
+      -->
+    <bean id="agoleDiscoveryRouter" class="net.es.nsi.dds.agole.AgoleDiscoveryRouter" scope="singleton" lazy-init="true">
+        <constructor-arg index="0" ref="ddsActorSystem"/>
+        <constructor-arg index="1" ref="ddsConfiguration"/>
+        <constructor-arg index="2" ref="agoleManifestReader"/>
+        <property name="poolSize" value="2"/>
+        <property name="interval" value="3600"/>
+    </bean>
+
+    <!-- 
+         gof3DiscoveryRouter - this router handles the Gang of Three specific discovery process.
+
+         interval is time in seconds that NSA will be checked for Gof3 NSA description and topology updates. 
+         poolSize is the number of threads to spawn for supporting this discovery process. 
+         refresh is the number of discovery checks allowed using lastModified before forcing a full read.
+      -->
+    <bean id="gof3DiscoveryRouter" class="net.es.nsi.dds.gangofthree.Gof3DiscoveryRouter" scope="singleton" lazy-init="true">
+        <constructor-arg index="0" ref="ddsActorSystem"/>
+        <constructor-arg index="1" ref="ddsConfiguration"/>
+        <property name="poolSize" value="5"/>
+        <property name="interval" value="120"/>
+        <property name="refresh" value="10"/>
+    </bean>
+
+    <!-- 
+         registrationRouter - handles creating and auditing our registrations with remote DDS servers.
+
+         interval is time in seconds between checks for valid remote subscriptions (our subscriptions on remote DDS).
+         poolSize is the number of threads to spawn for supporting the subscription process.
+      -->
+    <bean id="registrationRouter" class="net.es.nsi.dds.actors.RegistrationRouter" scope="singleton" lazy-init="true">
+        <constructor-arg index="0" ref="ddsActorSystem"/>
+        <constructor-arg index="1" ref="ddsConfiguration"/>
+        <constructor-arg index="2" ref="remoteSubscriptionCache"/>
+        <property name="poolSize" value="5"/>
+        <property name="interval" value="180"/>
+    </bean>
+
+    <!-- 
+         notificationRouter - routes new notification messages to all peers with registered subscriptions to our
+		document space.
+         poolSize is the number of threads to spawn for supporting the notification process.
+      -->
+    <bean id="notificationRouter" class="net.es.nsi.dds.actors.NotificationRouter" scope="singleton" lazy-init="true">
+        <constructor-arg index="0" ref="ddsActorSystem"/>
+        <constructor-arg index="1" ref="ddsConfiguration"/>
+        <constructor-arg index="2" ref="discoveryProvider"/>
+        <constructor-arg index="3" ref="documentCache"/>
+        <constructor-arg index="4" ref="restClient"/>
+        <property name="poolSize" value="5"/>
+        <property name="notificationSize" value="5"/>
+    </bean>
+
+    <!--
+        ddsActorController - performs the initial kick of our Actors at system start time.
+    -->
+    <bean id="ddsActorController" class="net.es.nsi.dds.actors.DdsActorController" init-method="init" scope="singleton" depends-on="remoteSubscriptionCache, ddsServer">
+        <constructor-arg index="0" ref="ddsActorSystem"/>
+        <constructor-arg index="1" ref="ddsConfiguration"/>
+        <constructor-arg index="2">
+            <list>
+                <bean class="net.es.nsi.dds.actors.ActorEntry"><property name="actor" value="configurationActor" /><property name="start" value="false" /></bean>
+                <bean class="net.es.nsi.dds.actors.ActorEntry"><property name="actor" value="localDocumentActor" /><property name="start" value="false" /></bean>
+                <bean class="net.es.nsi.dds.actors.ActorEntry"><property name="actor" value="documentExpiryActor" /><property name="start" value="false" /></bean>
+                <bean class="net.es.nsi.dds.actors.ActorEntry"><property name="actor" value="notificationRouter" /><property name="start" value="false" /></bean>
+                <bean class="net.es.nsi.dds.actors.ActorEntry"><property name="actor" value="registrationRouter" /><property name="start" value="true" /></bean>
+                <bean class="net.es.nsi.dds.actors.ActorEntry"><property name="actor" value="gof3DiscoveryRouter" /><property name="start" value="true" /></bean>
+                <bean class="net.es.nsi.dds.actors.ActorEntry"><property name="actor" value="agoleDiscoveryRouter" /><property name="start" value="true" /></bean>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!--
+        discoveryProvider - the master thread handling overall control of the DDS.
+    -->
+    <bean id="discoveryProvider" class="net.es.nsi.dds.provider.DdsProvider" init-method="init" scope="singleton" depends-on="ddsServer">
+        <constructor-arg index="0" ref="ddsConfiguration"/>
+        <constructor-arg index="1" ref="documentCache"/>
+        <constructor-arg index="2" ref="documentRepository"/>
+        <constructor-arg index="3" ref="ddsActorController"/>
+    </bean>
+</beans>

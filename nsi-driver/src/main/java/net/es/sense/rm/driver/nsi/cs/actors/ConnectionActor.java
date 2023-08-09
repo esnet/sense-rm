@@ -54,20 +54,20 @@ public class ConnectionActor extends UntypedAbstractActor {
 
   @Override
   public void onReceive(Object msg) {
-    log.info("[ConnectionActor] onRecieve({}).", msg.getClass().getName());
+    log.info("[ConnectionActor] onReceive {}", msg.getClass().getName());
     if (msg instanceof TimerMsg) {
       // Perform connection audit.
       try {
         connectionSummaryAudit();
       } catch (ServiceException ex) {
-        log.error("[ConnectionActor] onReceive received service exception", ex);
+        log.error(ex, "[ConnectionActor] onReceive connection audit failed");
       }
 
       // Schedule next audit.
-      TimerMsg message = (TimerMsg) msg;
       // Insert code here to handle local documents (i.e. create and push to remote DDS server?
-      nsiActorSystem.getActorSystem().scheduler().scheduleOnce(Duration.create(nsiProperties.getConnectionAuditTimer(),
-              TimeUnit.SECONDS), this.getSelf(), message, nsiActorSystem.getActorSystem().dispatcher(), null);
+      nsiActorSystem.getActorSystem().scheduler()
+          .scheduleOnce(Duration.create(nsiProperties.getConnectionAuditTimer(), TimeUnit.SECONDS),
+              this.getSelf(), (TimerMsg) msg, nsiActorSystem.getActorSystem().dispatcher(), null);
     } else {
       unhandled(msg);
     }

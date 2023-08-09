@@ -27,16 +27,9 @@
     </encoder>
   </appender>
 
-  <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-    <queueSize>8192</queueSize>
-    <neverBlock>true</neverBlock>
-    <appender-ref ref="FILE" />
-  </appender>
-
   <root level="DEBUG">
     <appender-ref ref="FILE" />
     <appender-ref ref="STDOUT" />
-    <appender-ref ref="ASYNC"/>
   </root>
 
 </configuration>

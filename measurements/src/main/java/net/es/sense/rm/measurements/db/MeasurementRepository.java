@@ -1,10 +1,11 @@
 package net.es.sense.rm.measurements.db;
 
-import java.util.Collection;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Collection;
 
 /**
  *
@@ -15,7 +16,7 @@ public interface MeasurementRepository extends CrudRepository<MeasurementResourc
 
   public MeasurementResource findOneById(@Param("id") String id);
 
-  public void deleteById(@Param("id") String id);
+  //public void deleteById(@Param("id") String id);
 
   /**
    * Find all measurements newer than the specified lastModified time.

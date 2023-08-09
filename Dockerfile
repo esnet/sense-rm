@@ -20,7 +20,8 @@ CMD java \
         -Xmx1024m -Djava.net.preferIPv4Stack=true  \
         -Dcom.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot=true \
         -Dbasedir="$HOME" \
-        -Dlogback.configurationFile="file:$HOME/config/logback.xml" \
+        -Dlogging.config="file:$HOME/config/logback.xml" \
         -XX:+StartAttachListener \
-        -jar "$HOME/sense-rm.jar" \
-        --spring.config.location="file:$HOME/config/"
+        --spring.config.location="file:$HOME/config/" \
+        -jar "$HOME/sense-rm.jar"
+

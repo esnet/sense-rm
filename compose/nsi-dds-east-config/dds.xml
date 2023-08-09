@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tns:dds xmlns:tns="http://schemas.es.net/nsi/2014/03/dds/configuration"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <nsaId>urn:ogf:network:es.net:2013:nsa:nsi-aggr-west</nsaId>
+    <nsaId>urn:ogf:network:es.net:2013:nsa:nsi-aggr-east</nsaId>
     <documents>/nsi-dds/config/documents</documents>
     <cache>/nsi-dds/config/cache</cache>
     <repository>/nsi-dds/config/repository</repository>
     <expiryInterval>600</expiryInterval>
-    <baseURL>http://nsi-dds:8401/dds</baseURL>
+    <baseURL>http://nsi-dds-east:8401/dds</baseURL>
 
-    <server address="nsi-dds" port="8401" packageName="net.es.nsi.dds" />
+    <server address="nsi-dds-east" port="8401" packageName="net.es.nsi.dds" />
 
     <!-- DDS service interfaces. -->
     <!-- <peerURL type="application/vnd.ogf.nsi.dds.v1+xml">https://agg.netherlight.net/dds</peerURL> -->
@@ -27,4 +27,5 @@
     <!-- <peerURL type="application/vnd.ogf.nsi.topology.v1+xml">https://raw.githubusercontent.com/jeroenh/AutoGOLE-Topologies/master/master.xml</peerURL> -->
 
     <peerURL type="application/vnd.ogf.nsi.nsa.v1+xml">http://opennsa:9080/NSI/discovery.xml</peerURL>
+    <peerURL type="application/vnd.ogf.nsi.dds.v1+xml">http://nsi-dds-west:8402/dds</peerURL>
 </tns:dds>

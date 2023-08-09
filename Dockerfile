@@ -22,6 +22,6 @@ CMD java \
         -Dbasedir="$HOME" \
         -Dlogging.config="file:$HOME/config/logback.xml" \
         -XX:+StartAttachListener \
-        --spring.config.location="file:$HOME/config/" \
-        -jar "$HOME/sense-rm.jar"
+        -jar "$HOME/sense-rm.jar" \
+        --spring.config.location="file:$HOME/config/"
 

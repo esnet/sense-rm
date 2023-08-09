@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutionException;
 public class Application {
   // Command line parameters.
   public static final String ARGNAME_PIDFILE = "pidFile";
+  public static final String ARGNAME_IGNORE = "-spring.config.location";
   public static final String SYSTEM_PROPERTY_PIDFILE = "pidFile";
 
   // Keep running while true.
@@ -38,6 +39,8 @@ public class Application {
   public static void main(String[] args) throws ExecutionException, InterruptedException {
     log.info("[SENSE-N-RM] Starting...");
 
+    ApplicationContext context = SpringApplication.run(Application.class, args);
+
     // Load the command line options into appropriate system properties.
     try {
       processOptions(args);
@@ -46,8 +49,6 @@ public class Application {
       System.exit(1);
       return;
     }
-
-    ApplicationContext context = SpringApplication.run(Application.class, args);
 
     // Dump some runtime information.
     RuntimeMXBean mxBean = ManagementFactory.getRuntimeMXBean();
@@ -142,9 +143,14 @@ public class Application {
   private static Options getOptions() {
     // Create Options object to hold our command line options.
     Options options = new Options();
+
     Option pidFileOption = new Option(ARGNAME_PIDFILE, true, "The file in which to write the process pid");
     pidFileOption.setRequired(false);
     options.addOption(pidFileOption);
+
+    Option springOption = new Option(ARGNAME_IGNORE, true, "External spring configuration file.");
+    springOption.setRequired(false);
+    options.addOption(springOption);
     return options;
   }
 

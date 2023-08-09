@@ -34,8 +34,8 @@ do_start() {
         -Dlogging.config="file:$HOME/config/logback.xml" \
         -XX:+StartAttachListener \
         -jar "$HOME/sense-n-rm.jar" \
-        --spring.config.location="file:$HOME/config/" &
-        echo $! > $PIDFILE
+        --spring.config.location="file:$HOME/config/" \
+        -pidFile $PIDFILE &
 }
 
 do_stop() {

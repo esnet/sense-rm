@@ -31,7 +31,7 @@ services:
     image: opennsa:latest
     container_name: opennsa
     build:
-      context: github.com/jmacauley/opennsa
+      context: github.com/jmacauley/opennsa.git#fix-regex-issue
       dockerfile: docker/Dockerfile
     env_file: ./compose/opennsa-config/opennsa.env
     depends_on:

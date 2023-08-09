@@ -16,5 +16,5 @@ export PASSWORD="changeit"
 	      -Dlogging.config="file:$HOME/config/logback.xml" \
 	      -XX:+StartAttachListener \
         -jar "$HOME/sense-n-rm.jar" \
-	--spring.config.location="file:$HOME/config/" 
+	      --spring.config.location="file:$HOME/config/"
 

@@ -10,47 +10,66 @@ import akka.routing.ActorRefRoutee;
 import akka.routing.RoundRobinRoutingLogic;
 import akka.routing.Routee;
 import akka.routing.Router;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.dds.db.Subscription;
 import net.es.sense.rm.driver.nsi.dds.db.SubscriptionService;
+import net.es.sense.rm.driver.nsi.messages.Message;
 import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent;
-import net.es.sense.rm.driver.nsi.dds.messages.StartMsg;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQuery;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQueryResult;
+import net.es.sense.rm.driver.nsi.messages.StartMsg;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.spring.SpringExtension;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 /**
+ * The Registration Router handles routing and distribution of DDS subscription
+ * registrations to RegistrationActors.
  *
  * @author hacksaw
  */
 @Component
-@Scope("prototype")
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RegistrationRouter extends UntypedAbstractActor {
-  LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
+  private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
-  @Autowired
-  private SpringExtension springExtension;
+  // These fields are injected through the constructor.
+  private final SpringExtension springExtension;
+  private final NsiActorSystem nsiActorSystem;
+  private final NsiProperties nsiProperties;
+  private final SubscriptionService subscriptionService;
 
-  @Autowired
-  private NsiProperties nsiProperties;
-
-  @Autowired
-  private NsiActorSystem nsiActorSystem;
-
-  @Autowired
-  private SubscriptionService subscriptionService;
-
+  // The AKKA router that is created on preStart().
   private Router router;
 
+  /**
+   * Default constructor called by Spring to initialize the actor.
+   *
+   * @param springExtension
+   * @param nsiActorSystem
+   * @param nsiProperties
+   * @param subscriptionService
+   */
+  public RegistrationRouter(SpringExtension springExtension, NsiActorSystem nsiActorSystem,
+                            NsiProperties nsiProperties, SubscriptionService subscriptionService) {
+    this.springExtension = springExtension;
+    this.nsiActorSystem = nsiActorSystem;
+    this.nsiProperties = nsiProperties;
+    this.subscriptionService = subscriptionService;
+  }
+
+  /**
+   * Initialize the actor by creating pool of RegistrationActors to do the work.
+   */
   @Override
   public void preStart() {
     log.info("[RegistrationRouter] Initializing registrationActors, debug= {}.", log.isDebugEnabled());
@@ -64,74 +83,84 @@ public class RegistrationRouter extends UntypedAbstractActor {
     router = new Router(new RoundRobinRoutingLogic(), routees);
 
     // Kick off those that need to be started.
-    nsiActorSystem.getActorSystem().scheduler().scheduleOnce(Duration.create(60, TimeUnit.SECONDS),
-            this.getSelf(), new StartMsg(), nsiActorSystem.getActorSystem().dispatcher(), null);
+    nsiActorSystem.getActorSystem().scheduler()
+        .scheduleOnce(Duration.create(60, TimeUnit.SECONDS), this.getSelf(),
+            new StartMsg("RegistrationRouter:preStart", this.self().path()),
+            nsiActorSystem.getActorSystem().dispatcher(), null);
 
     log.info("[RegistrationRouter] Initialization completed.");
   }
 
+  /**
+   * Process an incoming registration messages and distribute to actor pool.
+   *
+   * @param msg The message to process.
+   */
   @Override
   public void onReceive(Object msg) {
+    log.debug("[RegistrationRouter] onReceive {}", Message.getDebug(msg));
+
     // Check to see if we got the go ahead to start registering.
-    if (msg instanceof StartMsg) {
-      log.info("[RegistrationRouter] Start event");
+    if (msg instanceof StartMsg message) {
+      log.debug("[RegistrationRouter] start timer so convert to registration event.");
 
       // Create a Register event to start us off.
-      RegistrationEvent event = new RegistrationEvent();
+      RegistrationEvent event = new RegistrationEvent(message.getInitiator(), message.getPath());
       event.setEvent(RegistrationEvent.Event.Register);
       msg = event;
     }
 
-    if (msg instanceof RegistrationEvent) {
-      RegistrationEvent re = (RegistrationEvent) msg;
+    if (msg instanceof RegistrationEvent re) {
       if (null != re.getEvent()) switch (re.getEvent()) {
-        case Register:
+        case Register -> {
           // This is our first time through after initialization.
           log.info("[RegistrationRouter] routeRegister");
           routeRegister();
-          break;
-
-        case Audit:
+        }
+        case Audit -> {
           // A regular audit event.
           log.info("[RegistrationRouter] routeAudit request.");
           routeAudit();
-          break;
-
-        case Delete:
+        }
+        case Delete -> {
           // We are shutting down so clean up.
           log.info("[RegistrationRouter] routeShutdown");
           routeShutdown();
           return;
-
-        default:
+        }
+        default -> {
           return;
+        }
       }
-    } else if (msg instanceof SubscriptionQuery) {
+    } else if (msg instanceof SubscriptionQuery query) {
       log.info("[RegistrationRouter] Subscription query.");
-      SubscriptionQuery query = (SubscriptionQuery) msg;
       SubscriptionQueryResult subscription = new SubscriptionQueryResult();
       subscription.setSubscription(getSubscription(query.getUrl()));
       getSender().tell(subscription, self());
       return;
-    } else if (msg instanceof Terminated) {
-      log.debug("[RegistrationRouter] Terminated event.");
-      router = router.removeRoutee(((Terminated) msg).actor());
+    } else if (msg instanceof Terminated terminated) {
+      log.error("[RegistrationRouter] terminate event for {}", terminated.actor().path());
+      router = router.removeRoutee(terminated.actor());
       ActorRef r = getContext().actorOf(Props.create(RegistrationActor.class));
       getContext().watch(r);
       router = router.addRoutee(new ActorRefRoutee(r));
       return;
     } else {
-      log.error("[RegistrationRouter] Unhandled event.");
+      log.error("[RegistrationRouter] Unhandled event {}", Message.getDebug(msg));
       unhandled(msg);
       return;
     }
 
-    RegistrationEvent event = new RegistrationEvent();
+    RegistrationEvent event = new RegistrationEvent("RegistrationRouter:onReceive", this.getSelf().path());
     event.setEvent(RegistrationEvent.Event.Audit);
-    getContext().getSystem().scheduler().scheduleOnce(Duration.create(nsiProperties.getDdsAuditTimer(), TimeUnit.SECONDS),
+    getContext().getSystem().scheduler()
+        .scheduleOnce(Duration.create(nsiProperties.getDdsAuditTimer(), TimeUnit.SECONDS),
             this.getSelf(), event, getContext().getSystem().dispatcher(), null);
   }
 
+  /**
+   * Route an incoming registration message to an actor for processing.
+   */
   private void routeRegister() {
     // We need to register invoke a registration actor for each remote DDS
     // we are peering with.
@@ -144,6 +173,9 @@ public class RegistrationRouter extends UntypedAbstractActor {
     });
   }
 
+  /**
+   * Route an incoming registration audit message to an actor for processing.
+   */
   private void routeAudit() {
     // Check the list of discovery URL against what we already have.
     List<String> discoveryURL = nsiProperties.getPeers();
@@ -177,8 +209,8 @@ public class RegistrationRouter extends UntypedAbstractActor {
     // Now we see if there are any URL we missed from the old list and
     // unsubscribe them since we seem to no longer be interested.
     subscriptionURL.stream()
-            .map((url) -> subscriptionService.get(url))
-            .filter((sub) -> (sub != null)).map((sub) -> {
+            .map(subscriptionService::get)
+            .filter(Objects::nonNull).map((sub) -> {
       // Should always be true unless modified while we are processing.
       RegistrationEvent regEvent = new RegistrationEvent();
       regEvent.setEvent(RegistrationEvent.Event.Delete);
@@ -189,9 +221,12 @@ public class RegistrationRouter extends UntypedAbstractActor {
     });
   }
 
+  /**
+   * Route an incoming shutdown message to an actor for processing.
+   */
   private void routeShutdown() {
-    subscriptionService.keySet().stream().map((url) -> subscriptionService.get(url))
-            .filter((sub) -> (sub != null)).map((sub) -> {
+    subscriptionService.keySet().stream().map(subscriptionService::get)
+            .filter(Objects::nonNull).map((sub) -> {
       // Should always be true unless modified while we are processing.
       RegistrationEvent regEvent = new RegistrationEvent();
       regEvent.setEvent(RegistrationEvent.Event.Delete);
@@ -202,10 +237,22 @@ public class RegistrationRouter extends UntypedAbstractActor {
     });
   }
 
+  /**
+   * Return true if the provided URL is a valid subscription.
+   *
+   * @param url
+   * @return
+   */
   public boolean isSubscription(String url) {
     return subscriptionService.getByHref(url) != null;
   }
 
+  /**
+   * Get the subscription associated with the provided URL.
+   *
+   * @param url The URL identifying the subscription to retrieve.
+   * @return The matching subscription if one exists.
+   */
   public Subscription getSubscription(String url) {
     return subscriptionService.getByHref(url);
   }

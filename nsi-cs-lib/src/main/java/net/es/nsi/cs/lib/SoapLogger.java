@@ -1,10 +1,11 @@
 package net.es.nsi.cs.lib;
 
-import javax.xml.namespace.QName;
 import jakarta.xml.soap.SOAPMessage;
 import jakarta.xml.ws.handler.MessageContext;
 import jakarta.xml.ws.handler.soap.SOAPHandler;
 import jakarta.xml.ws.handler.soap.SOAPMessageContext;
+
+import javax.xml.namespace.QName;
 import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,9 +16,9 @@ public class SoapLogger implements SOAPHandler<SOAPMessageContext> {
     QName NsiHeader_QNAME = new QName("http://schemas.ogf.org/nsi/2013/12/framework/headers", "nsiHeader");
 
     @Override
-    public Set getHeaders() {
+    public Set<QName> getHeaders() {
         logger.debug("SoapLogger.getHeaders: entering...");
-        Set headers = new HashSet<>();
+        Set<QName> headers = new HashSet<>();
         headers.add(NsiHeader_QNAME);
         return headers;
     }

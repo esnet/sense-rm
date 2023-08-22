@@ -1,6 +1,12 @@
 package net.es.nsi.dds.lib.signing;
 
 import com.google.common.base.Strings;
+import net.es.nsi.dds.lib.constants.Properties;
+
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,11 +19,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
-import javax.xml.crypto.dsig.keyinfo.X509Data;
-import net.es.nsi.dds.lib.constants.Properties;
 
 
 /**
@@ -29,7 +30,7 @@ public class KeyStoreHandler {
   private final String keyStore;
   private final String keyStorePassword;
   private final String keyStoreType;
-  private KeyStore ks;
+  private final KeyStore ks;
 
   public KeyStoreHandler() throws KeyStoreException, FileNotFoundException, IOException,
           NoSuchAlgorithmException, CertificateException {
@@ -75,6 +76,7 @@ public class KeyStoreHandler {
     return (X509Certificate) getPrivateKeyEntry(alias).getCertificate();
   }
 
+  @SuppressWarnings("unchecked")
   public KeyInfo getKeyInfo(String alias, XMLSignatureFactory fac)
           throws NoSuchAlgorithmException, UnrecoverableEntryException, KeyStoreException {
     // Create the KeyInfo containing the X509Data.
@@ -84,7 +86,6 @@ public class KeyStoreHandler {
     x509Content.add(x509Certificate.getSubjectX500Principal().getName());
     x509Content.add(x509Certificate);
     X509Data xd = kif.newX509Data(x509Content);
-    KeyInfo ki = kif.newKeyInfo(Collections.singletonList(xd));
-    return ki;
+    return kif.newKeyInfo(Collections.singletonList(xd));
   }
 }

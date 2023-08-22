@@ -173,12 +173,12 @@ public class XmlUtilities {
       for (int i = 0; i < listOfFiles.length; i++) {
         if (listOfFiles[i].isFile()) {
           file = listOfFiles[i].getAbsolutePath();
-          if (file.endsWith(".xml") || file.endsWith(".xml")) {
+          if (file.endsWith(".xml")) {
             results.add(file);
           }
         }
       }
     }
-    return new CopyOnWriteArrayList(results);
+    return new CopyOnWriteArrayList<>(results);
   }
 }

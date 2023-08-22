@@ -1,33 +1,22 @@
 package net.es.nsi.dds.lib.signing;
 
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
-import java.util.Collections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.XMLStructure;
-import javax.xml.crypto.dsig.CanonicalizationMethod;
-import javax.xml.crypto.dsig.DigestMethod;
-import javax.xml.crypto.dsig.Reference;
-import javax.xml.crypto.dsig.SignatureMethod;
-import javax.xml.crypto.dsig.SignedInfo;
-import javax.xml.crypto.dsig.Transform;
-import javax.xml.crypto.dsig.XMLSignature;
-import javax.xml.crypto.dsig.XMLSignatureException;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.*;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.util.Collections;
 
 /**
  *
@@ -45,8 +34,9 @@ public class SignatureFactory {
         // Create a DOM XMLSignatureFactory that will be used to
         // generate the enveloped signature.
         try {
-            fac = XMLSignatureFactory.getInstance("DOM", (Provider) Class.forName(providerName).newInstance());
-        } catch (ClassNotFoundException | InstantiationException| IllegalAccessException ex) {
+            fac = XMLSignatureFactory.getInstance("DOM", (Provider) Class.forName(providerName).getDeclaredConstructor().newInstance());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException
+            | InvocationTargetException ex) {
             log.error("SignatureFactory: could not instantiate a jsr105Provider", ex);
             throw new RuntimeException(ex);
         }
@@ -66,8 +56,10 @@ public class SignatureFactory {
         // Create a DOM XMLSignatureFactory that will be used to
         // generate the enveloped signature.
         try {
-            fac = XMLSignatureFactory.getInstance("DOM", (Provider) Class.forName(providerName).newInstance());
-        } catch (ClassNotFoundException | InstantiationException| IllegalAccessException ex) {
+            fac = XMLSignatureFactory.getInstance("DOM",
+                (Provider) Class.forName(providerName).getDeclaredConstructor().newInstance());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException
+            | InvocationTargetException ex) {
             log.error("SignatureFactory: could not instantiate a jsr105Provider", ex);
             throw new RuntimeException(ex);
         }

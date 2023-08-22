@@ -150,8 +150,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.2.1</version>
         </dependency>
 
         <!-- Needed for certificate DN manipulation. -->
@@ -202,10 +203,6 @@
             <artifactId>jaxws-rt</artifactId>
             <version>4.0.1</version>
         </dependency>
-        <dependency>
-            <groupId>jakarta.xml.ws</groupId>
-            <artifactId>jakarta.xml.ws-api</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
@@ -217,10 +214,10 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <testSource>${java.version}</testSource>
-                    <testTarget>${java.version}</testTarget>
-                    <compilerArgument>-Xlint:unchecked</compilerArgument>
-                    <compilerArgument>-Xlint:deprecation</compilerArgument>
+                    <compilerArgs>
+                        <arg>-Xlint:unchecked</arg>
+                        <arg>-Xlint:deprecation</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
 

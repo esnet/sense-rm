@@ -2,7 +2,6 @@ package net.es.sense.rm.driver.nsi.db;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ModelRepository extends CrudRepository<Model, String> {
-  public void deleteByIdx(@Param("idx") String idx);
 
   @Query("select count(m) > 0 from #{#entityName} m where m.topologyId = :topologyId and m.version = :version")
   public boolean isVersion(@Param ("topologyId") String topologyId, @Param("version") String version);

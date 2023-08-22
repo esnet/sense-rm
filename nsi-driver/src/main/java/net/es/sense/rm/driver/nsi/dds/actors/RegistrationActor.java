@@ -15,6 +15,7 @@ import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent;
 import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent.Event;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import java.net.MalformedURLException;
@@ -27,7 +28,7 @@ import java.util.Date;
  * @author hacksaw
  */
 @Component
-@Scope("prototype")
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RegistrationActor extends UntypedAbstractActor {
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 

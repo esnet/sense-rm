@@ -14,8 +14,10 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
-import java.util.concurrent.ExecutionException;
 
+/**
+ * This is the SENSE-RM application main that initializes the springboot runtime.
+ */
 @Slf4j
 @SpringBootApplication(scanBasePackages={"net.es.sense.rm"})
 //@EnableSwagger2
@@ -23,7 +25,6 @@ import java.util.concurrent.ExecutionException;
 public class Application {
   // Command line parameters.
   public static final String ARGNAME_PIDFILE = "pidFile";
-  public static final String ARGNAME_IGNORE = "-spring.config.location";
   public static final String SYSTEM_PROPERTY_PIDFILE = "pidFile";
 
   // Keep running while true.
@@ -32,11 +33,10 @@ public class Application {
   /**
    * This is the Springboot main for this application.
    *
-   * @param args
-   * @throws java.util.concurrent.ExecutionException
-   * @throws java.lang.InterruptedException
+   * @param args Only one program specific parameter is accepted.
+   * @throws java.lang.InterruptedException Thrown when the program loop is interrupted.
    */
-  public static void main(String[] args) throws ExecutionException, InterruptedException {
+  public static void main(String[] args) throws InterruptedException {
     log.info("[SENSE-N-RM] Starting...");
 
     ApplicationContext context = SpringApplication.run(Application.class, args);
@@ -55,7 +55,6 @@ public class Application {
     log.info("Name: {}, {}", context.getApplicationName(), mxBean.getName());
     log.info("Pid: {}", ProcessHandle.current().pid());
     log.info("Uptime: {} ms", mxBean.getUptime());
-    log.info("BootClasspath: {}", mxBean.getBootClassPath());
     log.info("Classpath: {}", mxBean.getClassPath());
     log.info("Library Path: {}", mxBean.getLibraryPath());
     for (String argument : mxBean.getInputArguments()) {
@@ -71,9 +70,9 @@ public class Application {
       }
     });
 
-    // Loop until we are told to shutdown.
+    // Loop until we are told to shut down.
     MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
-    while (keepRunning) {
+    while (isKeepRunning()) {
       log.info("[SENSE-N-RM] {}", memStats(memoryBean));
       Thread.sleep(10000);
     }
@@ -84,6 +83,12 @@ public class Application {
 
   private static final int MEGABYTE = (1024 * 1024);
 
+  /**
+   * Compose a string with basic memory stats obtained from the provided MX bean.
+   *
+   * @param memoryBean The memory MX bean to obtain statistics.
+   * @return A string with basic memory stats
+   */
   private static String memStats(MemoryMXBean memoryBean) {
     MemoryUsage heapUsage = memoryBean.getHeapMemoryUsage();
     long maxMemory = heapUsage.getMax() / MEGABYTE;
@@ -123,7 +128,7 @@ public class Application {
     Options options = getOptions();
     CommandLine cmd;
     try {
-      cmd = parser.parse(options, args);
+      cmd = parser.parse(options, args, true);
     } catch (ParseException e) {
       System.err.println("Error: You did not provide the correct arguments, see usage below.");
       HelpFormatter formatter = new HelpFormatter();
@@ -147,10 +152,6 @@ public class Application {
     Option pidFileOption = new Option(ARGNAME_PIDFILE, true, "The file in which to write the process pid");
     pidFileOption.setRequired(false);
     options.addOption(pidFileOption);
-
-    Option springOption = new Option(ARGNAME_IGNORE, true, "External spring configuration file.");
-    springOption.setRequired(false);
-    options.addOption(springOption);
     return options;
   }
 

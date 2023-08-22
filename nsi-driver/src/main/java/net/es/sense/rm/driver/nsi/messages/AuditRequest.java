@@ -19,18 +19,43 @@
  */
 package net.es.sense.rm.driver.nsi.messages;
 
-import java.io.Serializable;
-import lombok.AllArgsConstructor;
+import akka.actor.ActorPath;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  *
  * @author hacksaw
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-@AllArgsConstructor
-public class AuditRequest implements Serializable {
+public class AuditRequest extends Message implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
-
     private String topologyId;
+
+    public AuditRequest() {
+        super();
+    }
+
+    public AuditRequest(String initiator) {
+        super(initiator);
+    }
+
+    public AuditRequest(String initiator, ActorPath path) {
+        super(initiator, path);
+    }
+
+    public AuditRequest(String initiator, ActorPath path, String topologyId) {
+        super(initiator, path);
+        this.topologyId = topologyId;
+    }
+
+    public AuditRequest(String initiator, String topologyId) {
+        super(initiator);
+        this.topologyId = topologyId;
+    }
 }

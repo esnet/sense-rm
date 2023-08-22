@@ -19,26 +19,11 @@
  */
 package net.es.sense.rm.api;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.core.Response.Status;
-import jakarta.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeConfigurationException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
-import net.es.sense.rm.driver.api.DeltaResponse;
-import net.es.sense.rm.driver.api.DeltasResponse;
-import net.es.sense.rm.driver.api.Driver;
-import net.es.sense.rm.driver.api.ModelResponse;
-import net.es.sense.rm.driver.api.ModelsResponse;
+import net.es.sense.rm.driver.api.*;
 import net.es.sense.rm.driver.api.mrml.ModelUtil;
 import net.es.sense.rm.model.DeltaRequest;
 import net.es.sense.rm.model.DeltaResource;
@@ -46,9 +31,17 @@ import net.es.sense.rm.model.DeltaState;
 import net.es.sense.rm.model.ModelResource;
 import org.assertj.core.util.Strings;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
+ * Test the RM driver API.
  *
  * @author hacksaw
  */
@@ -60,7 +53,7 @@ public class TestDriver implements Driver {
   private final Map<String, ModelResource> models;
   private final Map<String, DeltaResource> deltas;
 
-  public TestDriver() throws JAXBException, IOException, DatatypeConfigurationException {
+  public TestDriver() throws IOException {
     JsonProxy json = new JsonProxy();
 
     try (FileReader fileReader = new FileReader(MODEL_FILE)) {
@@ -89,19 +82,22 @@ public class TestDriver implements Driver {
   public Future<ModelResponse> getModel(String id, String modelType, long ifModifiedSince) {
 
     ModelResponse response = new ModelResponse();
+    CompletableFuture<ModelResponse> cf = new CompletableFuture<>();
 
     // A valid model type must be provided.
     if (!ModelUtil.isSupported(modelType)) {
       response.setStatus(Status.BAD_REQUEST);
       response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     ModelResource model = models.get(id);
     if (model == null) {
       response.setStatus(Status.NOT_FOUND);
       response.setError(Optional.of("model does not exist, id = " + id));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     try {
@@ -109,16 +105,19 @@ public class TestDriver implements Driver {
                   .toGregorianCalendar().getTimeInMillis();
       if (creationTime <= ifModifiedSince) {
         response.setStatus(Status.NOT_MODIFIED);
-        return new AsyncResult<>(response);
+        cf.complete(response);
+        return cf;
       }
     } catch (DatatypeConfigurationException ex) {
       response.setStatus(Status.INTERNAL_SERVER_ERROR);
       response.setError(Optional.of("Error converting creationTime for model id = " + id));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     response.setModel(Optional.of(model));
-    return new AsyncResult<>(response);
+    cf.complete(response);
+    return cf;
   }
 
   @Override
@@ -132,12 +131,14 @@ public class TestDriver implements Driver {
   public Future<ModelsResponse> getModels(String modelType, long ifModifiedSince) {
 
     ModelsResponse response = new ModelsResponse();
+    CompletableFuture<ModelsResponse> cf = new CompletableFuture<>();
 
     // A valid model type must be provided.
     if (!ModelUtil.isSupported(modelType)) {
       response.setStatus(Status.BAD_REQUEST);
       response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     Collection<ModelResource> results = new ArrayList<>();
@@ -151,17 +152,20 @@ public class TestDriver implements Driver {
       } catch (DatatypeConfigurationException ex) {
         response.setStatus(Status.INTERNAL_SERVER_ERROR);
         response.setError(Optional.of("Error converting creationTime for model id = " + m.getId()));
-        return new AsyncResult<>(response);
+        cf.complete(response);
+        return cf;
       }
     }
 
     if (results.isEmpty() && !models.isEmpty()) {
       response.setStatus(Status.NOT_MODIFIED);
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     response.setModels(results);
-    return new AsyncResult<>(response);
+    cf.complete(response);
+    return cf;
   }
 
   @Override
@@ -175,17 +179,20 @@ public class TestDriver implements Driver {
   public Future<ModelResponse> getCurrentModel(String modelType, long ifModifiedSince) {
 
     ModelResponse response = new ModelResponse();
+    CompletableFuture<ModelResponse> cf = new CompletableFuture<>();
 
     // A valid model type must be provided.
     if (!ModelUtil.isSupported(modelType)) {
       response.setStatus(Status.BAD_REQUEST);
       response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     if (models.isEmpty()) {
       response.setStatus(Status.NOT_FOUND);
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     ModelResource newest = null;
@@ -200,17 +207,20 @@ public class TestDriver implements Driver {
       } catch (DatatypeConfigurationException ex) {
         response.setStatus(Status.INTERNAL_SERVER_ERROR);
         response.setError(Optional.of("Error converting creationTime for model id = " + m.getId()));
-        return new AsyncResult<>(response);
+        cf.complete(response);
+        return cf;
       }
     }
 
     if (newest == null && !models.isEmpty()) {
       response.setStatus(Status.NOT_MODIFIED);
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
-    response.setModel(Optional.of(newest));
-    return new AsyncResult<>(response);
+    response.setModel(newest);
+    cf.complete(response);
+    return cf;
   }
 
   @Override
@@ -223,32 +233,37 @@ public class TestDriver implements Driver {
   @Async
   public Future<DeltaResponse> propagateDelta(DeltaRequest deltaRequest, String modelType) {
     DeltaResponse response = new DeltaResponse();
+    CompletableFuture<DeltaResponse> cf = new CompletableFuture<>();
 
     // A valid model type must be provided.
     if (!ModelUtil.isSupported(modelType)) {
       response.setStatus(Status.BAD_REQUEST);
       response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     if (Strings.isNullOrEmpty(deltaRequest.getId())) {
       response.setStatus(Status.BAD_REQUEST);
       response.setError(Optional.of("Delta id not provided = " + deltaRequest.getId()));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     DeltaResource delta = deltas.get(deltaRequest.getId());
     if (delta != null) {
       response.setStatus(Status.CONFLICT);
       response.setError(Optional.of("Delta id already exists = " + deltaRequest.getId()));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     ModelResource model = models.get(deltaRequest.getModelId());
     if (model == null) {
       response.setStatus(Status.NOT_FOUND);
       response.setError(Optional.of("Model id not found = " + deltaRequest.getModelId()));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     try {
@@ -268,25 +283,29 @@ public class TestDriver implements Driver {
       response.setError(Optional.of("Commit delta failed, message = " + ex.getLocalizedMessage()));
     }
 
-    return new AsyncResult<>(response);
+    cf.complete(response);
+    return cf;
   }
 
   @Override
   @Async
   public Future<DeltaResponse> commitDelta(String deltaId) {
     DeltaResponse response = new DeltaResponse();
+    CompletableFuture<DeltaResponse> cf = new CompletableFuture<>();
 
     if (Strings.isNullOrEmpty(deltaId)) {
       response.setStatus(Status.BAD_REQUEST);
       response.setError(Optional.of("Delta id not provided = " + deltaId));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     DeltaResource delta = deltas.get(deltaId);
     if (delta == null) {
       response.setStatus(Status.NOT_FOUND);
       response.setError(Optional.of("Delta not found, id = " + deltaId));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     if (delta.getState() == null || delta.getState() != DeltaState.Accepted) {
@@ -295,7 +314,8 @@ public class TestDriver implements Driver {
       response.setStatus(Status.CONFLICT);
       response.setError(Optional.of("requested delta not in Accepted state, id = " + deltaId
               + ", state = " + delta.getState()));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     try {
@@ -309,25 +329,29 @@ public class TestDriver implements Driver {
       response.setError(Optional.of("Commit delta failed, message = " + ex.getLocalizedMessage()));
     }
 
-    return new AsyncResult<>(response);
+    cf.complete(response);
+    return cf;
   }
 
   @Override
   @Async
   public Future<DeltaResponse> getDelta(String id, String modelType, long ifModifiedSince) {
     DeltaResponse response = new DeltaResponse();
+    CompletableFuture<DeltaResponse> cf = new CompletableFuture<>();
 
     // A valid model type must be provided.
     if (!ModelUtil.isSupported(modelType)) {
       response.setStatus(Status.BAD_REQUEST);
       response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     DeltaResource delta = deltas.get(id);
     if (delta == null) {
       response.setStatus(Status.NOT_FOUND);
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     try {
@@ -335,16 +359,19 @@ public class TestDriver implements Driver {
                   .toGregorianCalendar().getTimeInMillis();
       if (lastModified <= ifModifiedSince) {
         response.setStatus(Status.NOT_MODIFIED);
-        return new AsyncResult<>(response);
+        cf.complete(response);
+        return cf;
       }
     } catch (DatatypeConfigurationException ex) {
       response.setStatus(Status.INTERNAL_SERVER_ERROR);
       response.setError(Optional.of("Error converting creationTime for delta id = " + id));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     response.setDelta(Optional.of(delta));
-    return new AsyncResult<>(response);
+    cf.complete(response);
+    return cf;
   }
 
   @Override
@@ -355,14 +382,16 @@ public class TestDriver implements Driver {
 
   @Override
   @Async
-  public Future<DeltasResponse> getDeltas(String modelType, long ifModifiedSince) {
+  public CompletableFuture<DeltasResponse> getDeltas(String modelType, long ifModifiedSince) {
     DeltasResponse response = new DeltasResponse();
+    CompletableFuture<DeltasResponse> cf = new CompletableFuture<>();
 
     // A valid model type must be provided.
     if (!ModelUtil.isSupported(modelType)) {
       response.setStatus(Status.BAD_REQUEST);
       response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     Collection<DeltaResource> results = new ArrayList<>();
@@ -381,11 +410,13 @@ public class TestDriver implements Driver {
 
     if (results.isEmpty() && !deltas.isEmpty()) {
       response.setStatus(Status.NOT_FOUND);
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     response.setDeltas(results);
-    return new AsyncResult<>(response);
+    cf.complete(response);
+    return cf;
   }
 
   @Override

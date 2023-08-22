@@ -22,6 +22,11 @@ package net.es.sense.rm.driver.nsi;
 import akka.actor.ActorRef;
 import com.google.common.base.Strings;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.sense.rm.driver.api.*;
@@ -39,17 +44,13 @@ import net.es.sense.rm.model.ModelResource;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
-import jakarta.annotation.PreDestroy;
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
+
 import javax.xml.datatype.DatatypeConfigurationException;
-import jakarta.xml.ws.soap.SOAPFaultException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
@@ -115,12 +116,14 @@ public class NsiDriver implements Driver {
   public Future<ModelResponse> getModel(String id, String modelType, long ifModifiedSince) {
 
     ModelResponse response = new ModelResponse();
+    CompletableFuture<ModelResponse> cf = new CompletableFuture<>();
 
     // A valid model type must be provided.
     if (!ModelUtil.isSupported(modelType)) {
       response.setStatus(Status.BAD_REQUEST);
       response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     // Convert the internal referencedModel representation to the driver interface referencedModel.
@@ -130,13 +133,15 @@ public class NsiDriver implements Driver {
       if (model == null) {
         response.setStatus(Status.NOT_FOUND);
         response.setError(Optional.of("model does not exist, id = " + id));
-        return new AsyncResult<>(response);
+        cf.complete(response);
+        return cf;
       }
 
       long version = (model.getCreated() / 1000) * 1000;
       if (version <= ifModifiedSince) {
         response.setStatus(Status.NOT_MODIFIED);
-        return new AsyncResult<>(response);
+        cf.complete(response);
+        return cf;
       }
 
       ModelResource result = new ModelResource();
@@ -144,12 +149,14 @@ public class NsiDriver implements Driver {
       result.setCreationTime(XmlUtilities.longToXMLGregorianCalendar(version).toXMLFormat());
       result.setModel(model.getBase());
       response.setModel(Optional.of(result));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     } catch (IllegalArgumentException | DatatypeConfigurationException ex) {
       log.error("[NsiDriver] ontology creation failed for networkId = {}.", networkId);
       response.setStatus(Status.INTERNAL_SERVER_ERROR);
       response.setError(Optional.of("Could not generate model for networkId = " + networkId));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
   }
 
@@ -183,12 +190,14 @@ public class NsiDriver implements Driver {
   public Future<ModelsResponse> getModels(String modelType, long ifModifiedSince) {
 
     ModelsResponse response = new ModelsResponse();
+    CompletableFuture<ModelsResponse> cf = new CompletableFuture<>();
 
     // A valid model type must be provided.
     if (!ModelUtil.isSupported(modelType)) {
       response.setStatus(Status.BAD_REQUEST);
       response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     // The RA Controller maintains a database of MRML models created from NML and NSI connections.
@@ -212,18 +221,21 @@ public class NsiDriver implements Driver {
       } else if (modelService.countByTopologyId(networkId) != 0) {
         // There are models for this topology but none are newer than provided ifModifiedSince.
         response.setStatus(Status.NOT_MODIFIED);
-        return new AsyncResult<>(response);
+        cf.complete(response);
+        return cf;
       } else {
         log.info("[NsiDriver] no matching model entries returned for network = {}", networkId);
       }
 
       response.setModels(results);
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     } catch (IllegalArgumentException | DatatypeConfigurationException ex) {
       log.error("[NsiDriver] ontology creation failed for networkId = {}.", networkId, ex);
       response.setStatus(Status.INTERNAL_SERVER_ERROR);
       response.setError(Optional.of("Could not generate model for networkId = " + networkId));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
   }
 
@@ -256,12 +268,14 @@ public class NsiDriver implements Driver {
   public Future<ModelResponse> getCurrentModel(String modelType, long ifModifiedSince) {
 
     ModelResponse response = new ModelResponse();
+    CompletableFuture<ModelResponse> cf = new CompletableFuture<>();
 
     // A valid model type must be provided.
     if (!ModelUtil.isSupported(modelType)) {
       response.setStatus(Response.Status.BAD_REQUEST);
       response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     // The RA Controller maintains a database of MRML models created from NML and NSI connections.
@@ -281,7 +295,8 @@ public class NsiDriver implements Driver {
                   "model version = {} <= ifModifiedSince = {}",
                   model.getModelId(), version, ifModifiedSince);
           response.setStatus(Response.Status.NOT_MODIFIED);
-          return new AsyncResult<>(response);
+          cf.complete(response);
+          return cf;
         }
 
         log.debug("[NsiDriver] getCurrentModel: model id = {} MODIFIED, " +
@@ -296,19 +311,22 @@ public class NsiDriver implements Driver {
 
         log.info("[NsiDriver] found current matching modelId = {}", model.getIdx());
         response.setModel(Optional.of(result));
-        return new AsyncResult<>(response);
+        cf.complete(response);
+        return cf;
       }
     } catch (IllegalArgumentException | DatatypeConfigurationException ex) {
       log.error("[NsiDriver] ontology creation failed for networkId = {}.", networkId, ex);
       response.setStatus(Response.Status.INTERNAL_SERVER_ERROR);
       response.setError(Optional.of("Could not generate model for networkId = " + networkId));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     log.info("[NsiDriver] no matching model entries returned for network = {}", networkId);
     response.setStatus(Response.Status.NOT_FOUND);
     response.setError(Optional.of("no current model exists"));
-    return new AsyncResult<>(response);
+    cf.complete(response);
+    return cf;
   }
 
   /**
@@ -338,12 +356,14 @@ public class NsiDriver implements Driver {
   @Async
   public Future<DeltaResponse> propagateDelta(DeltaRequest deltaRequest, String modelType) {
     DeltaResponse response = new DeltaResponse();
+    CompletableFuture<DeltaResponse> cf = new CompletableFuture<>();
 
     // A valid model type must be provided.
     if (!ModelUtil.isSupported(modelType)) {
       response.setStatus(Status.BAD_REQUEST);
       response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     log.info("[propagateDelta] processing deltaId = {}, modelId = {}",
@@ -356,7 +376,8 @@ public class NsiDriver implements Driver {
       log.error("[NsiDriver] specified model not found, modelId = {}.", deltaRequest.getModelId());
       response.setStatus(Status.NOT_FOUND);
       response.setError(Optional.of("Specified model not found, modelId = " + deltaRequest.getModelId()));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     // We need to apply the reduction and addition to the current referenced model.
@@ -365,7 +386,8 @@ public class NsiDriver implements Driver {
       log.error("[NsiDriver] Could not find current model for networkId = {}", nsiProperties.getNetworkId());
       response.setStatus(Status.INTERNAL_SERVER_ERROR);
       response.setError(Optional.of("Could not find current model for networkId = " + nsiProperties.getNetworkId()));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     try {
@@ -415,7 +437,8 @@ public class NsiDriver implements Driver {
 
         response.setStatus(ResourceResponse.exceptionToStatus(ex));
         response.setError(Optional.ofNullable(ex.getMessage()));
-        return new AsyncResult<>(response);
+        cf.complete(response);
+        return cf;
       }
 
       // Read the delta again then update if needed.  The orchestrator should
@@ -440,12 +463,14 @@ public class NsiDriver implements Driver {
 
       response.setStatus(Status.CREATED);
       response.setDelta(Optional.of(deltaResponse));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     } catch (Exception ex) {
       log.error("[NsiDriver] propagateDelta failed for modelId = {}", deltaRequest.getModelId(), ex);
       response.setStatus(ResourceResponse.exceptionToStatus(ex));
       response.setError(Optional.of(ex.getMessage()));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
   }
 
@@ -462,6 +487,7 @@ public class NsiDriver implements Driver {
     log.info("[NsiDriver] processing commitDelta for id = {}", id);
 
     DeltaResponse response = new DeltaResponse();
+    CompletableFuture<DeltaResponse> cf = new CompletableFuture<>();
 
     // Make sure the referenced delta has not expired.
     DeltaService deltaService = raController.getDeltaService();
@@ -470,7 +496,8 @@ public class NsiDriver implements Driver {
       log.info("[NsiDriver] requested delta not found, id = {}.", id);
       response.setStatus(Status.NOT_FOUND);
       response.setError(Optional.of("Requested delta not found, id = " + id));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     // Make sure we are in the correct state.
@@ -481,7 +508,8 @@ public class NsiDriver implements Driver {
       response.setStatus(Status.CONFLICT);
       response.setError(Optional.of("Requested delta not in Accepted state, id = " + id
               + ", state = " + delta.getState().name()));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     // Update our internal delta state.
@@ -521,7 +549,8 @@ public class NsiDriver implements Driver {
       deltaResponse.setResult(delta.getResult());
       response.setStatus(Status.NO_CONTENT);
       response.setDelta(Optional.of(deltaResponse));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     } catch (ServiceException se) {
       log.error("NSI CS failed {}", se.getFaultInfo());
       delta = deltaService.get(id);
@@ -529,7 +558,8 @@ public class NsiDriver implements Driver {
       deltaService.store(delta);
       response.setStatus(Status.INTERNAL_SERVER_ERROR);
       response.setError(Optional.of("NSI CS failed, errorId = " + se.getFaultInfo().getErrorId() + "message = " + se.getFaultInfo().getText()));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     } catch (IllegalArgumentException | TimeoutException | DatatypeConfigurationException | SOAPFaultException ex) {
       log.error("NSI CS failed", ex);
       delta = deltaService.get(id);
@@ -537,7 +567,8 @@ public class NsiDriver implements Driver {
       deltaService.store(delta);
       response.setStatus(ResourceResponse.exceptionToStatus(ex));
       response.setError(Optional.of("NSI CS failed, message = " + ex.getMessage()));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
   }
 
@@ -558,12 +589,14 @@ public class NsiDriver implements Driver {
     log.info("[NsiDriver] processing getDelta for id = {}", id);
 
     DeltaResponse response = new DeltaResponse();
+    CompletableFuture<DeltaResponse> cf = new CompletableFuture<>();
 
     // A valid model type must be provided.
     if (!ModelUtil.isSupported(modelType)) {
       response.setStatus(Status.BAD_REQUEST);
       response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     // Make sure the referenced delta has not expired.
@@ -572,14 +605,16 @@ public class NsiDriver implements Driver {
     if (delta == null) {
       response.setStatus(Status.NOT_FOUND);
       response.setError(Optional.of("Requested delta not found, id = " + id));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     long modified = (delta.getLastModified() / 1000) * 1000;
     if (modified <= ifModifiedSince) {
       log.info("[NsiDriver] requested delta not modified, id = {}.", id);
       response.setStatus(Status.NOT_MODIFIED);
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     try {
@@ -592,12 +627,14 @@ public class NsiDriver implements Driver {
       resource.setReduction(delta.getReduction());
       resource.setAddition(delta.getAddition());
       response.setDelta(Optional.of(resource));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     } catch (DatatypeConfigurationException ex) {
       log.error("[NsiDriver] Failed to encode delta = {}.", delta.getDeltaId());
       response.setStatus(Status.INTERNAL_SERVER_ERROR);
       response.setError(Optional.of("Failed to encode delta id = " + delta.getDeltaId()));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
   }
 
@@ -631,12 +668,14 @@ public class NsiDriver implements Driver {
     log.info("[NsiDriver] processing getDeltas for lastModified = {}", ifModifiedSince);
 
     DeltasResponse response = new DeltasResponse();
+    CompletableFuture<DeltasResponse> cf = new CompletableFuture<>();
 
     // A valid model type must be provided.
     if (!ModelUtil.isSupported(modelType)) {
       response.setStatus(Status.BAD_REQUEST);
       response.setError(Optional.of("Specified model type = " + modelType + " not supported."));
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     Collection<DeltaResource> results = new ArrayList<>();
@@ -654,7 +693,8 @@ public class NsiDriver implements Driver {
         response.setDeltas(results);
       }
 
-      return new AsyncResult<>(response);
+      cf.complete(response);
+      return cf;
     }
 
     try {
@@ -675,7 +715,8 @@ public class NsiDriver implements Driver {
     }
 
     response.setDeltas(results);
-    return new AsyncResult<>(response);
+    cf.complete(response);
+    return cf;
   }
 
   /**

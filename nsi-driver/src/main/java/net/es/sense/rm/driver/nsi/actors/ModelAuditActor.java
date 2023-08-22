@@ -23,59 +23,73 @@ import akka.actor.Cancellable;
 import akka.actor.UntypedAbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import java.util.concurrent.TimeUnit;
 import net.es.sense.rm.driver.nsi.AuditService;
 import net.es.sense.rm.driver.nsi.cs.CsOperations;
 import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
 import net.es.sense.rm.driver.nsi.messages.AuditRequest;
+import net.es.sense.rm.driver.nsi.messages.Message;
 import net.es.sense.rm.driver.nsi.messages.TerminateRequest;
 import net.es.sense.rm.driver.nsi.messages.TimerMsg;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
 
+import java.util.concurrent.TimeUnit;
+
 /**
+ * This actor performs an audit on the topology model.
  *
  * @author hacksaw
  */
 @Component
-@Scope("prototype")
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ModelAuditActor extends UntypedAbstractActor {
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
-  @Autowired
-  private NsiActorSystem nsiActorSystem;
-
-  @Autowired
-  private NsiProperties nsiProperties;
-
-  @Autowired
-  private AuditService auditService;
-
-  @Autowired
-  private OperationMapRepository operationMap;
-
+  private final NsiActorSystem nsiActorSystem;
+  private final NsiProperties nsiProperties;
+  private final AuditService auditService;
+  private final OperationMapRepository operationMap;
   private Cancellable scheduled;
+
+  /**
+   * Constructor for bean to be instantiated.
+   *
+   * @param nsiActorSystem
+   * @param nsiProperties
+   * @param auditService
+   * @param operationMap
+   */
+  public ModelAuditActor(NsiActorSystem nsiActorSystem, NsiProperties nsiProperties,
+                         AuditService auditService, OperationMapRepository operationMap) {
+    this.nsiActorSystem = nsiActorSystem;
+    this.nsiProperties = nsiProperties;
+    this.auditService = auditService;
+    this.operationMap = operationMap;
+  }
 
   @Override
   public void preStart() {
     log.info("[ModelAuditActor] starting.");
     TimerMsg message = new TimerMsg();
-    scheduled = nsiActorSystem.getActorSystem().scheduler().scheduleOnce(Duration.create(nsiProperties.getModelAuditTimer() + 20,
-            TimeUnit.SECONDS), this.getSelf(), message, nsiActorSystem.getActorSystem().dispatcher(), null);
+    scheduled = nsiActorSystem.getActorSystem().scheduler()
+        .scheduleOnce(Duration.create(nsiProperties.getModelAuditTimer() + 20, TimeUnit.SECONDS),
+            this.getSelf(), message, nsiActorSystem.getActorSystem().dispatcher(), null);
   }
 
   public void cancel() {
-    log.info("[ModelAuditActor] schedule cancelled: {} ", scheduled.isCancelled());
+    log.info("[ModelAuditActor] cancelling schedule isCancelled = {} ", scheduled.isCancelled());
     scheduled.cancel();
-    log.info("[ModelAuditActor] schedule cancelled: {} ", scheduled.isCancelled());
+    log.info("[ModelAuditActor] cancelled schedule isCancelled = {} ", scheduled.isCancelled());
   }
 
   @Override
   public void onReceive(Object msg) {
-    if (msg instanceof TimerMsg) {
+    log.debug("[ModelAuditActor] onReceive {}", Message.getDebug(msg));
+
+    if (msg instanceof TimerMsg timer) {
       // Kick of audit and schedule next update.
       try {
         auditService.audit();
@@ -83,18 +97,19 @@ public class ModelAuditActor extends UntypedAbstractActor {
         log.error("[ModelAuditActor] audit failed", ex);
       }
 
-      TimerMsg message = (TimerMsg) msg;
+      timer.setInitiator("ModelAuditActor:onReceive");
+      timer.setPath(this.self().path());
+
       scheduled = nsiActorSystem.getActorSystem().scheduler().scheduleOnce(
               Duration.create(nsiProperties.getModelAuditTimer(), TimeUnit.SECONDS),
-              this.getSelf(), message, nsiActorSystem.getActorSystem().dispatcher(), null);
-    } else if (msg instanceof AuditRequest) {
+              this.getSelf(), timer, nsiActorSystem.getActorSystem().dispatcher(), null);
+    } else if (msg instanceof AuditRequest ar) {
       try {
-        auditService.audit(((AuditRequest) msg).getTopologyId());
+        auditService.audit(ar.getTopologyId());
       } catch (Exception ex) {
         log.error("[ModelAuditActor] audit failed", ex);
       }
-    } else if (msg instanceof TerminateRequest) {
-      TerminateRequest req = (TerminateRequest) msg;
+    } else if (msg instanceof TerminateRequest req) {
       try {
         log.info("[ModelAuditActor] TerminateRequest for cid = {}", req.getConnectionId());
 
@@ -108,6 +123,7 @@ public class ModelAuditActor extends UntypedAbstractActor {
         log.error("[ModelAuditActor] TerminateRequest failed", ex);
       }
     } else {
+      log.error("[ModelAuditActor] Unhandled message {}.", msg.getClass().getName());
       unhandled(msg);
     }
   }

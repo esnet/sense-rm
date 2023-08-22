@@ -24,4 +24,3 @@ CMD java \
         -XX:+StartAttachListener \
         -jar "$HOME/sense-rm.jar" \
         --spring.config.location="file:$HOME/config/"
-

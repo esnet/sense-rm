@@ -3,11 +3,11 @@ services:
   opennsa-db:
     image: postgres:14.1-alpine
     container_name: opennsa-db
-    restart: always
     environment:
       - POSTGRES_USER=opennsa
       - POSTGRES_PASSWORD=opennsa
       - POSTGRES_DB=opennsa
+    restart: always
     ports:
       - '5432:5432'
     volumes: 
@@ -17,11 +17,11 @@ services:
   sense-db:
     image: postgres:14.1-alpine
     container_name: sense-db
-    restart: always
     environment:
       - POSTGRES_USER=sense
       - POSTGRES_PASSWORD=sense
       - POSTGRES_DB=sense
+    restart: always
     ports:
       - '5433:5432'
     volumes:
@@ -31,11 +31,12 @@ services:
     image: opennsa:latest
     container_name: opennsa
     build:
-      context: github.com/jmacauley/opennsa.git#fix-regex-issue
+      context: github.com/jmacauley/opennsa
       dockerfile: docker/Dockerfile
     env_file: ./compose/opennsa-config/opennsa.env
     depends_on:
       - opennsa-db
+    restart: always
     ports:
       - 9080:9080
     volumes:
@@ -52,6 +53,7 @@ services:
         BUILDKIT_CONTEXT_KEEP_GIT_DIR: 1
     depends_on:
       - opennsa
+    restart: always
     ports:
       - 8401:8401
     volumes:
@@ -68,6 +70,7 @@ services:
         BUILDKIT_CONTEXT_KEEP_GIT_DIR: 1
     depends_on:
       - nsi-dds-east
+    restart: always
     ports:
       - 8402:8402
     volumes:
@@ -86,6 +89,7 @@ services:
       - nsi-dds-west
       - opennsa
       - sense-db
+    restart: always
     ports:
       - 8080:8080
     volumes:

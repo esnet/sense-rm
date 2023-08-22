@@ -311,9 +311,10 @@
           <target>${java.version}</target>
           <testSource>${java.version}</testSource>
           <testTarget>${java.version}</testTarget>
-          <compilerArgument>-Xlint:unchecked</compilerArgument>
-          <compilerArgument>-Xlint:unchecked</compilerArgument>
-          <compilerArgument>-Xdiags:verbose</compilerArgument>
+          <compilerArgs>
+            <arg>-Xlint:unchecked</arg>
+            <arg>-Xlint:deprecation</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
 

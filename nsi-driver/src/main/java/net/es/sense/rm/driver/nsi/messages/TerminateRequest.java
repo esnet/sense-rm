@@ -19,18 +19,41 @@
  */
 package net.es.sense.rm.driver.nsi.messages;
 
-import java.io.Serializable;
-import lombok.AllArgsConstructor;
+import akka.actor.ActorPath;
 import lombok.Data;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  *
  * @author hacksaw
  */
 @Data
-@AllArgsConstructor
-public class TerminateRequest implements Serializable {
+public class TerminateRequest extends Message implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
-
     private String connectionId;
+
+    public TerminateRequest() {
+        super();
+    }
+
+    public TerminateRequest(String initiator) {
+        super(initiator);
+    }
+
+    public TerminateRequest(String initiator, ActorPath path) {
+        super(initiator, path);
+    }
+
+    public TerminateRequest(String initiator, ActorPath path, String connectionId) {
+        super(initiator, path);
+        this.connectionId = connectionId;
+    }
+
+    public TerminateRequest(String initiator, String connectionId) {
+        super(initiator);
+        this.connectionId = connectionId;
+    }
 }

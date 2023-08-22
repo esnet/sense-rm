@@ -47,10 +47,6 @@
       <version>4.9.0</version>
       <type>pom</type>
     </dependency>
-      <dependency>
-          <groupId>jakarta.ws.rs</groupId>
-          <artifactId>jakarta.ws.rs-api</artifactId>
-      </dependency>
   </dependencies>
 
   <build>
@@ -105,10 +101,10 @@
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
-          <testSource>${java.version}</testSource>
-          <testTarget>${java.version}</testTarget>
-          <compilerArgument>-Xlint:unchecked</compilerArgument>
-          <compilerArgument>-Xlint:deprecation</compilerArgument>
+          <compilerArgs>
+            <arg>-Xlint:unchecked</arg>
+            <arg>-Xlint:deprecation</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
 

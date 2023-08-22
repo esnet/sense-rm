@@ -1,13 +1,21 @@
 package net.es.sense.rm.driver.nsi.dds.messages;
 
+import akka.actor.ActorPath;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import net.es.sense.rm.driver.nsi.messages.Message;
+
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  *
  * @author hacksaw
  */
-public class RegistrationEvent implements Serializable {
-
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class RegistrationEvent extends Message implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   public enum Event {
@@ -17,6 +25,18 @@ public class RegistrationEvent implements Serializable {
 
   private Event event;
   private String url;
+
+  public RegistrationEvent() {
+    super();
+  }
+
+  public RegistrationEvent(String initiator) {
+    super(initiator);
+  }
+
+  public RegistrationEvent(String initiator, ActorPath path) {
+    super(initiator, path);
+  }
 
   /**
    * @return the event

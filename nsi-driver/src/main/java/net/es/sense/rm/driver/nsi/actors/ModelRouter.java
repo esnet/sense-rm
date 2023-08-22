@@ -27,21 +27,24 @@ import akka.routing.ActorRefRoutee;
 import akka.routing.RoundRobinRoutingLogic;
 import akka.routing.Routee;
 import akka.routing.Router;
-import java.util.ArrayList;
-import java.util.List;
+import net.es.sense.rm.driver.nsi.messages.Message;
 import net.es.sense.rm.driver.nsi.messages.ModelQueryRequest;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.spring.SpringExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author hacksaw
  */
 @Component
-@Scope("prototype")
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ModelRouter extends UntypedAbstractActor {
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
@@ -70,6 +73,8 @@ public class ModelRouter extends UntypedAbstractActor {
 
   @Override
   public void onReceive(Object msg) {
+    log.debug("[ModelRouter] onReceive {}", Message.getDebug(msg));
+
     if (msg instanceof ModelQueryRequest) {
       router.route(msg, getSender());
     } else {

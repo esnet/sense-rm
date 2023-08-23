@@ -46,7 +46,6 @@ import net.es.sense.rm.measurements.db.MetricType;
 import net.es.sense.rm.model.DeltaRequest;
 import net.es.sense.rm.model.DeltaResource;
 import net.es.sense.rm.model.ModelResource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -86,15 +85,12 @@ import java.util.concurrent.ExecutionException;
 public class SenseRmController {
 
   // Spring application context.
-  @Autowired
-  ApplicationContext context;
+  private final ApplicationContext context;
 
   // SENSE YAML configuration.
-  @Autowired(required = true)
-  SenseProperties config;
+  private final SenseProperties config;
 
-  @Autowired
-  private MeasurementController measurementController;
+  private final MeasurementController measurementController;
 
   // Transformer to manipulate URL path in case there are mapping issues.
   private UrlTransform utilities;
@@ -102,6 +98,20 @@ public class SenseRmController {
   // The solution specific technology driver implementing SENSE protocol
   // mapping to underlying network technology.
   private Driver driver;
+
+  /**
+   * Constructor for bean injection.
+   *
+   * @param context
+   * @param config
+   * @param measurementController
+   */
+  public SenseRmController(ApplicationContext context, SenseProperties config,
+                           MeasurementController measurementController) {
+    this.context = context;
+    this.config = config;
+    this.measurementController = measurementController;
+  }
 
   /**
    * Initialize API by loading technology specific driver using reflection.
@@ -1815,13 +1825,18 @@ public class SenseRmController {
 
       DeltaResponse response = driver.propagateDelta(deltaRequest, model).get();
 
+      // Record measurement associated with the delta duration.
       measurementController.add(
               MeasurementType.DELTA_RESERVE,
               deltaRequest.getId(),
               MetricType.DURATION,
               String.valueOf(System.currentTimeMillis() - start));
 
+      // Verify there were no exceptions.
       if (response == null || response.getStatus() != Status.CREATED) {
+        return Common.toResponseEntity(headers, response);
+      } else if (response.getDelta().isEmpty()) {
+        log.error("[SenseRmController] returned delta is null");
         return Common.toResponseEntity(headers, response);
       }
 

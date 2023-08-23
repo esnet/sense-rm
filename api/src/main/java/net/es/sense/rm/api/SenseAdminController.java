@@ -39,7 +39,6 @@ import net.es.sense.rm.api.config.SenseProperties;
 import net.es.sense.rm.measurements.MeasurementController;
 import net.es.sense.rm.measurements.MeasurementResults;
 import net.es.sense.rm.model.ModelResource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -69,14 +68,20 @@ import java.util.Optional;
 @Tag(name = "SENSE Admin API", description = "SENSE-RM administration management API")
 @ResourceAnnotation(name = "admin", version = "v1")
 public class SenseAdminController {
-
-  @Autowired(required = true)
-  SenseProperties config;
-
-  @Autowired
-  private MeasurementController measurementController;
-
+  private final SenseProperties config;
+  private final MeasurementController measurementController;
   private UrlTransform utilities;
+
+  /**
+   * Constructor to inject bean parameters.
+   *
+   * @param config
+   * @param measurementController
+   */
+  public SenseAdminController(SenseProperties config, MeasurementController measurementController) {
+    this.config = config;
+    this.measurementController = measurementController;
+  }
 
   @PostConstruct
   public void init() throws Exception {
@@ -242,7 +247,7 @@ public class SenseAdminController {
   @Operation(
           summary = "Get a collection of available operational log resources.",
           description = "Returns a list of available operational log resources.",
-          tags = { "getVersion", "get" },
+          tags = { "getMeasurements", "get" },
           method = "GET")
   @ApiResponses(value = {
           @ApiResponse(

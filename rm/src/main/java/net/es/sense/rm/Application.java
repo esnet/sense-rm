@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.io.BufferedWriter;
@@ -39,13 +39,14 @@ public class Application {
   public static void main(String[] args) throws InterruptedException {
     log.info("[SENSE-N-RM] Starting...");
 
-    ApplicationContext context = SpringApplication.run(Application.class, args);
+    ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
 
     // Load the command line options into appropriate system properties.
     try {
       processOptions(args);
     } catch (ParseException | IOException ex) {
       System.err.println("Failed to load command line options: " + ex.getMessage());
+      context.close();
       System.exit(1);
       return;
     }
@@ -67,6 +68,7 @@ public class Application {
       public void run() {
         log.info("[SENSE-N-RM] Shutting down RM...");
         Application.setKeepRunning(false);
+        context.close();
       }
     });
 

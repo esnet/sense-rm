@@ -53,6 +53,7 @@ server:
   port: 8080
   contextPath: /
   packageName: net.es.sense.rm.driver.nsi
+  shutdown: graceful
   
 #  ssl:
 #    enabled: true
@@ -132,6 +133,33 @@ spring:
 #   driver-class-name: org.h2.Driver
 #   username: sense
 #   password: bubbles
+
+# Enable the application management endpoints in spring.
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+    shutdown:
+      enabled: true
+
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    shutdown:
+      enabled: true
+
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
+  info:
+    git:
+      mode: full
 
 #########################################
 # NSI CS related configuration.         #

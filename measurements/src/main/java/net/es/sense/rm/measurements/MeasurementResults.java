@@ -19,9 +19,10 @@
  */
 package net.es.sense.rm.measurements;
 
+import net.es.sense.rm.measurements.db.MeasurementResource;
+
 import java.util.Collection;
 import java.util.Optional;
-import net.es.sense.rm.measurements.db.MeasurementResource;
 
 /**
  * Holder for a set of measurement results.
@@ -40,11 +41,7 @@ public class MeasurementResults {
   }
 
   public String getUuid() {
-    if (lastUuid.isPresent()) {
-      return lastUuid.get();
-    }
-
-    return null;
+    return lastUuid.orElse(null);
   }
 
   public long getLastModifiedTime() {

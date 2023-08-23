@@ -19,15 +19,15 @@
  */
 package net.es.sense.rm.measurements;
 
-import java.util.Collection;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.measurements.db.MeasurementResource;
 import net.es.sense.rm.measurements.db.MeasurementService;
 import net.es.sense.rm.measurements.db.MeasurementType;
 import net.es.sense.rm.measurements.db.MetricType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Collection;
+import java.util.Optional;
 
 /**
  *
@@ -36,10 +36,18 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class MeasurementController {
-  @Autowired
-  private MeasurementService measurementService;
+  private final MeasurementService measurementService;
 
   private static final int MAX_QUEUE_SIZE = 2000;
+
+  /**
+   * Constructor for bean injection.
+   *
+   * @param measurementService the measurement service used to store metrics.
+   */
+  public MeasurementController(MeasurementService measurementService) {
+      this.measurementService = measurementService;
+  }
 
   /**
    * Write an entry to the logging system.

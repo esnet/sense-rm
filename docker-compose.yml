@@ -35,7 +35,8 @@ services:
       dockerfile: docker/Dockerfile
     env_file: ./compose/opennsa-config/opennsa.env
     depends_on:
-      - opennsa-db
+      opennsa-db:
+          condition: service_healthy
     restart: always
     ports:
       - 9080:9080
@@ -90,6 +91,12 @@ services:
       - opennsa
       - sense-db
     restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://sense-rm:8080/actuator/health" ]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     ports:
       - 8080:8080
     volumes:

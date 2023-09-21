@@ -1,5 +1,6 @@
 package net.es.sense.rm;
 
+import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
 import org.springframework.boot.SpringApplication;
@@ -114,6 +115,13 @@ public class Application {
    */
   public static void setKeepRunning(boolean keepRunning) {
     Application.keepRunning = keepRunning;
+  }
+
+  @PreDestroy
+  public void onExit() {
+    log.info("[SENSE-N-RM] onExit invoked.");
+    Application.setKeepRunning(false);
+    log.info("[SENSE-N-RM] onExit exiting.");
   }
 
   /**

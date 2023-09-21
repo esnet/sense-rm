@@ -204,7 +204,7 @@ public class SenseRmController {
           resource.setVersion(ra.version());
           UriComponentsBuilder path = utilities.getPath(location.toASCIIString());
           path.path(rm.value()[0]);
-          resource.setHref(path.build().toUriString());
+          resource.setHref(path.build().encode().toUriString());
           resources.add(resource);
         }
       }

@@ -188,7 +188,7 @@ public class MrmlFactory {
 
     Resource res = model.createResource(Nml.Location);
     if (location.getAddress() != null) {
-      res.addProperty(Nml.address, XmlUtilities.jaxbToString(NmlAddress.class, location.getAddress()));
+      res.addProperty(Nml.address, XmlUtilities.jaxbToXml(NmlAddress.class, location.getAddress()));
     }
 
     if (location.getAlt() != null) {

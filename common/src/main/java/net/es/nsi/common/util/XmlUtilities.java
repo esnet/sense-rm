@@ -34,7 +34,7 @@ public class XmlUtilities {
    * @param xmlObject	The JAXB object to marshal.
    * @return	String containing the XML encoded object.
    */
-  public static String jaxbToString(Class<?> xmlClass, Object xmlObject) {
+  public static String jaxbToXml(Class<?> xmlClass, Object xmlObject) {
 
     // Make sure we are given the correct input.
     if (xmlClass == null || xmlObject == null) {
@@ -44,11 +44,11 @@ public class XmlUtilities {
     @SuppressWarnings("unchecked")
     JAXBElement<?> jaxbElement = new JAXBElement(new QName("uri", "local"), xmlClass, xmlObject);
 
-    return jaxbToString(xmlClass, jaxbElement);
+    return jaxbToXml(xmlClass, jaxbElement);
   }
 
-  public static String jaxbToString(Class<?> xmlClass, JAXBElement<?> jaxbElement) {
-    return jaxbToString(false, xmlClass, jaxbElement);
+  public static String jaxbToXml(Class<?> xmlClass, JAXBElement<?> jaxbElement) {
+    return jaxbToXml(false, xmlClass, jaxbElement);
   }
 
   public static String prettyPrint(Class<?> xmlClass, Object xmlObject) {
@@ -61,14 +61,14 @@ public class XmlUtilities {
     @SuppressWarnings("unchecked")
     JAXBElement<?> jaxbElement = new JAXBElement(new QName("uri", "local"), xmlClass, xmlObject);
 
-    return jaxbToString(true, xmlClass, jaxbElement);
+    return jaxbToXml(true, xmlClass, jaxbElement);
   }
 
   public static String prettyPrint(Class<?> xmlClass, JAXBElement<?> jaxbElement) {
-    return jaxbToString(true, xmlClass, jaxbElement);
+    return jaxbToXml(true, xmlClass, jaxbElement);
   }
 
-  public static String jaxbToString(boolean pretty, Class<?> xmlClass, JAXBElement<?> jaxbElement) {
+  public static String jaxbToXml(boolean pretty, Class<?> xmlClass, JAXBElement<?> jaxbElement) {
     // Make sure we are given the correct input.
     if (xmlClass == null || jaxbElement == null) {
       return null;

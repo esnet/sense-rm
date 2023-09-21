@@ -5,7 +5,7 @@
 # sense.root - the root of our URL context for building REST URL.  If we are behind
 #        a proxy this is the URL of that proxy. [Not currently used]
 #
-# sense.proxy - A simple mechanism that allows for URL manupulation on returned
+# sense.proxy - A simple mechanism that allows for URL manipulation on returned
 #         resources to map any localized URL to URL externalized by a proxy.
 #         Proper configuration of the Spring-boot web environment should mean
 #         this proxy value is left empty.  Here is an example:

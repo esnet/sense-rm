@@ -80,7 +80,7 @@ public abstract class SenseControllerErrorHandling {
   @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
   @ResponseBody
   public ResponseEntity<?> handleException(HttpServletRequest request, Exception ex) {
-    log.error("handleException: recieved Exception for request {}", request.getRequestURL());
+    log.error("handleException: received Exception for request {}", request.getRequestURL());
     log.error(getHeaders(request));
     Error error = Error.builder()
             .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())

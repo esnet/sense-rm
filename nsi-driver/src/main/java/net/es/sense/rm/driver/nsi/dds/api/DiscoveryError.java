@@ -1,14 +1,15 @@
 package net.es.sense.rm.driver.nsi.dds.api;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import net.es.nsi.dds.lib.jaxb.DdsParser;
 import net.es.nsi.dds.lib.jaxb.dds.ErrorType;
 import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Defines the error values for the PCE logging system.

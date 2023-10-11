@@ -1,11 +1,6 @@
 package net.es.sense.rm.driver.nsi.db;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import javax.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeConfigurationException;
+import jakarta.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
@@ -15,6 +10,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import javax.xml.datatype.DatatypeConfigurationException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 /**
  *

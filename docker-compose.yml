@@ -1,0 +1,110 @@
+version: '3.8'
+services:
+  opennsa-db:
+    image: postgres:14.1-alpine
+    container_name: opennsa-db
+    environment:
+      - POSTGRES_USER=opennsa
+      - POSTGRES_PASSWORD=opennsa
+      - POSTGRES_DB=opennsa
+    restart: always
+    ports:
+      - '5432:5432'
+    volumes: 
+      - ./compose/02-schema.sql:/docker-entrypoint-initdb.d/02-schema.sql:ro
+      - opennsa-db:/var/lib/postgresql/data
+
+  sense-db:
+    image: postgres:14.1-alpine
+    container_name: sense-db
+    environment:
+      - POSTGRES_USER=sense
+      - POSTGRES_PASSWORD=sense
+      - POSTGRES_DB=sense
+    restart: always
+    ports:
+      - '5433:5432'
+    volumes:
+      - sense-db:/var/lib/postgresql/data
+
+  opennsa:
+    image: opennsa:latest
+    container_name: opennsa
+    build:
+      context: github.com/jmacauley/opennsa
+      dockerfile: docker/Dockerfile
+    env_file: ./compose/opennsa-config/opennsa.env
+    depends_on:
+      opennsa-db:
+          condition: service_healthy
+    restart: always
+    ports:
+      - 9080:9080
+    volumes:
+      - ./compose/opennsa-config/opennsa.conf:/home/opennsa/opennsa/config/opennsa.conf:ro
+      - ./compose/opennsa-config/opennsa.nrm:/home/opennsa/opennsa/config/opennsa.nrm:ro
+
+  nsi-dds-east:
+    image: nsi-dds:latest
+    container_name: nsi-dds-east
+    build:
+      context: github.com/bandwidthondemand/nsi-dds
+      dockerfile: Dockerfile
+      args:
+        BUILDKIT_CONTEXT_KEEP_GIT_DIR: 1
+    depends_on:
+      - opennsa
+    restart: always
+    ports:
+      - 8401:8401
+    volumes:
+      - ./compose/nsi-dds-east-config:/nsi-dds/config
+      - /tmp:/nsi-dds/var/log
+
+  nsi-dds-west:
+    image: nsi-dds:latest
+    container_name: nsi-dds-west
+    build:
+      context: github.com/bandwidthondemand/nsi-dds
+      dockerfile: Dockerfile
+      args:
+        BUILDKIT_CONTEXT_KEEP_GIT_DIR: 1
+    depends_on:
+      - nsi-dds-east
+    restart: always
+    ports:
+      - 8402:8402
+    volumes:
+      - ./compose/nsi-dds-west-config:/nsi-dds/config
+      - /tmp:/nsi-dds/var/log
+
+  sense-rm:
+    image: sense-rm:latest
+    container_name: sense-rm
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILDKIT_CONTEXT_KEEP_GIT_DIR: 1
+    depends_on:
+      - nsi-dds-west
+      - opennsa
+      - sense-db
+    restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://sense-rm:8080/actuator/health" ]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    ports:
+      - 8080:8080
+    volumes:
+      - ./compose/sense-config:/sense-rm/config
+      - /tmp:/sense-rm/var/log
+
+volumes:
+  opennsa-db:
+    driver: local
+  sense-db:
+    driver: local

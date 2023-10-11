@@ -1,15 +1,7 @@
 package net.es.sense.rm.driver.nsi.mrml;
 
 import com.google.common.base.Strings;
-import java.io.StringWriter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
+import jakarta.xml.bind.JAXBElement;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlDate;
 import net.es.nsi.common.util.XmlUtilities;
@@ -18,18 +10,18 @@ import net.es.nsi.dds.lib.jaxb.nml.NmlLocationType.NmlAddress;
 import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
 import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyType;
 import net.es.nsi.dds.lib.jaxb.nml.ServiceDefinitionType;
-import net.es.sense.rm.driver.schema.Mrs;
-import net.es.sense.rm.driver.schema.Nml;
-import net.es.sense.rm.driver.schema.Owl;
-import net.es.sense.rm.driver.schema.Rdf;
-import net.es.sense.rm.driver.schema.Rdfs;
-import net.es.sense.rm.driver.schema.Sd;
+import net.es.sense.rm.driver.schema.*;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.StringWriter;
+import java.util.*;
 
 /**
  *
@@ -196,7 +188,7 @@ public class MrmlFactory {
 
     Resource res = model.createResource(Nml.Location);
     if (location.getAddress() != null) {
-      res.addProperty(Nml.address, XmlUtilities.jaxbToString(NmlAddress.class, location.getAddress()));
+      res.addProperty(Nml.address, XmlUtilities.jaxbToXml(NmlAddress.class, location.getAddress()));
     }
 
     if (location.getAlt() != null) {

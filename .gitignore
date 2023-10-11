@@ -12,3 +12,5 @@
 /api/nbproject/
 /nsi-driver/nbproject/
 /target/
+compose/nsi-dds-east-config/cache/
+compose/nsi-dds-west-config/cache/

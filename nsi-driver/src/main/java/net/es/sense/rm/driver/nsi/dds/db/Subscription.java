@@ -1,11 +1,9 @@
 package net.es.sense.rm.driver.nsi.dds.db;
 
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  *

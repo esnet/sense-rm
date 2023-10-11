@@ -1,11 +1,12 @@
 package net.es.sense.rm.driver.nsi.dds;
 
-import java.util.Collection;
-import javax.ws.rs.WebApplicationException;
+import jakarta.ws.rs.WebApplicationException;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentType;
 import net.es.nsi.dds.lib.jaxb.dds.FilterType;
 import net.es.nsi.dds.lib.jaxb.dds.NotificationType;
 import net.es.sense.rm.driver.nsi.dds.db.Document;
+
+import java.util.Collection;
 
 /**
  *

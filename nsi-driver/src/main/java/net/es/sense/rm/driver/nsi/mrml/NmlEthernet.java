@@ -19,15 +19,16 @@
  */
 package net.es.sense.rm.driver.nsi.mrml;
 
+import jakarta.xml.bind.JAXBElement;
+import net.es.nsi.dds.lib.jaxb.nml.NmlLabelGroupType;
+import net.es.nsi.dds.lib.jaxb.nml.NmlLabelType;
+
+import javax.xml.namespace.QName;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import net.es.nsi.dds.lib.jaxb.nml.NmlLabelGroupType;
-import net.es.nsi.dds.lib.jaxb.nml.NmlLabelType;
 
 /**
  *

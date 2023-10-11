@@ -21,8 +21,8 @@ package net.es.sense.rm.driver.nsi.cs.api;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.JAXBException;
-import javax.xml.ws.Holder;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.cs.lib.CsParser;

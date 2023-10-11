@@ -1,13 +1,9 @@
 package net.es.sense.rm.api;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.util.Enumeration;
-import java.util.NoSuchElementException;
-import javax.servlet.http.HttpServletRequest;
+import com.google.common.base.Strings;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.api.common.Error;
-import org.apache.jena.ext.com.google.common.base.Strings;
 import org.eclipse.jetty.http.BadMessageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +11,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
 
 /**
  * Exception
@@ -79,7 +80,7 @@ public abstract class SenseControllerErrorHandling {
   @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
   @ResponseBody
   public ResponseEntity<?> handleException(HttpServletRequest request, Exception ex) {
-    log.error("handleException: recieved Exception for request {}", request.getRequestURL());
+    log.error("handleException: received Exception for request {}", request.getRequestURL());
     log.error(getHeaders(request));
     Error error = Error.builder()
             .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())

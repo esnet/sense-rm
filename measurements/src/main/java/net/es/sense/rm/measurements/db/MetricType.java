@@ -19,22 +19,27 @@
  */
 package net.es.sense.rm.measurements.db;
 
-import io.swagger.annotations.ApiModel;
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  *
  * @author hacksaw
  */
-@ApiModel(value="type", description="The type of metric.")
+@Schema(implementation = MetricType.class, name = "type", description = "The type of metric.")
 @XmlType(name = "type")
 @XmlEnum
 public enum MetricType {
   DURATION(1001, "duration"),
   END(9000, "");
 
+  @Schema(name = "code", description = "An integer value for the name of the SENSE measurement type.",
+      accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.REQUIRED)
   private final int code;
+
+  @Schema(name = "label", description = "A text string name for the SENSE measurement type.",
+      accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.REQUIRED)
   private final String label;
 
   private MetricType(int code, String label) {
@@ -45,6 +50,8 @@ public enum MetricType {
   /**
    * @return the code
    */
+  @Schema(name = "getCode", description = "Returns an integer value for the name of the SENSE measurement type.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   public int getCode() {
     return code;
   }
@@ -52,6 +59,8 @@ public enum MetricType {
   /**
    * @return the label
    */
+  @Schema(name = "getLabel", description = "Returns an string value for the name of the SENSE measurement type.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   public String getLabel() {
     return label;
   }

@@ -1,10 +1,10 @@
 package net.es.nsi.dds.lib.client;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyManagementException;
@@ -45,7 +45,7 @@ public enum HttpsContext {
   /**
    * Construct an HttpConfig object.
    */
-  private HttpsContext() {
+  HttpsContext() {
     log.debug("[HttpsContext]: constructor invoked");
 
     // If the BouncyCastle provider is not register add it in.
@@ -153,14 +153,13 @@ public enum HttpsContext {
    *
    * @throws java.security.KeyManagementException
    * @throws java.security.NoSuchAlgorithmException
-   * @throws java.security.NoSuchProviderException
    * @throws java.security.KeyStoreException
    * @throws java.io.IOException
    * @throws java.security.cert.CertificateException
    * @throws java.security.UnrecoverableKeyException
    */
   private SSLContext initContext(SecureType st) throws KeyManagementException, NoSuchAlgorithmException,
-          NoSuchProviderException, KeyStoreException, IOException, CertificateException, UnrecoverableKeyException {
+          KeyStoreException, IOException, CertificateException, UnrecoverableKeyException {
 
     // Log what security providers are available to us.
     for (Provider provider : Security.getProviders()) {
@@ -196,7 +195,7 @@ public enum HttpsContext {
   }
 
   /**
-   * Get a instance of a keystore based on requested type and initializes with the provide keystore file.
+   * Get an instance of a keystore based on requested type and initializes with the provide keystore file.
    *
    * @param ks
    * @return
@@ -210,10 +209,10 @@ public enum HttpsContext {
     File file = new File(ks.getFile());
     if (!file.exists()) {
       log.error("[HttpsContext].getKeyStore: file {} does not exist.", ks.getFile());
-      throw new FileNotFoundException(String.format("[HttpsContext].getKeyStore: file {} does not exist", ks.getFile()));
+      throw new FileNotFoundException(String.format("[HttpsContext].getKeyStore: file %s does not exist", ks.getFile()));
     }
     KeyStore keyStore;
-    try (InputStream stream = new FileInputStream(file)) {
+    try (InputStream stream = Files.newInputStream(file.toPath())) {
       keyStore = KeyStore.getInstance(ks.getType());
       keyStore.load(stream, ks.getPassword().toCharArray());
     }
@@ -259,4 +258,3 @@ public enum HttpsContext {
     return isProduction;
   }
 }
-

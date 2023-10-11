@@ -21,45 +21,20 @@ package net.es.sense.rm.driver.nsi.cs.api;
 
 import akka.actor.ActorRef;
 import com.google.common.base.Strings;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import javax.jws.WebService;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.ws.Holder;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.ws.Holder;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.jaxb.JaxbParser;
 import net.es.nsi.cs.lib.CsParser;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.sense.rm.driver.nsi.RaController;
-import net.es.sense.rm.driver.nsi.cs.db.Operation;
-import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
-import net.es.sense.rm.driver.nsi.cs.db.Reservation;
-import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
-import net.es.sense.rm.driver.nsi.cs.db.StateType;
+import net.es.sense.rm.driver.nsi.cs.db.*;
 import net.es.sense.rm.driver.nsi.messages.TerminateRequest;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException;
-import org.ogf.schemas.nsi._2013._12.connection.types.DataPlaneStateChangeRequestType;
-import org.ogf.schemas.nsi._2013._12.connection.types.DataPlaneStatusType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ErrorEventType;
-import org.ogf.schemas.nsi._2013._12.connection.types.GenericAcknowledgmentType;
-import org.ogf.schemas.nsi._2013._12.connection.types.GenericConfirmedType;
-import org.ogf.schemas.nsi._2013._12.connection.types.GenericErrorType;
-import org.ogf.schemas.nsi._2013._12.connection.types.GenericFailedType;
-import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
-import org.ogf.schemas.nsi._2013._12.connection.types.MessageDeliveryTimeoutRequestType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory;
-import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
-import org.ogf.schemas.nsi._2013._12.connection.types.QueryNotificationConfirmedType;
-import org.ogf.schemas.nsi._2013._12.connection.types.QueryRecursiveConfirmedType;
-import org.ogf.schemas.nsi._2013._12.connection.types.QueryResultConfirmedType;
-import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ReservationConfirmCriteriaType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ReserveConfirmedType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ReserveTimeoutRequestType;
+import org.ogf.schemas.nsi._2013._12.connection.types.*;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 import org.ogf.schemas.nsi._2013._12.framework.types.ServiceExceptionType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
@@ -68,11 +43,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
 /**
  * This is the NSI CS 2.1 web service requester endpoint used to receive responses from our associated uPA.
  * Communication between the requester thread and this requester endpoint is controlled using a semaphore
  * allowing the request thread to block on the returned response. Reservation state is updated through the
- * ReservationService which maintains reservations in the database.
+ * ReservationService which maintains reservations in the database.  WebService endpoints within this class
+ * are called by the spring web container when the connection service endpoint is invoked by an external
+ * entity.
  *
  * @author hacksaw
  */
@@ -122,10 +103,10 @@ public class ConnectionService {
   /**
    * Endpoint receiving the NSI CS reserveConfirmed response message.
    *
-   * @param reserveConfirmed
-   * @param header
-   * @return
-   * @throws ServiceException
+   * @param reserveConfirmed The incoming NSI reserved confirmed message.
+   * @param header The NIS common header associated with the incoming message.
+   * @return GenericAcknowledgmentType acknowledging the reserveConfirmed has been accepted for processing.
+   * @throws ServiceException When an issue processing the reserveConfirmed has occurred.
    */
   public GenericAcknowledgmentType reserveConfirmed(
           ReserveConfirmedType reserveConfirmed,
@@ -225,7 +206,7 @@ public class ConnectionService {
    * @param lifecycleState Life cycle state.
    * @param dataPlaneStatus Dataplane state.
    * @param criteria The reservation criteria.
-   * @return
+   * @return The reservation contained in the confirmed criteria.
    */
   private Reservation processConfirmedCriteria(
           String providerNsa,
@@ -242,7 +223,7 @@ public class ConnectionService {
     log.info("[ConnectionService] processConfirmedCriteria: connectionId = {}", cid);
 
     // We should look into the P2PS service for the connection endpoints to
-    // determine the networkId but we will assume if we are recieving the
+    // determine the networkId but we will assume if we are receiving the
     // confirmation we correctly sent the request.
     Reservation reservation = new Reservation();
     reservation.setProviderNsa(providerNsa);
@@ -929,7 +910,8 @@ public class ConnectionService {
                   cid, errorEvent.getOriginatingConnectionId());
 
           // TODO: Send a terminate for this reservation since it has gone bad.
-          TerminateRequest req = new TerminateRequest(errorEvent.getConnectionId());
+          TerminateRequest req = new TerminateRequest("ConnectionService:errorEvent",
+              errorEvent.getConnectionId());
           raController.getModelAuditActor().tell(req, ActorRef.noSender());
           break;
       }

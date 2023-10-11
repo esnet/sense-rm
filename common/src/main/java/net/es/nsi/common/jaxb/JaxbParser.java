@@ -1,28 +1,16 @@
 package net.es.nsi.common.jaxb;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Optional;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import jakarta.xml.bind.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
 
 /**
  * A singleton to load the very expensive JAXBContext once.
@@ -62,7 +50,7 @@ public class JaxbParser {
    * @throws JAXBException Could not parse the specified XML document.
    * @throws IOException Could not open the specified file.
    */
-  public <T extends Object> T parseFile(Class<T> xmlClass, String file)
+  public <T> T parseFile(Class<T> xmlClass, String file)
           throws JAXBException, IOException {
     // Parse the specified file.
     try (FileInputStream fileInputStream = new FileInputStream(file);
@@ -88,9 +76,8 @@ public class JaxbParser {
 
     // Parse the specified file.
     try (FileOutputStream fileOutputStream = new FileOutputStream(file);
-            BufferedOutputStream bufferedOutputStream =
-                    new BufferedOutputStream(fileOutputStream)) {
-      marshaller().marshal(jaxbElement, fileOutputStream);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream)) {
+      marshaller().marshal(jaxbElement, bufferedOutputStream);
     }
   }
 
@@ -148,7 +135,7 @@ public class JaxbParser {
     } finally {
       try {
         writer.close();
-      } catch (IOException ex) {
+      } catch (IOException ignored) {
       }
     }
 
@@ -172,7 +159,7 @@ public class JaxbParser {
     } finally {
       try {
         writer.close();
-      } catch (IOException ex) {
+      } catch (IOException ignored) {
       }
     }
 
@@ -189,19 +176,22 @@ public class JaxbParser {
    * @return JAXB object representing the XML document.
    * @throws JAXBException Could not parse the specified XML document.
    */
-  public <T extends Object> T xml2Jaxb(Class<T> xmlClass, String xml) throws JAXBException, IllegalArgumentException {
-    Optional<JAXBElement<T>> element;
+  @SuppressWarnings("unchecked")
+  public <T> T xml2Jaxb(Class<T> xmlClass, String xml) throws JAXBException, IllegalArgumentException {
+    JAXBElement<T> element = null;
     try (StringReader reader = new StringReader(xml)) {
-      element = Optional.ofNullable((JAXBElement<T>) unmarshaller().unmarshal(reader));
+      element = (JAXBElement<T>) unmarshaller().unmarshal(reader);
     }
 
-    if (!element.isPresent()) {
-      throw new IllegalArgumentException("Unable to convert string to JAXB, class=" + xmlClass.getName() + ", xml=\n" + xml);
-    } else if (element.get().getDeclaredType() == xmlClass) {
-      return xmlClass.cast(element.get().getValue());
+    if (element == null) {
+      throw new IllegalArgumentException("Unable to convert string to JAXB, class="
+          + xmlClass.getName() + ", xml=\n" + xml);
+    } else if (element.getDeclaredType() == xmlClass) {
+      return xmlClass.cast(element.getValue());
     }
 
-    throw new JAXBException("Expected XML for class " + xmlClass.getCanonicalName() + " but found " + element.get().getDeclaredType().getCanonicalName());
+    throw new JAXBException("Expected XML for class " + xmlClass.getCanonicalName()
+        + " but found " + element.getDeclaredType().getCanonicalName());
   }
 
   /**
@@ -215,6 +205,7 @@ public class JaxbParser {
    * @throws IOException InputStream could not be read.
    */
   public <T extends Object> T xml2Jaxb(Class<T> xmlClass, InputStream is) throws JAXBException, IOException {
+    @SuppressWarnings("unchecked")
     JAXBElement<T> element = (JAXBElement<T>) unmarshaller().unmarshal(is);
     if (element == null) {
       throw new IllegalArgumentException("Unable to convert stream to JAXB, class=" + xmlClass.getName());
@@ -222,7 +213,8 @@ public class JaxbParser {
       return xmlClass.cast(element.getValue());
     }
 
-    throw new JAXBException("Expected XML for class " + xmlClass.getCanonicalName() + " but found " + element.getDeclaredType().getCanonicalName());
+    throw new JAXBException("Expected XML for class " + xmlClass.getCanonicalName()
+        + " but found " + element.getDeclaredType().getCanonicalName());
   }
 
   /**
@@ -235,13 +227,15 @@ public class JaxbParser {
    * @throws JAXBException Could not parse the specified XML document.
    * @throws IOException BufferedInputStream could not be read.
    */
-  public <T extends Object> T xml2Jaxb(Class<T> xmlClass, BufferedInputStream is) throws JAXBException, IOException {
+  public <T> T xml2Jaxb(Class<T> xmlClass, BufferedInputStream is) throws JAXBException, IOException {
+    @SuppressWarnings("unchecked")
     JAXBElement<T> element = (JAXBElement<T>) unmarshaller().unmarshal(is);
     if (element.getDeclaredType() == xmlClass) {
       return xmlClass.cast(element.getValue());
     }
 
-    throw new JAXBException("Expected XML for class " + xmlClass.getCanonicalName() + " but found " + element.getDeclaredType().getCanonicalName());
+    throw new JAXBException("Expected XML for class " + xmlClass.getCanonicalName()
+        + " but found " + element.getDeclaredType().getCanonicalName());
   }
 
   /**
@@ -267,7 +261,9 @@ public class JaxbParser {
 
       // We do not have @XmlRootElement annotations on the classes so
       // we need to manually create the JAXBElement.
-      JAXBElement<?> element = new JAXBElement(new QName("uri", "local"), messageClass, message);
+      @SuppressWarnings("unchecked")
+      JAXBElement<?> element =
+          new JAXBElement(new QName("uri", "local"), messageClass, message);
 
       // Marshal the object.
       jaxbContext.createMarshaller().marshal(element, writer);

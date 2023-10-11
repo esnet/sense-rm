@@ -1,7 +1,7 @@
 package net.es.nsi.cs.lib;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import net.es.nsi.common.jaxb.JaxbParser;
 import org.ogf.schemas.nsi._2013._12.connection.types.DataPlaneStateChangeRequestType;

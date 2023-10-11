@@ -37,7 +37,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @JsonRootName(value = "sense")
 public class SenseProperties {
-
   private String root;
   private String proxy;
   private String driver;

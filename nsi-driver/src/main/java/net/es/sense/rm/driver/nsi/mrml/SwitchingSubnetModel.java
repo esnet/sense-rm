@@ -19,26 +19,23 @@
  */
 package net.es.sense.rm.driver.nsi.mrml;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
+import com.google.common.base.Strings;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.cs.lib.CsParser;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
 import net.es.nsi.dds.lib.jaxb.nml.ServiceDefinitionType;
-import net.es.sense.rm.driver.nsi.cs.db.ConnectionMap;
-import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
-import net.es.sense.rm.driver.nsi.cs.db.Reservation;
-import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
-import net.es.sense.rm.driver.nsi.cs.db.StpMapping;
-import org.apache.jena.ext.com.google.common.base.Strings;
+import net.es.sense.rm.driver.nsi.cs.db.*;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Create MRML SwitchingSubnet model from stored NSI reservations and connection maps.

@@ -19,15 +19,16 @@
  */
 package net.es.sense.rm.measurements.db;
 
-import io.swagger.annotations.ApiModel;
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  *
  * @author hacksaw
  */
-@ApiModel(value="measurement", description="The type of operational measurement.")
+@Schema(implementation = MeasurementType.class, name = "measurement",
+    description =" The type of operational measurement.")
 @XmlType(name = "measurement")
 @XmlEnum
 public enum MeasurementType {
@@ -38,7 +39,12 @@ public enum MeasurementType {
 
   END(9000, "");
 
+  @Schema(name = "code", description = "An integer value for the name of the SENSE measurement.",
+      accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.REQUIRED)
   private final int code;
+
+  @Schema(name = "label", description = "A text string name for the SENSE measurement.",
+      accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.REQUIRED)
   private final String label;
 
   private MeasurementType(int code, String label) {
@@ -49,6 +55,8 @@ public enum MeasurementType {
   /**
    * @return the code
    */
+  @Schema(name = "getCode", description = "Returns an integer value for the name of the SENSE measurement.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   public int getCode() {
     return code;
   }
@@ -56,6 +64,8 @@ public enum MeasurementType {
   /**
    * @return the label
    */
+  @Schema(name = "getLabel", description = "Returns an string value for the name of the SENSE measurement.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   public String getLabel() {
     return label;
   }

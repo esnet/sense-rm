@@ -19,19 +19,12 @@
  */
 package net.es.sense.rm.driver.nsi.cs.db;
 
-import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
+import jakarta.persistence.*;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
+
+import java.io.Serializable;
 
 /**
  *

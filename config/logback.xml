@@ -15,7 +15,7 @@
       <!-- keep 5 days worth of history capped at 1GB total size -->
       <maxHistory>5</maxHistory>
       <totalSizeCap>1GB</totalSizeCap>
-      
+
       <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
             <maxFileSize>150MB</maxFileSize>
       </timeBasedFileNamingAndTriggeringPolicy>
@@ -25,7 +25,7 @@
     <encoder>
       <pattern>%date [%thread] %-5level %logger{35} \(%line\) - %msg%n</pattern>
     </encoder>
-  </appender> 
+  </appender>
 
   <root level="DEBUG">
     <appender-ref ref="FILE" />

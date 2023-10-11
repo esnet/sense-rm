@@ -19,12 +19,12 @@
  */
 package net.es.sense.rm.driver.api;
 
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.core.Response;
 
 /**
  * A runtime exception indicating a resource requested by a client was
- * {@link javax.ws.rs.core.Response.Status#NOT_MODIFIED not modified}
+ * {@link jakarta.ws.rs.core.Response.Status#NOT_MODIFIED not modified}
  * on the server.
  *
  * @author hacksaw

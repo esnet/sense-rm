@@ -1,12 +1,7 @@
 package net.es.sense.rm.driver.nsi.dds.db;
 
 import com.google.common.collect.Lists;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Date;
-import javax.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
+import jakarta.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.jaxb.dds.ContentType;
@@ -21,6 +16,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Date;
 
 /**
  *

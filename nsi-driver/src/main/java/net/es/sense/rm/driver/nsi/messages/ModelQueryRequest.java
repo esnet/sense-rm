@@ -22,6 +22,7 @@ package net.es.sense.rm.driver.nsi.messages;
 import java.io.Serializable;
 
 /**
+ * Message for requesting topology models.
  *
  * @author hacksaw
  */

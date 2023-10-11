@@ -1,11 +1,12 @@
 package net.es.sense.rm.driver.nsi.cs.db;
 
+import com.google.common.base.Strings;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.jena.ext.com.google.common.base.Strings;
-import org.springframework.stereotype.Repository;
 
 /**
  * Maintain a list of deltas with associated NSI connectionIds through to

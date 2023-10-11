@@ -1,18 +1,13 @@
 package net.es.sense.rm.driver.nsi.mrml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import javax.xml.bind.JAXBException;
+import com.google.common.collect.Lists;
+import jakarta.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyType;
 import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.dds.api.DocumentReader;
-import org.apache.jena.ext.com.google.common.collect.Lists;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -20,6 +15,12 @@ import org.apache.jena.riot.RDFFormat;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
 
 /**
  *

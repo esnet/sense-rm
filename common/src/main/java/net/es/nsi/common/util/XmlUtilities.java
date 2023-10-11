@@ -1,27 +1,20 @@
 package net.es.nsi.common.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import jakarta.xml.bind.*;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * This {@link XmlUtilities} is a utility class providing tools for the manipulation of JAXB generated XML objects.
@@ -41,7 +34,7 @@ public class XmlUtilities {
    * @param xmlObject	The JAXB object to marshal.
    * @return	String containing the XML encoded object.
    */
-  public static String jaxbToString(Class<?> xmlClass, Object xmlObject) {
+  public static String jaxbToXml(Class<?> xmlClass, Object xmlObject) {
 
     // Make sure we are given the correct input.
     if (xmlClass == null || xmlObject == null) {
@@ -51,11 +44,11 @@ public class XmlUtilities {
     @SuppressWarnings("unchecked")
     JAXBElement<?> jaxbElement = new JAXBElement(new QName("uri", "local"), xmlClass, xmlObject);
 
-    return jaxbToString(xmlClass, jaxbElement);
+    return jaxbToXml(xmlClass, jaxbElement);
   }
 
-  public static String jaxbToString(Class<?> xmlClass, JAXBElement<?> jaxbElement) {
-    return jaxbToString(false, xmlClass, jaxbElement);
+  public static String jaxbToXml(Class<?> xmlClass, JAXBElement<?> jaxbElement) {
+    return jaxbToXml(false, xmlClass, jaxbElement);
   }
 
   public static String prettyPrint(Class<?> xmlClass, Object xmlObject) {
@@ -68,14 +61,14 @@ public class XmlUtilities {
     @SuppressWarnings("unchecked")
     JAXBElement<?> jaxbElement = new JAXBElement(new QName("uri", "local"), xmlClass, xmlObject);
 
-    return jaxbToString(true, xmlClass, jaxbElement);
+    return jaxbToXml(true, xmlClass, jaxbElement);
   }
 
   public static String prettyPrint(Class<?> xmlClass, JAXBElement<?> jaxbElement) {
-    return jaxbToString(true, xmlClass, jaxbElement);
+    return jaxbToXml(true, xmlClass, jaxbElement);
   }
 
-  public static String jaxbToString(boolean pretty, Class<?> xmlClass, JAXBElement<?> jaxbElement) {
+  public static String jaxbToXml(boolean pretty, Class<?> xmlClass, JAXBElement<?> jaxbElement) {
     // Make sure we are given the correct input.
     if (xmlClass == null || jaxbElement == null) {
       return null;
@@ -180,12 +173,12 @@ public class XmlUtilities {
       for (int i = 0; i < listOfFiles.length; i++) {
         if (listOfFiles[i].isFile()) {
           file = listOfFiles[i].getAbsolutePath();
-          if (file.endsWith(".xml") || file.endsWith(".xml")) {
+          if (file.endsWith(".xml")) {
             results.add(file);
           }
         }
       }
     }
-    return new CopyOnWriteArrayList(results);
+    return new CopyOnWriteArrayList<>(results);
   }
 }

@@ -19,12 +19,43 @@
  */
 package net.es.sense.rm.api;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ResponseHeader;
+import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.PostConstruct;
+import jakarta.ws.rs.core.Response.Status;
+import lombok.extern.slf4j.Slf4j;
+import net.es.nsi.common.util.Decoder;
+import net.es.nsi.common.util.UrlHelper;
+import net.es.nsi.common.util.UuidHelper;
+import net.es.nsi.common.util.XmlUtilities;
+import net.es.sense.rm.api.common.Error;
+import net.es.sense.rm.api.common.*;
+import net.es.sense.rm.api.config.SenseProperties;
+import net.es.sense.rm.driver.api.*;
+import net.es.sense.rm.measurements.MeasurementController;
+import net.es.sense.rm.measurements.db.MeasurementType;
+import net.es.sense.rm.measurements.db.MetricType;
+import net.es.sense.rm.model.DeltaRequest;
+import net.es.sense.rm.model.DeltaResource;
+import net.es.sense.rm.model.ModelResource;
+import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -34,49 +65,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import javax.annotation.PostConstruct;
-import javax.ws.rs.core.Response.Status;
-import javax.xml.datatype.DatatypeConfigurationException;
-import lombok.extern.slf4j.Slf4j;
-import net.es.nsi.common.util.Decoder;
-import net.es.nsi.common.util.UrlHelper;
-import net.es.nsi.common.util.UuidHelper;
-import net.es.nsi.common.util.XmlUtilities;
-import net.es.sense.rm.api.common.Encoder;
-import net.es.sense.rm.api.common.Error;
-import net.es.sense.rm.api.common.HttpConstants;
-import net.es.sense.rm.api.common.Resource;
-import net.es.sense.rm.api.common.ResourceAnnotation;
-import net.es.sense.rm.api.common.UrlTransform;
-import net.es.sense.rm.api.config.SenseProperties;
-import net.es.sense.rm.driver.api.DeltaResponse;
-import net.es.sense.rm.driver.api.DeltasResponse;
-import net.es.sense.rm.driver.api.Driver;
-import net.es.sense.rm.driver.api.ModelResponse;
-import net.es.sense.rm.driver.api.ModelsResponse;
-import net.es.sense.rm.measurements.MeasurementController;
-import net.es.sense.rm.measurements.db.MeasurementType;
-import net.es.sense.rm.measurements.db.MetricType;
-import net.es.sense.rm.model.DeltaRequest;
-import net.es.sense.rm.model.DeltaResource;
-import net.es.sense.rm.model.ModelResource;
-import org.apache.jena.ext.com.google.common.base.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * The SENSE RM API web services module based on Spring REST annotations.
@@ -92,20 +80,17 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/sense/v1")
-@Api(tags = "SENSE RM API")
+@Tag(name = "SENSE RM API", description = "SENSE-RM protocol endpoint")
 @ResourceAnnotation(name = "sense", version = "v1")
 public class SenseRmController {
 
   // Spring application context.
-  @Autowired
-  ApplicationContext context;
+  private final ApplicationContext context;
 
   // SENSE YAML configuration.
-  @Autowired(required = true)
-  SenseProperties config;
+  private final SenseProperties config;
 
-  @Autowired
-  private MeasurementController measurementController;
+  private final MeasurementController measurementController;
 
   // Transformer to manipulate URL path in case there are mapping issues.
   private UrlTransform utilities;
@@ -113,6 +98,20 @@ public class SenseRmController {
   // The solution specific technology driver implementing SENSE protocol
   // mapping to underlying network technology.
   private Driver driver;
+
+  /**
+   * Constructor for bean injection.
+   *
+   * @param context
+   * @param config
+   * @param measurementController
+   */
+  public SenseRmController(ApplicationContext context, SenseProperties config,
+                           MeasurementController measurementController) {
+    this.context = context;
+    this.config = config;
+    this.measurementController = measurementController;
+  }
 
   /**
    * Initialize API by loading technology specific driver using reflection.
@@ -134,32 +133,39 @@ public class SenseRmController {
    * @return A RESTful response.
    * @throws java.net.MalformedURLException
    */
-  @ApiOperation(
-          value = "Get a list of supported SENSE resources.",
-          notes = "Returns a list of available SENSE resource URL.",
-          response = DeltaResource.class,
-          responseContainer = "List")
+  @Operation(
+      summary = "Get a list of supported SENSE resources.",
+      description = "Returns a list of available SENSE resource URL.",
+      tags = {"getResources", "get"},
+      method = "GET")
   @ApiResponses(
-          value = {
-            @ApiResponse(
-                    code = HttpConstants.OK_CODE,
-                    message = HttpConstants.OK_MSG,
-                    response = Resource.class)
-            ,
-            @ApiResponse(
-                    code = HttpConstants.UNAUTHORIZED_CODE,
-                    message = HttpConstants.UNAUTHORIZED_MSG,
-                    response = Error.class)
-            ,
-            @ApiResponse(
-                    code = HttpConstants.FORBIDDEN_CODE,
-                    message = HttpConstants.FORBIDDEN_MSG,
-                    response = Error.class)
-            ,
-            @ApiResponse(
-                    code = HttpConstants.INTERNAL_ERROR_CODE,
-                    message = HttpConstants.INTERNAL_ERROR_MSG,
-                    response = Error.class),})
+      value = {
+          @ApiResponse(
+              responseCode = HttpConstants.OK_CODE,
+              description = HttpConstants.OK_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_LOCATION_NAME,
+                      description = HttpConstants.CONTENT_LOCATION_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(array = @ArraySchema(schema = @Schema(implementation = Resource.class)),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)),
+          @ApiResponse(
+              responseCode = HttpConstants.UNAUTHORIZED_CODE,
+              description = HttpConstants.UNAUTHORIZED_MSG,
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)),
+          @ApiResponse(
+              responseCode = HttpConstants.FORBIDDEN_CODE,
+              description = HttpConstants.FORBIDDEN_MSG,
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)),
+          @ApiResponse(
+              responseCode = HttpConstants.INTERNAL_ERROR_CODE,
+              description = HttpConstants.INTERNAL_ERROR_MSG,
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)),
+      })
   @RequestMapping(method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseBody
   public ResponseEntity<?> getResources() throws MalformedURLException {
@@ -198,7 +204,7 @@ public class SenseRmController {
           resource.setVersion(ra.version());
           UriComponentsBuilder path = utilities.getPath(location.toASCIIString());
           path.path(rm.value()[0]);
-          resource.setHref(path.build().toUriString());
+          resource.setHref(path.build().encode().toUriString());
           resources.add(resource);
         }
       }
@@ -244,95 +250,89 @@ public class SenseRmController {
    *
    * @return A RESTful response.
    */
-  @ApiOperation(
-          value = "Get a collection of available model resources.",
-          notes = "Returns a list of available SENSE topology model resources.",
-          response = ModelResource.class,
-          responseContainer = "List")
+  @Operation(
+      summary = "Get a collection of available model resources.",
+      description = "Returns a list of available SENSE topology model resources.",
+      tags = {"getModels", "get"},
+      method = "GET")
   @ApiResponses(
-          value = {
-            @ApiResponse(
-                    code = HttpConstants.OK_CODE,
-                    message = HttpConstants.OK_TOPOLOGIES_MSG,
-                    response = ModelResource.class,
-                    responseContainer = "List",
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_MODIFIED,
-                    message = HttpConstants.NOT_MODIFIED_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.BAD_REQUEST_CODE,
-                    message = HttpConstants.BAD_REQUEST_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.UNAUTHORIZED_CODE,
-                    message = HttpConstants.UNAUTHORIZED_MSG,
-                    response = Error.class,
-                     responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.FORBIDDEN_CODE,
-                    message = HttpConstants.FORBIDDEN_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.INTERNAL_ERROR_CODE,
-                    message = HttpConstants.INTERNAL_ERROR_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),})
+      value = {
+          @ApiResponse(
+              responseCode = HttpConstants.OK_CODE,
+              description = HttpConstants.OK_TOPOLOGIES_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_LOCATION_NAME,
+                      description = HttpConstants.CONTENT_LOCATION_DESC,
+                      schema = @Schema(implementation = String.class)),
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class)),
+                  @Header(name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(array = @ArraySchema(schema = @Schema(implementation = ModelResource.class)),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_MODIFIED,
+              description = HttpConstants.NOT_MODIFIED_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class)),
+                  @Header(name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.BAD_REQUEST_CODE,
+              description = HttpConstants.BAD_REQUEST_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.UNAUTHORIZED_CODE,
+              description = HttpConstants.UNAUTHORIZED_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.FORBIDDEN_CODE,
+              description = HttpConstants.FORBIDDEN_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.INTERNAL_ERROR_CODE,
+              description = HttpConstants.INTERNAL_ERROR_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          )
+      })
   @RequestMapping(
           value = "/models",
           method = RequestMethod.GET,
@@ -340,30 +340,18 @@ public class SenseRmController {
   @ResponseBody
   @ResourceAnnotation(name = "models", version = "v1")
   public ResponseEntity<?> getModels(
-          @RequestHeader(
-                  value = HttpConstants.ACCEPT_NAME,
-                  defaultValue = MediaType.APPLICATION_JSON_VALUE)
-          @ApiParam(value = HttpConstants.ACCEPT_MSG, required = false) String accept,
-          @RequestHeader(
-                  value = HttpConstants.IF_MODIFIED_SINCE_NAME,
-                  required = false)
-          @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
-          @RequestParam(
-                  value = HttpConstants.CURRENT_NAME,
-                  defaultValue = "false")
-          @ApiParam(value = HttpConstants.CURRENT_MSG, required = false) boolean current,
-          @RequestParam(
-                  value = HttpConstants.SUMMARY_NAME,
-                  defaultValue = "false")
-          @ApiParam(value = HttpConstants.SUMMARY_MSG, required = false) boolean summary,
-          @RequestParam(
-                  value = HttpConstants.ENCODE_NAME,
-                  defaultValue = "false")
-          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode,
-          @RequestParam(
-                  value = HttpConstants.MODEL_NAME,
-                  defaultValue = HttpConstants.MODEL_TURTLE)
-          @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model) {
+          @RequestHeader(value = HttpConstants.ACCEPT_NAME, defaultValue = MediaType.APPLICATION_JSON_VALUE)
+          @Parameter(description = HttpConstants.ACCEPT_MSG, required = false) String accept,
+          @RequestHeader(value = HttpConstants.IF_MODIFIED_SINCE_NAME, required = false)
+          @Parameter(description = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
+          @RequestParam(value = HttpConstants.CURRENT_NAME, defaultValue = "false")
+          @Parameter(description = HttpConstants.CURRENT_MSG, required = false) boolean current,
+          @RequestParam(value = HttpConstants.SUMMARY_NAME, defaultValue = "false")
+          @Parameter(description = HttpConstants.SUMMARY_MSG, required = false) boolean summary,
+          @RequestParam(value = HttpConstants.ENCODE_NAME, defaultValue = "false")
+          @Parameter(description = HttpConstants.ENCODE_MSG, required = false) boolean encode,
+          @RequestParam(value = HttpConstants.MODEL_NAME, defaultValue = HttpConstants.MODEL_TURTLE)
+          @Parameter(description = HttpConstants.MODEL_MSG, required = false) String model) {
 
     // We need the request URL to build fully qualified resource URLs.
     final URI location;
@@ -406,7 +394,7 @@ public class SenseRmController {
           return Common.toResponseEntity(headers, response);
         }
 
-        response.getModel().ifPresent(m -> result.add(m));
+        response.getModel().ifPresent(result::add);
       } else {
         ModelsResponse response = driver.getModels(model, ifms).get();
         if (response == null || response.getStatus() != Status.OK) {
@@ -452,7 +440,7 @@ public class SenseRmController {
       return new ResponseEntity<>(models, headers, HttpStatus.OK);
     } catch (InterruptedException | IOException | DatatypeConfigurationException | IllegalArgumentException |
             ExecutionException ex) {
-      log.error("[SenseRmController] getModels failed, ex = {}", ex);
+      log.error("[SenseRmController] getModels failed", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
@@ -488,135 +476,119 @@ public class SenseRmController {
    *
    * @return A RESTful response.
    */
-  @ApiOperation(
-          value = "Get a specific SENSE topology model resource.",
-          notes = "Returns SENSE topology model resource corresponding to the specified resource id.",
-          response = ModelResource.class)
+  @Operation(
+          summary = "Get a specific SENSE topology model resource.",
+          description = "Returns SENSE topology model resource corresponding to the specified resource id.",
+          tags = { "getModel", "get" },
+          method = "GET")
   @ApiResponses(
-          value = {
-            @ApiResponse(
-                    code = HttpConstants.OK_CODE,
-                    message = HttpConstants.OK_TOPOLOGIES_MSG,
-                    response = ModelResource.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_MODIFIED,
-                    message = HttpConstants.NOT_MODIFIED_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.BAD_REQUEST_CODE,
-                    message = HttpConstants.BAD_REQUEST_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.FORBIDDEN_CODE,
-                    message = HttpConstants.FORBIDDEN_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_FOUND_CODE,
-                    message = HttpConstants.NOT_FOUND_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_ACCEPTABLE_CODE,
-                    message = HttpConstants.NOT_ACCEPTABLE_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.INTERNAL_ERROR_CODE,
-                    message = HttpConstants.INTERNAL_ERROR_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),})
+      value = {
+          @ApiResponse(
+              responseCode = HttpConstants.OK_CODE,
+              description = HttpConstants.OK_TOPOLOGIES_MSG,
+              headers = {
+                  @Header(
+                      name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+                  ,
+                  @Header(
+                      name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = ModelResource.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(//
+              responseCode = HttpConstants.NOT_MODIFIED,
+              description = HttpConstants.NOT_MODIFIED_MSG,
+              headers = {
+                  @Header(
+                      name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+                  ,
+                  @Header(
+                      name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(//
+              responseCode = HttpConstants.BAD_REQUEST_CODE,
+              description = HttpConstants.BAD_REQUEST_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(//
+              responseCode = HttpConstants.FORBIDDEN_CODE,
+              description = HttpConstants.FORBIDDEN_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(//
+              responseCode = HttpConstants.NOT_FOUND_CODE,
+              description = HttpConstants.NOT_FOUND_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(//
+              responseCode = HttpConstants.NOT_ACCEPTABLE_CODE,
+              description = HttpConstants.NOT_ACCEPTABLE_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(//
+              responseCode = HttpConstants.INTERNAL_ERROR_CODE,
+              description = HttpConstants.INTERNAL_ERROR_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          )
+      })
   @RequestMapping(
           value = "/models/{" + HttpConstants.ID_NAME + "}",
           method = RequestMethod.GET,
           produces = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseBody
   public ResponseEntity<?> getModel(
-          @RequestHeader(
-                  value = HttpConstants.ACCEPT_NAME,
-                  defaultValue = MediaType.APPLICATION_JSON_VALUE)
-          @ApiParam(value = HttpConstants.ACCEPT_MSG, required = false) String accept,
-          /*
-            @RequestHeader(
-                  value = HttpConstants.IF_MODIFIED_SINCE_NAME,
-                  defaultValue = HttpConstants.IF_MODIFIED_SINCE_DEFAULT)
-            @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
-          */
-          @RequestHeader(
-                  value = HttpConstants.IF_MODIFIED_SINCE_NAME,
-                  required = false)
-          @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
-          @RequestParam(
-                  value = HttpConstants.MODEL_NAME,
-                  defaultValue = HttpConstants.MODEL_TURTLE)
-          @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model,
-          @RequestParam(
-                  value = HttpConstants.ENCODE_NAME,
-                  defaultValue = "false")
-          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode,
+          @RequestHeader(value = HttpConstants.ACCEPT_NAME, defaultValue = MediaType.APPLICATION_JSON_VALUE)
+          @Parameter(description = HttpConstants.ACCEPT_MSG, required = false) String accept,
+          @RequestHeader(value = HttpConstants.IF_MODIFIED_SINCE_NAME, required = false)
+          @Parameter(description = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
+          @RequestParam(value = HttpConstants.MODEL_NAME, defaultValue = HttpConstants.MODEL_TURTLE)
+          @Parameter(description = HttpConstants.MODEL_MSG, required = false) String model,
+          @RequestParam(value = HttpConstants.ENCODE_NAME, defaultValue = "false")
+          @Parameter(description = HttpConstants.ENCODE_MSG, required = false) boolean encode,
           @PathVariable(HttpConstants.ID_NAME)
-          @ApiParam(value = HttpConstants.ID_MSG, required = true) String id) {
+          @Parameter(description = HttpConstants.ID_MSG, required = true) String id) {
 
     final URI location;
     try {
@@ -645,7 +617,7 @@ public class SenseRmController {
       // Retrieve the model if newer than specified If-Modified-Since header.
       ModelResponse response = driver.getModel(id, model, ifms).get();
 
-      if (response == null || response.getStatus() != Status.OK) {
+      if (response == null || response.getStatus() != Status.OK || response.getModel().isEmpty()) {
         return Common.toResponseEntity(headers, response);
       }
 
@@ -667,7 +639,7 @@ public class SenseRmController {
 
       return new ResponseEntity<>(m, headers, HttpStatus.OK);
     } catch (InterruptedException | IOException | DatatypeConfigurationException | ExecutionException ex) {
-      log.error("[SenseRmController] getModel failed, ex = {}", ex);
+      log.error("[SenseRmController] getModel failed", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
@@ -678,18 +650,16 @@ public class SenseRmController {
   }
 
   /**
-   * ***********************************************************************
-   * GET /api/sense/v1/models/{id}/deltas ***********************************************************************
-   */
-  /**
    * Returns a list of accepted delta resources associated with the specified SENSE topology model.
+   *
+   * GET /api/sense/v1/models/{id}/deltas
    *
    * @param accept Provides media types that are acceptable for the response. At the moment 'application/json' is the
    * supported response encoding.
    * @param ifModifiedSince The HTTP request may contain the If-Modified-Since header requesting all models with
    * creationTime after the specified date. The date must be specified in RFC 1123 format.
    * @param summary If summary=true then a summary collection of delta resources will be returned including the delta
- meta-data while excluding the addition, reduction, and m elements. Default value is summary=true.
+   *     meta-data while excluding the addition, reduction, and m elements. Default value is summary=true.
    *
    * @param encode Transfer size of the model element contents can be optimized by gzip/base64
    *    encoding the contained model.  If encode=true then returned model will be gzipped
@@ -697,112 +667,103 @@ public class SenseRmController {
    *    to reduce transfer size. Default value is encode=false.
    *
    * @param model If model=turtle then the returned addition, reduction, and m elements will contain the full
- topology model in a TURTLE representation. Default value is model=turtle.
+   *     topology model in a TURTLE representation. Default value is model=turtle.
    * @param id The UUID uniquely identifying the topology model resource.
    * @return A RESTful response.
    */
-  @ApiOperation(
-          value = "Get a collection of delta resources associated with the model resource "
+  @Operation(
+      summary = "Get a collection of delta resources associated with the model resource "
           + "identified by id.",
-          notes = "Returns a collection of delta resources associated with a model resource.",
-          response = DeltaResource.class,
-          responseContainer = "List")
+      description = "Returns a collection of delta resources associated with a model resource.",
+      tags = { "getModelDeltas", "get" },
+      method = "GET")
   @ApiResponses(
-          value = {
-            @ApiResponse(
-                    code = HttpConstants.OK_CODE,
-                    message = HttpConstants.OK_DELTAS_MSG,
-                    response = DeltaResource.class,
-                    responseContainer = "List",
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_MODIFIED,
-                    message = HttpConstants.NOT_MODIFIED_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.BAD_REQUEST_CODE,
-                    message = HttpConstants.BAD_REQUEST_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.FORBIDDEN_CODE,
-                    message = HttpConstants.FORBIDDEN_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_FOUND_CODE,
-                    message = HttpConstants.NOT_FOUND_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_ACCEPTABLE_CODE,
-                    message = HttpConstants.NOT_ACCEPTABLE_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.INTERNAL_ERROR_CODE,
-                    message = HttpConstants.INTERNAL_ERROR_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),})
+      value = {
+          @ApiResponse(
+              responseCode = HttpConstants.OK_CODE,
+              description = HttpConstants.OK_DELTAS_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class)),
+                  @Header(name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class)),
+              },
+              content = @Content(array = @ArraySchema(schema = @Schema(implementation = DeltaResource.class)),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_MODIFIED,
+              description = HttpConstants.NOT_MODIFIED_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+                  ,
+                  @Header(name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.BAD_REQUEST_CODE,
+              description = HttpConstants.BAD_REQUEST_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.FORBIDDEN_CODE,
+              description = HttpConstants.FORBIDDEN_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_FOUND_CODE,
+              description = HttpConstants.NOT_FOUND_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_ACCEPTABLE_CODE,
+              description = HttpConstants.NOT_ACCEPTABLE_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.INTERNAL_ERROR_CODE,
+              description = HttpConstants.INTERNAL_ERROR_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          )
+      })
   @RequestMapping(
           value = "/models/{" + HttpConstants.ID_NAME + "}/deltas",
           method = RequestMethod.GET,
@@ -813,25 +774,17 @@ public class SenseRmController {
           @RequestHeader(
                   value = HttpConstants.ACCEPT_NAME,
                   defaultValue = MediaType.APPLICATION_JSON_VALUE)
-          @ApiParam(value = HttpConstants.ACCEPT_MSG, required = false) String accept,
-          @RequestHeader(
-                  value = HttpConstants.IF_MODIFIED_SINCE_NAME,
-                  required = false)
-          @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
-          @RequestParam(
-                  value = HttpConstants.SUMMARY_NAME,
-                  defaultValue = "false")
-          @ApiParam(value = HttpConstants.SUMMARY_MSG, required = false) boolean summary,
-          @RequestParam(
-                  value = HttpConstants.ENCODE_NAME,
-                  defaultValue = "false")
-          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode,
-          @RequestParam(
-                  value = HttpConstants.MODEL_NAME,
-                  defaultValue = HttpConstants.MODEL_TURTLE)
-          @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model,
+          @Parameter(description = HttpConstants.ACCEPT_MSG, required = false) String accept,
+          @RequestHeader(value = HttpConstants.IF_MODIFIED_SINCE_NAME, required = false)
+          @Parameter(description = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
+          @RequestParam(value = HttpConstants.SUMMARY_NAME, defaultValue = "false")
+          @Parameter(description = HttpConstants.SUMMARY_MSG, required = false) boolean summary,
+          @RequestParam(value = HttpConstants.ENCODE_NAME, defaultValue = "false")
+          @Parameter(description = HttpConstants.ENCODE_MSG, required = false) boolean encode,
+          @RequestParam(value = HttpConstants.MODEL_NAME, defaultValue = HttpConstants.MODEL_TURTLE)
+          @Parameter(description = HttpConstants.MODEL_MSG, required = false) String model,
           @PathVariable(HttpConstants.ID_NAME)
-          @ApiParam(value = HttpConstants.ID_MSG, required = true) String id) {
+          @Parameter(description = HttpConstants.ID_MSG, required = true) String id) {
 
     // We need the request URL to build fully qualified resource URLs.
     final URI location;
@@ -847,7 +800,7 @@ public class SenseRmController {
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    log.info("[SenseRmController] GET operation = {}, accept = {}, If-Modified-Since = {}, current = {}, "
+    log.info("[SenseRmController] GET location = {}, accept = {}, If-Modified-Since = {}, "
             + "summary = {}, model = {}, modelId = {}", location, accept, ifModifiedSince, summary, model, id);
 
     // Parse the If-Modified-Since header if it is present.
@@ -910,7 +863,7 @@ public class SenseRmController {
       return new ResponseEntity<>(deltas, headers, HttpStatus.OK);
     } catch (InterruptedException | IOException | DatatypeConfigurationException | IllegalArgumentException |
             ExecutionException ex) {
-      log.error("[SenseRmController] getModelDeltas failed, ex = {}", ex);
+      log.error("[SenseRmController] getModelDeltas failed", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
@@ -921,13 +874,10 @@ public class SenseRmController {
   }
 
   /**
-   * ***********************************************************************
-   * GET /api/sense/v1/models/{id}/deltas/{deltaId}
-   * ***********************************************************************
-   */
-  /**
    * Returns the delta resource identified by deltaId that is associated with model identified by id within the Resource
    * Manager.
+   *
+   *  GET /api/sense/v1/models/{id}/deltas/{deltaId}
    *
    * @param accept Provides media types that are acceptable for the response. At the moment 'application/json' is the
    * supported response encoding.
@@ -941,106 +891,98 @@ public class SenseRmController {
    * @param deltaId Identifier of the target delta resource.
    * @return A RESTful response.
    */
-  @ApiOperation(
-          value = "Get a specific SENSE topology model resource.",
-          notes = "Returns SENSE topology model resource corresponding to the specified resource id.",
-          response = DeltaResource.class)
+  @Operation(
+      summary = "Get a specific SENSE topology model resource.",
+      description = "Returns SENSE topology model resource corresponding to the specified resource id.",
+      tags = {"getModelDelta", "get"},
+      method = "GET")
   @ApiResponses(
-          value = {
-            @ApiResponse(
-                    code = HttpConstants.OK_CODE,
-                    message = HttpConstants.OK_DELTA_MSG,
-                    response = DeltaResource.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_MODIFIED,
-                    message = HttpConstants.NOT_MODIFIED_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.BAD_REQUEST_CODE,
-                    message = HttpConstants.BAD_REQUEST_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.FORBIDDEN_CODE,
-                    message = HttpConstants.FORBIDDEN_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_FOUND_CODE,
-                    message = HttpConstants.NOT_FOUND_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_ACCEPTABLE_CODE,
-                    message = HttpConstants.NOT_ACCEPTABLE_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.INTERNAL_ERROR_CODE,
-                    message = HttpConstants.INTERNAL_ERROR_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),}
-  )
+      value = {
+          @ApiResponse(
+              responseCode = HttpConstants.OK_CODE,
+              description = HttpConstants.OK_DELTAS_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class)),
+                  @Header(name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class)),
+              },
+              content = @Content(schema = @Schema(implementation = DeltaResource.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_MODIFIED,
+              description = HttpConstants.NOT_MODIFIED_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+                  ,
+                  @Header(name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.BAD_REQUEST_CODE,
+              description = HttpConstants.BAD_REQUEST_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.FORBIDDEN_CODE,
+              description = HttpConstants.FORBIDDEN_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_FOUND_CODE,
+              description = HttpConstants.NOT_FOUND_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_ACCEPTABLE_CODE,
+              description = HttpConstants.NOT_ACCEPTABLE_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.INTERNAL_ERROR_CODE,
+              description = HttpConstants.INTERNAL_ERROR_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          )
+      })
   @RequestMapping(
           value = "/models/{" + HttpConstants.ID_NAME + "}/deltas/{"
           + HttpConstants.DELTAID_NAME + "}",
@@ -1048,27 +990,18 @@ public class SenseRmController {
           produces = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseBody
   public ResponseEntity<?> getModelDelta(
-          @RequestHeader(
-                  value = HttpConstants.ACCEPT_NAME,
-                  defaultValue = MediaType.APPLICATION_JSON_VALUE)
-          @ApiParam(value = HttpConstants.ACCEPT_MSG, required = false) String accept,
-          @RequestHeader(
-                  value = HttpConstants.IF_MODIFIED_SINCE_NAME,
-                  defaultValue = HttpConstants.IF_MODIFIED_SINCE_DEFAULT)
-          @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
-          @RequestParam(
-                  value = HttpConstants.MODEL_NAME,
-                  defaultValue = HttpConstants.MODEL_TURTLE)
-          @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model,
-          @RequestParam(
-                  value = HttpConstants.ENCODE_NAME,
-                  defaultValue = "false")
-          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode,
+          @RequestHeader(value = HttpConstants.ACCEPT_NAME, defaultValue = MediaType.APPLICATION_JSON_VALUE)
+          @Parameter(description = HttpConstants.ACCEPT_MSG, required = false) String accept,
+          @RequestHeader(value = HttpConstants.IF_MODIFIED_SINCE_NAME, defaultValue = HttpConstants.IF_MODIFIED_SINCE_DEFAULT)
+          @Parameter(description = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
+          @RequestParam(value = HttpConstants.MODEL_NAME, defaultValue = HttpConstants.MODEL_TURTLE)
+          @Parameter(description = HttpConstants.MODEL_MSG, required = false) String model,
+          @RequestParam(value = HttpConstants.ENCODE_NAME, defaultValue = "false")
+          @Parameter(description = HttpConstants.ENCODE_MSG, required = false) boolean encode,
           @PathVariable(HttpConstants.ID_NAME)
-          @ApiParam(value = HttpConstants.ID_MSG, required = true) String id,
+          @Parameter(description = HttpConstants.ID_MSG, required = true) String id,
           @PathVariable(HttpConstants.DELTAID_NAME)
-          @ApiParam(value = HttpConstants.DELTAID_MSG, required = true) String deltaId) {
-
+          @Parameter(description = HttpConstants.DELTAID_MSG, required = true) String deltaId) {
 
     // Get the requested resource URL.
     final URI location;
@@ -1120,7 +1053,7 @@ public class SenseRmController {
 
       return new ResponseEntity<>(d, headers, HttpStatus.OK);
     } catch (InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
-      log.error("getDelta failed, ex = {}", ex);
+      log.error("getDelta failed", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
@@ -1142,139 +1075,125 @@ public class SenseRmController {
    * @param id
    * @return
    */
-  @ApiOperation(
-          value = "Submits a proposed model delta to the Resource Manager based on the model identified by id.",
-          notes = "The Resource Manager must verify the proposed model change, confirming (201 Created), rejecting (500 Internal Server Error), or proposing an optional counter-offer (200 OK).",
-          response = DeltaResource.class)
+  @Operation(
+      summary = "Submits a proposed model delta to the Resource Manager based on the model identified by id.",
+      description = "The Resource Manager must verify the proposed model change, confirming (201 Created), "
+          + "rejecting (500 Internal Server Error), or proposing an optional counter-offer (200 OK).",
+      tags = { "propagateModelDelta", "post" },
+      method = "POST")
   @ApiResponses(
-          value = {
-            @ApiResponse(
-                    code = HttpConstants.OK_CODE,
-                    message = HttpConstants.OK_DELTA_COUNTER_MSG,
-                    response = DeltaRequest.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.CREATED_CODE,
-                    message = HttpConstants.CREATED_MSG,
-                    response = DeltaResource.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.BAD_REQUEST_CODE,
-                    message = HttpConstants.BAD_REQUEST_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.FORBIDDEN_CODE,
-                    message = HttpConstants.FORBIDDEN_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_FOUND_CODE,
-                    message = HttpConstants.NOT_FOUND_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_ACCEPTABLE_CODE,
-                    message = HttpConstants.NOT_ACCEPTABLE_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.CONFLICT_CODE,
-                    message = HttpConstants.CONFLICT_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.INTERNAL_ERROR_CODE,
-                    message = HttpConstants.INTERNAL_ERROR_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),}
-  )
+      value = {
+          @ApiResponse(
+              responseCode = HttpConstants.OK_CODE,
+              description = HttpConstants.OK_DELTA_COUNTER_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class)),
+                  @Header(name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class)),
+              },
+              content = @Content(schema = @Schema(implementation = DeltaResource.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.CREATED_CODE,
+              description = HttpConstants.CREATED_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class)),
+                  @Header(name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class)),
+              },
+              content = @Content(schema = @Schema(implementation = DeltaResource.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.BAD_REQUEST_CODE,
+              description = HttpConstants.BAD_REQUEST_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.FORBIDDEN_CODE,
+              description = HttpConstants.FORBIDDEN_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_FOUND_CODE,
+              description = HttpConstants.NOT_FOUND_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_ACCEPTABLE_CODE,
+              description = HttpConstants.NOT_ACCEPTABLE_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.CONFLICT_CODE,
+              description = HttpConstants.CONFLICT_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.INTERNAL_ERROR_CODE,
+              description = HttpConstants.INTERNAL_ERROR_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          )
+      })
   @RequestMapping(
           value = "/models/{" + HttpConstants.ID_NAME + "}/deltas",
           method = RequestMethod.POST,
           consumes = {MediaType.APPLICATION_JSON_VALUE},
           produces = {MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<?> propagateModelDelta(
-          @RequestHeader(
-                  value = HttpConstants.ACCEPT_NAME,
-                  defaultValue = MediaType.APPLICATION_JSON_VALUE)
-          @ApiParam(value = HttpConstants.ACCEPT_MSG, required = false) String accept,
-          @RequestParam(
-                  value = HttpConstants.MODEL_NAME,
-                  defaultValue = HttpConstants.MODEL_TURTLE)
-          @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model,
+          @RequestHeader(value = HttpConstants.ACCEPT_NAME, defaultValue = MediaType.APPLICATION_JSON_VALUE)
+          @Parameter(description = HttpConstants.ACCEPT_MSG, required = false) String accept,
+          @RequestParam(value = HttpConstants.MODEL_NAME, defaultValue = HttpConstants.MODEL_TURTLE)
+          @Parameter(description = HttpConstants.MODEL_MSG, required = false) String model,
           @PathVariable(HttpConstants.ID_NAME)
-          @ApiParam(value = HttpConstants.ID_MSG, required = true) String id,
+          @Parameter(description = HttpConstants.ID_MSG, required = true) String id,
           @RequestBody
-          @ApiParam(value = "A JSON structure-containing the model reduction and/or addition "
+          @Parameter(description = "A JSON structure-containing the model reduction and/or addition "
                   + " elements. If provided, the model reduction element is applied first, "
-                  + " followed by the model addition element.", required = true) DeltaRequest deltaRequest
-  ) {
+                  + " followed by the model addition element.", required = true) DeltaRequest deltaRequest) {
 
     log.info("propagateModelDelta: {}", deltaRequest);
 
@@ -1320,108 +1239,98 @@ public class SenseRmController {
  topology model in a TURTLE representation. Default value is model=turtle.
    * @return A RESTful response.
    */
-  @ApiOperation(
-          value = "Get a collection of accepted delta resources.",
-          notes = "Returns a collection of available delta resources.",
-          response = DeltaResource.class,
-          responseContainer = "List")
+  @Operation(
+      summary = "Get a collection of accepted delta resources.",
+      description = "Returns a collection of available delta resources.",
+      tags = {"getDeltas", "get"},
+      method = "GET")
   @ApiResponses(
-          value = {
-            @ApiResponse(
-                    code = HttpConstants.OK_CODE,
-                    message = HttpConstants.OK_DELTAS_MSG,
-                    response = DeltaResource.class,
-                    responseContainer = "List",
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_MODIFIED,
-                    message = HttpConstants.NOT_MODIFIED_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.BAD_REQUEST_CODE,
-                    message = HttpConstants.BAD_REQUEST_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.FORBIDDEN_CODE,
-                    message = HttpConstants.FORBIDDEN_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_FOUND_CODE,
-                    message = HttpConstants.NOT_FOUND_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_ACCEPTABLE_CODE,
-                    message = HttpConstants.NOT_ACCEPTABLE_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.INTERNAL_ERROR_CODE,
-                    message = HttpConstants.INTERNAL_ERROR_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),}
-  )
+      value = {
+          @ApiResponse(
+              responseCode = HttpConstants.OK_CODE,
+              description = HttpConstants.OK_DELTAS_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class)),
+                  @Header(name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class)),
+              },
+              content = @Content(array = @ArraySchema(schema = @Schema(implementation = DeltaResource.class)),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_MODIFIED,
+              description = HttpConstants.NOT_MODIFIED_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+                  ,
+                  @Header(name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.BAD_REQUEST_CODE,
+              description = HttpConstants.BAD_REQUEST_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.FORBIDDEN_CODE,
+              description = HttpConstants.FORBIDDEN_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_FOUND_CODE,
+              description = HttpConstants.NOT_FOUND_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_ACCEPTABLE_CODE,
+              description = HttpConstants.NOT_ACCEPTABLE_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.INTERNAL_ERROR_CODE,
+              description = HttpConstants.INTERNAL_ERROR_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          )
+      })
   @RequestMapping(
           value = "/deltas",
           method = RequestMethod.GET,
@@ -1429,26 +1338,17 @@ public class SenseRmController {
   @ResponseBody
   @ResourceAnnotation(name = "deltas", version = "v1")
   public ResponseEntity<?> getDeltas(
-          @RequestHeader(
-                  value = HttpConstants.ACCEPT_NAME,
-                  defaultValue = MediaType.APPLICATION_JSON_VALUE)
-          @ApiParam(value = HttpConstants.ACCEPT_MSG, required = false) String accept,
-          @RequestHeader(
-                  value = HttpConstants.IF_MODIFIED_SINCE_NAME,
-                  defaultValue = HttpConstants.IF_MODIFIED_SINCE_DEFAULT)
-          @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
-          @RequestParam(
-                  value = HttpConstants.SUMMARY_NAME,
-                  defaultValue = "false")
-          @ApiParam(value = HttpConstants.SUMMARY_MSG, required = false) boolean summary,
-          @RequestParam(
-                  value = HttpConstants.MODEL_NAME,
-                  defaultValue = HttpConstants.MODEL_TURTLE)
-          @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model,
-          @RequestParam(
-                  value = HttpConstants.ENCODE_NAME,
-                  defaultValue = "false")
-          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode) {
+          @RequestHeader(value = HttpConstants.ACCEPT_NAME, defaultValue = MediaType.APPLICATION_JSON_VALUE)
+          @Parameter(description = HttpConstants.ACCEPT_MSG, required = false) String accept,
+          @RequestHeader(value = HttpConstants.IF_MODIFIED_SINCE_NAME,
+              defaultValue = HttpConstants.IF_MODIFIED_SINCE_DEFAULT)
+          @Parameter(description = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
+          @RequestParam(value = HttpConstants.SUMMARY_NAME, defaultValue = "false")
+          @Parameter(description = HttpConstants.SUMMARY_MSG, required = false) boolean summary,
+          @RequestParam(value = HttpConstants.MODEL_NAME, defaultValue = HttpConstants.MODEL_TURTLE)
+          @Parameter(description = HttpConstants.MODEL_MSG, required = false) String model,
+          @RequestParam(value = HttpConstants.ENCODE_NAME, defaultValue = "false")
+          @Parameter(description = HttpConstants.ENCODE_MSG, required = false) boolean encode) {
 
     // We need the request URL to build fully qualified resource URLs.
     final URI location;
@@ -1464,7 +1364,7 @@ public class SenseRmController {
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    log.info("[SenseRmController] GET operation = {}, accept = {}, If-Modified-Since = {}, current = {}, "
+    log.info("[SenseRmController] GET location = {}, accept = {}, If-Modified-Since = {}, "
             + "summary = {}, model = {}", location, accept, ifModifiedSince, summary, model);
 
     // Parse the If-Modified-Since header if it is present.
@@ -1527,7 +1427,7 @@ public class SenseRmController {
       return new ResponseEntity<>(deltas, headers, HttpStatus.OK);
     } catch (InterruptedException | IOException | DatatypeConfigurationException | IllegalArgumentException |
             ExecutionException ex) {
-      log.error("[SenseRmController] getDeltas failed, ex = {}", ex);
+      log.error("[SenseRmController] getDeltas failed", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
@@ -1552,130 +1452,121 @@ public class SenseRmController {
    * @param deltaId Identifier of the target delta resource.
    * @return A RESTful response.
    */
-  @ApiOperation(
-          value = "Get a specific SENSE topology model resource.",
-          notes = "Returns SENSE topology model resource corresponding to the specified resource id.",
-          response = DeltaResource.class)
+  @Operation(
+      summary = "Get a specific SENSE topology model resource.",
+      description = "Returns SENSE topology model resource corresponding to the specified resource id.",
+      tags = { "getDelta", "get" },
+      method = "GET")
   @ApiResponses(
-          value = {
-            @ApiResponse(
-                    code = HttpConstants.OK_CODE,
-                    message = HttpConstants.OK_DELTA_MSG,
-                    response = DeltaResource.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.NOT_MODIFIED,
-                    message = HttpConstants.NOT_MODIFIED_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.BAD_REQUEST_CODE,
-                    message = HttpConstants.BAD_REQUEST_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.FORBIDDEN_CODE,
-                    message = HttpConstants.FORBIDDEN_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.NOT_FOUND_CODE,
-                    message = HttpConstants.NOT_FOUND_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.NOT_ACCEPTABLE_CODE,
-                    message = HttpConstants.NOT_ACCEPTABLE_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.INTERNAL_ERROR_CODE,
-                    message = HttpConstants.INTERNAL_ERROR_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-          }
-  )
+      value = {
+          @ApiResponse(
+              responseCode = HttpConstants.OK_CODE,
+              description = HttpConstants.OK_DELTA_MSG,
+              headers = {
+                  @Header(
+                      name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+                  ,
+                  @Header(
+                      name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(array = @ArraySchema(schema = @Schema(implementation = DeltaResource.class)),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_MODIFIED,
+              description = HttpConstants.NOT_MODIFIED_MSG,
+              headers = {
+                  @Header(
+                      name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+                  ,
+                  @Header(
+                      name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.BAD_REQUEST_CODE,
+              description = HttpConstants.BAD_REQUEST_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.FORBIDDEN_CODE,
+              description = HttpConstants.FORBIDDEN_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_FOUND_CODE,
+              description = HttpConstants.NOT_FOUND_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_ACCEPTABLE_CODE,
+              description = HttpConstants.NOT_ACCEPTABLE_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.INTERNAL_ERROR_CODE,
+              description = HttpConstants.INTERNAL_ERROR_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          )
+      })
   @RequestMapping(
-          value = "/deltas/{" + HttpConstants.DELTAID_NAME + "}",
-          method = RequestMethod.GET,
-          produces = {MediaType.APPLICATION_JSON_VALUE})
+      value = "/deltas/{" + HttpConstants.DELTAID_NAME + "}",
+      method = RequestMethod.GET,
+      produces = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseBody
   public ResponseEntity<?> getDelta(
-          @RequestHeader(
-                  value = HttpConstants.ACCEPT_NAME,
-                  defaultValue = MediaType.APPLICATION_JSON_VALUE)
-          @ApiParam(value = HttpConstants.ACCEPT_MSG, required = false) String accept,
-          @RequestHeader(
-                  value = HttpConstants.IF_MODIFIED_SINCE_NAME,
-                  required = false)
-          @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
-          @RequestParam(
-                  value = HttpConstants.SUMMARY_NAME,
-                  defaultValue = "false")
-          @ApiParam(value = HttpConstants.SUMMARY_MSG, required = false) boolean summary,
-          @RequestParam(
-                  value = HttpConstants.MODEL_NAME,
-                  defaultValue = HttpConstants.MODEL_TURTLE)
-          @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model,
-          @RequestParam(
-                  value = HttpConstants.ENCODE_NAME,
-                  defaultValue = "false")
-          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode,
+          @RequestHeader(value = HttpConstants.ACCEPT_NAME, defaultValue = MediaType.APPLICATION_JSON_VALUE)
+          @Parameter(description = HttpConstants.ACCEPT_MSG, required = false) String accept,
+          @RequestHeader(value = HttpConstants.IF_MODIFIED_SINCE_NAME, required = false)
+          @Parameter(description = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
+          @RequestParam(value = HttpConstants.SUMMARY_NAME, defaultValue = "false")
+          @Parameter(description = HttpConstants.SUMMARY_MSG, required = false) boolean summary,
+          @RequestParam(value = HttpConstants.MODEL_NAME, defaultValue = HttpConstants.MODEL_TURTLE)
+          @Parameter(description = HttpConstants.MODEL_MSG, required = false) String model,
+          @RequestParam(value = HttpConstants.ENCODE_NAME, defaultValue = "false")
+          @Parameter(description = HttpConstants.ENCODE_MSG, required = false) boolean encode,
           @PathVariable(HttpConstants.DELTAID_NAME)
-          @ApiParam(value = HttpConstants.DELTAID_MSG, required = true) String deltaId
-  ) {
+          @Parameter(description = HttpConstants.DELTAID_MSG, required = true) String deltaId) {
 
     // Get the requested resource URL.
     final URI location;
@@ -1708,9 +1599,14 @@ public class SenseRmController {
         return Common.toResponseEntity(headers, response);
       }
 
+      // Delta should be present but just in case.
+      if (response.getDelta().isEmpty()) {
+        log.error("[SenseRmController] failed to find deltaId = {}", deltaId);
+        return Common.toResponseEntity(headers, response);
+      }
       DeltaResource d = response.getDelta().get();
 
-      log.info("[SenseRmController] deltaId = {}, lastModified = {}, If-Modified-Since = {}", d.getId(),
+      log.info("[SenseRmController] found deltaId = {}, lastModified = {}, If-Modified-Since = {}", d.getId(),
               d.getLastModified(), ifModifiedSince);
 
       // Determine when this was last modified.
@@ -1741,7 +1637,7 @@ public class SenseRmController {
               d.getId(), d.getLastModified(), ifModifiedSince);
       return new ResponseEntity<>(d, headers, HttpStatus.OK);
     } catch (InterruptedException | ExecutionException | IOException | DatatypeConfigurationException ex) {
-      log.error("[SenseRmController] getDelta failed, deltaId = {}, ex = {}", deltaId, ex);
+      log.error("[SenseRmController] getDelta failed, deltaId = {}", deltaId, ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())
@@ -1764,135 +1660,125 @@ public class SenseRmController {
    * @return
    * @throws java.net.URISyntaxException
    */
-  @ApiOperation(
-          value = "Submits a proposed model delta to the Resource Manager based on the model "
+  @Operation(
+      summary = "Submits a proposed model delta to the Resource Manager based on the model "
           + "identified by id.",
-          notes = "The Resource Manager must verify the proposed model change, confirming "
+      description = "The Resource Manager must verify the proposed model change, confirming "
           + "(201 Created), rejecting (500 Internal Server Error), or proposing an "
           + "optional counter-offer (200 OK).",
-          response = DeltaResource.class)
+      tags = {"propagateDelta", "post"},
+      method = "POST")
   @ApiResponses(
-          value = {
-            @ApiResponse(
-                    code = HttpConstants.OK_CODE,
-                    message = HttpConstants.OK_DELTA_COUNTER_MSG,
-                    response = DeltaRequest.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.CREATED_CODE,
-                    message = HttpConstants.CREATED_MSG,
-                    response = DeltaResource.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.BAD_REQUEST_CODE,
-                    message = HttpConstants.BAD_REQUEST_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.FORBIDDEN_CODE,
-                    message = HttpConstants.FORBIDDEN_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.NOT_FOUND_CODE,
-                    message = HttpConstants.NOT_FOUND_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.NOT_ACCEPTABLE_CODE,
-                    message = HttpConstants.NOT_ACCEPTABLE_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.CONFLICT_CODE,
-                    message = HttpConstants.CONFLICT_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.INTERNAL_ERROR_CODE,
-                    message = HttpConstants.INTERNAL_ERROR_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-          }
-  )
+      value = {
+          @ApiResponse(
+              responseCode = HttpConstants.OK_CODE,
+              description = HttpConstants.OK_DELTA_COUNTER_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class)),
+                  @Header(name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class)),
+              },
+              content = @Content(schema = @Schema(implementation = DeltaResource.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.CREATED_CODE,
+              description = HttpConstants.CREATED_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class)),
+                  @Header(name = HttpConstants.LAST_MODIFIED_NAME,
+                      description = HttpConstants.LAST_MODIFIED_DESC,
+                      schema = @Schema(implementation = String.class)),
+              },
+              content = @Content(schema = @Schema(implementation = DeltaResource.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.BAD_REQUEST_CODE,
+              description = HttpConstants.BAD_REQUEST_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.FORBIDDEN_CODE,
+              description = HttpConstants.FORBIDDEN_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_FOUND_CODE,
+              description = HttpConstants.NOT_FOUND_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_ACCEPTABLE_CODE,
+              description = HttpConstants.NOT_ACCEPTABLE_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.CONFLICT_CODE,
+              description = HttpConstants.CONFLICT_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.INTERNAL_ERROR_CODE,
+              description = HttpConstants.INTERNAL_ERROR_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          )
+      })
   @RequestMapping(
           value = "/deltas",
           method = RequestMethod.POST,
           consumes = {MediaType.APPLICATION_JSON_VALUE},
           produces = {MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<?> propagateDelta(
-          @RequestHeader(
-                  value = HttpConstants.ACCEPT_NAME,
-                  defaultValue = MediaType.APPLICATION_JSON_VALUE)
-          @ApiParam(value = HttpConstants.ACCEPT_MSG, required = false) String accept,
-          @RequestParam(
-                  value = HttpConstants.MODEL_NAME,
-                  defaultValue = HttpConstants.MODEL_TURTLE)
-          @ApiParam(value = HttpConstants.MODEL_MSG, required = false) String model,
-          @RequestParam(
-                  value = HttpConstants.ENCODE_NAME,
-                  defaultValue = "false")
-          @ApiParam(value = HttpConstants.ENCODE_MSG, required = false) boolean encode,
+          @RequestHeader(value = HttpConstants.ACCEPT_NAME, defaultValue = MediaType.APPLICATION_JSON_VALUE)
+          @Parameter(description = HttpConstants.ACCEPT_MSG, required = false) String accept,
+          @RequestParam(value = HttpConstants.MODEL_NAME, defaultValue = HttpConstants.MODEL_TURTLE)
+          @Parameter(description = HttpConstants.MODEL_MSG, required = false) String model,
+          @RequestParam(value = HttpConstants.ENCODE_NAME, defaultValue = "false")
+          @Parameter(description = HttpConstants.ENCODE_MSG, required = false) boolean encode,
           @RequestBody
-          @ApiParam(value = "A JSON structure-containing the model reduction and/or addition "
+          @Parameter(description = "A JSON structure-containing the model reduction and/or addition "
                   + " elements. If provided, the model reduction element is applied first, "
                   + " followed by the model addition element.", required = true) DeltaRequest deltaRequest
   ) throws URISyntaxException {
@@ -1939,13 +1825,18 @@ public class SenseRmController {
 
       DeltaResponse response = driver.propagateDelta(deltaRequest, model).get();
 
+      // Record measurement associated with the delta duration.
       measurementController.add(
               MeasurementType.DELTA_RESERVE,
               deltaRequest.getId(),
               MetricType.DURATION,
               String.valueOf(System.currentTimeMillis() - start));
 
+      // Verify there were no exceptions.
       if (response == null || response.getStatus() != Status.CREATED) {
+        return Common.toResponseEntity(headers, response);
+      } else if (response.getDelta().isEmpty()) {
+        log.error("[SenseRmController] returned delta is null");
         return Common.toResponseEntity(headers, response);
       }
 
@@ -2000,74 +1891,82 @@ public class SenseRmController {
    *
    * @return A RESTful response with status NO_CONTENT if successful.
    */
-  @ApiOperation(
-          value = "Transition a delta resource from the Accepted to Committed state.",
-          notes = "The Resource Manager must verify the proposed delta commit and will "
+  @Operation(
+      summary = "Transition a delta resource from the Accepted to Committed state.",
+      description = "The Resource Manager must verify the proposed delta commit and will "
           + "confirm success returning (204 No Content).",
-          response = DeltaResource.class)
+      tags = {"commitDelta", "put"},
+      method = "PUT")
   @ApiResponses(
-          value = {
-            @ApiResponse(
-                    code = HttpConstants.NO_CONTENT_CODE,
-                    message = HttpConstants.NO_CONTENT_MSG
-            ),
-            @ApiResponse(
-                    code = HttpConstants.BAD_REQUEST_CODE,
-                    message = HttpConstants.BAD_REQUEST_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.FORBIDDEN_CODE,
-                    message = HttpConstants.FORBIDDEN_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.NOT_FOUND_CODE,
-                    message = HttpConstants.NOT_FOUND_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.NOT_ACCEPTABLE_CODE,
-                    message = HttpConstants.NOT_ACCEPTABLE_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-            @ApiResponse(
-                    code = HttpConstants.INTERNAL_ERROR_CODE,
-                    message = HttpConstants.INTERNAL_ERROR_MSG,
-                    response = Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),
-          }
-  )
+      value = {
+          @ApiResponse(
+              responseCode = HttpConstants.NO_CONTENT_CODE,
+              description = HttpConstants.NO_CONTENT_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_LOCATION_NAME,
+                      description = HttpConstants.CONTENT_LOCATION_DESC,
+                      schema = @Schema(implementation = String.class))
+              }
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.BAD_REQUEST_CODE,
+              description = HttpConstants.BAD_REQUEST_MSG,
+              headers = {
+                  @Header(
+                      name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.FORBIDDEN_CODE,
+              description = HttpConstants.FORBIDDEN_MSG,
+              headers = {
+                  @Header(
+                      name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_FOUND_CODE,
+              description = HttpConstants.NOT_FOUND_MSG,
+              headers = {
+                  @Header(
+                      name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.NOT_ACCEPTABLE_CODE,
+              description = HttpConstants.NOT_ACCEPTABLE_MSG,
+              headers = {
+                  @Header(
+                      name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+              responseCode = HttpConstants.INTERNAL_ERROR_CODE,
+              description = HttpConstants.INTERNAL_ERROR_MSG,
+              headers = {
+                  @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                      description = HttpConstants.CONTENT_TYPE_DESC,
+                      schema = @Schema(implementation = String.class))
+              },
+              content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                  mediaType = MediaType.APPLICATION_JSON_VALUE))
+      })
   @RequestMapping(
           value = "/deltas/{" + HttpConstants.DELTAID_NAME + "}/actions/commit",
           method = RequestMethod.PUT,
@@ -2075,7 +1974,7 @@ public class SenseRmController {
   @ResponseBody
   public ResponseEntity<?> commitDelta(
           @PathVariable(HttpConstants.DELTAID_NAME)
-          @ApiParam(value = HttpConstants.DELTAID_MSG, required = true) String deltaId
+          @Parameter(description = HttpConstants.DELTAID_MSG, required = true) String deltaId
   ) {
 
     // Get the requested resource URL.
@@ -2121,7 +2020,7 @@ public class SenseRmController {
 
       return new ResponseEntity<>(headers, HttpStatus.NO_CONTENT);
     } catch (InterruptedException | ExecutionException ex) {
-      log.error("getDelta failed, ex = {}", ex);
+      log.error("getDelta failed", ex);
       Error error = Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())

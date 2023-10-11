@@ -1,11 +1,9 @@
 package net.es.sense.rm.driver.nsi.dds.actors;
 
 import akka.actor.UntypedAbstractActor;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
-import javax.ws.rs.core.Response.Status;
-import lombok.extern.slf4j.Slf4j;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
+import jakarta.ws.rs.core.Response.Status;
 import net.es.nsi.dds.lib.client.DdsClient;
 import net.es.nsi.dds.lib.client.SubscriptionResult;
 import net.es.nsi.dds.lib.client.SubscriptionsResult;
@@ -17,18 +15,22 @@ import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent;
 import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent.Event;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
 
 /**
  * The Registration Actor handles local DDS subscription registrations to peer DDS services.
  *
  * @author hacksaw
  */
-@Slf4j
 @Component
-@Scope("prototype")
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RegistrationActor extends UntypedAbstractActor {
+  LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
   private static final String NOTIFICATIONS_URL = "notifications";
 
@@ -47,8 +49,7 @@ public class RegistrationActor extends UntypedAbstractActor {
 
   @Override
   public void onReceive(Object msg) {
-    if (msg instanceof RegistrationEvent) {
-      RegistrationEvent event = (RegistrationEvent) msg;
+    if (msg instanceof RegistrationEvent event) {
       log.debug("[RegistrationActor] event={}, url={}", event.getEvent().name(), event.getUrl());
 
       switch (event.getEvent()) {

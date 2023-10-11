@@ -20,12 +20,14 @@
 package net.es.sense.rm.api;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  *
@@ -34,17 +36,22 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 @Slf4j
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class X509AuthenticationServer extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity(prePostEnabled = true)
+public class X509AuthenticationServer {
 
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
-    log.debug("X509AuthenticationServer: configure ");
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    log.debug("X509AuthenticationServer: filterChain");
 
-    http.csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+    http.csrf()
+        .disable()
+            .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
-              .authorizeRequests().antMatchers("/").permitAll();
+              .authorizeHttpRequests()
+        .requestMatchers(new AntPathRequestMatcher("/**"))
+        .permitAll();
+    return http.build();
   }
 }
 

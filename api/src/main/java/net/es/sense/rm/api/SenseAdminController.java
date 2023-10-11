@@ -20,12 +20,33 @@
 package net.es.sense.rm.api;
 
 import com.google.common.base.Strings;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ResponseHeader;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import net.es.sense.rm.api.common.HttpConstants;
+import net.es.sense.rm.api.common.Resource;
+import net.es.sense.rm.api.common.ResourceAnnotation;
+import net.es.sense.rm.api.common.UrlTransform;
+import net.es.sense.rm.api.config.SenseProperties;
+import net.es.sense.rm.measurements.MeasurementController;
+import net.es.sense.rm.measurements.MeasurementResults;
+import net.es.sense.rm.model.ModelResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,29 +57,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
-import net.es.sense.rm.api.common.HttpConstants;
-import net.es.sense.rm.api.common.Resource;
-import net.es.sense.rm.api.common.ResourceAnnotation;
-import net.es.sense.rm.api.common.UrlTransform;
-import net.es.sense.rm.api.config.SenseProperties;
-import net.es.sense.rm.measurements.MeasurementController;
-import net.es.sense.rm.measurements.MeasurementResults;
-import net.es.sense.rm.model.DeltaResource;
-import net.es.sense.rm.model.ModelResource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  *
@@ -67,17 +65,23 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/admin/v1")
-@Api(tags = "SENSE Admin API")
+@Tag(name = "SENSE Admin API", description = "SENSE-RM administration management API")
 @ResourceAnnotation(name = "admin", version = "v1")
 public class SenseAdminController {
-
-  @Autowired(required = true)
-  SenseProperties config;
-
-  @Autowired
-  private MeasurementController measurementController;
-
+  private final SenseProperties config;
+  private final MeasurementController measurementController;
   private UrlTransform utilities;
+
+  /**
+   * Constructor to inject bean parameters.
+   *
+   * @param config
+   * @param measurementController
+   */
+  public SenseAdminController(SenseProperties config, MeasurementController measurementController) {
+    this.config = config;
+    this.measurementController = measurementController;
+  }
 
   @PostConstruct
   public void init() throws Exception {
@@ -94,31 +98,33 @@ public class SenseAdminController {
    * @return A RESTful response.
    * @throws java.net.MalformedURLException
    */
-  @ApiOperation(
-          value = "Get a list of supported SENSE Administration resources.",
-          notes = "Returns a list of available SENSE Administration resource URL.",
-          response = DeltaResource.class,
-          responseContainer = "List")
-  @ApiResponses(
-          value = {
-            @ApiResponse(
-                    code = HttpConstants.OK_CODE,
-                    message = HttpConstants.OK_MSG,
-                    response = Resource.class),
-            @ApiResponse(
-                    code = HttpConstants.UNAUTHORIZED_CODE,
-                    message = HttpConstants.UNAUTHORIZED_MSG,
-                    response = net.es.sense.rm.api.common.Error.class),
-            @ApiResponse(
-                    code = HttpConstants.FORBIDDEN_CODE,
-                    message = HttpConstants.FORBIDDEN_MSG,
-                    response = net.es.sense.rm.api.common.Error.class),
-            @ApiResponse(
-                    code = HttpConstants.INTERNAL_ERROR_CODE,
-                    message = HttpConstants.INTERNAL_ERROR_MSG,
-                    response = net.es.sense.rm.api.common.Error.class),
-          }
-      )
+  @Operation(
+          summary = "Get a list of supported SENSE Administration resources.",
+          description = "Returns a list of available SENSE Administration resource URL.",
+          tags = { "getResources", "get" },
+          method = "GET")
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = HttpConstants.OK_CODE,
+                  description = HttpConstants.OK_MSG,
+                  content = @Content(array = @ArraySchema(schema = @Schema(implementation = Resource.class)),
+                          mediaType = MediaType.APPLICATION_JSON_VALUE)),
+          @ApiResponse(
+                  responseCode = HttpConstants.UNAUTHORIZED_CODE,
+                  description = HttpConstants.UNAUTHORIZED_MSG,
+                  content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                          mediaType = MediaType.APPLICATION_JSON_VALUE)),
+          @ApiResponse(
+                  responseCode = HttpConstants.FORBIDDEN_CODE,
+                  description = HttpConstants.FORBIDDEN_MSG,
+                  content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                          mediaType = MediaType.APPLICATION_JSON_VALUE)),
+          @ApiResponse(
+                  responseCode = HttpConstants.INTERNAL_ERROR_CODE,
+                  description = HttpConstants.INTERNAL_ERROR_MSG,
+                  content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                          mediaType = MediaType.APPLICATION_JSON_VALUE)),
+  })
   @RequestMapping(method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_VALUE })
   @ResponseBody
   public List<Resource> getResources() throws MalformedURLException {
@@ -150,6 +156,28 @@ public class SenseAdminController {
    *
    * @return The build information in a JSON structure, or an Error if information cannot be found.
    */
+  @Operation(
+          summary = "Get SENSE-RM version information.",
+          description = "Returns a map of git related version information.",
+          tags = { "getVersion", "get" },
+          method = "GET")
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = HttpConstants.OK_CODE,
+                  description = HttpConstants.OK_MSG,
+                  content = @Content(schema = @Schema(implementation = String.class),
+                          mediaType = MediaType.APPLICATION_JSON_VALUE)),
+          @ApiResponse(
+                  responseCode = HttpConstants.UNAUTHORIZED_CODE,
+                  description = HttpConstants.UNAUTHORIZED_MSG,
+                  content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                          mediaType = MediaType.APPLICATION_JSON_VALUE)),
+          @ApiResponse(
+                  responseCode = HttpConstants.INTERNAL_ERROR_CODE,
+                  description = HttpConstants.INTERNAL_ERROR_MSG,
+                  content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                          mediaType = MediaType.APPLICATION_JSON_VALUE)),
+  })
   @RequestMapping(
             value = "/version",
             method = RequestMethod.GET,
@@ -216,95 +244,82 @@ public class SenseAdminController {
    *    is returned.
    * @return A RESTful response.
    */
-  @ApiOperation(
-          value = "Get a collection of available operational log resources.",
-          notes = "Returns a list of available operational log resources.",
-          response = ModelResource.class,
-          responseContainer = "List")
-  @ApiResponses(
-          value = {
-            @ApiResponse(
-                    code = HttpConstants.OK_CODE,
-                    message = HttpConstants.OK_LOGS_MSG,
-                    response = ModelResource.class,
-                    responseContainer = "List",
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.NOT_MODIFIED,
-                    message = HttpConstants.NOT_MODIFIED_MSG,
-                    response = net.es.sense.rm.api.common.Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                      ,
-                      @ResponseHeader(
-                              name = HttpConstants.LAST_MODIFIED_NAME,
-                              description = HttpConstants.LAST_MODIFIED_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.BAD_REQUEST_CODE,
-                    message = HttpConstants.BAD_REQUEST_MSG,
-                    response = net.es.sense.rm.api.common.Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.UNAUTHORIZED_CODE,
-                    message = HttpConstants.UNAUTHORIZED_MSG,
-                    response = net.es.sense.rm.api.common.Error.class,
-                     responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.FORBIDDEN_CODE,
-                    message = HttpConstants.FORBIDDEN_MSG,
-                    response = net.es.sense.rm.api.common.Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            )
-            ,
-            @ApiResponse(
-                    code = HttpConstants.INTERNAL_ERROR_CODE,
-                    message = HttpConstants.INTERNAL_ERROR_MSG,
-                    response = net.es.sense.rm.api.common.Error.class,
-                    responseHeaders = {
-                      @ResponseHeader(
-                              name = HttpConstants.CONTENT_TYPE_NAME,
-                              description = HttpConstants.CONTENT_TYPE_DESC,
-                              response = String.class)
-                    }
-            ),})
+  @Operation(
+          summary = "Get a collection of available operational log resources.",
+          description = "Returns a list of available operational log resources.",
+          tags = { "getMeasurements", "get" },
+          method = "GET")
+  @ApiResponses(value = {
+          @ApiResponse(
+                  responseCode = HttpConstants.OK_CODE,
+                  description = HttpConstants.OK_MEASURE_MSG,
+                  headers = {
+                          @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                                  description = HttpConstants.CONTENT_TYPE_DESC,
+                                  schema = @Schema(implementation = String.class)),
+                  },
+                  content = @Content(array = @ArraySchema(schema = @Schema(implementation = ModelResource.class)),
+                          mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+                  responseCode = HttpConstants.NOT_MODIFIED,
+                  description = HttpConstants.NOT_MODIFIED_MSG,
+                  headers = {
+                          @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                                  description = HttpConstants.CONTENT_TYPE_DESC,
+                                  schema = @Schema(implementation = String.class)),
+                          @Header(name = HttpConstants.LAST_MODIFIED_NAME,
+                                  description = HttpConstants.LAST_MODIFIED_DESC,
+                                  schema = @Schema(implementation = String.class))
+                  },
+                  content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                          mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+                  responseCode = HttpConstants.BAD_REQUEST_CODE,
+                  description = HttpConstants.BAD_REQUEST_MSG,
+                  headers = {
+                          @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                                  description = HttpConstants.CONTENT_TYPE_DESC,
+                                  schema = @Schema(implementation = String.class))
+                  },
+                  content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                          mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+                  responseCode = HttpConstants.UNAUTHORIZED_CODE,
+                  description = HttpConstants.UNAUTHORIZED_MSG,
+                  headers = {
+                          @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                                  description = HttpConstants.CONTENT_TYPE_DESC,
+                                  schema = @Schema(implementation = String.class))
+                  },
+                  content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                          mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+                  responseCode = HttpConstants.FORBIDDEN_CODE,
+                  description = HttpConstants.FORBIDDEN_MSG,
+                  headers = {
+                          @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                                  description = HttpConstants.CONTENT_TYPE_DESC,
+                                  schema = @Schema(implementation = String.class))
+                  },
+                  content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                          mediaType = MediaType.APPLICATION_JSON_VALUE)
+          ),
+          @ApiResponse(
+                  responseCode = HttpConstants.INTERNAL_ERROR_CODE,
+                  description = HttpConstants.INTERNAL_ERROR_MSG,
+                  headers = {
+                          @Header(name = HttpConstants.CONTENT_TYPE_NAME,
+                                  description = HttpConstants.CONTENT_TYPE_DESC,
+                                  schema = @Schema(implementation = String.class))
+                  },
+                  content = @Content(schema = @Schema(implementation = net.es.sense.rm.api.common.Error.class),
+                          mediaType = MediaType.APPLICATION_JSON_VALUE)
+          )
+  })
   @RequestMapping(
           value = "/measurements",
           method = RequestMethod.GET,
@@ -312,18 +327,12 @@ public class SenseAdminController {
   @ResponseBody
   @ResourceAnnotation(name = "measurements", version = "v1")
   public ResponseEntity<?> getMeasurements(
-          @RequestHeader(
-                  value = HttpConstants.ACCEPT_NAME,
-                  defaultValue = MediaType.APPLICATION_JSON_VALUE)
-          @ApiParam(value = HttpConstants.ACCEPT_MSG, required = false) String accept,
-          @RequestHeader(
-                  value = HttpConstants.IF_MODIFIED_SINCE_NAME,
-                  required = false)
-          @ApiParam(value = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
-          @RequestHeader(
-                  value = HttpConstants.IF_NONE_MATCH_NAME,
-                  required = false)
-          @ApiParam(value = HttpConstants.IF_NONE_MATCH_MSG, required = false) String ifNoneMatch) {
+          @RequestHeader(value = HttpConstants.ACCEPT_NAME, defaultValue = MediaType.APPLICATION_JSON_VALUE)
+          @Parameter(description = HttpConstants.ACCEPT_MSG, required = false) String accept,
+          @RequestHeader(value = HttpConstants.IF_MODIFIED_SINCE_NAME, required = false)
+          @Parameter(description = HttpConstants.IF_MODIFIED_SINCE_MSG, required = false) String ifModifiedSince,
+          @RequestHeader(value = HttpConstants.IF_NONE_MATCH_NAME, required = false)
+          @Parameter(description = HttpConstants.IF_NONE_MATCH_MSG, required = false) String ifNoneMatch) {
 
     // We need the request URL to build fully qualified resource URLs.
     final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
@@ -355,7 +364,7 @@ public class SenseAdminController {
         filter = false;
       }
 
-      if (!results.isPresent()) {
+      if (results.isEmpty()) {
         // There are no results.
         return new ResponseEntity<>(headers, HttpStatus.NO_CONTENT);
       }
@@ -374,7 +383,7 @@ public class SenseAdminController {
       return new ResponseEntity<>(results.get().getQueue(), headers, HttpStatus.OK);
 
     } catch (IllegalArgumentException ex) {
-      log.error("[SenseRmController] getMeasurements failed, ex = {}", ex);
+      log.error("[SenseRmController] getMeasurements failed", ex);
       net.es.sense.rm.api.common.Error error = net.es.sense.rm.api.common.Error.builder()
               .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
               .error_description(ex.getMessage())

@@ -21,13 +21,7 @@ package net.es.sense.rm.driver.nsi.db;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +32,12 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
+ * Transactional service bean for managing model versions.
  *
  * @author hacksaw
  */
@@ -46,9 +45,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(propagation=Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE, readOnly=true)
 public class ModelServiceBean implements ModelService {
+  private final ModelRepository modelRepository;
 
-  @Autowired
-  private ModelRepository modelRepository;
+  /**
+   * Constructor for bean initialization.
+   *
+   * @param modelRepository The repository holding our topology models.
+   */
+  public ModelServiceBean(ModelRepository modelRepository) {
+    this.modelRepository = modelRepository;
+  }
 
   @Override
   public Collection<Model> get() {
@@ -105,9 +111,7 @@ public class ModelServiceBean implements ModelService {
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
   public void delete() {
-    for (Model model : modelRepository.findAll()) {
-      modelRepository.delete(model);
-    }
+    modelRepository.deleteAll(modelRepository.findAll());
   }
 
   // Used by nsi-driver API to implement driver interface.
@@ -125,24 +129,18 @@ public class ModelServiceBean implements ModelService {
 
   @Override
   public Collection<Model> getByTopologyId(String topologyId) {
-    Collection<Model> result = new ArrayList();
+    Collection<Model> result = new ArrayList<>();
     Iterable<Model> list = modelRepository.findByTopologyId(topologyId);
-    list.forEach(m -> {
-      result.add(m);
-    });
-
+    list.forEach(result::add);
     return result;
   }
 
   @Override
   public Collection<Model> getByTopologyId(String topologyId, long created) {
-    Collection<Model> result = new ArrayList();
+    Collection<Model> result = new ArrayList<>();
 
     Iterable<Model> findByTopologyId = modelRepository.findTopologyIdNewerThanCreated(topologyId, created);
-    findByTopologyId.forEach(m -> {
-      result.add(m);
-    });
-
+    findByTopologyId.forEach(result::add);
     return result;
   }
 
@@ -157,7 +155,7 @@ public class ModelServiceBean implements ModelService {
   public void purge(String topologyId, int size) {
     Pageable newest = PageRequest.of(0, size, Sort.by(Direction.DESC, "created"));
     Page<Model> top = modelRepository.findByTopologyId(topologyId, newest);
-    List<Long> list = top.map((m)-> m.getCreated()).getContent();
+    List<Long> list = top.map(Model::getCreated).getContent();
     Long last = list.get(list.size() - 1);
     modelRepository.deleteByTopologyIdAndLessThanCreated(topologyId, last);
   }

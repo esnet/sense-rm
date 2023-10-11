@@ -21,55 +21,24 @@ package net.es.sense.rm.driver.nsi.cs;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-import javax.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.ws.Holder;
-import javax.xml.ws.soap.SOAPFaultException;
+import com.google.common.base.Strings;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
-import net.es.nsi.cs.lib.Client;
-import net.es.nsi.cs.lib.ClientUtil;
-import net.es.nsi.cs.lib.Helper;
-import net.es.nsi.cs.lib.NsiHeader;
-import net.es.nsi.cs.lib.SimpleLabel;
-import net.es.nsi.cs.lib.SimpleStp;
+import net.es.nsi.cs.lib.*;
 import net.es.sense.rm.driver.api.mrml.ModelUtil;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.cs.api.CsUtils;
 import net.es.sense.rm.driver.nsi.cs.api.QuerySummary;
-import net.es.sense.rm.driver.nsi.cs.db.ConnectionMap;
-import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
-import net.es.sense.rm.driver.nsi.cs.db.DeltaConnection;
-import net.es.sense.rm.driver.nsi.cs.db.DeltaMapRepository;
-import net.es.sense.rm.driver.nsi.cs.db.Operation;
-import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
-import net.es.sense.rm.driver.nsi.cs.db.OperationType;
-import net.es.sense.rm.driver.nsi.cs.db.Reservation;
-import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
-import net.es.sense.rm.driver.nsi.cs.db.StateType;
-import net.es.sense.rm.driver.nsi.cs.db.StpMapping;
-import net.es.sense.rm.driver.nsi.mrml.MrsBandwidthService;
-import net.es.sense.rm.driver.nsi.mrml.MrsBandwidthType;
-import net.es.sense.rm.driver.nsi.mrml.MrsUnits;
-import net.es.sense.rm.driver.nsi.mrml.NmlExistsDuring;
-import net.es.sense.rm.driver.nsi.mrml.NmlLabel;
-import net.es.sense.rm.driver.nsi.mrml.StpHolder;
+import net.es.sense.rm.driver.nsi.cs.db.*;
+import net.es.sense.rm.driver.nsi.mrml.*;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.spring.SpringExtension;
 import net.es.sense.rm.driver.schema.Mrs;
 import net.es.sense.rm.driver.schema.Nml;
 import net.es.sense.rm.driver.schema.Sd;
-import org.apache.jena.ext.com.google.common.base.Strings;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
@@ -78,21 +47,17 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.ogf.schemas.nsi._2013._12.connection.provider.Error;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException;
-import org.ogf.schemas.nsi._2013._12.connection.types.GenericRequestType;
-import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
-import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
-import org.ogf.schemas.nsi._2013._12.connection.types.QueryType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ReservationRequestCriteriaType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ReserveResponseType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ReserveType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ScheduleType;
+import org.ogf.schemas.nsi._2013._12.connection.types.*;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 import org.ogf.schemas.nsi._2013._12.services.types.DirectionalityType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.*;
+import java.util.concurrent.TimeoutException;
 
 /**
  * A provider implementing MRML delta operations using the NSI Connection Service.
@@ -177,7 +142,7 @@ public class CsProvider {
       log.info("[load] Sending querySummarySync: providerNSA = {}, correlationId = {}",
               header.value.getProviderNSA(), header.value.getCorrelationId());
       QuerySummaryConfirmedType querySummarySync = nsiClient.getProxy().querySummarySync(query, header);
-      log.info("[load] QuerySummaryConfirmed recieved, providerNSA = {}, correlationId = {}",
+      log.info("[load] QuerySummaryConfirmed received, providerNSA = {}, correlationId = {}",
               header.value.getProviderNSA(), header.value.getCorrelationId());
 
       QuerySummary q = new QuerySummary(nsiProperties.getNetworkId(), reservationService);
@@ -191,8 +156,7 @@ public class CsProvider {
               ex.getFaultInfo().getErrorId(),
               ex.getFaultInfo().getText());
     } catch (SOAPFaultException ex) {
-      log.error("[load] querySummarySync SOAPFaultException exception: {}", ex.getMessage());
-      log.error("{}", ex);
+      log.error("[load] querySummarySync SOAPFaultException exception", ex);
     } catch (Exception ex) {
       log.error("[load] querySummarySync exception processing results", ex);
     }
@@ -274,7 +238,7 @@ public class CsProvider {
       List<Reservation> reservations = reservationService.getByGlobalReservationId(ssid).stream()
               .filter(r -> (LifecycleStateEnumType.TERMINATED != r.getLifecycleState()
                       /*&& LifecycleStateEnumType.TERMINATING != r.getLifecycleState()*/))
-              .collect(Collectors.toList());
+              .toList();
 
       // Terminate using the parent connectionId if one exists.
       for (Reservation reservation : reservations) {
@@ -309,7 +273,7 @@ public class CsProvider {
    */
   private Set<String> processDeltaAddition(net.es.sense.rm.driver.nsi.db.Model m, String deltaId, Model addition)
           throws DatatypeConfigurationException, ServiceException, IllegalArgumentException, TimeoutException, Exception {
-    log.debug("[processDeltaAddition] start deletaId = {}, model = {}", deltaId, m.toString());
+    log.debug("[processDeltaAddition] start deltaId = {}, model = {}", deltaId, m.toString());
 
     // This is a list of cid associated with reservations created
     // as part of the delta addition.
@@ -332,7 +296,7 @@ public class CsProvider {
     // addition model for all those provided.
     ResultSet ssSet = ModelUtil.getResourcesOfType(addition, Mrs.SwitchingSubnet);
     if (!ssSet.hasNext()) {
-      log.debug("[processDeltaAddition] no SwitchingSubnet found so ignoring addition, deletaId = {}", deltaId);
+      log.debug("[processDeltaAddition] no SwitchingSubnet found so ignoring addition, deltaId = {}", deltaId);
       return commits;
     }
 
@@ -344,7 +308,7 @@ public class CsProvider {
       Resource switchingSubnet = querySolution.get("resource").asResource();
       log.debug("[processDeltaAddition] SwitchingSubnet: " + switchingSubnet.getURI());
 
-      // Get the existDruing lifetime object if it exists so we can model a schedule.
+      // Get the existDuring lifetime object if it exists so we can model a schedule.
       Optional<Statement> existsDuring = Optional.ofNullable(switchingSubnet.getProperty(Nml.existsDuring));
       NmlExistsDuring ssExistsDuring;
       if (existsDuring.isPresent()) {
@@ -362,7 +326,7 @@ public class CsProvider {
       // the ServiceDefinition that holds the serviceType.
       Statement belongsTo = switchingSubnet.getProperty(Nml.belongsTo);
       Resource switchingServiceRef = belongsTo.getResource();
-      log.debug("[processDeltaAddition] SwitchingServiceRef: " + switchingServiceRef.getURI());
+      log.debug("[processDeltaAddition] SwitchingServiceRef: {}", switchingServiceRef.getURI());
 
       // Get the full SwitchingService definition from the merged model.
       Resource switchingService = ModelUtil.getResourceOfType(model, switchingServiceRef, Nml.SwitchingService);
@@ -370,7 +334,7 @@ public class CsProvider {
         throw new IllegalArgumentException("Could not find referenced switching service "
                 + switchingServiceRef.getURI());
       }
-      log.debug("[processDeltaAddition] SwitchingService: " + switchingService.getURI());
+      log.debug("[processDeltaAddition] SwitchingService: {}", switchingService.getURI());
 
       // Now we need the ServiceDefinition associated with this SwitchingService.
       Statement hasServiceDefinition = switchingService.getProperty(Sd.hasServiceDefinition);
@@ -379,10 +343,10 @@ public class CsProvider {
 
       // Get the full ServiceDefinition definition from the merged model.
       Resource serviceDefinition = ModelUtil.getResourceOfType(model, serviceDefinitionRef, Sd.ServiceDefinition);
-      log.debug("[processDeltaAddition] ServiceDefinition: " + serviceDefinition.getURI());
+      log.debug("[processDeltaAddition] ServiceDefinition: {}", serviceDefinition.getURI());
 
       Statement serviceTypeRef = serviceDefinition.getProperty(Sd.serviceType);
-      log.debug("[processDeltaAddition] serviceType: " + serviceTypeRef.getString());
+      log.debug("[processDeltaAddition] serviceType: {}", serviceTypeRef.getString());
 
       // We currently know about the EVTS p2p service.
       List<StpHolder> stps = new ArrayList<>();
@@ -396,7 +360,7 @@ public class CsProvider {
         while (listProperties.hasNext()) {
           Statement hasBidirectionalPort = listProperties.next();
           Resource biRef = hasBidirectionalPort.getResource();
-          log.debug("[processDeltaAddition] bi member: " + biRef.getURI());
+          log.debug("[processDeltaAddition] bi member: {}", biRef.getURI());
 
           Resource biChild = ModelUtil.getResourceOfType(addition, biRef, Nml.BidirectionalPort);
           if (biChild == null) {
@@ -404,7 +368,7 @@ public class CsProvider {
             throw new IllegalArgumentException("Requested BidirectionalPort does not exist " + biRef.getURI());
           }
 
-          log.debug("[processDeltaAddition] biChild: " + biChild.getURI());
+          log.debug("[processDeltaAddition] biChild: {}", biChild.getURI());
 
           MrsBandwidthService bws = new MrsBandwidthService(biChild, addition);
 

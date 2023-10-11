@@ -1,25 +1,32 @@
 package net.es.sense.rm;
 
+import jakarta.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.cli.*;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
-import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.ExecutionException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+/**
+ * This is the SENSE-RM application main that initializes the springboot runtime.
+ */
 @Slf4j
 @SpringBootApplication(scanBasePackages={"net.es.sense.rm"})
-@EnableSwagger2
-@EnableAutoConfiguration
+//@EnableSwagger2
 @EnableTransactionManagement
 public class Application {
+  // Command line parameters.
+  public static final String ARGNAME_PIDFILE = "pidFile";
+  public static final String SYSTEM_PROPERTY_PIDFILE = "pidFile";
 
   // Keep running while true.
   private static boolean keepRunning = true;
@@ -27,44 +34,48 @@ public class Application {
   /**
    * This is the Springboot main for this application.
    *
-   * @param args
-   * @throws java.util.concurrent.ExecutionException
-   * @throws java.lang.InterruptedException
+   * @param args Only one program specific parameter is accepted.
+   * @throws java.lang.InterruptedException Thrown when the program loop is interrupted.
    */
-  public static void main(String[] args) throws ExecutionException, InterruptedException {
+  public static void main(String[] args) throws InterruptedException {
     log.info("[SENSE-N-RM] Starting...");
 
-    ApplicationContext context = SpringApplication.run(Application.class, args);
+    ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+
+    // Load the command line options into appropriate system properties.
+    try {
+      processOptions(args);
+    } catch (ParseException | IOException ex) {
+      System.err.println("Failed to load command line options: " + ex.getMessage());
+      context.close();
+      System.exit(1);
+      return;
+    }
 
     // Dump some runtime information.
     RuntimeMXBean mxBean = ManagementFactory.getRuntimeMXBean();
     log.info("Name: {}, {}", context.getApplicationName(), mxBean.getName());
-    try {
-      log.info("Pid: {}", getProcessId(mxBean));
-    } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException |
-            NoSuchMethodException | InvocationTargetException ex) {
-      log.error("[SENSE-N-RM] Could not determine Pid", ex);
-    }
+    log.info("Pid: {}", ProcessHandle.current().pid());
     log.info("Uptime: {} ms", mxBean.getUptime());
-    log.info("BootClasspath: {}", mxBean.getBootClassPath());
     log.info("Classpath: {}", mxBean.getClassPath());
     log.info("Library Path: {}", mxBean.getLibraryPath());
     for (String argument : mxBean.getInputArguments()) {
       log.info("Input Argument: {}", argument);
     }
+
     // Listen for a shutdown event so we can clean up.
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
         log.info("[SENSE-N-RM] Shutting down RM...");
         Application.setKeepRunning(false);
+        context.close();
       }
-    }
-    );
+    });
 
-    // Loop until we are told to shutdown.
+    // Loop until we are told to shut down.
     MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
-    while (keepRunning) {
+    while (isKeepRunning()) {
       log.info("[SENSE-N-RM] {}", memStats(memoryBean));
       Thread.sleep(10000);
     }
@@ -75,30 +86,17 @@ public class Application {
 
   private static final int MEGABYTE = (1024 * 1024);
 
+  /**
+   * Compose a string with basic memory stats obtained from the provided MX bean.
+   *
+   * @param memoryBean The memory MX bean to obtain statistics.
+   * @return A string with basic memory stats
+   */
   private static String memStats(MemoryMXBean memoryBean) {
     MemoryUsage heapUsage = memoryBean.getHeapMemoryUsage();
     long maxMemory = heapUsage.getMax() / MEGABYTE;
     long usedMemory = heapUsage.getUsed() / MEGABYTE;
     return "Memory use :" + usedMemory + "M/" + maxMemory + "M";
-  }
-
-  /**
-   *
-   * @return
-   * @throws NoSuchFieldException
-   * @throws IllegalArgumentException
-   * @throws IllegalAccessException
-   * @throws NoSuchMethodException
-   * @throws InvocationTargetException
-   */
-  private static int getProcessId(RuntimeMXBean mxBean) throws NoSuchFieldException, IllegalArgumentException,
-          IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-    java.lang.reflect.Field jvm = mxBean.getClass().getDeclaredField("jvm");
-    jvm.setAccessible(true);
-    Object mgmt = jvm.get(mxBean);
-    java.lang.reflect.Method pid_method = mgmt.getClass().getDeclaredMethod("getProcessId");
-    pid_method.setAccessible(true);
-    return (int) pid_method.invoke(mgmt);
   }
 
   /**
@@ -117,5 +115,82 @@ public class Application {
    */
   public static void setKeepRunning(boolean keepRunning) {
     Application.keepRunning = keepRunning;
+  }
+
+  @PreDestroy
+  public void onExit() {
+    log.info("[SENSE-N-RM] onExit invoked.");
+    Application.setKeepRunning(false);
+    log.info("[SENSE-N-RM] onExit exiting.");
+  }
+
+  /**
+   * Process any command line arguments and set up associated system properties for runtime components.
+   *
+   * @param args
+   * @throws ParseException
+   * @throws IOException
+   */
+  private static void processOptions(String[] args) throws ParseException, IOException {
+    // Parse the command line options.
+    CommandLineParser parser = new DefaultParser();
+
+    Options options = getOptions();
+    CommandLine cmd;
+    try {
+      cmd = parser.parse(options, args, true);
+    } catch (ParseException e) {
+      System.err.println("Error: You did not provide the correct arguments, see usage below.");
+      HelpFormatter formatter = new HelpFormatter();
+      formatter.printHelp("java -jar sense-n-rm.jar [-pidFile <filename>]", options);
+      throw e;
+    }
+
+    // Write the process id out to file if specified.
+    processPidFile(cmd);
+  }
+
+  /**
+   * Build supported command line options for parsing of parameter input.
+   *
+   * @return List of supported command line options.
+   */
+  private static Options getOptions() {
+    // Create Options object to hold our command line options.
+    Options options = new Options();
+
+    Option pidFileOption = new Option(ARGNAME_PIDFILE, true, "The file in which to write the process pid");
+    pidFileOption.setRequired(false);
+    options.addOption(pidFileOption);
+    return options;
+  }
+
+  /**
+   * Processes the "pidFile" command line and system property option.
+   *
+   * @param cmd Commands entered by the user.
+   * @throws IOException If there is an issue creating the PID file.
+   */
+  private static void processPidFile(CommandLine cmd) throws IOException {
+    // Get the application base directory.
+    String pidFile = cmd.getOptionValue(ARGNAME_PIDFILE, System.getProperty(SYSTEM_PROPERTY_PIDFILE));
+    pidFile = cmd.getOptionValue(ARGNAME_PIDFILE, pidFile);
+    long pid = ProcessHandle.current().pid();
+    if (pidFile == null || pidFile.isEmpty() || pid == -1) {
+      return;
+    }
+
+    BufferedWriter out = null;
+    try {
+      FileWriter fstream = new FileWriter(pidFile, false);
+      out = new BufferedWriter(fstream);
+      out.write(String.valueOf(pid));
+    } catch (IOException e) {
+      System.err.printf("Error: %s\n", e.getMessage());
+    } finally {
+      if (out != null) {
+        out.close();
+      }
+    }
   }
 }

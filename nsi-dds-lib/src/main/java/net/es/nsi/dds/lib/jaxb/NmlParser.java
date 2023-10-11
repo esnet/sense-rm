@@ -1,11 +1,12 @@
 package net.es.nsi.dds.lib.jaxb;
 
-import java.io.IOException;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import net.es.nsi.common.jaxb.JaxbParser;
 import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyType;
 import net.es.nsi.dds.lib.jaxb.nml.ObjectFactory;
+
+import java.io.IOException;
 
 /**
  * A singleton to load the very expensive NMWG JAXBContext once.

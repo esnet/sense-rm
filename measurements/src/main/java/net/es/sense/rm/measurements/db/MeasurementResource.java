@@ -21,24 +21,26 @@ package net.es.sense.rm.measurements.db;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 import java.io.Serializable;
 import java.util.UUID;
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author hacksaw
  */
-@ApiModel(value = "measurement", description = "This is an operational measurment resource.")
+@Schema(implementation = MeasurementResource.class,
+    name = "measurement",
+    description = "This is an operational measurement resource.")
 @XmlRootElement(name = "measurement")
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonInclude(Include.NON_NULL)
@@ -61,26 +63,36 @@ public class MeasurementResource implements Serializable {
     this.mvalue = mvalue;
   }
 
+  @Schema(name = "id", description = "Unique identifier for this log.", requiredMode = Schema.RequiredMode.REQUIRED)
   @Id
   @XmlElement(required = true)
   private String id;                      // Unique identifier for this log.
 
+  @Schema(name = "measurement", description = "Operational measurement.", requiredMode = Schema.RequiredMode.REQUIRED)
   @Basic(optional = false)
   @XmlElement(required = true)
-  private MeasurementType measurement; // Operational measument.
+  private MeasurementType measurement; // Operational measurement.
 
+  @Schema(name = "resource",
+      description = "The resource identifier associated with the measurement (modelId, deltaId, etc).",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   @Basic(optional = false)
   @XmlElement(required = true)
-  private String resource;             // The resource identifier associated with the measurment (modelId, deltaId, etc).
+  private String resource;             // The resource identifier associated with the measurement (modelId, deltaId, etc).
 
+  @Schema(name = "generated",
+      description = "Generation generated for the measurement.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   @Basic(optional = false)
   @XmlElement(required = true)
-  private long generated;                   // Generation generated for the measurment.
+  private long generated;                   // Generation generated for the measurement.
 
+  @Schema(name = "mtype", description = "Type of metric.", requiredMode = Schema.RequiredMode.REQUIRED)
   @Basic(optional = false)
   @XmlElement(required = true)
   private MetricType mtype;             // Type of metric.
 
+  @Schema(name = "mvalue", description = "Value of metric.", requiredMode = Schema.RequiredMode.REQUIRED)
   @Basic(optional = false)
   @XmlElement(required = true)
   private String mvalue;                // Value of metric.
@@ -88,7 +100,7 @@ public class MeasurementResource implements Serializable {
   /**
    * @return the id
    */
-  @ApiModelProperty(value = "Unique identifier for measurement resource.", required = true)
+  @Schema(description = "Unique identifier for measurement resource.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getId() {
     return id;
   }
@@ -103,7 +115,8 @@ public class MeasurementResource implements Serializable {
   /**
    * @return the measurement
    */
-  @ApiModelProperty(value = "The type of measurement contained in this resource.", required = true)
+  @Schema(description = "The type of measurement contained in this resource.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   public MeasurementType getMeasurement() {
     return measurement;
   }
@@ -118,7 +131,8 @@ public class MeasurementResource implements Serializable {
   /**
    * @return the resource
    */
-  @ApiModelProperty(value = "The SENSE resource associted with this measurement resource.", required = true)
+  @Schema(description = "The SENSE resource associated with this measurement resource.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   public String getResource() {
     return resource;
   }
@@ -133,7 +147,7 @@ public class MeasurementResource implements Serializable {
   /**
    * @return the generated time
    */
-  @ApiModelProperty(value = "The time this measurement was generated.", required = true)
+  @Schema(description = "The time this measurement was generated.", requiredMode = Schema.RequiredMode.REQUIRED)
   public long getGenerated() {
     return generated;
   }
@@ -148,7 +162,8 @@ public class MeasurementResource implements Serializable {
   /**
    * @return the type
    */
-  @ApiModelProperty(value = "The type of metric associated with the measurement resource.", required = true)
+  @Schema(description = "The type of metric associated with the measurement resource.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   public MetricType getMtype() {
     return mtype;
   }
@@ -163,7 +178,8 @@ public class MeasurementResource implements Serializable {
   /**
    * @return the metric value
    */
-  @ApiModelProperty(value = "The value of metric associated with the measurement resource.", required = true)
+  @Schema(description = "The value of metric associated with the measurement resource.",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   public String getMvalue() {
     return mvalue;
   }

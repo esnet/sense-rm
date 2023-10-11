@@ -13,8 +13,8 @@ export PASSWORD="changeit"
         -Djavax.net.ssl.trustStorePassword=$PASSWORD \
         -Djavax.net.ssl.keyStore=$KEYSTORE \
         -Djavax.net.ssl.keyStorePassword=$PASSWORD \
-	-Dlogback.configurationFile="file:$HOME/config/logback.xml" \
-	-XX:+StartAttachListener \
+	      -Dlogging.config="file:$HOME/config/logback.xml" \
+	      -XX:+StartAttachListener \
         -jar "$HOME/sense-n-rm.jar" \
-	--spring.config.location="file:$HOME/config/" 
+	      --spring.config.location="file:$HOME/config/"
 

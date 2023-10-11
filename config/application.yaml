@@ -5,7 +5,7 @@
 # sense.root - the root of our URL context for building REST URL.  If we are behind
 #        a proxy this is the URL of that proxy. [Not currently used]
 #
-# sense.proxy - A simple mechanism that allows for URL manupulation on returned
+# sense.proxy - A simple mechanism that allows for URL manipulation on returned
 #         resources to map any localized URL to URL externalized by a proxy.
 #         Proper configuration of the Spring-boot web environment should mean
 #         this proxy value is left empty.  Here is an example:
@@ -53,6 +53,7 @@ server:
   port: 8080
   contextPath: /
   packageName: net.es.sense.rm.driver.nsi
+  shutdown: graceful
   
 #  ssl:
 #    enabled: true
@@ -71,8 +72,10 @@ server:
 #########################################
 
 # This is the path to expose the swagger generated documentation.
-springfox.documentation.swagger.v2.path: /v2/api-docs
-springfox.documentation.swagger.v1.path: /v1/api-docs
+springdoc.api-docs.enabled: true
+springdoc.swagger-ui.enabled: true
+springdoc.api-docs.path: /v3/api-docs
+springdoc.swagger-ui.path: /v3/swagger-ui
 
 #########################################
 # Logging configuration.                #
@@ -130,6 +133,33 @@ spring:
 #   driver-class-name: org.h2.Driver
 #   username: sense
 #   password: bubbles
+
+# Enable the application management endpoints in spring.
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+    shutdown:
+      enabled: true
+
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    shutdown:
+      enabled: true
+
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
+  info:
+    git:
+      mode: full
 
 #########################################
 # NSI CS related configuration.         #
@@ -242,3 +272,34 @@ nsi:
         nsaId:
           - "urn:ogf:network:es.net:2013:nsa:nsi-aggr-west"
 
+  akka:
+
+    # Loggers to register at boot time (akka.event.Logging$DefaultLogger logs
+    # to STDOUT)
+    loggers:
+       - "akka.event.slf4j.Slf4jLogger"
+    logging-filter: "akka.event.slf4j.Slf4jLoggingFilter"
+    event-handlers:
+      - "akka.event.slf4j.Slf4jEventHandler"
+
+    # Log level used by the configured loggers (see "loggers") as soon
+    # as they have been started; before that, see "stdout-loglevel"
+    # Options: OFF, ERROR, WARNING, INFO, DEBUG
+    loglevel: "DEBUG"
+
+    log-config-on-start: on
+
+    # Log level for the very basic logger activated during ActorSystem startup.
+    # This logger prints the log messages to stdout (System.out).
+    # Options: OFF, ERROR, WARNING, INFO, DEBUG
+    stdout-loglevel: "OFF"
+
+    actor:
+      debug:  {
+        # enable DEBUG logging of all AutoReceiveMessages (Kill, PoisonPill et.c.)
+        autoreceive = on
+        lifecycle = on
+        unhandled = on
+    }
+}
+}

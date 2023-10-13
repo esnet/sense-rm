@@ -277,7 +277,7 @@ nsi:
     # Loggers to register at boot time (akka.event.Logging$DefaultLogger logs
     # to STDOUT)
     loggers:
-       - "akka.event.slf4j.Slf4jLogger"
+      - "akka.event.slf4j.Slf4jLogger"
     logging-filter: "akka.event.slf4j.Slf4jLoggingFilter"
     event-handlers:
       - "akka.event.slf4j.Slf4jEventHandler"
@@ -295,11 +295,8 @@ nsi:
     stdout-loglevel: "OFF"
 
     actor:
-      debug:  {
+      debug:
         # enable DEBUG logging of all AutoReceiveMessages (Kill, PoisonPill et.c.)
-        autoreceive = on
-        lifecycle = on
-        unhandled = on
-    }
-}
-}
+        autoreceive: on
+        lifecycle: on
+        unhandled: on

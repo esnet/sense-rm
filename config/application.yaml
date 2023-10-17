@@ -39,11 +39,11 @@ sense:
 #
 # server.port - The local TCP port to bind for the web server.
 #
-# server.contextPath - The URI underwhich to anchor all discoverd REST endpoints.
+# server.servlet.context-path - The URI under which to anchor all discovered REST endpoints.
 #          If behind a reverse proxy then set this to the URI used to map though
 #          to this SENSE-N-RM instance, otherwise use "/".
 #
-# server.packageName - This is the java package name underwhich to search for
+# server.packageName - This is the java package name under which to search for
 #          exposed REST endpoints.  Do not change this value.
 #
 # server.ssl - If behind an HTTPS reverse proxy then disable the ssl configuration,
@@ -51,10 +51,11 @@ sense:
 server:
   address: 127.0.0.1
   port: 8080
-  contextPath: /
   packageName: net.es.sense.rm.driver.nsi
   shutdown: graceful
-  
+  servlet:
+    context-path: /
+
 #  ssl:
 #    enabled: true
 #    protocol: TLS

@@ -371,7 +371,7 @@ public class SenseRmController {
             + "summary = {}, model = {}", location, accept, ifModifiedSince, current, summary, model);
 
     // Parse the If-Modified-Since header if it is present.
-    long ifms = Common.parseIfModfiedSince(ifModifiedSince);
+    long ifms = Common.parseIfModifiedSince(ifModifiedSince);
 
     // Populate the content location header with our URL location.
     final HttpHeaders headers = new HttpHeaders();
@@ -607,7 +607,7 @@ public class SenseRmController {
             location, id, accept, ifModifiedSince, model);
 
     // Parse the If-Modified-Since header if it is present.
-    long ifms = Common.parseIfModfiedSince(ifModifiedSince);
+    long ifms = Common.parseIfModifiedSince(ifModifiedSince);
 
     // Return the local in HTTP header.
     final HttpHeaders headers = new HttpHeaders();
@@ -804,7 +804,7 @@ public class SenseRmController {
             + "summary = {}, model = {}, modelId = {}", location, accept, ifModifiedSince, summary, model, id);
 
     // Parse the If-Modified-Since header if it is present.
-    long ifms = Common.parseIfModfiedSince(ifModifiedSince);
+    long ifms = Common.parseIfModifiedSince(ifModifiedSince);
 
     // Populate the content location header with our URL location.
     final HttpHeaders headers = new HttpHeaders();
@@ -1021,7 +1021,7 @@ public class SenseRmController {
             location, id, deltaId, accept, ifModifiedSince, model);
 
     // Parse the If-Modified-Since header if it is present.
-    long ifms = Common.parseIfModfiedSince(ifModifiedSince);
+    long ifms = Common.parseIfModifiedSince(ifModifiedSince);
 
     final HttpHeaders headers = new HttpHeaders();
     headers.add(HttpHeaders.CONTENT_LOCATION, location.toASCIIString());
@@ -1368,7 +1368,7 @@ public class SenseRmController {
             + "summary = {}, model = {}", location, accept, ifModifiedSince, summary, model);
 
     // Parse the If-Modified-Since header if it is present.
-    long ifms = Common.parseIfModfiedSince(ifModifiedSince);
+    long ifms = Common.parseIfModifiedSince(ifModifiedSince);
 
     // Populate the content location header with our URL location.
     final HttpHeaders headers = new HttpHeaders();
@@ -1586,7 +1586,7 @@ public class SenseRmController {
             location, deltaId, accept, ifModifiedSince, model);
 
     // Parse the If-Modified-Since header if it is present.
-    long ifms = Common.parseIfModfiedSince(ifModifiedSince);
+    long ifms = Common.parseIfModifiedSince(ifModifiedSince);
 
     // We need to return the current location of this resource in the response header.
     final HttpHeaders headers = new HttpHeaders();

@@ -8,6 +8,12 @@ services:
       - POSTGRES_PASSWORD=opennsa
       - POSTGRES_DB=opennsa
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U opennsa -d opennsa'"]
+      interval: 10s  # Interval between health checks.
+      timeout: 5s    # Timeout for each health checking.
+      retries: 5     # How many times retries.
+      start_period: 40s # Estimated time to boot.
     ports:
       - '5432:5432'
     volumes: 
@@ -22,6 +28,12 @@ services:
       - POSTGRES_PASSWORD=sense
       - POSTGRES_DB=sense
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U sense -d sense'"]
+      interval: 10s  # Interval between health checks.
+      timeout: 5s    # Timeout for each health checking.
+      retries: 5     # How many times retries.
+      start_period: 40s # Estimated time to boot.
     ports:
       - '5433:5432'
     volumes:
@@ -55,6 +67,12 @@ services:
     depends_on:
       - opennsa
     restart: always
+    healthcheck:
+      test: "curl -s http://host.docker.internal:8401/dds/management/v1/health || exit 1" # Command to check health.
+      interval: 10s     # Interval between health checks.
+      timeout: 5s       # Timeout for each health checking.
+      retries: 5        # Hou many times retries.
+      start_period: 30s # Estimated time to boot.
     ports:
       - 8401:8401
     volumes:
@@ -72,6 +90,12 @@ services:
     depends_on:
       - nsi-dds-east
     restart: always
+    healthcheck:
+      test: "curl -s http://host.docker.internal:8402/dds/management/v1/health || exit 1" # Command to check health.
+      interval: 10s     # Interval between health checks.
+      timeout: 5s       # Timeout for each health checking.
+      retries: 5        # Hou many times retries.
+      #start_period: 30s # Estimated time to boot.
     ports:
       - 8402:8402
     volumes:
@@ -92,7 +116,7 @@ services:
       - sense-db
     restart: always
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://sense-rm:8080/actuator/health" ]
+      test: "curl -s http://host.docker.internal:8080/actuator/health || exit 1" # Command to check health.
       interval: 1m30s
       timeout: 10s
       retries: 3

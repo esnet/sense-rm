@@ -8,12 +8,20 @@ import org.springframework.boot.availability.LivenessState;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class is invoked when there is a change in application liveness availability.
+ */
 @Slf4j
 @Component
 public class LivenessEventListener {
   @Autowired
   private ApplicationAvailability applicationAvailability;
 
+  /**
+   * Catch an availability event.  Currently we just log the change.
+   *
+   * @param event
+   */
   @EventListener
   public void onEvent(AvailabilityChangeEvent<LivenessState> event) {
     switch (event.getState()) {

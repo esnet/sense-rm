@@ -29,7 +29,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.api.common.HttpConstants;
 import net.es.sense.rm.api.common.Resource;
@@ -59,6 +58,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * This class implements the administration controller interface for the SENSE-RM
+ * that provides REST endpoints to monitor the running process.
  *
  * @author hacksaw
  */
@@ -75,16 +76,12 @@ public class SenseAdminController {
   /**
    * Constructor to inject bean parameters.
    *
-   * @param config
-   * @param measurementController
+   * @param config The SENSE configuration bean.
+   * @param measurementController Reference to the measurement controller for statistics.
    */
   public SenseAdminController(SenseProperties config, MeasurementController measurementController) {
     this.config = config;
     this.measurementController = measurementController;
-  }
-
-  @PostConstruct
-  public void init() throws Exception {
     utilities = new UrlTransform(config.getProxy());
   }
 
@@ -341,7 +338,7 @@ public class SenseAdminController {
             location, accept, ifModifiedSince, ifNoneMatch);
 
     // Parse the If-Modified-Since header if it is present.
-    long ifms = Common.parseIfModfiedSince(ifModifiedSince);
+    long ifms = Common.parseIfModifiedSince(ifModifiedSince);
 
     // Populate the content location header with our URL location.
     final HttpHeaders headers = new HttpHeaders();

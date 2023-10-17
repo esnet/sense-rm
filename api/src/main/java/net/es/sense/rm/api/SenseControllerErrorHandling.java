@@ -18,17 +18,18 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
 /**
- * Exception
- * HTTP Status Code
- * ConversionNotSupportedException	500 (Internal Server Error)
- * HttpMediaTypeNotAcceptableException	406 (Not Acceptable)
- * HttpMediaTypeNotSupportedException	415 (Unsupported MediaType)
- * HttpMessageNotReadableException	400 (Bad Request)
- * HttpMessageNotWritableException	500 (Internal Server Error)
- * HttpRequestMethodNotSupportedException	405 (Method Not Allowed)
- * MissingServletRequestParameterException	400 (Bad Request)
- * NoSuchRequestHandlingMethodException 404 (Not Found)
- * TypeMismatchException	400 (Bad Request)
+ * This class acts as an HTTP error handler.
+ *
+ * Exception :: HTTP Status Code
+ *  ConversionNotSupportedException	:: 500 (Internal Server Error)
+ *  HttpMediaTypeNotAcceptableException ::	406 (Not Acceptable)
+ *  HttpMediaTypeNotSupportedException ::	415 (Unsupported MediaType)
+ *  HttpMessageNotReadableException ::	400 (Bad Request)
+ *  HttpMessageNotWritableException ::	500 (Internal Server Error)
+ *  HttpRequestMethodNotSupportedException ::	405 (Method Not Allowed)
+ *  MissingServletRequestParameterException ::	400 (Bad Request)
+ *  NoSuchRequestHandlingMethodException :: 404 (Not Found)
+ *  TypeMismatchException ::	400 (Bad Request)
  *
  * @author hacksaw
  */
@@ -61,7 +62,6 @@ public abstract class SenseControllerErrorHandling {
             .build();
     return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
   }
-
 
   @ExceptionHandler(BadMessageException.class)
   @ResponseStatus(value = HttpStatus.BAD_REQUEST)

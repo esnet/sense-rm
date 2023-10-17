@@ -8,12 +8,20 @@ import org.springframework.boot.availability.ReadinessState;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class is a listener for readiness events.
+ */
 @Slf4j
 @Component
 public class ReadinessEventListener {
   @Autowired
   private ApplicationAvailability applicationAvailability;
 
+  /**
+   * Event listener for the ReadinessState.
+   *
+   * @param event
+   */
   @EventListener
   public void onEvent(AvailabilityChangeEvent<ReadinessState> event) {
     switch (event.getState()) {

@@ -9,6 +9,10 @@ RUN mvn clean install -Dmaven.test.skip=true -Ddocker.nocache
 FROM openjdk:17
 
 ENV HOME /sense-rm
+ENV TRUSTSTORE $HOME/pkcs/truststore.p12
+ENV KEYSTORE $HOME/pkcs/keystore.p12
+ENV STORETYPE "PKCS12"
+ENV PASSWORD "changeit"
 USER 1000:1000
 
 WORKDIR $HOME
@@ -20,7 +24,13 @@ CMD java \
         -Xmx1024m -Djava.net.preferIPv4Stack=true  \
         -Dcom.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot=true \
         -Dbasedir="$HOME" \
-        -Dlogging.config="file:$HOME/config/logback.xml" \
+        -logback.configurationFile="file:$HOME/config/logback.xml" \
+        -Djavax.net.ssl.trustStore=$TRUSTSTORE \
+        -Djavax.net.ssl.trustStorePassword=$PASSWORD \
+        -Djavax.net.ssl.trustStoreType=$STORETYPE \
+        -Djavax.net.ssl.keyStore=$KEYSTORE \
+        -Djavax.net.ssl.keyStorePassword=$PASSWORD \
+        -Djavax.net.ssl.keyStoreType=$STORETYPE \
         -XX:+StartAttachListener \
         -jar "$HOME/sense-rm.jar" \
         --spring.config.location="file:$HOME/config/"

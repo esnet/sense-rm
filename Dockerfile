@@ -24,7 +24,7 @@ CMD java \
         -Xmx1024m -Djava.net.preferIPv4Stack=true  \
         -Dcom.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot=true \
         -Dbasedir="$HOME" \
-        -logback.configurationFile="file:$HOME/config/logback.xml" \
+        -Dlogback.configurationFile="file:$HOME/config/logback.xml" \
         -Djavax.net.ssl.trustStore=$TRUSTSTORE \
         -Djavax.net.ssl.trustStorePassword=$PASSWORD \
         -Djavax.net.ssl.trustStoreType=$STORETYPE \

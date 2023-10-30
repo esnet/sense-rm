@@ -1,10 +1,11 @@
 package net.es.nsi.cs.lib;
 
-import java.util.HashMap;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionProviderPort;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utility classes for building clients
@@ -32,21 +33,21 @@ public class ClientUtil {
   private ConnectionProviderPort createProviderClient(String url) {
     JaxWsProxyFactoryBean fb = new JaxWsProxyFactoryBean();
     fb.setAddress(url);
+    fb.setProperties(setProps(fb.getProperties()));
+    fb.setServiceClass(ConnectionProviderPort.class);
+    return (ConnectionProviderPort) fb.create();
+  }
 
-    Map<String, Object> props = fb.getProperties();
+  public static Map<String, Object> setProps(Map<String, Object> props) {
     if (props == null) {
       props = new HashMap<>();
     }
-    props.put("jaxb.additionalContextClasses",
-            new Class[]{
-              org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory.class,
-              org.ogf.schemas.nsi._2013._12.services.types.ObjectFactory.class
-            });
-    fb.setProperties(props);
+      props.put("jaxb.additionalContextClasses",
+          new Class[]{
+      org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory.class,
+          org.ogf.schemas.nsi._2013._12.services.types.ObjectFactory.class
+    });
 
-    fb.setServiceClass(ConnectionProviderPort.class);
-    ConnectionProviderPort client = (ConnectionProviderPort) fb.create();
-
-    return client;
+    return props;
   }
 }

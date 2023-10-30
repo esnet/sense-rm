@@ -19,51 +19,47 @@
  */
 package net.es.sense.rm.driver.nsi.cs.api;
 
-import java.util.HashMap;
-import java.util.Map;
 import jakarta.xml.ws.Endpoint;
+import net.es.nsi.cs.lib.ClientUtil;
 import net.es.sense.rm.driver.nsi.RaController;
 import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.apache.cxf.Bus;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 public class ConnectionServiceConfig {
+  final private Bus bus;
+  final private NsiProperties nsiProperties;
+  final private ReservationService reservationService;
+  final private OperationMapRepository operationMap;
+  final private RaController raController;
 
-  @Autowired
-  private Bus bus;
-
-  @Autowired
-  private NsiProperties nsiProperties;
-
-  @Autowired
-  private ReservationService reservationService;
-
-  @Autowired
-  private OperationMapRepository operationMap;
-
-  @Autowired
-  private RaController raController;
+  public ConnectionServiceConfig(Bus bus, NsiProperties nsiProperties, ReservationService reservationService,
+                          OperationMapRepository operationMap, RaController raController) {
+    this.bus = bus;
+    this.nsiProperties = nsiProperties;
+    this.reservationService = reservationService;
+    this.operationMap = operationMap;
+    this.raController = raController;
+  }
 
   @Bean
   public Endpoint endpoint() {
     EndpointImpl endpoint = new EndpointImpl(bus, new ConnectionService(nsiProperties, reservationService, operationMap, raController));
+    endpoint.setProperties(ClientUtil.setProps(endpoint.getProperties()));
+    LoggingFeature lf = new LoggingFeature();
+    lf.setPrettyLogging(true);
+    endpoint.getFeatures().add(lf);
 
-    Map<String, Object> props = endpoint.getProperties();
-    if (props == null) {
-      props = new HashMap<>();
-    }
-    props.put("jaxb.additionalContextClasses",
-            new Class[]{
-              org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory.class,
-              org.ogf.schemas.nsi._2013._12.services.types.ObjectFactory.class
-            });
-    endpoint.setProperties(props);
     endpoint.publish("/nsi-v2");
 
     return (Endpoint) endpoint;

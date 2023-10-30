@@ -76,7 +76,7 @@ services:
       - opennsa
     restart: always
     healthcheck:
-      test: "curl -s http://host.docker.internal:8401/dds/management/v1/health || exit 1" # Command to check health.
+      test: "curl -s -f http://nsi-dds-east:8401/dds/management/v1/health || exit 1" # Command to check health.
       interval: 10s     # Interval between health checks.
       timeout: 5s       # Timeout for each health checking.
       retries: 5        # Hou many times retries.
@@ -99,7 +99,7 @@ services:
       - nsi-dds-east
     restart: always
     healthcheck:
-      test: "curl -s http://host.docker.internal:8402/dds/management/v1/health || exit 1" # Command to check health.
+      test: "curl -s -f http://nsi-dds-west:8402/dds/management/v1/health || exit 1" # Command to check health.
       interval: 10s     # Interval between health checks.
       timeout: 5s       # Timeout for each health checking.
       retries: 5        # Hou many times retries.
@@ -127,7 +127,7 @@ services:
       - sense-db
     restart: always
     healthcheck:
-      test: "curl -s http://host.docker.internal:8080/actuator/health || exit 1" # Command to check health.
+      test: "curl -s -f http://sense-rm:8080/actuator/health || exit 1" # Command to check health.
       interval: 1m30s
       timeout: 10s
       retries: 3

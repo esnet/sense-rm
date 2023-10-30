@@ -116,7 +116,7 @@ public class ConnectionService {
     CommonHeaderType value = header.value;
 
     try {
-      log.info("[ConnectionService] reserveConfirmed recieved for correlationId = {}, reserveConfirmed:\n{}",
+      log.info("[ConnectionService] reserveConfirmed received for correlationId = {}, reserveConfirmed:\n{}",
             value.getCorrelationId(), CsParser.getInstance().reserveConfirmedType2xml(reserveConfirmed));
     } catch (JAXBException ex) {
       log.error("[ConnectionService] reserveConfirmed could not encode log message, correlationId = {}",

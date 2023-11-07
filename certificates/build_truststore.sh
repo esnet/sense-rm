@@ -40,21 +40,22 @@ do
   filename="${file##*/}"
   alias="${filename%.*}"
 
-  echo "Adding $file as alias $alias"
+  if [ "$filename" != "ca-chain.pem" ]; then
+  	echo "Adding $file as alias $alias"
 
-  openssl x509 -in $file -text | grep -i "Subject: " | cut -d':' -f2-
+  	openssl x509 -in $file -text | grep -i "Subject: " | cut -d':' -f2-
 
-  $JAVA_HOME/bin/keytool -importcert \
-        -keystore $2 \
-        -storepass "$3" \
-        -alias $alias \
-        -trustcacerts \
-        -file $file \
-        -noprompt \
-        -deststoretype $1
-        # -deststoretype PKCS12
-        # -deststoretype JKS
-
+  	$JAVA_HOME/bin/keytool -importcert \
+        	-keystore $2 \
+        	-storepass "$3" \
+        	-alias $alias \
+        	-trustcacerts \
+        	-file $file \
+        	-noprompt \
+        	-deststoretype $1
+        	# -deststoretype PKCS12
+        	# -deststoretype JKS
+  fi
 done
 
 if [[ -f "$2" ]]; then

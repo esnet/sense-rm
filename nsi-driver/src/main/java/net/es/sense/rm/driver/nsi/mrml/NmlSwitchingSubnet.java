@@ -20,6 +20,7 @@
 package net.es.sense.rm.driver.nsi.mrml;
 
 import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
+import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,8 @@ public class NmlSwitchingSubnet {
   private Optional<Long> endTime = Optional.empty();
   private String tag;
   private NetworkStatusEnum status;
+  private Reservation.ErrorState errorState;
+  private String errorMessage;
   private NmlSwitchingServiceType switchingService;
   private List<NmlPort> ports = new ArrayList<>();
 

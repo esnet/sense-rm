@@ -10,6 +10,7 @@ import net.es.nsi.dds.lib.jaxb.nml.NmlLocationType.NmlAddress;
 import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
 import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyType;
 import net.es.nsi.dds.lib.jaxb.nml.ServiceDefinitionType;
+import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import net.es.sense.rm.driver.schema.*;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
@@ -503,6 +504,17 @@ public class MrmlFactory {
         resNetworkStatus.addProperty(Mrs.type, "dataplane");
         resNetworkStatus.addProperty(Mrs.value, switchingSubnet.getStatus().toString());
         ssr.addProperty(Mrs.hasNetworkStatus, resNetworkStatus);
+
+        // Add the errorStatus information if there is an error.
+        if (switchingSubnet.getErrorState() != Reservation.ErrorState.NONE) {
+          Resource resNetworkError = createResource(model, switchingSubnet.getId() + ":error", Mrs.ErrorStatus);
+          resNetworkError.addProperty(Mrs.type, "errorStatus");
+          resNetworkError.addProperty(Mrs.value, switchingSubnet.getErrorState().toString());
+          if (!Strings.isNullOrEmpty(switchingSubnet.getErrorMessage())) {
+            resNetworkError.addProperty(Mrs.errorMessage, switchingSubnet.getErrorMessage());
+          }
+          ssr.addProperty(Mrs.hasErrorStatus, resNetworkError);
+        }
 
         // Add all the bidirectional port identifiers.
         switchingSubnet.getPorts().forEach(bi -> {

@@ -37,15 +37,26 @@ import java.io.Serializable;
 @Table(name = "reservations")
 public class Reservation implements Serializable {
   public enum ErrorState {
-    NONE,
-    NSIRESERVEFAILED,
-    NSIRESERVETIMEOUT,
-    NSIRESERVECOMMIT,
-    NSIPROVISION,
-    NSITERMINATE,
-    NSIERROR,
-    NSIERROREVENT,
-    NSIMESSAGEDELIVERYTIMEOUT
+    NONE("none"),
+    NSIRESERVEFAILED("nsiReserveFailed"),
+    NSIRESERVETIMEOUT("nsiReserveTimeout"),
+    NSIRESERVECOMMIT("nsiReserveCommit"),
+    NSIPROVISION("nsiProvision"),
+    NSITERMINATE("nsiTerminate"),
+    NSIERROR("nsiError"),
+    NSIERROREVENT("nsiErrorEvent"),
+    NSIMESSAGEDELIVERYTIMEOUT("nsiMessageDeliveryTimeout");
+
+    private final String value;
+
+    ErrorState(String label) {
+      this.value = label;
+    }
+
+    @Override
+    public String toString() {
+      return this.value;
+    }
   }
 
   @Id

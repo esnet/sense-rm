@@ -118,7 +118,7 @@ public class SwitchingSubnetModel {
                 serviceHolder.put(ss.getId(), sh);
               });
 
-      // Now link all the bidirection port members back to their containing SwitchingService.
+      // Now link all the bidirectional port members back to their containing SwitchingService.
       nml.getBidirectionalPortIdFromSwitchingService(ss).forEach((p) -> {
         Optional<NmlPort> ofNullable = Optional.ofNullable(nml.getPort(p));
         ofNullable.ifPresent(np -> np.getSwitchingServices().add(ss));
@@ -135,10 +135,6 @@ public class SwitchingSubnetModel {
     // ports associated with the parent bidirectional port.
     log.debug("processReservations: loading topologyId = {}", topologyId);
 
-    for (Reservation reservation : reservationService.get()) {
-      log.debug("processReservations: reservation:\n{}", reservation.toString());
-    }
-
     for (Reservation reservation : reservationService.getByTopologyId(topologyId)) {
       log.info("[SwitchingSubnetModel] processing reservation\n{}", reservation.toString());
 
@@ -150,14 +146,13 @@ public class SwitchingSubnetModel {
 
       // Skip generating model for reservation if it is expired.
       switch (reservation.getReservationState()) {
-        case RESERVE_FAILED:
-        case RESERVE_ABORTING:
-        case RESERVE_TIMEOUT:
+        case RESERVE_FAILED, RESERVE_ABORTING, RESERVE_TIMEOUT -> {
           log.info("[SwitchingSubnetModel] skipping reservation cid = {}, reservationState = {}",
-                  reservation.getConnectionId(), reservation.getReservationState());
+              reservation.getConnectionId(), reservation.getReservationState());
           continue;
-        default:
-          break;
+        }
+        default -> {
+        }
       }
 
       // We only need to model those reservations in the "created" state.
@@ -252,7 +247,7 @@ public class SwitchingSubnetModel {
           );
 
           // No nml port if consolidation with parent port is not possible.
-          if (!srcChildPort.isPresent()) {
+          if (srcChildPort.isEmpty()) {
             log.error("[SwitchingSubnetModel] Could not find parent port for STP {}", p2ps.getSourceSTP());
             continue;
           }
@@ -268,7 +263,7 @@ public class SwitchingSubnetModel {
           );
 
           // No nml port if consolidation with parent port is not possible.
-          if (!dstChildPort.isPresent()) {
+          if (dstChildPort.isEmpty()) {
             log.error("[SwitchingSubnetModel] Could not find parent port for STP {}", p2ps.getDestSTP());
             continue;
           }
@@ -322,6 +317,8 @@ public class SwitchingSubnetModel {
           nss.setDiscovered(reservation.getDiscovered());
           nss.setTag("connectionId=" + topologyId + ":cid+" + ConnectionId.strip(reservation.getConnectionId()));
           nss.setStatus(NetworkStatus.parse(reservation));
+          nss.setErrorState(reservation.getErrorState());
+          nss.setErrorMessage(reservation.getErrorMessage());
           holder.getSwitchingSubnets().add(nss);
           log.info("[SwitchingSubnetModel] adding SwitchingSubnet = {}", nss.getId());
         } catch (JAXBException ex) {

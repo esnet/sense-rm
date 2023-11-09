@@ -59,7 +59,7 @@ public class Reservation implements Serializable {
   // Is this entry flagged for deletion.
   boolean dirty = false;
 
-  // The providerNSA hosting this conenction.
+  // The providerNSA hosting this connection.
   @Basic(optional = false)
   String providerNsa;
 

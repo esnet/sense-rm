@@ -31,6 +31,7 @@ import net.es.nsi.cs.lib.CsParser;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.sense.rm.driver.nsi.RaController;
 import net.es.sense.rm.driver.nsi.cs.db.*;
+import net.es.sense.rm.driver.nsi.messages.AuditRequest;
 import net.es.sense.rm.driver.nsi.messages.TerminateRequest;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException;
@@ -987,17 +988,17 @@ public class ConnectionService {
       log.error("[ConnectionService] dataPlaneStateChange could not find connectionId = {}", connectionId);
     } else {
       for (Reservation r : reservations) {
-        log.info("[ConnectionService] updating connectionId = {}, dataPlaneStatus = {}", connectionId, dataPlaneStatus.isActive());
+        log.info("[ConnectionService] updating connectionId = {}, dataPlaneStatus = {}",
+            connectionId, dataPlaneStatus.isActive());
         if (reservationService.setDataPlaneActive(r.getId(), dataPlaneStatus.isActive(),
                 System.currentTimeMillis()) != 1) {
           log.error("[ConnectionService] failed to update connectionId = {}, id = {}", connectionId, r.getId());
         }
 
-        // TODO: Enable this once properly dataplane state is modelled in MRML.
         // We just did something successfully so invoke a model audit to
         // generate an updated version.
-        // AuditRequest req = new AuditRequest(networkId);
-        // raController.getModelAuditActor().tell(req, ActorRef.noSender());
+        AuditRequest req = new AuditRequest("ConnectionService:dataPlaneStateChange", r.getTopologyId());
+        raController.getModelAuditActor().tell(req, ActorRef.noSender());
       }
     }
 

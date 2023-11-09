@@ -51,7 +51,6 @@ import org.ogf.schemas.nsi._2013._12.connection.types.*;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 import org.ogf.schemas.nsi._2013._12.services.types.DirectionalityType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -61,41 +60,60 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * A provider implementing MRML delta operations using the NSI Connection Service.
+ * This class maps MRML topologies changes to NSI connection service operations.
+ * This class acts in the ConnectionRequester role, initiating NSI-CS operations
+ * to the remote NSA, then blocking on a semaphore until the asynchronous response
+ * is returned to the receiving NSI-CS SOAP endpoint.
  *
  * @author hacksaw
  */
 @Slf4j
 @Component
 public class CsProvider {
-
-  @Autowired
-  private NsiProperties nsiProperties;
-
-  @Autowired
-  private ConnectionMapService connectionMapService;
-
-  @Autowired
-  private OperationMapRepository operationMap;
-
-  @Autowired
-  private DeltaMapRepository deltaMap;
-
-  @Autowired
-  private ReservationService reservationService;
-
-  @Autowired
-  private SpringExtension springExtension;
-
-  @Autowired
-  private NsiActorSystem nsiActorSystem;
+  private final NsiProperties nsiProperties;
+  private final ConnectionMapService connectionMapService;
+  private final OperationMapRepository operationMap;
+  private final DeltaMapRepository deltaMap;
+  private final ReservationService reservationService;
+  private final SpringExtension springExtension;
+  private final NsiActorSystem nsiActorSystem;
 
   private ActorRef connectionActor;
 
+  /**
+   * Initialize the connection service provider with autowired parameters.
+   *
+   * @param nsiProperties
+   * @param connectionMapService
+   * @param operationMap
+   * @param deltaMap
+   * @param reservationService
+   * @param springExtension
+   * @param nsiActorSystem
+   */
+  public CsProvider(NsiProperties nsiProperties, ConnectionMapService connectionMapService,
+                    OperationMapRepository operationMap, DeltaMapRepository deltaMap,
+                    ReservationService reservationService, SpringExtension springExtension,
+                    NsiActorSystem nsiActorSystem) {
+    this.nsiProperties = nsiProperties;
+    this.connectionMapService = connectionMapService;
+    this.operationMap = operationMap;
+    this.deltaMap = deltaMap;
+    this.reservationService = reservationService;
+    this.springExtension = springExtension;
+    this.nsiActorSystem = nsiActorSystem;
+  }
+
+  // Object factories for creating NSI objects for JAXB manipulation.
   private static final org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory CS_FACTORY
           = new org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory();
   private static final org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory P2PS_FACTORY
           = new org.ogf.schemas.nsi._2013._12.services.point2point.ObjectFactory();
 
+  /**
+   * Initialize the NSI connection service system and load the remote NSA's
+   * connection list to build initial topology model.
+   */
   public void start() {
     // Initialize the actors.
     log.info("[CsProvider] Starting NSI CS system...");
@@ -115,14 +133,26 @@ public class CsProvider {
     log.info("[CsProvider] Completed NSI CS system initialization.");
   }
 
+  /**
+   * Returns the connection actor.
+   *
+   * @return
+   */
   public ActorRef GetConnectionActor() {
     return connectionActor;
   }
 
+  /**
+   * Terminate the connection actor.
+   */
   public void terminate() {
     nsiActorSystem.shutdown(connectionActor);
   }
 
+  /**
+   * Load all NSA connections into the database using the synchronous querySummarySync
+   * operation.
+   */
   public void load() {
     Client nsiClient = new Client(nsiProperties.getProviderConnectionURL());
 
@@ -205,8 +235,6 @@ public class CsProvider {
    * Determine the set of NSI connections that must be removed as part of this
    * delta, leaving the termination operation for the commit.
    *
-   * @param m
-   * @param deltaId
    * @param reduction
    * @return
    */
@@ -609,9 +637,6 @@ public class CsProvider {
    * Create and send NSI Terminate operations for each connectionId provided,
    * blocking until all response have been received.
    *
-   * @param m
-   * @param deltaId
-   * @param reduction
    * @return
    */
   private void commitDeltaReduction(Set<String> connectionIds)
@@ -796,7 +821,7 @@ public class CsProvider {
             for (Reservation r : reservations) {
               // The reservation commit failed so put it in the RESERVE_HELD.
               // Maybe RESERVE_FAILED would have been better? At least they can
-              // terminte it this way.
+              // terminate it this way.
               log.error("[CsProvider] commitDeltaAddition: current errored during reserveCommit reservation state:\n{}", r.toString());
               r.setReservationState(ReservationStateEnumType.RESERVE_HELD);
               r.setErrorState(Reservation.ErrorState.NSIRESERVECOMMIT);
@@ -886,7 +911,8 @@ public class CsProvider {
               // The reservation commit failed so put it in the RESERVE_HELD.
               // Maybe RESERVE_FAILED would have been better? At least they can
               // terminte it this way.
-              log.error("[CsProvider] commitDeltaAddition: current errored during provision reservation state:\n{}", r.toString());
+              log.error("[CsProvider] commitDeltaAddition: current errored during provision reservation state:\n{}",
+                  r.toString());
               r.setReservationState(ReservationStateEnumType.RESERVE_START);
               r.setErrorState(Reservation.ErrorState.NSIPROVISION);
               r.setErrorMessage(errorMessage);
@@ -906,7 +932,7 @@ public class CsProvider {
    * Wait for queued NSI operations to complete by waiting on a shared semaphore
    * between this thread and the NSI CS callback thread.
    *
-   * @param correlationIds List of the outstand correlationIds the will need to complete.
+   * @param correlationIds List of the outstanding correlationIds the will need to complete.
    *
    * @return Will return an exception (the last encountered) if one has occurred.
    */
@@ -921,7 +947,7 @@ public class CsProvider {
         log.info("[CsProvider] operation {} completed, correlationId = {}", op.getOperation(), id);
 
         if (op.getOperation() == OperationType.reserve && op.getState() != StateType.reserved) {
-          log.error("[CsProvider] operation failed to reserve, correlationId = {}, state = {}",
+          log.error("[CsProvider] operation failed to reserve, correlationId = {}, state = {}, exception = {}",
                   id, op.getState(), op.getException());
 
           if (op.getException() != null) {
@@ -948,11 +974,11 @@ public class CsProvider {
     if (exception.isPresent()) {
       Exception ex = exception.get();
       if (ex instanceof ServiceException) {
-        throw ServiceException.class.cast(ex);
+        throw (ServiceException) ex;
       } else if (ex instanceof IllegalArgumentException) {
-        throw IllegalArgumentException.class.cast(ex);
-      } else if (ex instanceof TimeoutException) {
-        throw TimeoutException.class.cast(ex);
+        throw (IllegalArgumentException) ex;
+      } else {
+        throw (TimeoutException) ex;
       }
     }
   }

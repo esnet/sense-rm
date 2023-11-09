@@ -19,7 +19,6 @@
  */
 package net.es.sense.rm.driver.nsi;
 
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
@@ -34,42 +33,62 @@ import net.es.sense.rm.measurements.MeasurementController;
 import net.es.sense.rm.measurements.db.MeasurementType;
 import net.es.sense.rm.measurements.db.MetricType;
 import org.apache.jena.riot.Lang;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 /**
+ * Audit the information associated with our MRML model and generate a new model if anything has changed.
  *
  * @author hacksaw
  */
 @Slf4j
 @Service
 public class AuditServiceBean implements AuditService {
-  @Autowired
-  private NsiProperties nsiProperties;
-
-  @Autowired
-  private DocumentReader documentReader;
-
-  @Autowired
-  private ReservationService reservationService;
-
-  @Autowired
-  private ConnectionMapService connectionMapService;
-
-  @Autowired
-  private ModelService modelService;
-
-  @Autowired
-  private MeasurementController measurementController;
-
+  private final NsiProperties nsiProperties;
+  private final DocumentReader documentReader;
+  private final ReservationService reservationService;
+  private final ConnectionMapService connectionMapService;
+  private final ModelService modelService;
+  private final MeasurementController measurementController;
   private long lastDds = 0;
   private long lastCon = 0;
 
+  /**
+   * Constructor for autowire injection of service beans.
+   *
+   * @param nsiProperties
+   * @param documentReader
+   * @param reservationService
+   * @param connectionMapService
+   * @param modelService
+   * @param measurementController
+   */
+  public AuditServiceBean(NsiProperties nsiProperties, DocumentReader documentReader,
+                          ReservationService reservationService, ConnectionMapService connectionMapService,
+                          ModelService modelService, MeasurementController measurementController) {
+    this.nsiProperties = nsiProperties;
+    this.documentReader = documentReader;
+    this.reservationService = reservationService;
+    this.connectionMapService = connectionMapService;
+    this.modelService = modelService;
+    this.measurementController = measurementController;
+  }
+
+  /**
+   * Audit all models.
+   */
   @Override
   public void audit() {
+    // We really only have one model to audit.
     audit(nsiProperties.getNetworkId());
   }
 
+  /**
+   * Audit the model associated with the supplied topologyId.
+   *
+   * @param topologyId
+   */
   @Override
   public void audit(String topologyId) {
     long start = System.currentTimeMillis();

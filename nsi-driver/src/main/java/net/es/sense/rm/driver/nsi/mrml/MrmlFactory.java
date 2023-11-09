@@ -250,7 +250,7 @@ public class MrmlFactory {
               });
 
               // Make a label relationship.
-              p.getLabels().stream().forEach(l -> {
+              p.getLabels().forEach(l -> {
                 String postfix = l.getLabeltype().substring(l.getLabeltype().lastIndexOf("#") + 1);
                 Resource label = createResource(model, p.getId() + ":" + postfix, Nml.LabelGroup);
                 Resource labelType = model.createResource(l.getLabeltype());
@@ -376,82 +376,84 @@ public class MrmlFactory {
 
     log.debug("[MrmlFactory] createBidirectionalPortsFromConnections for topologyId {}", topologyId);
 
-    nml.getPorts(topologyId, Orientation.child).values().stream()
-            .forEach(p -> {
-              Resource parentPort = model.getResource(p.getParentPort().get());
+    nml.getPorts(topologyId, Orientation.child).values().forEach(p -> {
+      log.debug("[MrmlFactory] creating child port {}", p.getId());
 
-              log.debug("[MrmlFactory] creating child port {}, parentPort {}, resource {}",
-                      p.getId(), p.getParentPort().get(), parentPort);
+      // Create the Bidirectional port resource.
+      Resource bi = createResource(model, p.getId(), Nml.BidirectionalPort);
 
-              Resource bi = createResource(model, p.getId(), Nml.BidirectionalPort);
-              bi.addProperty(Nml.belongsTo, parentPort);
-              parentPort.addProperty(Nml.hasBidirectionalPort, bi);
+      p.getParentPort().ifPresent(parent -> {
+        log.debug("[MrmlFactory] linking child port {} to parentPort {}", p.getId(), parent);
+        Resource parentPort = model.getResource(parent);
+        bi.addProperty(Nml.belongsTo, parentPort);
+        parentPort.addProperty(Nml.hasBidirectionalPort, bi);
+      });
 
-              p.getName().ifPresent(n -> bi.addLiteral(Nml.name, n));
+      p.getName().ifPresent(n -> bi.addLiteral(Nml.name, n));
 
-              p.getEncoding().ifPresent(e -> {
-                Resource encoding = model.createResource(e);
-                bi.addProperty(Nml.encoding, encoding);
-              });
+      p.getEncoding().ifPresent(e -> {
+        Resource encoding = model.createResource(e);
+        bi.addProperty(Nml.encoding, encoding);
+      });
 
-              p.getIsAlias().ifPresent(i -> {
-                Resource res = model.createResource(i);
-                bi.addProperty(Nml.isAlias, res);
-              });
+      p.getIsAlias().ifPresent(i -> {
+        Resource res = model.createResource(i);
+        bi.addProperty(Nml.isAlias, res);
+      });
 
-              p.getServiceId().ifPresent(sid -> {
-                Resource tag = model.createResource(sid);
-                bi.addProperty(Mrs.tag, tag);
-              });
+      p.getServiceId().ifPresent(sid -> {
+        Resource tag = model.createResource(sid);
+        bi.addProperty(Mrs.tag, tag);
+      });
 
-              // Special nml:existsDuring handling: If we do not have an existsDuring
-              // resource with the same identfifier as ours, we will need to create a new
-              // one, otherewise, just reference the existing one.
-              final Resource existsDuring = createLifetime(model, p.getNmlExistsDuringId().get(),
-                      p.getStartTime(), p.getEndTime());
-              bi.addProperty(Nml.existsDuring, existsDuring);
+      // Special nml:existsDuring handling: If we do not have an existsDuring
+      // resource with the same identifier as ours, we will need to create a new
+      // one, otherwise, just reference the existing one.
+      final Resource existsDuring = createLifetime(model, p.getNmlExistsDuringId().get(),
+          p.getStartTime(), p.getEndTime());
+      bi.addProperty(Nml.existsDuring, existsDuring);
 
-              // Make a label relationship.
-              p.getLabels().stream().forEach(l -> {
-                String labelId;
-                if (p.getMrsLabelId().isPresent()) {
-                  labelId = p.getMrsLabelId().get();
-                } else {
-                  labelId = p.getId() + ":label";
-                }
+      // Make a label relationship.
+      p.getLabels().forEach(l -> {
+        String labelId;
+        if (p.getMrsLabelId().isPresent()) {
+          labelId = p.getMrsLabelId().get();
+        } else {
+          labelId = p.getId() + ":label";
+        }
 
-                Resource label = createResource(model, labelId, Nml.Label);
-                Resource labelType = model.createResource(l.getLabeltype());
-                label.addProperty(Nml.existsDuring, existsDuring);
-                label.addProperty(Nml.labeltype, labelType);
-                label.addLiteral(Nml.value, l.getValue());
-                bi.addProperty(Nml.hasLabel, label);
-                label.addProperty(Nml.belongsTo, bi);
-              });
+        Resource label = createResource(model, labelId, Nml.Label);
+        Resource labelType = model.createResource(l.getLabeltype());
+        label.addProperty(Nml.existsDuring, existsDuring);
+        label.addProperty(Nml.labeltype, labelType);
+        label.addLiteral(Nml.value, l.getValue());
+        bi.addProperty(Nml.hasLabel, label);
+        label.addProperty(Nml.belongsTo, bi);
+      });
 
-              // Make the bandwidth service - NSI supports guaranteedCapped only.
-              String bwId;
-              if (p.getMrsBandwidthId().isPresent()) {
-                bwId = p.getMrsBandwidthId().get();
-              } else {
-                bwId = p.getId() + ":BandwidthService";
-              }
+      // Make the bandwidth service - NSI supports guaranteedCapped only.
+      String bwId;
+      if (p.getMrsBandwidthId().isPresent()) {
+        bwId = p.getMrsBandwidthId().get();
+      } else {
+        bwId = p.getId() + ":BandwidthService";
+      }
 
-              Resource bw = createResource(model, bwId, Mrs.BandwidthService);
-              bi.addProperty(Nml.hasService, bw);
-              bw.addProperty(Nml.existsDuring, existsDuring);
-              bw.addLiteral(Mrs.type, p.getType().name());
-              bw.addLiteral(Mrs.unit, nml.getDefaultUnits());
-              bw.addLiteral(Mrs.granularity, p.getGranularity().orElse(nml.getDefaultGranularity()));
-              p.getMaximumCapacity().ifPresent(c -> bw.addLiteral(Mrs.maximumCapacity, c));
-              bw.addLiteral(Mrs.minimumCapacity, p.getMinimumCapacity().orElse(1L));
-              p.getUsedCapacity().ifPresent(c -> bw.addLiteral(Mrs.usedCapacity, c));
-              p.getAvailableCapacity().ifPresent(c -> bw.addLiteral(Mrs.availableCapacity, c));
-              p.getReservableCapacity().ifPresent(c -> bw.addLiteral(Mrs.reservableCapacity, c));
-              p.getIndividualCapacity().ifPresent(c -> bw.addLiteral(Mrs.individualCapacity, c));
-              bw.addProperty(Nml.belongsTo, bi);
-              biPorts.put(p.getId(), bi);
-            });
+      Resource bw = createResource(model, bwId, Mrs.BandwidthService);
+      bi.addProperty(Nml.hasService, bw);
+      bw.addProperty(Nml.existsDuring, existsDuring);
+      bw.addLiteral(Mrs.type, p.getType().name());
+      bw.addLiteral(Mrs.unit, nml.getDefaultUnits());
+      bw.addLiteral(Mrs.granularity, p.getGranularity().orElse(nml.getDefaultGranularity()));
+      p.getMaximumCapacity().ifPresent(c -> bw.addLiteral(Mrs.maximumCapacity, c));
+      bw.addLiteral(Mrs.minimumCapacity, p.getMinimumCapacity().orElse(1L));
+      p.getUsedCapacity().ifPresent(c -> bw.addLiteral(Mrs.usedCapacity, c));
+      p.getAvailableCapacity().ifPresent(c -> bw.addLiteral(Mrs.availableCapacity, c));
+      p.getReservableCapacity().ifPresent(c -> bw.addLiteral(Mrs.reservableCapacity, c));
+      p.getIndividualCapacity().ifPresent(c -> bw.addLiteral(Mrs.individualCapacity, c));
+      bw.addProperty(Nml.belongsTo, bi);
+      biPorts.put(p.getId(), bi);
+    });
 
     return biPorts;
   }
@@ -496,9 +498,22 @@ public class MrmlFactory {
                 switchingSubnet.getStartTime(), switchingSubnet.getEndTime());
         ssr.addProperty(Nml.existsDuring, existsDuring);
 
+        // Add dataPlane status to the SwitchingSubnet.
+        Resource resNetworkStatus = createResource(model, switchingSubnet.getId() + ":status", Mrs.NetworkStatus);
+        resNetworkStatus.addProperty(Mrs.type, "dataplane");
+        resNetworkStatus.addProperty(Mrs.value, switchingSubnet.getStatus().toString());
+        ssr.addProperty(Mrs.hasNetworkStatus, resNetworkStatus);
+
         // Add all the bidirectional port identifiers.
         switchingSubnet.getPorts().forEach(bi -> {
-          ssr.addProperty(Nml.hasBidirectionalPort, model.getResource(bi.getId()));
+          // Get the resource associated with the bidirectional port.
+          Resource biResource = model.getResource(bi.getId());
+
+          // Add the hasBidirectionalPort relationship to the SwitchingSubnet.
+          ssr.addProperty(Nml.hasBidirectionalPort, biResource);
+
+          // Now add the NetworkStatus to this BiDirectional port.
+          biResource.addProperty(Mrs.hasNetworkStatus, resNetworkStatus);
         });
 
         ssCollection.put(ssr.getURI(), ssr);
@@ -525,7 +540,7 @@ public class MrmlFactory {
         XMLGregorianCalendar start = XmlUtilities.xmlGregorianCalendar(new Date(s));
         res.addProperty(Nml.start, start.toXMLFormat());
       } catch (DatatypeConfigurationException ex) {
-        log.error("[MrmlFactory] failed to create startTime xmlGregorianCalendar, {}", ex);
+        log.error("[MrmlFactory] failed to create startTime xmlGregorianCalendar", ex);
       }
     });
 
@@ -534,7 +549,7 @@ public class MrmlFactory {
         XMLGregorianCalendar end = XmlUtilities.xmlGregorianCalendar(new Date(s));
         res.addProperty(Nml.end, end.toXMLFormat());
       } catch (DatatypeConfigurationException ex) {
-        log.error("[MrmlFactory] failed to create endTime xmlGregorianCalendar, {}", ex);
+        log.error("[MrmlFactory] failed to create endTime xmlGregorianCalendar", ex);
       }
     });
 

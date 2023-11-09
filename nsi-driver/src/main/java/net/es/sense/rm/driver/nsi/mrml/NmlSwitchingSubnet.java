@@ -19,10 +19,11 @@
  */
 package net.es.sense.rm.driver.nsi.mrml;
 
+import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
 
 /**
  *
@@ -38,6 +39,7 @@ public class NmlSwitchingSubnet {
   private Optional<Long> startTime = Optional.empty();
   private Optional<Long> endTime = Optional.empty();
   private String tag;
+  private NetworkStatusEnum status;
   private NmlSwitchingServiceType switchingService;
   private List<NmlPort> ports = new ArrayList<>();
 

@@ -321,6 +321,7 @@ public class SwitchingSubnetModel {
           nss.setId(nssId);
           nss.setDiscovered(reservation.getDiscovered());
           nss.setTag("connectionId=" + topologyId + ":cid+" + ConnectionId.strip(reservation.getConnectionId()));
+          nss.setStatus(NetworkStatus.parse(reservation));
           holder.getSwitchingSubnets().add(nss);
           log.info("[SwitchingSubnetModel] adding SwitchingSubnet = {}", nss.getId());
         } catch (JAXBException ex) {

@@ -151,7 +151,7 @@ public class MrmlFactory {
     // Instead of using the NML document version we make our own based on the most recent of the topology
     // document or connection discovery.
     try {
-      long version = (nml.getLastDiscovered() < ssm.getVersion()) ? ssm.getVersion() : nml.getLastDiscovered();
+      long version = Math.max(nml.getLastDiscovered(), ssm.getVersion());
       model.add(model.createStatement(nmlTopology, Nml.version, XmlDate.longToXMLGregorianCalendar(version).toXMLFormat()));
     } catch (DatatypeConfigurationException ex) {
       log.error("createTopolgyResource: failed to convert internal version to XML.", ex);
@@ -229,26 +229,13 @@ public class MrmlFactory {
 
     Resource topologyResource = model.getResource(topologyId);
 
-    nml.getPorts(topologyId, Orientation.bidirectional).values().stream()
+    nml.getPorts(topologyId, Orientation.bidirectional).values()
             .forEach(p -> {
               Resource bi = createResource(model, p.getId(), Nml.BidirectionalPort);
               bi.addProperty(Nml.belongsTo, topologyResource);
               topologyResource.addProperty(Nml.hasBidirectionalPort, bi);
 
-              p.getName().ifPresent(n -> bi.addLiteral(Nml.name, n));
-              p.getEncoding().ifPresent(e -> {
-                Resource encoding = model.createResource(e);
-                bi.addProperty(Nml.encoding, encoding);
-              });
-              p.getIsAlias().ifPresent(i -> {
-                Resource res = model.createResource(i);
-                bi.addProperty(Nml.isAlias, res);
-              });
-
-              p.getServiceId().ifPresent(sid -> {
-                Resource tag = model.createResource(sid);
-                bi.addProperty(Mrs.tag, tag);
-              });
+              addCommonAttributes(model, p, bi);
 
               // Make a label relationship.
               p.getLabels().forEach(l -> {
@@ -265,11 +252,7 @@ public class MrmlFactory {
               Resource bw = createResource(model, p.getId() + ":BandwidthService", Mrs.BandwidthService);
 
               bi.addProperty(Nml.hasService, bw);
-              bw.addLiteral(Mrs.type, p.getType().name());
-              bw.addLiteral(Mrs.unit, nml.getDefaultUnits());
-              bw.addLiteral(Mrs.granularity, p.getGranularity().orElse(nml.getDefaultGranularity()));
-              p.getMaximumCapacity().ifPresent(c -> bw.addLiteral(Mrs.maximumCapacity, c));
-              bw.addLiteral(Mrs.minimumCapacity, p.getMinimumCapacity().orElse(1L));
+              addBwAttributes(p, bw);
               //p.getUsedCapacity().ifPresent(c -> bw.addLiteral(Mrs.usedCapacity, c));
               //p.getAvailableCapacity().ifPresent(c -> bw.addLiteral(Mrs.availableCapacity, c));
               p.getReservableCapacity().ifPresent(c -> bw.addLiteral(Mrs.reservableCapacity, c));
@@ -279,6 +262,31 @@ public class MrmlFactory {
             });
 
     return biPorts;
+  }
+
+  private void addBwAttributes(NmlPort p, Resource bw) {
+    bw.addLiteral(Mrs.type, p.getType().name());
+    bw.addLiteral(Mrs.unit, nml.getDefaultUnits());
+    bw.addLiteral(Mrs.granularity, p.getGranularity().orElse(nml.getDefaultGranularity()));
+    p.getMaximumCapacity().ifPresent(c -> bw.addLiteral(Mrs.maximumCapacity, c));
+    bw.addLiteral(Mrs.minimumCapacity, p.getMinimumCapacity().orElse(1L));
+  }
+
+  private void addCommonAttributes(OntModel model, NmlPort p, Resource bi) {
+    p.getName().ifPresent(n -> bi.addLiteral(Nml.name, n));
+    p.getEncoding().ifPresent(e -> {
+      Resource encoding = model.createResource(e);
+      bi.addProperty(Nml.encoding, encoding);
+    });
+    p.getIsAlias().ifPresent(i -> {
+      Resource res = model.createResource(i);
+      bi.addProperty(Nml.isAlias, res);
+    });
+
+    p.getServiceId().ifPresent(sid -> {
+      Resource tag = model.createResource(sid);
+      bi.addProperty(Mrs.tag, tag);
+    });
   }
 
   private Map<String, Resource> createServiceDefinition(OntModel model) throws IllegalArgumentException {
@@ -331,17 +339,7 @@ public class MrmlFactory {
         ssr.addLiteral(Nml.name, ss.getName());
       }
 
-      if (!Strings.isNullOrEmpty(ss.getEncoding())) {
-        Resource encoding = model.createResource(ss.getEncoding());
-        ssr.addProperty(Nml.encoding, encoding);
-      }
-
-      ssr.addLiteral(Nml.labelSwapping, ss.isLabelSwapping());
-
-      if (!Strings.isNullOrEmpty(ss.getLabelType())) {
-        Resource encoding = model.createResource(ss.getLabelType());
-        ssr.addProperty(Nml.labeltype, encoding);
-      }
+      AddSsAttributes(model, ss, ssr);
 
       // Add the ServiceDefinition.
       ss.getAny().stream()
@@ -363,6 +361,20 @@ public class MrmlFactory {
     });
 
     return ssCollection;
+  }
+
+  private void AddSsAttributes(OntModel model, NmlSwitchingServiceType ss, Resource ssr) {
+    if (!Strings.isNullOrEmpty(ss.getEncoding())) {
+      Resource encoding = model.createResource(ss.getEncoding());
+      ssr.addProperty(Nml.encoding, encoding);
+    }
+
+    ssr.addLiteral(Nml.labelSwapping, ss.isLabelSwapping());
+
+    if (!Strings.isNullOrEmpty(ss.getLabelType())) {
+      Resource encoding = model.createResource(ss.getLabelType());
+      ssr.addProperty(Nml.labeltype, encoding);
+    }
   }
 
   /**
@@ -390,22 +402,7 @@ public class MrmlFactory {
         parentPort.addProperty(Nml.hasBidirectionalPort, bi);
       });
 
-      p.getName().ifPresent(n -> bi.addLiteral(Nml.name, n));
-
-      p.getEncoding().ifPresent(e -> {
-        Resource encoding = model.createResource(e);
-        bi.addProperty(Nml.encoding, encoding);
-      });
-
-      p.getIsAlias().ifPresent(i -> {
-        Resource res = model.createResource(i);
-        bi.addProperty(Nml.isAlias, res);
-      });
-
-      p.getServiceId().ifPresent(sid -> {
-        Resource tag = model.createResource(sid);
-        bi.addProperty(Mrs.tag, tag);
-      });
+      addCommonAttributes(model, p, bi);
 
       // Special nml:existsDuring handling: If we do not have an existsDuring
       // resource with the same identifier as ours, we will need to create a new
@@ -443,11 +440,7 @@ public class MrmlFactory {
       Resource bw = createResource(model, bwId, Mrs.BandwidthService);
       bi.addProperty(Nml.hasService, bw);
       bw.addProperty(Nml.existsDuring, existsDuring);
-      bw.addLiteral(Mrs.type, p.getType().name());
-      bw.addLiteral(Mrs.unit, nml.getDefaultUnits());
-      bw.addLiteral(Mrs.granularity, p.getGranularity().orElse(nml.getDefaultGranularity()));
-      p.getMaximumCapacity().ifPresent(c -> bw.addLiteral(Mrs.maximumCapacity, c));
-      bw.addLiteral(Mrs.minimumCapacity, p.getMinimumCapacity().orElse(1L));
+      addBwAttributes(p, bw);
       p.getUsedCapacity().ifPresent(c -> bw.addLiteral(Mrs.usedCapacity, c));
       p.getAvailableCapacity().ifPresent(c -> bw.addLiteral(Mrs.availableCapacity, c));
       p.getReservableCapacity().ifPresent(c -> bw.addLiteral(Mrs.reservableCapacity, c));
@@ -483,17 +476,7 @@ public class MrmlFactory {
         // We provide the subnet.
         swResource.addProperty(Mrs.providesSubnet, ssr);
 
-        if (!Strings.isNullOrEmpty(switchingService.getEncoding())) {
-          Resource encoding = model.createResource(switchingService.getEncoding());
-          ssr.addProperty(Nml.encoding, encoding);
-        }
-
-        ssr.addLiteral(Nml.labelSwapping, switchingService.isLabelSwapping());
-
-        if (!Strings.isNullOrEmpty(switchingService.getLabelType())) {
-          Resource encoding = model.createResource(switchingService.getLabelType());
-          ssr.addProperty(Nml.labeltype, encoding);
-        }
+        AddSsAttributes(model, switchingService, ssr);
 
         Resource existsDuring = createLifetime(model, switchingSubnet.getExistsDuringId(),
                 switchingSubnet.getStartTime(), switchingSubnet.getEndTime());

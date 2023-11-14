@@ -87,14 +87,14 @@ public class ModelAuditActor extends UntypedAbstractActor {
 
   @Override
   public void onReceive(Object msg) {
-    log.debug("[ModelAuditActor] onReceive {}", Message.getDebug(msg));
+    log.debug("[ModelAuditActor] onReceive {} {}", Message.getDebug(msg), msg.getClass());
 
     if (msg instanceof TimerMsg timer) {
       // Kick of audit and schedule next update.
       try {
         auditService.audit();
       } catch (Exception ex) {
-        log.error("[ModelAuditActor] audit failed", ex);
+        log.error(ex, "[ModelAuditActor] audit failed");
       }
 
       timer.setInitiator("ModelAuditActor:onReceive");
@@ -104,10 +104,11 @@ public class ModelAuditActor extends UntypedAbstractActor {
               Duration.create(nsiProperties.getModelAuditTimer(), TimeUnit.SECONDS),
               this.getSelf(), timer, nsiActorSystem.getActorSystem().dispatcher(), null);
     } else if (msg instanceof AuditRequest ar) {
+      log.info("[ModelAuditActor] AuditRequest received for topologyId={}", ar.getTopologyId());
       try {
         auditService.audit(ar.getTopologyId());
       } catch (Exception ex) {
-        log.error("[ModelAuditActor] audit failed", ex);
+        log.error(ex, "[ModelAuditActor] audit failed");
       }
     } else if (msg instanceof TerminateRequest req) {
       try {

@@ -34,6 +34,7 @@ CMD java \
         -Dcom.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot=true \
         -Dbasedir="$HOME" \
         -Dlogback.configurationFile=$LOGBACK \
+        -Dlogging.config=$LOGBACK \
         $SSL_OPTS \
         -XX:+StartAttachListener \
         -jar "$HOME/sense-rm.jar" \

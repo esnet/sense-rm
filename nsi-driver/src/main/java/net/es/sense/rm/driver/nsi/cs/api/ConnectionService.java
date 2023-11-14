@@ -997,6 +997,7 @@ public class ConnectionService {
 
         // We just did something successfully so invoke a model audit to
         // generate an updated version.
+        log.info("[ConnectionService] dataPlaneStateChange: issuing audit for topologyId={}", r.getTopologyId());
         AuditRequest req = new AuditRequest("ConnectionService:dataPlaneStateChange", r.getTopologyId());
         raController.getModelAuditActor().tell(req, ActorRef.noSender());
       }

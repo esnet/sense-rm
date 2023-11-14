@@ -35,6 +35,7 @@ import net.es.sense.rm.measurements.db.MetricType;
 import org.apache.jena.riot.Lang;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -95,6 +96,13 @@ public class AuditServiceBean implements AuditService {
 
     log.info("[AuditService] starting audit for {}.", topologyId);
     log.info("[AuditService] lastDds = {}, lastCon = {}", lastDds, lastCon);
+
+    // Here is a little bug hack to get us through SC23.
+    if (topologyId == null) {
+      topologyId = nsiProperties.getNetworkId();
+      log.error("[AuditService] Adding topologyId={} in place of null.", topologyId);
+      log.error("[AuditService] here is a trace:\n{}", Arrays.toString(Thread.currentThread().getStackTrace()));
+    }
 
     // How do we determine if there was a change in network data that would
     // result in a new model being generated?  First check to see if we have

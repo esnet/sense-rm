@@ -45,8 +45,7 @@ public class Message {
    */
   public static String getDebug(Object msg) {
     StringBuilder result = new StringBuilder(msg.getClass().getCanonicalName());
-    if (msg instanceof Message) {
-      Message message = (Message) msg;
+    if (msg instanceof Message message) {
       result.append(" : ");
       result.append(message.getInitiator());
 

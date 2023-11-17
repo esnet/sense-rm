@@ -21,7 +21,6 @@ hosts=( "nsi0.uhnet.net:9443" \
         "sense-rm.es.net:8000" \
         "dds.dlp.surfnet.nl:443" \
         "agg.netherlight.net:443" \
-        "dds.netherlight.net:443" \
         "opennsa.northwestern.edu:9443" \
         "sense-o.es.net:8443" \
         "sense-rm.es.net:443" \

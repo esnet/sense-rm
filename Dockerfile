@@ -18,6 +18,10 @@ ENV KEYSTORE $HOME/pkcs/keystore.p12
 ENV STORETYPE "PKCS12"
 ENV PASSWORD "changeit"
 
+# Add any debug options here.
+#DEBUG_OPTS: "-Djavax.net.debug=ssl:handshake:verbose:keymanager:trustmanager -Djava.security.debug=access:stack:certpath"
+ENV DEBUG_OPTS ""
+
 # We add these SSL options to a separate variable so they can be overridden if needed.
 ENV SSL_OPTS "-Djavax.net.ssl.trustStore=$TRUSTSTORE -Djavax.net.ssl.trustStorePassword=$PASSWORD \
                -Djavax.net.ssl.trustStoreType=$STORETYPE -Djavax.net.ssl.keyStore=$KEYSTORE \
@@ -36,6 +40,7 @@ CMD java \
         -Dlogback.configurationFile=$LOGBACK \
         -Dlogging.config=$LOGBACK \
         $SSL_OPTS \
+        $DEBUG_OPTS \
         -XX:+StartAttachListener \
         -jar "$HOME/sense-rm.jar" \
         --spring.config.location=$CONFIG_DIR

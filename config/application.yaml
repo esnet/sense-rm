@@ -142,10 +142,16 @@ management:
       probes:
         enabled: true
       show-details: always
+      status:
+        http-mapping:
+          down: 500
+          out_of_service: 503
+          warning: 500
     shutdown:
       enabled: true
 
   endpoints:
+    enabled-by-default: true
     web:
       exposure:
         include: "*"
@@ -159,8 +165,19 @@ management:
       enabled: true
 
   info:
+    java.enabled: true
+    env.enabled: true
     git:
+      enabled: true
       mode: full
+
+info:
+  app:
+    name: SENSE-N-RM
+    description: "This is the SENSE network resource manager."
+    version: "2.0"
+    java.version: 17
+    type: Spring Boot
 
 #########################################
 # NSI CS related configuration.         #

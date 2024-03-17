@@ -84,6 +84,7 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -91,6 +92,13 @@
         <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
+          <executions>
+            <execution>
+              <goals>
+                <goal>build-info</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
 
       <plugin>
@@ -117,9 +125,9 @@
       </plugin>
 
       <plugin>
-        <groupId>pl.project13.maven</groupId>
-        <artifactId>git-commit-id-plugin</artifactId>
-        <version>4.0.0</version>
+        <groupId>io.github.git-commit-id</groupId>
+        <artifactId>git-commit-id-maven-plugin</artifactId>
+        <version>7.0.0</version>
         <executions>
           <execution>
             <id>get-the-git-infos</id>
@@ -141,11 +149,6 @@
         <configuration>
           <generateGitPropertiesFile>true</generateGitPropertiesFile>
           <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
-          <format>json</format>
-          <includeOnlyProperties>
-            <includeOnlyProperty>^git.build.(time|version)$</includeOnlyProperty>
-            <includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>
-          </includeOnlyProperties>
           <commitIdGenerationMode>full</commitIdGenerationMode>
         </configuration>
       </plugin>

@@ -20,7 +20,7 @@ public class Client {
   private final ConnectionProviderPort proxy;
 
   public Client(String providerUrl) {
-    logger.info("Client: created client for " + providerUrl);
+    logger.info("Client: creating client for " + providerUrl);
     ConnectionServiceProvider provider = new ConnectionServiceProvider();
     proxy = provider.getConnectionServiceProviderPort();
     BindingProvider bp = (BindingProvider) proxy;

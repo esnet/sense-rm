@@ -93,6 +93,16 @@
                 Definition that are not defined directly in the service
                 specific schema.
                 
+                inclusion - Inclusions provide pathfinders with a specific set
+                of resources to use in path computation.  Different from an ERO
+                in that an ERO provides a specific path through the network, while
+                inclusions specifies the starting set of resources to be used in
+                pathfinding (not all of the resources need be used).
+                
+                exclusion - Exclusions provide a mechanism allowing an RA to
+                specify a set of resources that must be excluded when computing
+                a path.
+                
                 ##other - For future expansion and extensibility.
             </xsd:documentation>
         </xsd:annotation>

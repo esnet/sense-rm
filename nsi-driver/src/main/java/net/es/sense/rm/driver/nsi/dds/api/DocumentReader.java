@@ -25,8 +25,12 @@ import java.util.Collection;
 @Slf4j
 @Service
 public class DocumentReader {
+  private final DdsProvider ddsProvider;
+
   @Autowired
-  private DdsProvider ddsProvider;
+  public DocumentReader(DdsProvider ddsProvider) {
+    this.ddsProvider = ddsProvider;
+  }
 
   public long getLastDiscovered() {
     return ddsProvider.getLastDiscovered();
@@ -38,6 +42,10 @@ public class DocumentReader {
 
   public Collection<NsaType> getNsaById(String id) {
     return decode(NsaType.class, ddsProvider.getDocumentsByTypeAndId(Nsi.NSI_DOC_TYPE_NSA_V1, id));
+  }
+
+  public NsaType getNsa(String id) {
+    return decodeNSA(ddsProvider.getDocument(id, Nsi.NSI_DOC_TYPE_NSA_V1, id));
   }
 
   public Collection<NmlTopologyType> getNmlTopologyAll() {
@@ -62,5 +70,18 @@ public class DocumentReader {
     }
 
     return list;
+  }
+
+  private NsaType decodeNSA(Document document) {
+      try {
+        ContentType content = document.getDocumentFull().getContent();
+        InputStream is = Decoder.decode(content.getContentTransferEncoding(), content.getContentType(),
+            content.getValue());
+        return XmlUtilities.xmlToJaxb(NsaType.class, is);
+      } catch (IOException | JAXBException ex) {
+        log.error("[DocumentReader] could not decode NSA document id = {}", document.getId(), ex);
+      }
+
+      return null;
   }
 }

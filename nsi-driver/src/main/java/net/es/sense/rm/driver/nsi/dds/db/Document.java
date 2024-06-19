@@ -1,6 +1,7 @@
 package net.es.sense.rm.driver.nsi.dds.db;
 
 import com.google.common.base.Strings;
+import jakarta.persistence.*;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.xml.bind.JAXBException;
 import net.es.nsi.common.util.XmlUtilities;
@@ -9,17 +10,18 @@ import net.es.nsi.dds.lib.jaxb.dds.DocumentType;
 import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
 import net.es.sense.rm.driver.nsi.dds.api.DiscoveryError;
 import net.es.sense.rm.driver.nsi.dds.api.Exceptions;
-import jakarta.persistence.*;
+
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
+ * This class represents an NSI-DDS document as stored in the database.
  *
  * @author hacksaw
  */
@@ -34,16 +36,20 @@ public class Document implements Serializable {
   private static final String DOCUMENTS_URL = "documents";
   private static final ObjectFactory FACTORY = new ObjectFactory();
 
+  // Unique database index identifier.
   @Id
   @Basic(optional=false)
   private String id;
 
+  // The unique NSA identifier URI owning this document.
   @Basic(optional=false)
   private String nsa;
 
+  // The document type (i.e. vnd.ogf.nsi.nsa.v1+xml or vnd.ogf.nsi.topology.v2+xml).
   @Basic(optional=false)
   private String type;
 
+  // The document identifier unique in the context of the NSA identifier.
   @Basic(optional=false)
   private String documentId;
 
@@ -62,10 +68,11 @@ public class Document implements Serializable {
   private String document;
 
   /**
+   * Document constructor accepting a document type object and a baseURL for setting the href.
    *
-   * @param documentT
-   * @param baseURL
-   * @throws WebApplicationException
+   * @param documentT The document object to used for initialization.
+   * @param baseURL The base URL for the document.
+   * @throws WebApplicationException For any errors creating the document.
    */
   public Document(DocumentType documentT, String baseURL) throws WebApplicationException {
     // Populate the searchable fields.
@@ -75,8 +82,6 @@ public class Document implements Serializable {
     this.documentId = documentT.getId();
 
     // This is the time we discovered this documentT.
-    //Date discovered = new Date();
-    //discovered.setTime(discovered.getTime() - discovered.getTime() % 1000);
     lastDiscovered = now();
     expires = expires(documentT.getExpires());
     try {
@@ -95,17 +100,24 @@ public class Document implements Serializable {
     }
   }
 
+  /**
+   * Document constructor accepting a document type object used for initialization.
+   *
+   * @param documentT The document object to used for initialization.
+   * @throws WebApplicationException For any errors creating the document.
+   */
   public Document(DocumentType documentT) throws WebApplicationException {
     this(documentT, null);
   }
 
   /**
+   * Create an NSI-DDS document identifier that is URL encoded.
    *
-   * @param nsa
-   * @param type
-   * @param id
-   * @return
-   * @throws WebApplicationException
+   * @param nsa The NSA owning the document.
+   * @param type The type of document.
+   * @param id The unique identifier for the document.
+   * @return URL encoded globally unique document identifier.
+   * @throws WebApplicationException If the document identifier cannot be URL encoded.
    */
   public static String documentId(String nsa, String type, String id) throws WebApplicationException {
     if (Strings.isNullOrEmpty(nsa)) {
@@ -117,35 +129,20 @@ public class Document implements Serializable {
     }
 
     StringBuilder sb = new StringBuilder();
-
-    try {
-      sb.append(URLEncoder.encode(nsa, "UTF-8"));
-    } catch (UnsupportedEncodingException ex) {
-      throw Exceptions.illegalArgumentException(DiscoveryError.DOCUMENT_INVALID, "nsa", nsa);
-    }
-
-    try {
-      sb.append("/").append(URLEncoder.encode(type, "UTF-8"));
-    } catch (UnsupportedEncodingException ex) {
-      throw Exceptions.illegalArgumentException(DiscoveryError.DOCUMENT_INVALID, "type", type);
-    }
-
-    try {
-      sb.append("/").append(URLEncoder.encode(id, "UTF-8"));
-    } catch (UnsupportedEncodingException ex) {
-      throw Exceptions.illegalArgumentException(DiscoveryError.DOCUMENT_INVALID, "id", id);
-    }
-
+    sb.append(URLEncoder.encode(nsa, StandardCharsets.UTF_8));
+    sb.append("/").append(URLEncoder.encode(type, StandardCharsets.UTF_8));
+    sb.append("/").append(URLEncoder.encode(id, StandardCharsets.UTF_8));
     return sb.toString();
   }
 
   /**
+   * Create an NSI-DDS document identifier that is URL encoded.
    *
-   * @param documentT
-   * @return
-   * @throws IllegalArgumentException
+   * @param documentT The document to use as the source for the identifier.
+   * @return URL encoded globally unique document identifier.
+   * @throws WebApplicationException If the document identifier cannot be URL encoded.
    */
-  public static String documentId(DocumentType documentT) throws IllegalArgumentException {
+  public static String documentId(DocumentType documentT) throws WebApplicationException {
     return documentId(documentT.getNsa(), documentT.getType(), documentT.getId());
   }
 
@@ -156,7 +153,7 @@ public class Document implements Serializable {
    * @throws WebApplicationException
    */
   private String getDocumentURL(String baseURL) throws WebApplicationException {
-    if (baseURL == null) {
+    if (Strings.isNullOrEmpty(baseURL)) {
       return null;
     }
 

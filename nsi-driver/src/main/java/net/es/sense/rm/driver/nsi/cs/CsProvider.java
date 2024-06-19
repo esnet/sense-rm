@@ -30,11 +30,14 @@ import jakarta.xml.ws.soap.SOAPFaultException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.cs.lib.*;
+import net.es.nsi.dds.lib.jaxb.nsa.InterfaceType;
+import net.es.nsi.dds.lib.jaxb.nsa.NsaType;
 import net.es.sense.rm.driver.api.mrml.ModelUtil;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.cs.api.CsUtils;
 import net.es.sense.rm.driver.nsi.cs.api.QuerySummary;
 import net.es.sense.rm.driver.nsi.cs.db.*;
+import net.es.sense.rm.driver.nsi.dds.api.DocumentReader;
 import net.es.sense.rm.driver.nsi.mrml.*;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.spring.SpringExtension;
@@ -80,6 +83,7 @@ public class CsProvider {
   private final ReservationService reservationService;
   private final SpringExtension springExtension;
   private final NsiActorSystem nsiActorSystem;
+  private final DocumentReader documentReader;
 
   private ActorRef connectionActor;
 
@@ -97,7 +101,7 @@ public class CsProvider {
   public CsProvider(NsiProperties nsiProperties, ConnectionMapService connectionMapService,
                     OperationMapRepository operationMap, DeltaMapRepository deltaMap,
                     ReservationService reservationService, SpringExtension springExtension,
-                    NsiActorSystem nsiActorSystem) {
+                    NsiActorSystem nsiActorSystem, DocumentReader documentReader) {
     this.nsiProperties = nsiProperties;
     this.connectionMapService = connectionMapService;
     this.operationMap = operationMap;
@@ -105,6 +109,7 @@ public class CsProvider {
     this.reservationService = reservationService;
     this.springExtension = springExtension;
     this.nsiActorSystem = nsiActorSystem;
+    this.documentReader = documentReader;
   }
 
   // Object factories for creating NSI objects for JAXB manipulation.
@@ -134,6 +139,26 @@ public class CsProvider {
     load();
 
     log.info("[CsProvider] Completed NSI CS system initialization.");
+  }
+
+  /**
+   * Configure the NSI-CS client based on either static URL or dynamic data from NSI-DDS.
+   *
+   * @return The new NSI-CS client.
+   */
+  private ClientUtil getNsiClient() {
+    String url = nsiProperties.getProviderConnectionURL();
+    if (Strings.isNullOrEmpty(url)) {
+      // If a manual override for the URL was not specified then we
+      // will need to learn the URL from the NSI-DDS.
+      NsaType doc = documentReader.getNsa(nsiProperties.getProviderNsaId());
+      url = doc.getInterface().stream()
+          .filter(f -> f.getType().equalsIgnoreCase(Nsi.NSI_CS_PROVIDER_V2))
+          .map(InterfaceType::getHref)
+          .findFirst()
+          .orElse(null);
+    }
+    return new ClientUtil(url);
   }
 
   /**
@@ -721,7 +746,7 @@ public class CsProvider {
       // Issue the NSI reservation request.
       try {
         log.debug("[processNewSwitchingSubnet] issuing reserve operation correlationId = {}", correlationId);
-        ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
+        ClientUtil nsiClient = getNsiClient();
         ReserveResponseType response = nsiClient.getProxy().reserve(r, header);
 
         // Update the reservation in the database with returned connectionId.
@@ -1204,7 +1229,7 @@ public class CsProvider {
       try {
         log.debug("[processModifiedSwitchingSubnet] issuing reserve operation correlationId = {}, connectionId = {}",
             correlationId, r.getConnectionId());
-        ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
+        ClientUtil nsiClient = getNsiClient();
         ReserveResponseType response = nsiClient.getProxy().reserve(r, header);
 
         // Add connectionId to the list we need to commit.
@@ -1389,7 +1414,7 @@ public class CsProvider {
       boolean error = true;
       String errorMessage = null;
       try {
-        ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
+        ClientUtil nsiClient = getNsiClient();
         nsiClient.getProxy().terminate(terminate, header);
         log.debug("[commitDeltaReduction] issued terminate operation correlationId = {}, connectionId = {}",
                 correlationId, terminate.getConnectionId());
@@ -1496,7 +1521,7 @@ public class CsProvider {
       boolean error = true;
       String errorMessage = null;
       try {
-        ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
+        ClientUtil nsiClient = getNsiClient();
         nsiClient.getProxy().reserveCommit(commitBody, header);
 
         log.debug("[commitDeltaAddition] issued commitDeltaAddition operation correlationId = {}, connectionId = {}",
@@ -1588,7 +1613,7 @@ public class CsProvider {
       boolean error = true;
       String errorMessage = null;
       try {
-        ClientUtil nsiClient = new ClientUtil(nsiProperties.getProviderConnectionURL());
+        ClientUtil nsiClient = getNsiClient();
         nsiClient.getProxy().provision(commitBody, header);
 
         log.debug("[commitDeltaAddition] issued provision operation correlationId = {}, connectionId = {}",

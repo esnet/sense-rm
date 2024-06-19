@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Utility classes for building clients
+ * Utility classes for building NSI-CS clients.
  *
  */
 @Slf4j

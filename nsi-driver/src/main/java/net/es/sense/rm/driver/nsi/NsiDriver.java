@@ -62,14 +62,15 @@ import java.util.concurrent.TimeoutException;
 @Slf4j
 @Component
 public class NsiDriver implements Driver {
-
-  @Autowired
-  private NsiProperties nsiProperties;
-
-  @Autowired
-  private RaController raController;
-
+  private final NsiProperties nsiProperties;
+  private final RaController raController;
   private String networkId;
+
+  @Autowired
+  public NsiDriver(NsiProperties nsiProperties, RaController raController) {
+    this.nsiProperties = nsiProperties;
+    this.raController = raController;
+  }
 
   /**
    * Start the NSI driver.

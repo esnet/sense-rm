@@ -21,6 +21,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -64,23 +65,19 @@ public class DdsClient extends RestClient {
       if (response.getStatus() == Status.OK.getStatusCode()) {
         result.setLastModified(response.getLastModified() == null ?
                 (System.currentTimeMillis() / 1000) * 1000 : response.getLastModified().getTime());
-        result.setDocuments(response.readEntity(DocumentListType.class)
-                .getDocument()
-                .stream()
-                .collect(Collectors.toList()));
+        result.setDocuments(new ArrayList<>(response.readEntity(DocumentListType.class)
+            .getDocument()));
       } else {
         log.error("DdsClient] Failed to retrieve list of documents = {}, result = {}",
                 webTarget.getUri().toASCIIString(), response.getStatusInfo().getReasonPhrase());
         Optional<ErrorType> error = Optional.ofNullable(response.readEntity(ErrorType.class));
-        if (error.isPresent()) {
-          log.error("[DdsClient] Subscription get failed, href={}, error={}.", webTarget.getUri().toASCIIString(), error.get().getId());
-        }
+        error.ifPresent(errorType -> log.error("[DdsClient] Subscription get failed, href={}, error={}.", webTarget.getUri().toASCIIString(), errorType.getId()));
       }
     } catch (Exception ex) {
-      log.error("[DdsClient] GET failed for href={}, ex={}", webTarget.getUri().toASCIIString(), ex);
+      log.error("[DdsClient] GET failed for href={}", webTarget.getUri().toASCIIString(), ex);
       result.setStatus(Status.INTERNAL_SERVER_ERROR);
     } finally {
-      optional.ifPresent(r -> r.close());
+      optional.ifPresent(Response::close);
     }
 
     return result;
@@ -121,10 +118,8 @@ public class DdsClient extends RestClient {
       if (response.getStatus() == Status.OK.getStatusCode()) {
         result.setLastModified(response.getLastModified() == null ?
                 (System.currentTimeMillis() / 1000) * 1000 : response.getLastModified().getTime());
-        result.setSubscriptions(response.readEntity(SubscriptionListType.class)
-                .getSubscription()
-                .stream()
-                .collect(Collectors.toList()));
+        result.setSubscriptions(new ArrayList<>(response.readEntity(SubscriptionListType.class)
+            .getSubscription()));
       } else {
         log.error("DdsClient] Failed to retrieve list of subscriptions {}, result = {}",
                 baseURL, response.getStatusInfo().getReasonPhrase());
@@ -136,10 +131,10 @@ public class DdsClient extends RestClient {
         }
       }
     } catch (Exception ex) {
-      log.error("[DdsClient] GET failed for href={}, ex={}", webTarget.getUri().toASCIIString(), ex);
+      log.error("[DdsClient] GET failed for href={}", webTarget.getUri().toASCIIString(), ex);
       result.setStatus(Status.INTERNAL_SERVER_ERROR);
     } finally {
-      optional.ifPresent(r -> r.close());
+      optional.ifPresent(Response::close);
     }
 
     return result;

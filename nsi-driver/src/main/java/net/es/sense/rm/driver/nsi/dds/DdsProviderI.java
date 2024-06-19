@@ -9,6 +9,7 @@ import net.es.sense.rm.driver.nsi.dds.db.Document;
 import java.util.Collection;
 
 /**
+ * The interface description for a DdsProvider.
  *
  * @author hacksaw
  */
@@ -36,17 +37,13 @@ public interface DdsProviderI {
 
   public Document getDocument(String nsa, String type, String id, long lastDiscovered) throws WebApplicationException;
 
+  public Document getDocument(String nsa, String type, String id) throws WebApplicationException;
+
   // public Document getDocument(DocumentType document) throws WebApplicationException;
   public Collection<Document> getLocalDocuments(String type, String id, long lastDiscovered) throws WebApplicationException;
 
   public Collection<Document> getLocalDocumentsByType(String type, String id, long lastDiscovered) throws WebApplicationException;
 
   public Document getLocalDocument(String type, String id, long lastDiscovered) throws WebApplicationException;
-/**
-  public Subscription addSubscription(SubscriptionRequestType request, String encoding);
 
-  public Subscription deleteSubscription(String id) throws WebApplicationException;
-
-  public Subscription editSubscription(String id, SubscriptionRequestType request, String encoding) throws WebApplicationException;
-**/
 }

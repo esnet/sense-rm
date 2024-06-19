@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.client.DdsClient;
 import net.es.nsi.dds.lib.client.DocumentsResult;
-import net.es.nsi.dds.lib.client.HttpsContext;
 import net.es.nsi.dds.lib.jaxb.dds.DocumentType;
 import net.es.nsi.dds.lib.jaxb.dds.FilterType;
 import net.es.nsi.dds.lib.jaxb.dds.NotificationType;
@@ -34,6 +33,7 @@ import org.springframework.stereotype.Component;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
+
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.IOException;
@@ -41,8 +41,10 @@ import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
+ * The DdsProvider class provides access to all documents stored in the NSI-DDS peers.
  *
  * @author hacksaw
  */
@@ -50,34 +52,50 @@ import java.util.Collection;
 @Component
 public class DdsProvider implements DdsProviderI {
 
-  // Runtime properties.
-  @Autowired
-  private NsiProperties nsiProperties;
-
-  @Autowired
-  private DocumentService documentService;
-
-  @Autowired
-  private SpringExtension springExtension;
-
-  @Autowired
-  private NsiActorSystem nsiActorSystem;
+  // Injected runtime properties.
+  private final NsiProperties nsiProperties;
+  private final DocumentService documentService;
+  private final SpringExtension springExtension;
+  private final NsiActorSystem nsiActorSystem;
+  private final DdsClientProvider ddsClientProvider;
 
   private ActorRef localDocumentActor;
   private ActorRef documentExpiryActor;
   private ActorRef registrationRouter;
-  private DdsClient ddsClient;
+
 
   /**
+   * Constructor injection to initialize the DdsProvider.
+   *
+   * @param nsiProperties
+   * @param documentService
+   * @param springExtension
+   * @param nsiActorSystem
+   */
+  @Autowired
+  public DdsProvider(NsiProperties nsiProperties, DocumentService documentService,
+                     SpringExtension springExtension, NsiActorSystem nsiActorSystem,
+                     DdsClientProvider ddsClientProvider) {
+    this.nsiProperties = nsiProperties;
+    this.documentService = documentService;
+    this.springExtension = springExtension;
+    this.nsiActorSystem = nsiActorSystem;
+    this.ddsClientProvider = ddsClientProvider;
+  }
+
+  /**
+   * Get the singleton instance of ddsProvider bean.
    *
    * @return
    */
   public static DdsProvider getInstance() {
-    DdsProvider instance = SpringApplicationContext.getBean("ddsProvider", DdsProvider.class);
-    return instance;
+    return SpringApplicationContext.getBean("ddsProvider", DdsProvider.class);
   }
 
   /**
+   * Initialize the DDS provider infrastructure.  This includes the akka actor system, the dds
+   * client, configuration of peer NSI-DDS systems, and a one time load of documents into the
+   * cache.
    *
    * @throws KeyManagementException
    * @throws NoSuchAlgorithmException
@@ -101,34 +119,32 @@ public class DdsProvider implements DdsProviderI {
       log.error("[DdsProvider] Failed to initialize actor", ex);
     }
 
+    /**
     // If there is a secure SSL context specified then we process it.
     if (nsiProperties.getSecure() != null) {
       HttpsContext.getInstance().load(nsiProperties.getSecure());
     }
 
-
     // We need to initialize the DDS client with specified configuration.
-
     if (nsiProperties.getClient().isSecure()) {
       ddsClient = new DdsClient(nsiProperties.getClient(), HttpsContext.getInstance());
     } else {
       ddsClient = new DdsClient(nsiProperties.getClient());
     }
+     **/
 
-    // Do a one time load of documents from remote DDS service since the web
+    // Do a one time load of documents from remote DDS service since our web
     // server may not yet be servicing requests.  From this point on it is
     // controlled through the notification process.
-
-
     for (String url : nsiProperties.getPeers()) {
-      log.debug("[load] registering url={}", url);
-      DocumentsResult results = ddsClient.getDocuments(url);
+      log.debug("[load] loading documents from url = {}", url);
+      DocumentsResult results = getDdsClient().getDocuments(url);
       if (results.getStatus() != Status.OK) {
         log.error("[DdsProvider] could not not load documents from peer = {}, status = {}", url, results.getStatus());
         continue;
       }
 
-      results.getDocuments().stream().filter(d -> d != null).forEach(d -> {
+      results.getDocuments().stream().filter(Objects::nonNull).forEach(d -> {
         String documentId = Document.documentId(d);
 
         Document entry = documentService.get(documentId);
@@ -173,7 +189,7 @@ public class DdsProvider implements DdsProviderI {
    * @return the ddsClient
    */
   public DdsClient getDdsClient() {
-    return ddsClient;
+    return ddsClientProvider.get();
   }
 
   public void terminate() {
@@ -181,7 +197,7 @@ public class DdsProvider implements DdsProviderI {
     RegistrationEvent event = new RegistrationEvent();
     event.setEvent(RegistrationEvent.Event.Delete);
     registrationRouter.tell(event, registrationRouter);
-    try { Thread.sleep(4000); } catch (Exception ex) {}
+    try { Thread.sleep(4000); } catch (Exception ignored) {}
 
     // We need to kill each of our actors but not touch the actorSystem.
     nsiActorSystem.shutdown(localDocumentActor);
@@ -245,13 +261,6 @@ public class DdsProvider implements DdsProviderI {
       throw Exceptions.doesNotExistException(DiscoveryError.INTERNAL_SERVER_ERROR, "document", document.getDocumentId());
     }
 
-/**
-    // Route a new document event.
-    DocumentEvent de = new DocumentEvent();
-    de.setEvent(DocumentEventType.NEW);
-    de.setDocument(document);
-    ddsController.sendNotification(de);
-**/
     return document;
   }
 
@@ -308,13 +317,6 @@ public class DdsProvider implements DdsProviderI {
       throw Exceptions.doesNotExistException(DiscoveryError.INTERNAL_SERVER_ERROR, "document", documentId);
     }
 
-/**
-    // Route a update document event.
-    DocumentEvent de = new DocumentEvent();
-    de.setEvent(DocumentEventType.UPDATED);
-    de.setDocument(newDoc);
-    ddsController.sendNotification(de);
-**/
     return document;
   }
 
@@ -402,14 +404,6 @@ public class DdsProvider implements DdsProviderI {
     }
     // End temp debugging.
 
-
-    // Route a update document event.
-/**
-    DocumentEvent de = new DocumentEvent();
-    de.setEvent(DocumentEventType.UPDATED);
-    de.setDocument(newDoc);
-    ddsController.sendNotification(de);
-**/
     return update;
   }
 
@@ -426,7 +420,7 @@ public class DdsProvider implements DdsProviderI {
   @Override
   public Collection<Document> getDocuments(String nsa, String type, String id, long lastDiscovered) {
     // We need to search for matching documents using the supplied criteria.
-    // We will do this linearly now, but we will need multiple indicies later
+    // We will do this linearly now, but we will need multiple indices later
     // to make this faster.
 
     // Seed the results.
@@ -458,7 +452,7 @@ public class DdsProvider implements DdsProviderI {
     Collection<Document> results;
 
     // This is the primary search value.  Make sure it is present.
-    if (!!Strings.isNullOrEmpty(nsa)) {
+    if (!Strings.isNullOrEmpty(nsa)) {
       results = Lists.newArrayList(documentService.getByNsa(nsa));
       if (results.isEmpty()) {
         throw Exceptions.doesNotExistException(DiscoveryError.NOT_FOUND, "nsa", nsa);
@@ -542,6 +536,18 @@ public class DdsProvider implements DdsProviderI {
     if (lastDiscovered != 0 && lastDiscovered >= document.getLastDiscovered()) {
       // NULL will represent not modified.
       return null;
+    }
+
+    return document;
+  }
+
+  @Override
+  public Document getDocument(String nsa, String type, String id) throws WebApplicationException {
+    String documentId = Document.documentId(nsa, type, id);
+    Document document = documentService.get(documentId);
+
+    if (document == null) {
+      throw Exceptions.doesNotExistException(DiscoveryError.DOCUMENT_DOES_NOT_EXIST, "document", "nsa=" + nsa + ", type=" + type + ", id=" + id);
     }
 
     return document;

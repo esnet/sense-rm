@@ -19,10 +19,11 @@
  */
 package net.es.sense.rm.driver.nsi.cs.db;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides an audit function to remove any connections that should not be in
@@ -34,8 +35,8 @@ import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 public class ReservationAudit {
   private final List<String> auditable = new ArrayList<>();
 
-  public void add(String providerId, String connectionId) {
-    auditable.add(providerId + ":" + connectionId);
+  public void add(String providerId, String connectionId, int version) {
+    auditable.add(providerId + ":" + connectionId + ":" + version);
   }
 
   /**
@@ -48,7 +49,7 @@ public class ReservationAudit {
    */
   public void audit(ReservationService reservationService) {
     for (Reservation reservation : reservationService.get()) {
-      String cid = reservation.getProviderNsa() + ":" + reservation.getConnectionId();
+      String cid = reservation.getProviderNsa() + ":" + reservation.getConnectionId() + ":" + reservation.getVersion();
       log.debug("[ReservationAudit] auditing cid = {}", cid);
       if (auditable.contains(cid)) {
         log.debug("[ReservationAudit] found cid = {}", cid);
@@ -69,10 +70,6 @@ public class ReservationAudit {
 
           reservationService.setLifecycleState(reservation.getId(), LifecycleStateEnumType.TERMINATED,
                   System.currentTimeMillis());
-
-          //reservation.setLifecycleState(LifecycleStateEnumType.TERMINATED);
-          //reservation.setDiscovered(System.currentTimeMillis());
-          //reservationService.store(reservation);
         } else {
           // This is probably our third time through so we can just delete it now.
           log.debug("[ReservationAudit] deleting cid = {}, lifecycleState = {}",

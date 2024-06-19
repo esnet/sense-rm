@@ -21,13 +21,14 @@ public class ModelAdditionTest {
 
   @Test
   public void readTtl() throws Exception {
+    /*
     // Get the models for this delta operation.
-    /*Model m = ModelFactory.createDefaultModel();
+    Model m = ModelFactory.createDefaultModel();
     m.read(MODEL_FILE, "TURTLE");
 
     net.es.sense.rm.driver.nsi.db.Model model = new net.es.sense.rm.driver.nsi.db.Model();
     model.setModelId(MODEL_ID);
-    model.setVersion(0);
+    model.setVersion("abcdef");
     model.setTopologyId("urn:ogf:network:es.net:2013:");
     model.setBase(ModelUtil.marshalModel(m));
 
@@ -41,6 +42,6 @@ public class ModelAdditionTest {
     request.setModelId("urn:uuid:c87c0ac1-e02b-484c-b595-e58d807a7661");
     request.setAddition(ModelUtil.marshalModel(addition));
 
-    processDeltaAddition(request); */
+    processDeltaAddition(request);*/
   }
 }

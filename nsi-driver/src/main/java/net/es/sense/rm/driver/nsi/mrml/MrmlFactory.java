@@ -10,41 +10,53 @@ import net.es.nsi.dds.lib.jaxb.nml.NmlLocationType.NmlAddress;
 import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
 import net.es.nsi.dds.lib.jaxb.nml.NmlTopologyType;
 import net.es.nsi.dds.lib.jaxb.nml.ServiceDefinitionType;
+import net.es.sense.rm.driver.api.mrml.ModelUtil;
 import net.es.sense.rm.driver.nsi.cs.db.Reservation;
-import net.es.sense.rm.driver.schema.*;
+import net.es.sense.rm.driver.schema.Mrs;
+import net.es.sense.rm.driver.schema.Nml;
+import net.es.sense.rm.driver.schema.Rdf;
+import net.es.sense.rm.driver.schema.Sd;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.io.StringWriter;
+import java.io.IOException;
 import java.util.*;
 
 /**
+ * This class handles creation of an MRML model representing the network.
  *
  * @author hacksaw
  */
 @Slf4j
 public class MrmlFactory {
 
-  private final NmlModel nml;
-  private final SwitchingSubnetModel ssm;
-  private final String topologyId;
-  private final NmlTopologyType topology;
+  private final NmlModel nml; // The NML topology model as discovered from the providerNSA (via DDS).
+  private final SwitchingSubnetModel ssm; // The MRS switching subnet model as discovered from providerNSA and locally stored data.
+  private final String topologyId; // The topology identifier for this network (networkId in NSI-CS speak).
+  private final NmlTopologyType topology; // The NML topology JAXB document that will be populated with discovered document.
 
+  /**
+   * Initialize this MRML factory class.
+   *
+   * @param nml The NML document cache.
+   * @param ssm The switching subnet model cache.
+   * @param topologyId The unique identifier for the topology managed by this MRML factory.
+   * @throws IllegalArgumentException When a DDS topology document cannot be found for the specified topologyId.
+   */
   public MrmlFactory(NmlModel nml, SwitchingSubnetModel ssm, String topologyId) throws IllegalArgumentException {
     log.debug("[MrmlFactory] creating topologyId = {}", topologyId);
-
     this.nml = nml;
     this.ssm = ssm;
     this.topologyId = topologyId;
     this.topology = nml.getTopology(topologyId)
             .orElseThrow(new IllegalArgumentExceptionSupplier(
                     "[MrmlFactory] Could not find NML document for topologyId = " + topologyId));
+    log.debug("[MrmlFactory] created topologyId = {}", topologyId);
   }
 
   /**
@@ -60,33 +72,17 @@ public class MrmlFactory {
     return nml.getLastDiscovered() + ":" + ssm.getVersion();
   }
 
-  public String getModelAsString(String modelType) {
-    log.debug("[MrmlFactory] getModelAsString for modelType {}", modelType);
 
-    Lang encoding;
-    switch (modelType.toLowerCase()) {
-      case "jasonld":
-        encoding = Lang.JSONLD;
-        break;
-      case "turtle":
-      default:
-        encoding = Lang.TURTLE;
-        break;
-
-    }
-    StringWriter sw = new StringWriter();
-    RDFDataMgr.write(sw, getOntologyModel().getBaseModel(), encoding);
-    return sw.toString();
-  }
-
-  public String getModelAsString(Lang encoding) {
-    log.debug("[MrmlFactory] getModelAsString for encoding {}", encoding);
-
-    OntModel baseModel = getOntologyModel();
-
-    StringWriter sw = new StringWriter();
-    RDFDataMgr.write(sw, baseModel.getBaseModel(), encoding);
-    return sw.toString();
+  /**
+   * Serialize the base Ontology model to a string.
+   *
+   * @param encoding The output encoding for the serializer.
+   * @return The model serialized as a string.
+   * @throws IOException If the model cannot be serialized.
+   */
+  public String getModelAsString(Lang encoding) throws IOException {
+    log.debug("[MrmlFactory] getModelAsString for modelType {}", encoding);
+    return ModelUtil.marshalModel(getOntologyModel().getBaseModel(), encoding.getName());
   }
 
   /**
@@ -94,12 +90,12 @@ public class MrmlFactory {
    *
    * @return MRML Ontology model.
    */
-  public OntModel getOntologyModel() {
+  public OntModel getOntologyModel() throws IOException {
 
     log.debug("[MrmlFactory] getOntologyModel for topologyId = {}", topologyId);
 
     // Create the empty model in which to place the content.
-    OntModel model = createEmptyModel();
+    OntModel model = ModelUtil.newMrmlModel();
 
     // Populate the root Topology resource.
     createTopolgyResource(model);
@@ -117,18 +113,6 @@ public class MrmlFactory {
 
     createSwitchingSubnet(model);
 
-    return model;
-  }
-
-  public static OntModel createEmptyModel() {
-    OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
-    model.setNsPrefix("rdfs", Rdfs.getURI());
-    model.setNsPrefix("rdf", Rdf.getURI());
-    model.setNsPrefix("sd", Sd.getURI());
-    model.setNsPrefix("owl", Owl.getURI());
-    model.setNsPrefix("nml", Nml.getURI());
-    model.setNsPrefix("mrs", Mrs.getURI());
-    //model.setNsPrefix("spa", Spa.getURI());
     return model;
   }
 
@@ -533,7 +517,7 @@ public class MrmlFactory {
     startTime.ifPresent(s -> {
       try {
         XMLGregorianCalendar start = XmlUtilities.xmlGregorianCalendar(new Date(s));
-        res.addProperty(Nml.start, start.toXMLFormat());
+        res.addProperty(Nml.start, ResourceFactory.createTypedLiteral(start.toXMLFormat(), XSDDatatype.XSDdateTime));
       } catch (DatatypeConfigurationException ex) {
         log.error("[MrmlFactory] failed to create startTime xmlGregorianCalendar", ex);
       }
@@ -542,7 +526,7 @@ public class MrmlFactory {
     endTime.ifPresent(s -> {
       try {
         XMLGregorianCalendar end = XmlUtilities.xmlGregorianCalendar(new Date(s));
-        res.addProperty(Nml.end, end.toXMLFormat());
+        res.addProperty(Nml.end, ResourceFactory.createTypedLiteral(end.toXMLFormat(), XSDDatatype.XSDdateTime));
       } catch (DatatypeConfigurationException ex) {
         log.error("[MrmlFactory] failed to create endTime xmlGregorianCalendar", ex);
       }

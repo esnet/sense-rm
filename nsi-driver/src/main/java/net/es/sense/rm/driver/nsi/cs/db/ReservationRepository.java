@@ -19,7 +19,6 @@
  */
 package net.es.sense.rm.driver.nsi.cs.db;
 
-import java.util.Collection;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
@@ -29,7 +28,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+
 /**
+ * This class models the CrudRepository class for the reservation database service.
  *
  * @author hacksaw
  */
@@ -38,6 +40,14 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
 
   public Reservation findOneById(@Param("id") long id);
   public void deleteById(@Param("id") long id);
+  public void deleteByUniqueId(@Param("uniqueId") String uniqueId);
+
+  /**
+   *
+   * @param uniqueId
+   * @return
+   */
+  public Reservation findByUniqueId(@Param("uniqueId") String uniqueId);
 
   /**
    *
@@ -66,9 +76,14 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
    * @param connectionId
    * @return
    */
-  public Reservation findByProviderNsaAndConnectionId(
+  public Collection<Reservation> findByProviderNsaAndConnectionId(
           @Param ("providerNsa") String providerNsa,
           @Param("connectionId") String connectionId);
+
+  public Reservation findByProviderNsaAndConnectionIdAndVersion(
+      @Param ("providerNsa") String providerNsa,
+      @Param("connectionId") String connectionId,
+      @Param("version") int version);
 
   /**
    * Lookup a reservation based on providerId and parentConnectionId.
@@ -114,7 +129,10 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
   public Collection<Reservation> findFirst1ByOrderByDiscoveredAsc();
 
   /**
-   * Get the newest reservation.
+   * Get the newest reservation.  Using spring hibernate's native query capabilities we
+   * structure the query to "find First1 By Order By Discovered Desc", meaning return
+   * the first matching entry ordered in descending sequence by sorting on the discovered
+   * attribute.  Or in layman's terms, return the newest reservation.
    *
    * @return
    */
@@ -140,6 +158,16 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
   /**
    *
    * @param id
+   * @param connectionId
+   * @return
+   */
+  @Modifying(clearAutomatically=true, flushAutomatically = true)
+  @Query("update #{#entityName} r set r.connectionId = :connectionId where r.id = :id")
+  public int setConnectionId(@Param("id") long id, @Param("connectionId") String connectionId);
+
+  /**
+   *
+   * @param id
    * @param reservationState
    * @param discovered
    * @return
@@ -153,6 +181,20 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
           @Param("id") long id,
           @Param("reservationState") ReservationStateEnumType reservationState,
           @Param("discovered") long discovered);
+
+  /**
+   *
+   * @param id
+   * @param reservationState
+   * @return
+   */
+  @Modifying(clearAutomatically=true, flushAutomatically = true)
+  @Query("update #{#entityName} r set r.reservationState = :reservationState, "
+      + "r.dirty = false "
+      + "where r.id = :id")
+  public int setReservationState(
+      @Param("id") long id,
+      @Param("reservationState") ReservationStateEnumType reservationState);
 
   /**
    *
@@ -291,5 +333,15 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
   @Modifying(clearAutomatically=true, flushAutomatically = true)
   @Query("update #{#entityName} r set r.dirty = :dirty where r.id = :id")
   public int setDirty(@Param("id") long id, @Param("dirty") boolean dirty);
+
+  /**
+   *
+   * @param id
+   * @param version
+   * @return
+   */
+  @Modifying(clearAutomatically=true, flushAutomatically = true)
+  @Query("update #{#entityName} r set r.version = :version where r.id = :id")
+  public int setVersion(@Param("id") long id, @Param("version") int version);
 
 }

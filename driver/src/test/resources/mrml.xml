@@ -1,0 +1,1357 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:ns0="http://schemas.ogf.org/mrs/2013/12/topology#"
+         xmlns:ns1="http://schemas.ogf.org/nml/2013/03/base#"
+         xmlns:ns2="http://schemas.ogf.org/nsi/2013/12/services/definition#">
+
+    <rdf:Description rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:BandwidthService">
+        <rdf:type rdf:resource="http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"/>
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+"/>
+    </rdf:Description>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>1779-1799,1800-1819,3400-3499</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+        <ns1:isAlias rdf:resource="urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_2:esnet"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-4094</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-4094</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-908,910-918,920-1800,1802-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>1000-1019</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+        <ns1:isAlias rdf:resource="urn:ogf:network:netherlight.net:2013:production7:esnet-1"/>
+    </ns1:BidirectionalPort>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">40000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">40000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">40000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">40000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech"/>
+    </ns0:BandwidthService>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1"/>
+    </ns0:BandwidthService>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+"/>
+    </ns0:BandwidthService>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+"/>
+    </ns0:BandwidthService>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+"/>
+    </ns0:BandwidthService>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>1662-1664</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-4089</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+"/>
+    </ns0:BandwidthService>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-4094</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-998,1000-4094</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>3600-3619</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:BandwidthService"/>
+        <ns1:isAlias rdf:resource="urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:esnet"/>
+    </ns1:BidirectionalPort>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+"/>
+    </ns0:BandwidthService>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-910,912-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+"/>
+    </ns0:BandwidthService>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-4094</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+"/>
+    </ns0:BandwidthService>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1"/>
+    </ns0:BandwidthService>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+"/>
+    </ns0:BandwidthService>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1"/>
+    </ns0:BandwidthService>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+"/>
+    </ns0:BandwidthService>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+"/>
+    </ns0:BandwidthService>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-4094</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+"/>
+    </ns0:BandwidthService>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-911,913-4094</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-1799,1801-4094</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>1779-1799</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-4094</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>1779-1799</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>1662,1720-1725</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+"/>
+    </ns0:BandwidthService>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:vlan"/>
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">80000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">80000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">80000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">80000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:vlan"/>
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-499,501-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-4094</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-4094</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-911,913-4094</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+"/>
+    </ns0:BandwidthService>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich"/>
+    </ns0:BandwidthService>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>1720-1725,1860-1899,3400-3499</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+"/>
+    </ns0:BandwidthService>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix"/>
+    </ns0:BandwidthService>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+"/>
+    </ns0:BandwidthService>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>3176-3179,3800-3809</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+"/>
+    </ns0:BandwidthService>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+"/>
+    </ns0:BandwidthService>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:BandwidthService"/>
+        <ns1:isAlias rdf:resource="urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_2:esnet"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>1779-1799</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:vlan"/>
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">40000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">40000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">40000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">40000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+        <ns1:isAlias rdf:resource="urn:ogf:network:snvaca.pacificwave.net:2016:topology:esnet-sunnyvale"/>
+    </ns1:BidirectionalPort>
+
+    <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:BandwidthService">
+        <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+        <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+        <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+        <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+        <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+        <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+        <ns0:type>guaranteedCapped</ns0:type>
+        <ns0:unit>bps</ns0:unit>
+        <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+"/>
+    </ns0:BandwidthService>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">100000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService>
+            <ns0:BandwidthService rdf:about="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:BandwidthService">
+                <ns0:availableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:availableCapacity>
+                <ns0:granularity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:granularity>
+                <ns0:individualCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:individualCapacity>
+                <ns0:maximumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:maximumCapacity>
+                <ns0:minimumCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1000000</ns0:minimumCapacity>
+                <ns0:reservableCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000000</ns0:reservableCapacity>
+                <ns0:type>guaranteedCapped</ns0:type>
+                <ns0:unit>bps</ns0:unit>
+                <ns0:usedCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</ns0:usedCapacity>
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+"/>
+            </ns0:BandwidthService>
+        </ns1:hasService>
+
+    </ns1:BidirectionalPort>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>1662,1720-1725</ns1:values>
+    </ns1:LabelGroup>
+
+    <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:vlan">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+"/>
+        <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+        <ns1:values>2-4094</ns1:values>
+    </ns1:LabelGroup>
+
+    <rdf:Description rdf:about="urn:ogf:network:es.net:2013::ServiceDefinition:EVTS.A-GOLE">
+        <rdf:type rdf:resource="http://schemas.ogf.org/nsi/2013/12/services/definition#ServiceDefinition"/>
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:name>GLIF Automated GOLE Ethernet VLAN Transfer Service</ns1:name>
+        <ns2:serviceType>http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE</ns2:serviceType>
+    </rdf:Description>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup>
+            <ns1:LabelGroup rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:vlan">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+"/>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns1:values>2-4094</ns1:values>
+            </ns1:LabelGroup>
+        </ns1:hasLabelGroup>
+
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:Topology rdf:about="urn:ogf:network:es.net:2013:">
+        <ns1:existsDuring>
+            <ns1:Lifetime>
+                <ns1:end>2017-11-14T10:15:13.129Z</ns1:end>
+                <ns1:start>2017-09-15T10:15:13.128Z</ns1:start>
+            </ns1:Lifetime>
+        </ns1:existsDuring>
+
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+"/>
+        <ns1:hasBidirectionalPort>
+            <ns1:SwitchingService rdf:about="urn:ogf:network:es.net:2013::ServiceDomain:EVTS.A-GOLE">
+                <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+                <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+"/>
+                <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech"/>
+                <ns1:labelSwapping rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</ns1:labelSwapping>
+                <ns1:labeltype rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet#vlan"/>
+                <ns2:hasServiceDefinition rdf:resource="urn:ogf:network:es.net:2013::ServiceDefinition:EVTS.A-GOLE"/>
+            </ns1:SwitchingService>
+        </ns1:hasBidirectionalPort>
+
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:10_1_7:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:10_1_8:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:3_1_1:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_1_1:+"/>
+        <ns1:hasBidirectionalPort rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+"/>
+        <ns1:locatedAt>
+            <ns1:Location>
+                <ns1:alt rdf:datatype="http://www.w3.org/2001/XMLSchema#float">809.0</ns1:alt>
+                <ns1:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#float">-122.24998</ns1:lat>
+                <ns1:long rdf:datatype="http://www.w3.org/2001/XMLSchema#float">37.87619</ns1:long>
+                <ns1:name>ESnet Berkeley</ns1:name>
+                <ns1:unlocode>Bogus String</ns1:unlocode>
+            </ns1:Location>
+        </ns1:locatedAt>
+
+        <ns1:name>es.net</ns1:name>
+        <ns1:version>2017-09-15T10:15:13.128Z</ns1:version>
+        <ns2:hasServiceDefinition rdf:resource="urn:ogf:network:es.net:2013::ServiceDefinition:EVTS.A-GOLE"/>
+    </ns1:Topology>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+    <ns1:BidirectionalPort rdf:about="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1">
+        <ns1:belongsTo rdf:resource="urn:ogf:network:es.net:2013:"/>
+        <ns1:encoding rdf:resource="http://schemas.ogf.org/nml/2012/10/ethernet"/>
+        <ns1:hasLabelGroup rdf:resource="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:vlan"/>
+        <ns1:hasService rdf:resource="urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:BandwidthService"/>
+    </ns1:BidirectionalPort>
+
+</rdf:RDF>

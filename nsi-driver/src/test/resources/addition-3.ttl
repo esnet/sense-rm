@@ -1,0 +1,198 @@
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlan+3989>
+        a       <http://schemas.ogf.org/mrs/2013/12/topology#SwitchingSubnet> ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#tag>
+                "urn:ogf:network:service+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy::Connection_1" ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE> ;
+        <http://schemas.ogf.org/nml/2013/03/base#encoding>
+                <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasBidirectionalPort>
+                <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3739> , <urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3989> ;
+        <http://schemas.ogf.org/nml/2013/03/base#labelSwapping>
+                "true" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>
+        <http://schemas.ogf.org/mrs/2013/12/topology#providesSubnet>
+                <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlan+3989> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlan+2012> .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3739:service+bw>
+        a       <http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService> ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#granularity>
+                "1000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#priority>
+                "0" ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#type>
+                "guaranteedCapped" ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#unit>
+                "bps" .
+
+<urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix>
+        <http://schemas.ogf.org/nml/2013/03/base#hasBidirectionalPort>
+                <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3603> .
+
+<urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3603:label+3603>
+        a       <http://schemas.ogf.org/nml/2013/03/base#Label> ;
+        <http://schemas.ogf.org/nml/2013/03/base#labeltype>
+                <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        <http://schemas.ogf.org/nml/2013/03/base#value>
+                "3603" .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric>
+        <http://schemas.ogf.org/nml/2013/03/base#hasBidirectionalPort>
+                <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+2012> .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+2012:service+bw>
+        a       <http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService> ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#granularity>
+                "1000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#priority>
+                "0" ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#type>
+                "guaranteedCapped" ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#unit>
+                "bps" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3739:label+3739>
+        a       <http://schemas.ogf.org/nml/2013/03/base#Label> ;
+        <http://schemas.ogf.org/nml/2013/03/base#labeltype>
+                <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        <http://schemas.ogf.org/nml/2013/03/base#value>
+                "3739" .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+2012:label+2012>
+        a       <http://schemas.ogf.org/nml/2013/03/base#Label> ;
+        <http://schemas.ogf.org/nml/2013/03/base#labeltype>
+                <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        <http://schemas.ogf.org/nml/2013/03/base#value>
+                "2012" .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+2012>
+        a       <http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort> ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#tag>
+                "urn:ogf:network:service+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy::Connection_1" ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlan+2012> ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasLabel>
+                <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+2012:label+2012> ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasService>
+                <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+2012:service+bw> ;
+        <http://schemas.ogf.org/nml/2013/03/base#isAlias>
+                <urn:ogf:network:stack-fabric:2024:topology:node+NEWY:port+ESnet-400G-NEWY:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+2012> .
+
+<urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3989:service+bw>
+        a       <http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService> ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#granularity>
+                "1000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#priority>
+                "0" ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#type>
+                "guaranteedCapped" ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#unit>
+                "bps" .
+
+<urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3603>
+        a       <http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort> ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#tag>
+                "urn:ogf:network:service+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy::Connection_1" ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlan+2012> ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasLabel>
+                <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3603:label+3603> ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasService>
+                <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3603:service+bw> ;
+        <http://schemas.ogf.org/nml/2013/03/base#isAlias>
+                <urn:ogf:network:maxgigapop.net:2013:s0:1_1:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3603> .
+
+<urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3989:label+3989>
+        a       <http://schemas.ogf.org/nml/2013/03/base#Label> ;
+        <http://schemas.ogf.org/nml/2013/03/base#labeltype>
+                <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        <http://schemas.ogf.org/nml/2013/03/base#value>
+                "3989" .
+
+<urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3603:service+bw>
+        a       <http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService> ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#granularity>
+                "1000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#priority>
+                "0" ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#type>
+                "guaranteedCapped" ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#unit>
+                "bps" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3739>
+        a       <http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort> ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#tag>
+                "urn:ogf:network:service+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy::Connection_1" ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlan+3989> ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasLabel>
+                <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3739:label+3739> ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasService>
+                <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3739:service+bw> ;
+        <http://schemas.ogf.org/nml/2013/03/base#isAlias>
+                <urn:ogf:network:stack-fabric:2024:topology:node+STAR:port+ESnet-StarLight:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3739> .
+
+<urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3989>
+        a       <http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort> ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#tag>
+                "urn:ogf:network:service+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy::Connection_1" ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlan+3989> ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasLabel>
+                <urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3989:label+3989> ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasService>
+                <urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3989:service+bw> ;
+        <http://schemas.ogf.org/nml/2013/03/base#isAlias>
+                <urn:ogf:network:sttlwa.pacificwave.net:2016:pw-sttl1-1:esnet-seattle:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3989> .
+
+<urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+>
+        <http://schemas.ogf.org/nml/2013/03/base#hasBidirectionalPort>
+                <urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3989> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlan+2012>
+        a       <http://schemas.ogf.org/mrs/2013/12/topology#SwitchingSubnet> ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#tag>
+                "urn:ogf:network:service+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy::Connection_1" ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE> ;
+        <http://schemas.ogf.org/nml/2013/03/base#encoding>
+                <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasBidirectionalPort>
+                <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3603> , <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+2012> ;
+        <http://schemas.ogf.org/nml/2013/03/base#labelSwapping>
+                "true" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+>
+        <http://schemas.ogf.org/nml/2013/03/base#hasBidirectionalPort>
+                <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+efb2907a-6f11-4f1e-a0a7-8e46cf75db10:vt+l2-policy-Connection_1:vlanport+3739> .

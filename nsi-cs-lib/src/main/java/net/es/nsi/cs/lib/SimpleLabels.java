@@ -90,7 +90,7 @@ public class SimpleLabels {
             // Add the label type when a new label type is encountered.
             if (currentType == null || !label.getType().equalsIgnoreCase(currentType)) {
                 if (currentType != null) {
-                    sb.append(SimpleLabel.LABELTYPE_SEPARATOR);
+                    sb.append(SimpleLabel.LABEL_TYPE_SEPARATOR);
                 }
                 currentType = label.getType();
                 sb.append(currentType);

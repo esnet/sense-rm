@@ -41,6 +41,7 @@ import net.es.sense.rm.model.DeltaRequest;
 import net.es.sense.rm.model.DeltaResource;
 import net.es.sense.rm.model.DeltaState;
 import net.es.sense.rm.model.ModelResource;
+import org.apache.jena.ontology.OntModel;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -380,6 +381,10 @@ public class NsiDriver implements Driver {
       return cf;
     }
 
+    // TODO: We store against this delta the current model with reduction and additions applied,
+    //  however, when processing the delta we use the model referenced by the delta.  This could
+    //  lead to some model conflicts in the future.  Revisit this if issues arise.
+
     // We need to apply the reduction and addition to the current referenced model.
     Model currentModel = modelService.getCurrent(nsiProperties.getNetworkId());
     if (currentModel == null) {
@@ -392,33 +397,34 @@ public class NsiDriver implements Driver {
 
     try {
       // Get the referencedModel on which we apply the changes.
-      org.apache.jena.rdf.model.Model rdfModel = ModelUtil.unmarshalModel(currentModel.getBase());
+      OntModel originalModel = ModelUtil.unmarshalOntModelTurtle(referencedModel.getBase());
+      OntModel updatedModel = ModelUtil.unmarshalOntModelTurtle(currentModel.getBase());
 
       // Apply the delta reduction.
-      Optional<org.apache.jena.rdf.model.Model> reduction = Optional.empty();
+      Optional<OntModel> reduction = Optional.empty();
       if (!Strings.isNullOrEmpty(deltaRequest.getReduction())) {
-        reduction = Optional.ofNullable(ModelUtil.unmarshalModel(deltaRequest.getReduction()));
-        reduction.ifPresent(r -> ModelUtil.applyDeltaReduction(rdfModel, r));
+        reduction = Optional.of(ModelUtil.unmarshalOntModel(deltaRequest.getReduction(), modelType));
+        reduction.ifPresent(r -> ModelUtil.applyDeltaReduction(updatedModel, r));
       }
 
       // Apply the delta addition.
-      Optional<org.apache.jena.rdf.model.Model> addition = Optional.empty();
+      Optional<OntModel> addition = Optional.empty();
       if (!Strings.isNullOrEmpty(deltaRequest.getAddition())) {
-        addition = Optional.ofNullable(ModelUtil.unmarshalModel(deltaRequest.getAddition()));
-        addition.ifPresent(a -> ModelUtil.applyDeltaAddition(rdfModel, a));
+        addition = Optional.of(ModelUtil.unmarshalOntModel(deltaRequest.getAddition(), modelType));
+        addition.ifPresent(a -> ModelUtil.applyDeltaAddition(updatedModel, a));
       }
 
-      // Create and store a delta object representing this request.
+      // At this point rdfModel has been transformed into the topology requested by the delta.
+      // Create and store a delta object representing this delta request.
       DeltaService deltaService = raController.getDeltaService();
       Delta delta = new Delta();
-      //delta.setDeltaId(UUID.randomUUID().toString());
       delta.setDeltaId(deltaRequest.getId());
       delta.setModelId(deltaRequest.getModelId());
       delta.setLastModified(System.currentTimeMillis());
       delta.setState(DeltaState.Accepting);
       delta.setAddition(deltaRequest.getAddition());
       delta.setReduction(deltaRequest.getReduction());
-      delta.setResult(ModelUtil.marshalModel(rdfModel));
+      delta.setResult(ModelUtil.marshalOntModel(updatedModel));
       long id = deltaService.store(delta).getIdx();
 
       log.info("[NsiDriver] stored deltaId = {}", delta.getDeltaId());
@@ -428,7 +434,7 @@ public class NsiDriver implements Driver {
       // so that we can commit connections associated with this
       // delta.
       try {
-        raController.getCsProvider().processDelta(referencedModel, delta.getDeltaId(), reduction, addition);
+        raController.getCsProvider().processDelta(originalModel, updatedModel, delta.getDeltaId(), reduction, addition);
       } catch (Exception ex) {
         log.error("[NsiDriver] NSI CS processing of delta failed,  deltaId = {}", delta.getDeltaId(), ex);
         delta = deltaService.get(id);
@@ -451,7 +457,7 @@ public class NsiDriver implements Driver {
       delta.setLastModified(System.currentTimeMillis());
       deltaService.store(delta);
 
-      // Sent back the delta created to the orchestrator.
+      // Send back the delta created to the orchestrator.
       DeltaResource deltaResponse = new DeltaResource();
       deltaResponse.setId(delta.getDeltaId());
       deltaResponse.setState(delta.getState());

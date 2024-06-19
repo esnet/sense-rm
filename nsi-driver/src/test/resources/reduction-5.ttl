@@ -1,0 +1,61 @@
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+owl:TransitiveProperty
+        rdfs:subClassOf  rdfs:Resource .
+
+owl:Property  a              owl:Class ;
+        rdfs:subClassOf      owl:Property ;
+        owl:equivalentClass  owl:Property .
+
+owl:FunctionalProperty
+        rdfs:subClassOf  rdfs:Resource .
+
+rdfs:Literal  a              owl:Class ;
+        rdfs:subClassOf      rdfs:Literal ;
+        owl:equivalentClass  rdfs:Literal .
+
+rdfs:ContainerMembershipProperty
+        rdfs:subClassOf  rdfs:Resource .
+
+owl:Ontology  a              owl:Class ;
+        rdfs:subClassOf      owl:Ontology ;
+        owl:equivalentClass  owl:Ontology .
+
+rdf:Statement  a             owl:Class ;
+        rdfs:subClassOf      rdf:Statement ;
+        owl:equivalentClass  rdf:Statement .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717:service+bw>
+        <http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity>
+                "25000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity>
+                "25000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity>
+                "25000000000"^^xsd:long .
+
+owl:OntologyProperty  rdfs:subClassOf  rdfs:Resource .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717:service+bw>
+        <http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity>
+                "25000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity>
+                "25000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity>
+                "25000000000"^^xsd:long .
+
+owl:ObjectProperty  rdfs:subClassOf  rdfs:Resource .
+
+owl:SymmetricProperty
+        rdfs:subClassOf  rdfs:Resource .
+
+owl:DatatypeProperty  rdfs:subClassOf  rdfs:Resource .
+
+rdf:List  a                  owl:Class ;
+        rdfs:subClassOf      rdf:List ;
+        owl:equivalentClass  rdf:List .
+
+owl:InverseFunctionalProperty
+        rdfs:subClassOf  rdfs:Resource .

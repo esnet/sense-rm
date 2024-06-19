@@ -22,6 +22,9 @@ package net.es.sense.rm.driver.nsi.cs.db;
 import java.io.Serializable;
 
 /**
+ * This class stores the user defined MRML and NML identifiers
+ * for created resources that can then be used to map back to
+ * the requested MRML topology.
  *
  * @author hacksaw
  */
@@ -30,6 +33,7 @@ import java.io.Serializable;
 @lombok.Data
 public class StpMapping implements Serializable {
   String stpId;
+  String mrsTag;
   String mrsPortId;
   String mrsLabelId;
   String mrsBandwidthId;

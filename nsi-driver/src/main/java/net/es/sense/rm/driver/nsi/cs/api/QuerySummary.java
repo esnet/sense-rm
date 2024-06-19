@@ -19,8 +19,6 @@
  */
 package net.es.sense.rm.driver.nsi.cs.api;
 
-import java.util.ArrayList;
-import java.util.List;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
@@ -30,16 +28,11 @@ import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationAudit;
 import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException;
-import org.ogf.schemas.nsi._2013._12.connection.types.ChildSummaryListType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ChildSummaryType;
-import org.ogf.schemas.nsi._2013._12.connection.types.DataPlaneStatusType;
-import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
-import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
-import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryResultCriteriaType;
-import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryResultType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
+import org.ogf.schemas.nsi._2013._12.connection.types.*;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class provides logic for creating and storing reservation objects
@@ -78,12 +71,14 @@ public class QuerySummary {
     // Extract the uPA reservation (connection) segments associated with individual networks.
     List<QuerySummaryResultType> reservations = querySummaryConfirmed.getReservation();
 
-    try {
-      log.debug("[QuerySummary] providerNSA = {}, # of reservations = {}, querySummaryConfirmed:\n{}",
-              providerNsa, reservations.size(),
-              CsParser.getInstance().querySummaryConfirmed2xml(querySummaryConfirmed));
-    } catch (JAXBException ex) {
-      log.error("[QuerySummary] providerNSA = {} failed to encode QuerySummaryConfirmedType", providerNsa, ex);
+    if (log.isTraceEnabled()) {
+      try {
+        log.trace("[QuerySummary] providerNSA = {}, # of reservations = {}, querySummaryConfirmed:\n{}",
+            providerNsa, reservations.size(),
+            CsParser.getInstance().querySummaryConfirmed2xml(querySummaryConfirmed));
+      } catch (JAXBException ex) {
+        log.error("[QuerySummary] providerNSA = {} failed to encode QuerySummaryConfirmedType", providerNsa, ex);
+      }
     }
 
     // Process each reservation returned from the NSA.
@@ -95,7 +90,7 @@ public class QuerySummary {
       LifecycleStateEnumType lifecycleState = reservation.getConnectionStates().getLifecycleState();
       DataPlaneStatusType dataPlaneStatus = reservation.getConnectionStates().getDataPlaneStatus();
 
-      log.debug("[QuerySummary] incoming providerNSA = {}, {}", providerNsa, getQuerySummaryResultType(reservation));
+      log.trace("[QuerySummary] incoming providerNSA = {}, {}", providerNsa, getQuerySummaryResultType(reservation));
 
       if (reservationState == null) {
         reservationState = ReservationStateEnumType.RESERVE_START;
@@ -110,7 +105,8 @@ public class QuerySummary {
       }
 
       // If this reservation is in the process of being created, or failed
-      // creation, then there will be no associated criteria.
+      // creation, then there will be no associated criteria.  Do our best
+      // to populate some reservation information.
       if (reservation.getCriteria().isEmpty()) {
         log.error("[QuerySummary] criteria is empty for cid = {}", reservation.getConnectionId());
         results.add(processReservationNoCriteria(
@@ -123,6 +119,7 @@ public class QuerySummary {
                 lifecycleState,
                 dataPlaneStatus));
       } else {
+        log.debug("[QuerySummary] processing criteria for cid = {}", reservation.getConnectionId());
         results.addAll(processSummaryCriteria(
                 providerNsa,
                 reservation.getGlobalReservationId(),
@@ -137,19 +134,22 @@ public class QuerySummary {
     }
 
     // TODO: Remove this once we fix the OpenNSA reservation issue.
-    log.debug("[QuerySummary] pre-add reservation database contents...");
-    for (Reservation reservation : reservationService.get()) {
-      log.debug("[QuerySummary] {}", reservation);
+    if (log.isTraceEnabled()) {
+      log.trace("[QuerySummary] pre-add reservation database contents...");
+      for (Reservation reservation : reservationService.get()) {
+        log.trace("[QuerySummary] {}", reservation);
+      }
     }
 
     // Determine if we need to update each reservation in the database.
     ReservationAudit rAudit = new ReservationAudit();
     for (Reservation reservation : results) {
       // Save this reservation for the later database contents audit.
-      rAudit.add(reservation.getProviderNsa(), reservation.getConnectionId());
+      rAudit.add(reservation.getProviderNsa(), reservation.getConnectionId(), reservation.getVersion());
 
       // Look for this returned reservation in the existing reservation database.
-      Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
+      Reservation r = reservationService.getByProviderNsaAndConnectionIdAndVersion(reservation.getProviderNsa(),
+          reservation.getConnectionId(), reservation.getVersion());
       if (r == null) {
         // We have not seen this reservation before so store it.
         log.debug("[QuerySummary] storing new reservation, cid = {}, discovered = {}",
@@ -170,6 +170,7 @@ public class QuerySummary {
                 "cid = {}, discovered = {},\n    update = {},\n    existing = {}",
                 reservation.getConnectionId(), reservation.getDiscovered(), reservation, r);
         reservation.setId(r.getId());
+        reservation.setUniqueId(r.getUniqueId());
         reservationService.store(reservation);
       }
       else {
@@ -178,13 +179,15 @@ public class QuerySummary {
     }
 
     // TODO: Remove this once we fix the OpenNSA reservation issue.
-    log.debug("[QuerySummary] before audit reservation database contents...");
-    for (Reservation reservation : reservationService.get()) {
-      log.debug("[QuerySummary] {}", reservation);
+    if (log.isTraceEnabled()) {
+      log.trace("[QuerySummary] before audit reservation database contents...");
+      for (Reservation reservation : reservationService.get()) {
+        log.trace("[QuerySummary] {}", reservation);
+      }
     }
 
     // TODO: Remove this once we fix the OpenNSA reservation issue.
-    log.debug("[QuerySummary] audit connection contents {}", rAudit.toString());
+    log.trace("[QuerySummary] audit connection contents {}", rAudit);
 
     // We now know all the reservation we can see on this providerNSA.  Go
     // through our reservation database a deleted any that are no longer
@@ -192,9 +195,11 @@ public class QuerySummary {
     rAudit.audit(reservationService);
 
     // TODO: Remove this once we fix the OpenNSA reservation issue.
-    log.debug("[QuerySummary] after audit reservation database contents...");
-    for (Reservation reservation : reservationService.get()) {
-      log.debug("[QuerySummary] {}", reservation);
+    if (log.isTraceEnabled()) {
+      log.trace("[QuerySummary] after audit reservation database contents...");
+      for (Reservation reservation : reservationService.get()) {
+        log.trace("[QuerySummary] {}", reservation);
+      }
     }
   }
 
@@ -271,7 +276,7 @@ public class QuerySummary {
 
     List<Reservation> results = new ArrayList<>();
 
-    // There will be one criteria for each version of this reservation. We
+    // There will be one criterion for each version of this reservation. We
     // will check to see if there are any more recent versions than what has
     // already been stored.
     for (QuerySummaryResultCriteriaType criteria : criteriaList) {
@@ -279,7 +284,7 @@ public class QuerySummary {
               cid, criteria.getVersion(), criteria.getServiceType());
 
       // If this reservation was created by us then we will have this stored in
-      // the database so we will need to update.  This could create two entries
+      // the database, so we will need to update.  This could create two entries
       // one for the parent and one for the child reservation.
       Reservation parent = buildReservation(
               providerNsa,
@@ -304,7 +309,7 @@ public class QuerySummary {
         log.info("[QuerySummary] processSummaryCriteria: processing child criteria.");
 
         for (ChildSummaryType child : children.getChild()) {
-          log.info("[QuerySummary] processSummaryCriteria: child cid = {}, gid = {}, decription = {}, " +
+          log.info("[QuerySummary] processSummaryCriteria: child cid = {}, gid = {}, description = {}, " +
                           "rstate = {}, lstate = {}",
                   child.getConnectionId(), gid, description, reservationState, lifecycleState);
 

@@ -21,7 +21,7 @@ public class SimpleLabel {
     public final static String EQUALS = "=";
     public final static String HYPHEN = "-";
     public final static String COMMA = ",";
-    public final static String LABELTYPE_SEPARATOR = ";";
+    public final static String LABEL_TYPE_SEPARATOR = ";";
 
     private String type;
     private String value;

@@ -27,6 +27,7 @@ import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 import java.io.Serializable;
 
 /**
+ * This class models a NSI-CS reservation.
  *
  * @author hacksaw
  */
@@ -62,6 +63,12 @@ public class Reservation implements Serializable {
   @Id
   @GeneratedValue
   long id;
+
+  // Internally generated unique identifier used to map to the
+  // ConnectionMap information associated with this reservation
+  // version.
+  @Basic(optional = false)
+  String uniqueId;
 
   // The time I first discovered this version of the connection.
   @Basic(optional = false)
@@ -112,7 +119,7 @@ public class Reservation implements Serializable {
   boolean dataPlaneActive = false;
 
   // Version of the reservation on the uPA.
-  long version;
+  int version;
 
   // We track interaction errors here to help debug remotely.
   @Enumerated(EnumType.STRING)
@@ -158,6 +165,10 @@ public class Reservation implements Serializable {
       return true;
     }
 
+    if (version != r.version) {
+      return true;
+    }
+
     if (globalReservationId != null && r.getGlobalReservationId() != null
             && !globalReservationId.equals(r.getGlobalReservationId())) {
       return true;
@@ -196,10 +207,6 @@ public class Reservation implements Serializable {
             || provisionState != r.getProvisionState()
             || lifecycleState != r.getLifecycleState()
             || dataPlaneActive != r.isDataPlaneActive()) {
-      return true;
-    }
-
-    if (version != r.getVersion()) {
       return true;
     }
 

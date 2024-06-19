@@ -1,6 +1,7 @@
 package net.es.sense.rm.driver.nsi.cs.db;
 
 /**
+ * The NSI-CS operation type.
  *
  * @author hacksaw
  */

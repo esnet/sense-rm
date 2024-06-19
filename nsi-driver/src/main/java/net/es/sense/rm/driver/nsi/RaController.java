@@ -120,7 +120,7 @@ public class RaController {
     // Start the CS controller.
     csProvider.start();
 
-    // Perform a model audit to consolitate the loaded DDS and CS information.
+    // Perform a model audit to consolidate the loaded DDS and CS information.
     auditService.audit();
 
     // Start the model audit actor.

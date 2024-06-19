@@ -1,0 +1,2396 @@
+@prefix mrs:  <http://schemas.ogf.org/mrs/2013/12/topology#> .
+@prefix nml:  <http://schemas.ogf.org/nml/2013/03/base#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sd:   <http://schemas.ogf.org/nsi/2013/12/services/definition#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+>
+        rdf:type                  nml:BidirectionalPort;
+        nml:belongsTo             <urn:ogf:network:es.net:2013:>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2400> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2401> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717>;
+        nml:hasLabelGroup         <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlan>;
+        nml:hasService            <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::wash-cr6:2_1_c17_3:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::wash-cr6:2_1_c17_3:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::wash-cr6:2_1_c17_3:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c19_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::star-cr6:2_1_c19_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "6-4094" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+>
+        rdf:type                  nml:BidirectionalPort;
+        nml:belongsTo             <urn:ogf:network:es.net:2013:>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+2026> , <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+3989:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b> , <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa> , <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3694> , <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3737> , <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3986>;
+        nml:hasLabelGroup         <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan>;
+        nml:hasService            <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:BandwidthService>;
+        nml:isAlias               <urn:ogf:network:icair.org:2013:mren8700:esnet> .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "25000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "25000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "25000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717:existsDuring> .
+
+<urn:ogf:network:es.net:2013::switchingSubnet+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2024-10-31T18:51:21.000Z";
+        nml:start  "2023-10-31T18:51:56.000Z" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2025-01-09T21:06:03.000Z";
+        nml:start  "2024-01-09T21:06:37.000Z" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013::eqxld8-cr6:lag-10:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::eqxld8-cr6:lag-10:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::eqxld8-cr6:lag-10:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-4095" .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3612:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3612>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:existsDuring> .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2023:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:label>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2023:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2023:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "2023" .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2401:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "25000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "25000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "25000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2401>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:existsDuring> .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2400>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2400:label+2400>;
+        nml:hasService        <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2400:service+bw>;
+        nml:name              "82802b42-3ec0-45ca-b5b7-2af57b301df8" .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3612>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3612:label+3612>;
+        nml:hasService        <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3612:service+bw>;
+        nml:name              "013f8fb4-9d6c-41be-b986-1fa01b94668d" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3613>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3613:label+3613>;
+        nml:hasService        <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3613:service+bw>;
+        nml:name              "7d69efbe-926d-467b-820e-8ef740c64bf8" .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "400000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "400000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:+> .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+>
+        rdf:type                  nml:BidirectionalPort;
+        nml:belongsTo             <urn:ogf:network:es.net:2013:>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+1798> , <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3610> , <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3611> , <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3612>;
+        nml:hasLabelGroup         <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlan>;
+        nml:hasService            <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+2026:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "100000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+2026>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:existsDuring> .
+
+<urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "1237-1328,2033-4095,1001-1234,2-999,1330-2001,2003-2031" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-1236,1239-4089" .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "10000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:+> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2024-11-09T14:54:42.000Z";
+        nml:start  "2023-11-09T14:55:16.000Z" .
+
+<urn:ogf:network:es.net:2013::salt-cr6:2_1_c17_2:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "1000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::salt-cr6:2_1_c17_2:+> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2025-03-26T23:31:50.000Z";
+        nml:start  "2024-03-26T23:32:24.000Z" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan+2689:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "1000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan+2689:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan+2689:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:existsDuring> .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-10:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "400000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "400000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::cern513-cr6:lag-10:+> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2025-01-09T21:05:23.000Z";
+        nml:start  "2024-01-09T21:05:58.000Z" .
+
+<urn:ogf:network:es.net:2013::switchingSubnet+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2025-03-26T23:27:06.000Z";
+        nml:start  "2024-03-26T23:27:42.000Z" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3986:label+3986>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3986>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3986" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "200000000000"^^xsd:long;
+        mrs:maximumCapacity     "200000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "200000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::cern513-cr6:lag-1:+> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3694:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3694>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:existsDuring> .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c19_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "400000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "400000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr6:2_1_c19_1:+> .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3612:label+3612>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3612>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3612" .
+
+<urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "92-93,2003-2009,3731-4095,95-122,3631,498-1199,2-89,1860-1899,2312-3629,1700-1729,474-496,3400-3499,2014-2039,204-472,124-193,198-202,3600-3619,2012-2012,1202-2001" .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "400000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "400000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+> .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlanport+2026>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlanport+2026:label+2026>;
+        nml:hasService        <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlanport+2026:service+bw>;
+        nml:name              "7a7594c5-58a5-413e-8612-60caa67d9c67" .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2400:label+2400>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2400>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "2400" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2024,3985-3989,3737-3739,2026,3694-3694,1779-1798" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3613>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3613:label+3613>;
+        nml:hasService        <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3613:service+bw>;
+        nml:name              "7d69efbe-926d-467b-820e-8ef740c64bf8" .
+
+<urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:wix:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:wix> .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+2410:label+2410>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+2410>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "2410" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3614:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3614>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:existsDuring> .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+1798:label+1798>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+1798>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "1798" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3611:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3611>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:existsDuring> .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3612:label+3612>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3612>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3612" .
+
+<urn:ogf:network:es.net:2013::switchingSubnet+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013::switchingSubnet+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013::switchingSubnet+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013::switchingSubnet+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2023:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15> , <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan+3619:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:wix>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:wix:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:wix:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+:vlanport+3600:label+3600>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+:vlanport+3600>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3600" .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-4095" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDefinition:EVTS.A-GOLE>
+        rdf:type        sd:ServiceDefinition;
+        nml:belongsTo   <urn:ogf:network:es.net:2013:>;
+        nml:name        "GLIF Automated GOLE Ethernet VLAN Transfer Service";
+        sd:serviceType  "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan+3619:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013::switchingSubnet+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan+3619:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan+3619:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:label>;
+        nml:hasService        <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan+3619:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:BandwidthService>;
+        nml:name              "dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3610>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3610:label+3610>;
+        nml:hasService        <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3610:service+bw>;
+        nml:name              "c505a004-0ca4-4f39-a56a-a60844cffa58" .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3611:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3611>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:existsDuring> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c17_3:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "1000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr6:2_1_c17_3:+> .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+2026>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+2026:label+2026>;
+        nml:hasService        <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+2026:service+bw>;
+        nml:name              "7a7594c5-58a5-413e-8612-60caa67d9c67" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3986:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "1000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3986>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:existsDuring> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013::cern773-cr6:lag-1:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::cern773-cr6:lag-1:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::cern773-cr6:lag-1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+:BandwidthService>;
+        nml:isAlias        <urn:ogf:network:sttlwa.pacificwave.net:2016:pw-sttl1-1:esnet-seattle> .
+
+<urn:ogf:network:es.net:2013::denv-cr6:1_1_c25_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::denv-cr6:1_1_c25_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-1798,1800-4095" .
+
+<urn:ogf:network:es.net:2013:>
+        rdf:type                  nml:Topology;
+        nml:existsDuring          [ rdf:type   nml:Lifetime;
+                                    nml:end    "2024-03-27T23:26:01.521Z";
+                                    nml:start  "2024-03-26T23:26:01.521Z"
+                                  ];
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix> , <urn:ogf:network:es.net:2013::wash-cr6:2_1_c17_3:+> , <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+> , <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+> , <urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:wix> , <urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+> , <urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:+> , <urn:ogf:network:es.net:2013::slac50n-cr6:1_1_c2_1:+> , <urn:ogf:network:es.net:2013::cern513-cr6:lag-1:+> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+> , <urn:ogf:network:es.net:2013::star-cr6:2_1_c17_3:+> , <urn:ogf:network:es.net:2013::denv-cr6:1_1_c25_1:+> , <urn:ogf:network:es.net:2013::star-cr6:2_1_c19_1:+> , <urn:ogf:network:es.net:2013::salt-cr6:2_1_c17_2:+> , <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+> , <urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:manlan> , <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c17_3:+> , <urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+> , <urn:ogf:network:es.net:2013::eqxam3-cr6:2_1_c1_1:+> , <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+> , <urn:ogf:network:es.net:2013::cern513-cr6:lag-10:+> , <urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:al2s> , <urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:+> , <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+> , <urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:+> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s> , <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:+> , <urn:ogf:network:es.net:2013::eqxld8-cr6:lag-10:+> , <urn:ogf:network:es.net:2013::losa-cr6:1_1_c2_1:+> , <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+> , <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric> , <urn:ogf:network:es.net:2013::eqxda3-cr6:2_1_c17_2:+> , <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c3_1:+> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+> , <urn:ogf:network:es.net:2013::cern773-cr6:lag-1:+>;
+        nml:hasService            <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:name                  "es.net";
+        nml:version               "2024-03-26T23:32:48.368Z";
+        sd:hasServiceDefinition   <urn:ogf:network:es.net:2013:topology:ServiceDefinition:EVTS.A-GOLE> .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "1000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2025-01-09T21:06:33.000Z";
+        nml:start  "2024-01-09T21:07:07.000Z" .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3611:label+3611>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3611>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3611" .
+
+<urn:ogf:network:es.net:2013::losa-cr6:1_1_c2_1:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::losa-cr6:1_1_c2_1:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::losa-cr6:1_1_c2_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::switchingSubnet+e028cd3d-7991-45dc-bc46-8ea78f8abc5b>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013::switchingSubnet+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013::switchingSubnet+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013::switchingSubnet+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan+2689:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b> , <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+3989:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-4095" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3600:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "1000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3600>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600:existsDuring> .
+
+<urn:ogf:network:es.net:2013::eqxld8-cr6:lag-10:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "400000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "400000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::eqxld8-cr6:lag-10:+> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlanport+2026:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "100000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlanport+2026>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:existsDuring> .
+
+<urn:ogf:network:es.net:2013::cern773-cr6:lag-1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "200000000000"^^xsd:long;
+        mrs:maximumCapacity     "200000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "200000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::cern773-cr6:lag-1:+> .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3615:label+3615>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3615>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3615" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+7a7594c5-58a5-413e-8612-60caa67d9c67";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlanport+2026> , <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+2026>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3615>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3615:label+3615>;
+        nml:hasService        <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3615:service+bw>;
+        nml:name              "6437c8fd-49f7-415d-8e47-f9d9e4304c18" .
+
+<urn:ogf:network:es.net:2013::switchingSubnet+abb64928-181c-4fb2-be97-25845a8d7faa:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:label>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "2024" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "1070-1079,1779-1799,3010-3019,3600-3619" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2024-11-09T14:59:58.000Z";
+        nml:start  "2023-11-09T15:00:32.000Z" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3613:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3613>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:existsDuring> .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3610:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3610>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:existsDuring> .
+
+<urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "1779-1799,3600-3619,3980-3984,3985-3989" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2025-02-22T18:02:40.000Z";
+        nml:start  "2024-02-22T18:03:27.000Z" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717:label+1717>;
+        nml:hasService        <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717:service+bw>;
+        nml:name              "3f872d37-e732-429e-86ea-b96845463f57" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2401>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2401:label+2401>;
+        nml:hasService        <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2401:service+bw>;
+        nml:name              "6fed6575-b1ae-4c36-865f-1529e3e2bba9" .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-10:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::cern513-cr6:lag-10:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::cern513-cr6:lag-10:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::eqxam3-cr6:2_1_c1_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::eqxam3-cr6:2_1_c1_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "1000-1008,1010-1019" .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "400000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "400000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric> .
+
+<urn:ogf:network:es.net:2013::switchingSubnet+abb64928-181c-4fb2-be97-25845a8d7faa:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2024-11-02T20:15:30.000Z";
+        nml:start  "2023-11-02T20:16:07.000Z" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:label>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "2024" .
+
+<urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:al2s:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:al2s>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-999,1001-1234,1237-2001,2003-2031,2033-4089" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s>
+        rdf:type                  nml:BidirectionalPort;
+        nml:belongsTo             <urn:ogf:network:es.net:2013:>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+2410>;
+        nml:hasLabelGroup         <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s:vlan>;
+        nml:hasService            <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3600>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3600:label+3600>;
+        nml:hasService        <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3600:service+bw>;
+        nml:name              "ad36785f-74f2-40e1-9f62-411b4361dcc2" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013::denv-cr6:1_1_c25_1:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::denv-cr6:1_1_c25_1:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::denv-cr6:1_1_c25_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2401:label+2401>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2401>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "2401" .
+
+<urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:vlanport+3613>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:vlanport+3613:label+3613>;
+        nml:hasService        <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:vlanport+3613:service+bw>;
+        nml:name              "b7a11c5f-0a0a-4bf1-bc97-e108fe40ddef" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3615>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3615:label+3615>;
+        nml:hasService        <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3615:service+bw>;
+        nml:name              "6437c8fd-49f7-415d-8e47-f9d9e4304c18" .
+
+<urn:ogf:network:es.net:2013::switchingSubnet+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+2410>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+2410:label+2410>;
+        nml:hasService        <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+2410:service+bw>;
+        nml:name              "2255ef9f-5e1f-4ad9-8d4a-d77a961a3f9e" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+>
+        rdf:type                  nml:BidirectionalPort;
+        nml:belongsTo             <urn:ogf:network:es.net:2013:>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlanport+2026> , <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2023:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15> , <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa>;
+        nml:hasLabelGroup         <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan>;
+        nml:hasService            <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2000-2049" .
+
+<urn:ogf:network:es.net:2013::cern773-cr6:lag-1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::cern773-cr6:lag-1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2029-4095,2-2027" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+6fed6575-b1ae-4c36-865f-1529e3e2bba9";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2401> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2401>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:al2s>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:al2s:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:al2s:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::switchingSubnet+abb64928-181c-4fb2-be97-25845a8d7faa:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3611>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3611:label+3611>;
+        nml:hasService        <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3611:service+bw>;
+        nml:name              "fd26d21e-9a0e-4fd3-8b95-91d9fbc8345f" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3612>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3612:label+3612>;
+        nml:hasService        <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3612:service+bw>;
+        nml:name              "013f8fb4-9d6c-41be-b986-1fa01b94668d" .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::cern513-cr6:lag-1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-2025,2027-4095" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2025-03-26T23:27:06.000Z";
+        nml:start  "2024-03-26T23:27:42.000Z" .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:manlan>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:manlan:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:manlan:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-1:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::cern513-cr6:lag-1:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::cern513-cr6:lag-1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3614:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3614>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:existsDuring> .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3737:label+3737>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3737>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3737" .
+
+<urn:ogf:network:es.net:2013::switchingSubnet+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2023:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "100000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2023:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2023:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:existsDuring> .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c17_3:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c17_3:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c17_3:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::eqxda3-cr6:2_1_c17_2:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "1000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::eqxda3-cr6:2_1_c17_2:+> .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "25000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "1000000000"^^xsd:long;
+        mrs:maximumCapacity     "25000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "25000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717:existsDuring> .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+1798:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "1000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+1798>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410:existsDuring> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+:vlanport+3600:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "1000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+:vlanport+3600>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:existsDuring> .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3600:label+3600>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3600>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3600" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013::slac50n-cr6:1_1_c2_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::slac50n-cr6:1_1_c2_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-1123,1125-2202,2204-4095" .
+
+<urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+>
+        rdf:type                  nml:BidirectionalPort;
+        nml:belongsTo             <urn:ogf:network:es.net:2013:>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+:vlanport+3600>;
+        nml:hasLabelGroup         <urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+:vlan>;
+        nml:hasService            <urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+:BandwidthService>;
+        nml:isAlias               <urn:ogf:network:nsi.geant.net:2021:topology-1-lon-uk:esnet1> .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3614:label+3614>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3614>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3614" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2400:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "25000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "1000000000"^^xsd:long;
+        mrs:maximumCapacity     "25000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "25000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2400>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:existsDuring> .
+
+<urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:al2s:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:al2s> .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717:label+1717>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "1717" .
+
+<urn:ogf:network:es.net:2013::salt-cr6:2_1_c17_2:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::salt-cr6:2_1_c17_2:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-1009,1011-4095" .
+
+<urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+:vlanport+3600>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+:vlanport+3600:label+3600>;
+        nml:hasService        <urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+:vlanport+3600:service+bw>;
+        nml:name              "14d3a51e-a9b9-4ba6-97db-8a861fe3d325" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c17_3:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::star-cr6:2_1_c17_3:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::star-cr6:2_1_c17_3:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3986>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3986:label+3986>;
+        nml:hasService        <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3986:service+bw>;
+        nml:name              "b7a11c5f-0a0a-4bf1-bc97-e108fe40ddef" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+fd26d21e-9a0e-4fd3-8b95-91d9fbc8345f";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3611> , <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3611>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+3989:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2024-10-31T18:51:21.000Z";
+        nml:start  "2023-10-31T18:51:56.000Z" .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "400000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "400000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+> .
+
+<urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:wix:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:wix>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "1700-1729,1860-1899,3400-3499,3600-3619" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+> .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3694>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3694:label+3694>;
+        nml:hasService        <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3694:service+bw>;
+        nml:name              "14d3a51e-a9b9-4ba6-97db-8a861fe3d325" .
+
+<urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+14d3a51e-a9b9-4ba6-97db-8a861fe3d325";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3694> , <urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+:vlanport+3600>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2011-3998,641-2000,2005-2009,199-211,4000-4095,2-122,125-196,213-408,2002-2003,414-639" .
+
+<urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::eqxda3-cr6:2_1_c17_2:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::eqxda3-cr6:2_1_c17_2:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::eqxda3-cr6:2_1_c17_2:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3613:label+3613>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3613>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3613" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3737>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3737:label+3737>;
+        nml:hasService        <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3737:service+bw>;
+        nml:name              "ad36785f-74f2-40e1-9f62-411b4361dcc2" .
+
+<urn:ogf:network:es.net:2013::denv-cr6:1_1_c25_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "400000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "400000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::denv-cr6:1_1_c25_1:+> .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "100000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:existsDuring> .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3613:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3613>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:existsDuring> .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2401:label+2401>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2401>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "2401" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2025-02-22T18:03:30.000Z";
+        nml:start  "2024-02-22T18:04:04.000Z" .
+
+<urn:ogf:network:es.net:2013::eqxda3-cr6:2_1_c17_2:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::eqxda3-cr6:2_1_c17_2:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-1009,1011-4095" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2025-01-05T20:53:49.000Z";
+        nml:start  "2024-01-05T20:54:24.000Z" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "deactivated" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+7d69efbe-926d-467b-820e-8ef740c64bf8";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3613> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3613>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+2026:label+2026>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+2026>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "2026" .
+
+<urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "400000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "400000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+> .
+
+<urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan+2689:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013::switchingSubnet+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan+2689:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan+2689:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:label>;
+        nml:hasService        <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan+2689:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:BandwidthService>;
+        nml:name              "e028cd3d-7991-45dc-bc46-8ea78f8abc5b" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+aa93970a-de1f-41f4-9297-add704e72fe9";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3614> , <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3614>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "3693-3699,3600-3619,1779-1799" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+6437c8fd-49f7-415d-8e47-f9d9e4304c18";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3615> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3615>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::switchingSubnet+abb64928-181c-4fb2-be97-25845a8d7faa>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013::switchingSubnet+abb64928-181c-4fb2-be97-25845a8d7faa:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013::switchingSubnet+abb64928-181c-4fb2-be97-25845a8d7faa:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+abb64928-181c-4fb2-be97-25845a8d7faa";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013::switchingSubnet+abb64928-181c-4fb2-be97-25845a8d7faa:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa> , <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3611:label+3611>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3611>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3611" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan+3619:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "100000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan+3619:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan+3619:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:existsDuring> .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c17_3:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::star-cr6:2_1_c17_3:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-1009,1011-4095" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+3989:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013::switchingSubnet+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+3989:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+3989:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:label>;
+        nml:hasService        <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+3989:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:BandwidthService>;
+        nml:name              "e028cd3d-7991-45dc-bc46-8ea78f8abc5b" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "80000000000"^^xsd:long;
+        mrs:maximumCapacity     "80000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "80000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s> .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2401>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2401:label+2401>;
+        nml:hasService        <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2401:service+bw>;
+        nml:name              "6fed6575-b1ae-4c36-865f-1529e3e2bba9" .
+
+<urn:ogf:network:es.net:2013::losa-cr6:1_1_c2_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::losa-cr6:1_1_c2_1:+> .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3614>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3614:label+3614>;
+        nml:hasService        <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3614:service+bw>;
+        nml:name              "aa93970a-de1f-41f4-9297-add704e72fe9" .
+
+<urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan+2689:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:label>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan+2689:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan+2689:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "2689" .
+
+<urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:vlanport+3613:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "1000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:vlanport+3613>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:existsDuring> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+2255ef9f-5e1f-4ad9-8d4a-d77a961a3f9e";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+1798> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+2410>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+1798>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+1798:label+1798>;
+        nml:hasService        <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+1798:service+bw>;
+        nml:name              "2255ef9f-5e1f-4ad9-8d4a-d77a961a3f9e" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2400>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2400:label+2400>;
+        nml:hasService        <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2400:service+bw>;
+        nml:name              "82802b42-3ec0-45ca-b5b7-2af57b301df8" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+3989:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:label>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+3989:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+3989:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3989" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+>
+        rdf:type                  nml:BidirectionalPort;
+        nml:belongsTo             <urn:ogf:network:es.net:2013:>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3615> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3613> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3600> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3614>;
+        nml:hasLabelGroup         <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlan>;
+        nml:hasService            <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:BandwidthService>;
+        nml:isAlias               <urn:ogf:network:snvaca.pacificwave.net:2016:pw-snvl2-1:esnet-sunnyvale> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+3f872d37-e732-429e-86ea-b96845463f57";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717> ,
+                                    <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3610:label+3610>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3610>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3610" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c19_1:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::star-cr6:2_1_c19_1:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::star-cr6:2_1_c19_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan+3619:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:label>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan+3619:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan+3619:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3619" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3615:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3615>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:existsDuring> .
+
+<urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "400000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "400000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix> .
+
+<urn:ogf:network:es.net:2013::eqxld8-cr6:lag-10:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::eqxld8-cr6:lag-10:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "3694-3694" .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2400:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "25000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "25000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "25000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2400>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:existsDuring> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+82802b42-3ec0-45ca-b5b7-2af57b301df8";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2400> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2400>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+c505a004-0ca4-4f39-a56a-a60844cffa58";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3610> , <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3610>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3614>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3614:label+3614>;
+        nml:hasService        <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3614:service+bw>;
+        nml:name              "aa93970a-de1f-41f4-9297-add704e72fe9" .
+
+<urn:ogf:network:es.net:2013::wash-cr6:2_1_c17_3:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::wash-cr6:2_1_c17_3:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-1009,1011-4095" .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717:label+1717>;
+        nml:hasService        <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717:service+bw>;
+        nml:name              "3f872d37-e732-429e-86ea-b96845463f57" .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3610:label+3610>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3610>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3610" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2023,3600-3619" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+>
+        rdf:type                  nml:BidirectionalPort;
+        nml:belongsTo             <urn:ogf:network:es.net:2013:>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3610> , <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan+3619:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15> , <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3614> , <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3613> , <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3611> , <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3615> , <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3612>;
+        nml:hasLabelGroup         <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan>;
+        nml:hasService            <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "400000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "400000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+>
+        rdf:type                  nml:BidirectionalPort;
+        nml:belongsTo             <urn:ogf:network:es.net:2013:>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan+2689:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b>;
+        nml:hasLabelGroup         <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan>;
+        nml:hasService            <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013::switchingSubnet+abb64928-181c-4fb2-be97-25845a8d7faa:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:label>;
+        nml:hasService        <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:BandwidthService>;
+        nml:name              "abb64928-181c-4fb2-be97-25845a8d7faa" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+3989:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "1000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+3989:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+3989:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:existsDuring> .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3614:label+3614>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3614>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3614" .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:manlan:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "10000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:manlan> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+ad36785f-74f2-40e1-9f62-411b4361dcc2";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3737> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3600>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::slac50n-cr6:1_1_c2_1:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::slac50n-cr6:1_1_c2_1:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::slac50n-cr6:1_1_c2_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3610>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3610:label+3610>;
+        nml:hasService        <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3610:service+bw>;
+        nml:name              "c505a004-0ca4-4f39-a56a-a60844cffa58" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3611>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3611:label+3611>;
+        nml:hasService        <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3611:service+bw>;
+        nml:name              "fd26d21e-9a0e-4fd3-8b95-91d9fbc8345f" .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2023-2024,3693,2026-2027" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2401:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "25000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "1000000000"^^xsd:long;
+        mrs:maximumCapacity     "25000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "25000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2401>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:existsDuring> .
+
+<urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlanport+2026:label+2026>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlanport+2026>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "2026" .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2025-02-12T22:12:02.000Z";
+        nml:start  "2024-02-12T22:12:35.000Z" .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlan+3619:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2024-11-03T01:32:53.000Z";
+        nml:start  "2023-11-03T01:34:09.000Z" .
+
+<urn:ogf:network:es.net:2013::switchingSubnet+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2024-11-03T01:32:53.000Z";
+        nml:start  "2023-11-03T01:34:09.000Z" .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c3_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c3_1:+> .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c3_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c3_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "6-4094" .
+
+<urn:ogf:network:es.net:2013::slac50n-cr6:1_1_c2_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::slac50n-cr6:1_1_c2_1:+> .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c3_1:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c3_1:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c3_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3737:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "1000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+3737>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600:existsDuring> .
+
+<urn:ogf:network:es.net:2013::wash-cr6:2_1_c17_3:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "10000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::wash-cr6:2_1_c17_3:+> .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+>
+        rdf:type                  nml:BidirectionalPort;
+        nml:belongsTo             <urn:ogf:network:es.net:2013:>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2400> , <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlanport+2401> , <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717>;
+        nml:hasLabelGroup         <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:vlan>;
+        nml:hasService            <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix>
+        rdf:type                  nml:BidirectionalPort;
+        nml:belongsTo             <urn:ogf:network:es.net:2013:>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:vlanport+3613>;
+        nml:hasLabelGroup         <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:vlan>;
+        nml:hasService            <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "1000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:+> .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2023:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013::switchingSubnet+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2023:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2023:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:label>;
+        nml:hasService        <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2023:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:BandwidthService>;
+        nml:name              "dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3613:label+3613>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+:vlanport+3613>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3613" .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2024-11-02T20:15:30.000Z";
+        nml:start  "2023-11-02T20:16:07.000Z" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "100000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:existsDuring> .
+
+<urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3610:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3610>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610:existsDuring> .
+
+<urn:ogf:network:es.net:2013::eqxam3-cr6:2_1_c1_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::eqxam3-cr6:2_1_c1_1:+> .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2400:label+2400>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlanport+2400>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "2400" .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa>
+        rdf:type              nml:BidirectionalPort;
+        mrs:hasNetworkStatus  <urn:ogf:network:es.net:2013::switchingSubnet+abb64928-181c-4fb2-be97-25845a8d7faa:status>;
+        nml:belongsTo         <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+>;
+        nml:encoding          <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring      <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:existsDuring>;
+        nml:hasLabel          <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:label>;
+        nml:hasService        <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:BandwidthService>;
+        nml:name              "abb64928-181c-4fb2-be97-25845a8d7faa" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2025-01-05T20:54:44.000Z";
+        nml:start  "2024-01-05T20:55:19.000Z" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlan+2024:cid+abb64928-181c-4fb2-be97-25845a8d7faa:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2024-11-02T20:15:30.000Z";
+        nml:start  "2023-11-02T20:16:07.000Z" .
+
+<urn:ogf:network:es.net:2013::salt-cr6:2_1_c17_2:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::salt-cr6:2_1_c17_2:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::salt-cr6:2_1_c17_2:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-10:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::cern513-cr6:lag-10:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "107-110,105,112-4095,2-103" .
+
+<urn:ogf:network:es.net:2013::eqxam3-cr6:2_1_c1_1:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::eqxam3-cr6:2_1_c1_1:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::eqxam3-cr6:2_1_c1_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2025-02-16T14:43:47.000Z";
+        nml:start  "2024-02-16T14:44:21.000Z" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-1236,1239-4095" .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2050-4095,0-1999" .
+
+<urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "1000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:+> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>
+        rdf:type                  nml:SwitchingService;
+        mrs:providesSubnet        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+43d918d3-78a1-4971-a48a-859a79f9dda9:vt+l2-policy-Connection_1:vlan+3611> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613> , <urn:ogf:network:es.net:2013::switchingSubnet+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+0657fb49-6f59-402d-911b-b72b74294144:vt+l2-policy-Connection_1:vlan+2400> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+f65247cc-db0e-491e-a3c6-37d0f7db9d90:vt+l2-policy-Connection_1:vlan+3610> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+aad8eb8e-db27-4b14-8420-835701ae8d3f:vt+l2-policy-Connection_1:vlan+3614> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615> , <urn:ogf:network:es.net:2013::switchingSubnet+abb64928-181c-4fb2-be97-25845a8d7faa> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410> , <urn:ogf:network:es.net:2013::switchingSubnet+e028cd3d-7991-45dc-bc46-8ea78f8abc5b> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+3600> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+7a1dc44c-131a-4820-baa9-009ebdb6937c:vt+l2-policy-Connection_1:vlan+2026> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+38df900a-0513-4481-a56f-02f264cdd350:vt+l2-policy-Connection_1:vlan+2401> , <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717>;
+        nml:belongsTo             <urn:ogf:network:es.net:2013:>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::cern773-cr6:lag-1:+> , <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+> , <urn:ogf:network:es.net:2013::denv-cr6:1_1_c25_1:+> , <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:fabric> , <urn:ogf:network:es.net:2013::slac50n-cr6:1_1_c2_1:+> , <urn:ogf:network:es.net:2013::seat-cr6:2_1_c2_1:+> , <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+> , <urn:ogf:network:es.net:2013::star-cr6:2_1_c17_3:+> , <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c17_3:+> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c2_1:+> , <urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+> , <urn:ogf:network:es.net:2013::wash-cr6:2_1_c17_3:+> , <urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:+> , <urn:ogf:network:es.net:2013::cern513-cr6:lag-10:+> , <urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:wix> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+> , <urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:al2s> , <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c3_1:+> , <urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:+> , <urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+> , <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s> , <urn:ogf:network:es.net:2013::chic-cr6:1_1_c8_1:+> , <urn:ogf:network:es.net:2013::salt-cr6:2_1_c17_2:+> , <urn:ogf:network:es.net:2013::cern513-cr6:lag-1:+> , <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+> , <urn:ogf:network:es.net:2013::eqxda3-cr6:2_1_c17_2:+> , <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+> , <urn:ogf:network:es.net:2013::newy32aoa-cr6:1_1_c13_1:+> , <urn:ogf:network:es.net:2013::star-cr6:2_1_c19_1:+> , <urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:manlan> , <urn:ogf:network:es.net:2013::losa-cr6:1_1_c2_1:+> , <urn:ogf:network:es.net:2013::eqxld8-cr6:lag-10:+> , <urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+> , <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix> , <urn:ogf:network:es.net:2013::eqxam3-cr6:2_1_c1_1:+>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        sd:hasServiceDefinition   <urn:ogf:network:es.net:2013:topology:ServiceDefinition:EVTS.A-GOLE> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+b7a11c5f-0a0a-4bf1-bc97-e108fe40ddef";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3986> , <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:vlanport+3613>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:+>
+        rdf:type           nml:BidirectionalPort;
+        nml:belongsTo      <urn:ogf:network:es.net:2013:>;
+        nml:encoding       <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:hasLabelGroup  <urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:+:vlan>;
+        nml:hasService     <urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:+:BandwidthService> .
+
+<urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:vlanport+3613:label+3613>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::wash-cr6:lag-50:wix:vlanport+3613>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+1df884bd-0721-4683-81d5-a5181917edb3:vt+l2-policy-Connection_1:vlan+3986:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3613" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3615:label+3615>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3615>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3615" .
+
+<urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::wash-cr6:1_1_c6_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "198-202,2-89,474-496,2014-2309,124-193,92-93,498-1199,1202-2001,2012-2012,204-472,3731-4095,2003-2009,95-122,2312-3629,3631" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717:label+1717>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "1717" .
+
+<urn:ogf:network:es.net:2013::switchingSubnet+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e8af4edc-b501-469f-b49f-031c9a5f4dd1:vt+l2-policy-Connection_1:vlan+3613:status>
+        rdf:type   mrs:NetworkStatus;
+        mrs:type   "dataplane";
+        mrs:value  "activated" .
+
+<urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:manlan:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::newy32aoa-cr6:2_1_c4_1:manlan>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "1779-1799,1800-1819,3400-3499,3600-3619" .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c17_3:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "10000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c17_3:+> .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c17_3:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c17_3:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-901,903-4095" .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "100000000000"^^xsd:long;
+        mrs:maximumCapacity     "100000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "100000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+> .
+
+<urn:ogf:network:es.net:2013::cern513-cr6:lag-3:+:vlan+2023:cid+dab5cda1-ff5d-49d7-bb4b-8ae045a2ae15:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2024-11-03T01:32:53.000Z";
+        nml:start  "2023-11-03T01:34:09.000Z" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3615:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3615>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:existsDuring> .
+
+<urn:ogf:network:es.net:2013::losa-cr6:1_1_c2_1:+:vlan>
+        rdf:type       nml:LabelGroup;
+        nml:belongsTo  <urn:ogf:network:es.net:2013::losa-cr6:1_1_c2_1:+>;
+        nml:labeltype  <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:values     "2-4095" .
+
+<urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3612:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "10000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "400000000000"^^xsd:long;
+        mrs:maximumCapacity     "10000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "10000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3612>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:existsDuring> .
+
+<urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+:BandwidthService>
+        rdf:type                mrs:BandwidthService;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "1000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::eqxld8-cr6:2_1_c1_1:+> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612>
+        rdf:type                  mrs:SwitchingSubnet;
+        mrs:hasErrorStatus        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:error>;
+        mrs:hasNetworkStatus      <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:status>;
+        mrs:tag                   "connectionId=urn:ogf:network:es.net:2013::cid+013f8fb4-9d6c-41be-b986-1fa01b94668d";
+        nml:belongsTo             <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE>;
+        nml:encoding              <http://schemas.ogf.org/nml/2012/10/ethernet>;
+        nml:existsDuring          <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+e5377891-1f55-44a0-a5bf-d23c25aac462:vt+l2-policy-Connection_1:vlan+3612:existsDuring>;
+        nml:hasBidirectionalPort  <urn:ogf:network:es.net:2013::losa-cr6:2_1_c4_1:+:vlanport+3612> , <urn:ogf:network:es.net:2013::fnalfcc-cr6:lag-1:+:vlanport+3612>;
+        nml:labelSwapping         true;
+        nml:labeltype             <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+<urn:ogf:network:es.net:2013::kans-cr6:2_1_c22_1:+:vlan+2689:cid+e028cd3d-7991-45dc-bc46-8ea78f8abc5b:existsDuring>
+        rdf:type   nml:Lifetime;
+        nml:end    "2024-10-31T18:51:21.000Z";
+        nml:start  "2023-10-31T18:51:56.000Z" .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+5da01dd4-baa1-4565-939a-22c28a3c2570:vt+l2-policy-Connection_1:vlan+3615:error>
+        rdf:type          mrs:ErrorStatus;
+        mrs:errorMessage  "errorEvent, cid = null, errorEvent = <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<ns2:errorEvent xmlns:ns6=\"http://schemas.ogf.org/nsi/2013/12/framework/types\" xmlns:ns5=\"http://www.w3.org/2001/04/xmlenc#\" xmlns:ns8=\"http://schemas.ogf.org/nsi/2013/12/framework/headers\" xmlns:ns7=\"http://schemas.ogf.org/nsi/2013/12/services/point2point\" xmlns:ns2=\"http://schemas.ogf.org/nsi/2013/12/connection/types\" xmlns:ns4=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\">\n    <notificationId>0</notificationId>\n    <timeStamp>2024-03-25T21:00:25.861Z</timeStamp>\n    <event>forcedEnd</event>\n    <originatingConnectionId>01783a6b-2301-4f8f-aace-0bfb94697a99</originatingConnectionId>\n    <originatingNSA>urn:ogf:network:es.net:2013:nsa</originatingNSA>\n</ns2:errorEvent>\n";
+        mrs:type          "errorStatus";
+        mrs:value         "nsiErrorEvent" .
+
+<urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3694:label+3694>
+        rdf:type          nml:Label;
+        nml:belongsTo     <urn:ogf:network:es.net:2013::star-cr6:2_1_c5_1:+:vlanport+3694>;
+        nml:existsDuring  <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+527e080f-8089-4fe2-b581-25b954d4ddc1:vt+l2-policy-Connection_1:vlan+3694:existsDuring>;
+        nml:labeltype     <http://schemas.ogf.org/nml/2012/10/ethernet#vlan>;
+        nml:value         "3694" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+2410:service+bw>
+        rdf:type                mrs:BandwidthService;
+        mrs:availableCapacity   "1000000000"^^xsd:long;
+        mrs:granularity         "1000000"^^xsd:long;
+        mrs:individualCapacity  "80000000000"^^xsd:long;
+        mrs:maximumCapacity     "1000000000"^^xsd:long;
+        mrs:minimumCapacity     "0"^^xsd:long;
+        mrs:reservableCapacity  "1000000000"^^xsd:long;
+        mrs:type                "guaranteedCapped";
+        mrs:unit                "bps";
+        nml:belongsTo           <urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:al2s:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlanport+2410>;
+        nml:existsDuring        <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+61d7edcb-f593-44d2-95a2-1eb4317d2d2c:vt+l2-policy-Connection_1:vlan+2410:existsDuring> .

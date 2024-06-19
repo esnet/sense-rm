@@ -2,18 +2,20 @@ package net.es.sense.rm.driver.nsi.cs.db;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import java.util.Collection;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.*;
+
+import static java.util.Comparator.comparing;
+
 /**
+ * This service bean implements the ConnectionMapService API.
  *
  * @author hacksaw
  */
@@ -36,8 +38,8 @@ public class ConnectionMapServiceBean implements ConnectionMapService {
   }
 
   @Override
-  public ConnectionMap getByDescription(String description) {
-    return connectionMapRepository.findByDescription(description);
+  public ConnectionMap getByUniqueId(String uid) {
+    return connectionMapRepository.findByUniqueId(uid);
   }
 
   @Override
@@ -46,8 +48,15 @@ public class ConnectionMapServiceBean implements ConnectionMapService {
   }
 
   @Override
-  public Collection<ConnectionMap> getBySwitchingSubnetId(String switchingSubnetId){
+  public Collection<ConnectionMap> getBySwitchingSubnetId(String switchingSubnetId) {
     return Lists.newArrayList(connectionMapRepository.findBySwitchingSubnetId(switchingSubnetId));
+  }
+
+  @Override
+  public ConnectionMap getNewestBySwitchingSubnetId(String switchingSubnetId) {
+    List<ConnectionMap> bySwitchingSubnetId =
+        Lists.newArrayList(connectionMapRepository.findBySwitchingSubnetId(switchingSubnetId));
+    return bySwitchingSubnetId.stream().max(comparing(ConnectionMap::getVersion)).orElse(null);
   }
 
   @Override
@@ -58,13 +67,13 @@ public class ConnectionMapServiceBean implements ConnectionMapService {
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
   public ConnectionMap store(ConnectionMap connectionMap) {
-    if (Strings.isNullOrEmpty(connectionMap.getDescription())
+    if (Strings.isNullOrEmpty(connectionMap.getUniqueId())
             || Strings.isNullOrEmpty(connectionMap.getDeltaId())
             || Strings.isNullOrEmpty(connectionMap.getSwitchingSubnetId())) {
       return null;
     }
 
-    ConnectionMap conn = connectionMapRepository.findByDescription(connectionMap.description);
+    ConnectionMap conn = connectionMapRepository.findByUniqueId(connectionMap.uniqueId);
     if (conn != null) {
       connectionMap.setId(conn.getId());
     }
@@ -88,9 +97,13 @@ public class ConnectionMapServiceBean implements ConnectionMapService {
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
+  public void deleteByUniqueId(@Param("uniqueId") String uniqueId) {
+    connectionMapRepository.deleteByUniqueId(uniqueId);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
   public void delete() {
-    for (ConnectionMap connectionMap : connectionMapRepository.findAll()) {
-      connectionMapRepository.delete(connectionMap);
-    }
+    connectionMapRepository.deleteAll(connectionMapRepository.findAll());
   }
 }

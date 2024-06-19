@@ -29,6 +29,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * This class loads all discovered NML documents from the DDS and tracks lastModified
+ * times to allow for change detection.  This class also consolidates unidirectional
+ * ports into bidirectional port entries with resolved isAlias relationships.
  *
  * @author hacksaw
  */

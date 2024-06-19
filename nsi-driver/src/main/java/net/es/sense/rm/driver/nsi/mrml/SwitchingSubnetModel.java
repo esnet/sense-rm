@@ -30,12 +30,13 @@ import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
 import net.es.nsi.dds.lib.jaxb.nml.ServiceDefinitionType;
 import net.es.sense.rm.driver.nsi.cs.db.*;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparing;
 
 /**
  * Create MRML SwitchingSubnet model from stored NSI reservations and connection maps.
@@ -45,17 +46,27 @@ import java.util.Optional;
 @Slf4j
 public class SwitchingSubnetModel {
 
-  private final ReservationService reservationService;
-  private final ConnectionMapService connectionMapService;
-  private final NmlModel nml;
-  private final String topologyId;
-  private final Map<String, ServiceDefinitionType> serviceDefinitions;
+  private final ReservationService reservationService; // The reservation database.
+  private final ConnectionMapService connectionMapService; // The connection map database.
+  private final NmlModel nml; // The currently discovered NML models from the DDS.
+  private final String topologyId; // The topologyId for network we are modelling.
+  private final Map<String, ServiceDefinitionType> serviceDefinitions; // Map from URI to service definition.
 
   // Will contain a map of serviceHolder indexed by SwitchingService identifier.
   Map<String, ServiceHolder> serviceHolder = new HashMap<>();
 
-  private long version = 0;
+  private long version = 0; // Will hold the version of this model once computed.
 
+  /**
+   * Constructor for the SwitchingSubnetModel initializes with needed database services
+   * and source models.  Also, initial processing of models is performed.
+   *
+   * @param reservationService The reservation database.
+   * @param connectionMapService The connection map database.
+   * @param nml The currently discovered NML models from the DDS.
+   * @param topologyId The topologyId for network we are modelling.
+   * @throws IllegalArgumentException If an invalid topologyId is provided.
+   */
   public SwitchingSubnetModel(ReservationService reservationService,
           ConnectionMapService connectionMapService, NmlModel nml,
           String topologyId) throws IllegalArgumentException {
@@ -68,34 +79,63 @@ public class SwitchingSubnetModel {
     load();
   }
 
+  /**
+   * Get the version of the current computed MRML model.
+   *
+   * @return The version of the computed MRML model.
+   */
   public long getVersion() {
     return version;
   }
 
+  /**
+   * Get the map of serviceHolder (containing switchingService related information)
+   * indexed by SwitchingService identifier for this topology.
+   *
+   * @return Map of serviceHolder.
+   */
   public Map<String, ServiceHolder> getServiceHolder() {
     return serviceHolder;
   }
 
+  /**
+   * Get the topology identifier for the SwitchingSubnet modelled by this class.
+   *
+   * @return The string topology identifier for the SwitchingSubnet modelled by this class.
+   */
   public String getTopologyId() {
     return topologyId;
   }
 
+  /**
+   * Get the NML model instance holding the currently discovered NML models from the DDS.
+   *
+   * @return The NML model instance.
+   */
   public NmlModel getNmlModel() {
     return nml;
   }
 
+  /**
+   * During construction this method loads all dependent data models.  This implies that
+   * the version of model generated is versioned at construction time and not when the
+   * created model is accessed.
+   */
   private void load() {
     log.debug("[SwitchingSubnetModel] loading...");
 
-    // Pull out ServiceDefinitions from SwtichingServices and link Bidirectional ports.
+    // Pull out ServiceDefinitions from SwitchingServices and link Bidirectional ports.
     processSwitchingService();
 
-    // Convert reservations to SwitchingSubnets.
+    // Convert NSI-CS reservations to SwitchingSubnets.
     processReservations();
+
+    log.debug("[SwitchingSubnetModel] completed loading.");
   }
 
   /**
-   * Process the JAXB representation of the NML SwitchingService elements.
+   * Process the JAXB representation of the NML SwitchingService elements populating
+   * the serviceHolder map for easy access.
    */
   private void processSwitchingService() {
     // Pull out ServiceDefinitions from the SwitchingServices.
@@ -127,6 +167,27 @@ public class SwitchingSubnetModel {
   }
 
   /**
+   * Get the list of active reservations we will need to model in MRML.
+   *
+   * @return The list of active reservations.
+   */
+  private List<Reservation> getActiveReservations() {
+    // In this new version supporting modifications we must account for reservations
+    // with multiple versions, some of which are not yet valid.  Let us try some
+    // pre-filtering magic to get reservations from a specific topology that are in
+    // the RESERVE_START state with a lifecycle state of CREATED or TERMINATING.
+    // Remove any duplicate reservations (sharing a connectionId) by keeping the
+    // reservation of the highest version.
+    return reservationService.getByTopologyId(topologyId).stream()
+        .filter(r -> r.getReservationState() == ReservationStateEnumType.RESERVE_START && (r.getLifecycleState() == LifecycleStateEnumType.CREATED || r.getLifecycleState() == LifecycleStateEnumType.TERMINATING))
+        .collect(Collectors.groupingBy(Reservation::getConnectionId, Collectors.maxBy(Comparator.comparing(Reservation::getVersion))))
+        .values().stream()
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  /**
    * Convert the NSI CS reservations into MRML SwitchingSubnet elements and
    * link to parent SwitchingService.
    */
@@ -135,7 +196,13 @@ public class SwitchingSubnetModel {
     // ports associated with the parent bidirectional port.
     log.debug("processReservations: loading topologyId = {}", topologyId);
 
-    for (Reservation reservation : reservationService.getByTopologyId(topologyId)) {
+    // In this new version supporting modifications we must account for reservations
+    // with multiple versions, some of which are not yet valid.  Let us try some
+    // pre-filtering magic to get reservations from a specific topology that are in
+    // the RESERVE_START state with a lifecycle state of CREATED or TERMINATING.
+    // Remove any duplicate reservations (sharing a connectionId) by keeping the
+    // reservation of the highest version.
+    for (Reservation reservation : getActiveReservations()) {
       log.info("[SwitchingSubnetModel] processing reservation\n{}", reservation.toString());
 
       // If we had a model change then make sure to update our version.
@@ -165,28 +232,37 @@ public class SwitchingSubnetModel {
 
       // One last test before processing this reservation... if this is a child reservation,
       // and the parent reservation is present in the database, then we skip the child
-      // reservation.  The oparent reservation will only be present if the src and dst STP
+      // reservation.  The parent reservation will only be present if the src and dst STP
       // are in our topology.  If either of the src or dst were not in out topology then we
       // discarded the reservation.
       if (!Strings.isNullOrEmpty(reservation.getParentConnectionId())) {
         // We have a parent connection id so see if it is in the DB.
-        Reservation parent = reservationService.get(reservation.getProviderNsa(), reservation.getParentConnectionId());
-        if (parent != null) {
+        Collection<Reservation> parent = reservationService.getByProviderNsaAndConnectionId(reservation.getProviderNsa(),
+            reservation.getParentConnectionId());
+        String parentConnectionId = parent.stream().max(comparing(Reservation::getVersion))
+            .map(Reservation::getConnectionId).orElse(null);
+        if (parentConnectionId != null) {
           log.info("[SwitchingSubnetModel] skipping child reservation cid = {}, lifecycleState = {}, parentId = {}",
-                reservation.getConnectionId(), reservation.getLifecycleState(), parent.getConnectionId());
+                reservation.getConnectionId(), reservation.getLifecycleState(), parentConnectionId);
           continue;
         }
       }
 
-      // The GlobalReservationId holds the original SwitchingSubnet name, while
+      // The globalReservationId holds the original SwitchingSubnet name, while
       // the description holds a unique identifier for the connection created by
       // us before the connectionId is assigned by the PA.
-      log.info("Testing for stored connection, gid = {}, cid = {}, description = {}",
+      log.info("[SwitchingSubnetModel] Testing for stored connection, gid = {}, cid = {}, description = {}",
               reservation.getGlobalReservationId(), reservation.getConnectionId(), reservation.getDescription());
 
-      Optional<ConnectionMap> connMap = Optional.empty();
-      if (!Strings.isNullOrEmpty(reservation.getDescription())) {
-        connMap = Optional.ofNullable(connectionMapService.getByDescription(reservation.getDescription()));
+      // Look up the connection map corresponding to this reservation.
+      Optional<ConnectionMap> connMap = Optional.ofNullable(connectionMapService.getByUniqueId(reservation.getUniqueId()));
+      if (connMap.isEmpty() && !Strings.isNullOrEmpty(reservation.getDescription())) {
+        // We probably do not need this special case, but just in case there was a race condition,
+        // and we lost the uniqueId in our reservation.
+        log.info("[SwitchingSubnetModel] no stored connection map for uniqueId = {}, gid = {}, cid = {}, description = {}",
+            reservation.getUniqueId(), reservation.getGlobalReservationId(), reservation.getConnectionId(),
+            reservation.getDescription());
+        connMap = Optional.ofNullable(connectionMapService.getByUniqueId(reservation.getDescription()));
       }
 
       // We may have a mapping to a different serviceType so use it if available.
@@ -276,7 +352,16 @@ public class SwitchingSubnetModel {
           }
 
           // Now build the SwitchingSubnet.
+          if (srcChildPort.get().getParentPort().isEmpty()) {
+            log.error("[SwitchingSubnetModel] Parent port missing src = {}", srcChildPort);
+            continue;
+          }
           Optional<String> srcSSid = createSwitchingSubnet(srcChildPort.get().getParentPort().get(), serviceType);
+
+          if (dstChildPort.get().getParentPort().isEmpty()) {
+            log.error("[SwitchingSubnetModel] Parent port missing dst = {}", dstChildPort);
+            continue;
+          }
           Optional<String> dstSSid = createSwitchingSubnet(dstChildPort.get().getParentPort().get(), serviceType);
 
           log.info("[SwitchingSubnetModel] srcSSid = {}, dstSSid = {}", srcSSid, dstSSid);

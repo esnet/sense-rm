@@ -48,6 +48,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Comparator.comparing;
+
 /**
  * This is the NSI CS 2.1 web service requester endpoint used to receive responses from our associated uPA.
  * Communication between the requester thread and this requester endpoint is controlled using a semaphore
@@ -115,74 +117,113 @@ public class ConnectionService {
 
     // We have some attributes in the SOAP header.
     CommonHeaderType value = header.value;
+    String correlationId = value.getCorrelationId();
+    String connectionId = reserveConfirmed.getConnectionId();
+    ReservationConfirmCriteriaType criteria = reserveConfirmed.getCriteria();
 
     try {
       log.info("[ConnectionService] reserveConfirmed received for correlationId = {}, reserveConfirmed:\n{}",
-            value.getCorrelationId(), CsParser.getInstance().reserveConfirmedType2xml(reserveConfirmed));
+          correlationId, CsParser.getInstance().reserveConfirmedType2xml(reserveConfirmed));
     } catch (JAXBException ex) {
       log.error("[ConnectionService] reserveConfirmed could not encode log message, correlationId = {}",
-              value.getCorrelationId(), ex);
+          correlationId, ex);
     }
 
-    // If we are connected to NSI-SAFNARI there is a bug where gid and description
-    // are not returned in this message.  We have put a hack here to pass the
-    // original reservation information in the operation structure.
-    Operation op = operationMap.get(value.getCorrelationId());
+    // Look up the operation map corresponding to this response message.
+    Operation op = operationMap.get(correlationId);
+    Reservation reservation;
     if (op == null) {
+      // There is no pending operation for this reserveConfirmed so something must
+      // have gone wrong like a timeout delay.  Try to recover.
       log.error("[ConnectionService] reserveConfirmed can't find outstanding operation for correlationId = {}",
-              value.getCorrelationId());
+          correlationId);
+      reservation = reservationService.getByAnyConnectionId(value.getProviderNSA(), connectionId)
+          .stream().max(comparing(Reservation::getVersion)).orElse(null);
+      if (reservation == null) {
+        log.error("[ConnectionService] reserveConfirmed could not find reservation for connectionId = {}",
+            connectionId);
+      }
     } else {
-      // Bug: NSI-SAFNARI does not return these values.
-      if (Strings.isNullOrEmpty(reserveConfirmed.getGlobalReservationId())) {
-        reserveConfirmed.setGlobalReservationId(op.getReservation().getGlobalReservationId());
-      }
-
-      if (Strings.isNullOrEmpty(reserveConfirmed.getDescription())) {
-        reserveConfirmed.setDescription(op.getReservation().getDescription());
-      }
-    }
-
-    ReservationConfirmCriteriaType criteria = reserveConfirmed.getCriteria();
-    DataPlaneStatusType dataPlaneStatus = FACTORY.createDataPlaneStatusType();
-    dataPlaneStatus.setVersion(criteria.getVersion());
-    dataPlaneStatus.setActive(false);
-    dataPlaneStatus.setVersionConsistent(true);
-
-    // Parse the associated criteria structure.
-    Reservation reservation = processConfirmedCriteria(
-            header.value.getProviderNSA(),
-            nsiProperties.getNetworkId(),
-            reserveConfirmed.getGlobalReservationId(),
-            reserveConfirmed.getDescription(),
-            reserveConfirmed.getConnectionId(),
-            ReservationStateEnumType.RESERVE_HELD,
-            ProvisionStateEnumType.RELEASED,
-            LifecycleStateEnumType.CREATED,
-            dataPlaneStatus,
-            criteria);
-
-    // No reservation returned means.....
-    if (reservation != null) {
-      Reservation r = reservationService.get(reservation.getProviderNsa(), reservation.getConnectionId());
-      if (r == null) {
-        // We have not seen this reservation before so store it.
-        log.info("[ConnectionService] reserveConfirmed: storing new reservation, cid = {}, reservation:\n{}",
-                reservation.getConnectionId(),
-                reservation.toString());
-        reservationService.store(reservation);
-      } else if (r.diff(reservation)) {
-        // We have to determine if the stored reservation needs to be updated.
-        log.info("[ConnectionService] reserveConfirmed: storing reservation update, cid = {}",
-                reservation.getConnectionId());
-        reservation.setId(r.getId());
-        reservationService.store(reservation);
-      } else {
-        log.info("[ConnectionService] reserveConfirmed: reservation no change, cid = {}",
-                reservation.getConnectionId());
+      log.error("[ConnectionService] reserveConfirmed found outstanding operation uniqueId = {} for correlationId = {}",
+          op.getUniqueId(), value.getCorrelationId());
+      reservation = reservationService.getByUniqueId(op.getUniqueId());
+      if (reservation == null) {
+        log.error("[ConnectionService] reserveConfirmed cannot find reservation for uniqueId = {}, correlationId = {}",
+            op.getUniqueId(), value.getCorrelationId());
       }
     }
+
+    // We have two cases to handle: 1) This is an unknown reservation, so we need to
+    // create one, 2) it is a known reservation so we need to update the existing
+    // one with this new information.
+    if (reservation == null) {
+      // Handle the unknown reservation case.
+      DataPlaneStatusType dataPlaneStatus = FACTORY.createDataPlaneStatusType();
+      dataPlaneStatus.setVersion(criteria.getVersion());
+      dataPlaneStatus.setActive(false);
+      dataPlaneStatus.setVersionConsistent(true);
+
+      // Parse the associated criteria structure.
+      reservation = processConfirmedCriteria(
+          header.value.getProviderNSA(),
+          nsiProperties.getNetworkId(),
+          reserveConfirmed.getGlobalReservationId(),
+          reserveConfirmed.getDescription(),
+          connectionId,
+          ReservationStateEnumType.RESERVE_HELD,
+          ProvisionStateEnumType.RELEASED,
+          LifecycleStateEnumType.CREATED,
+          dataPlaneStatus,
+          criteria);
+    } else {
+      // Check to see if the reservation versions match.
+      if (reservation.getVersion() != criteria.getVersion()) {
+        log.error("[ConnectionService] reserveConfirmed: reservation cid = {}, has inconsistent versions {}:{}",
+            connectionId, reservation.getVersion(), criteria.getVersion());
+        reservation.setVersion(criteria.getVersion());
+      }
+
+      // Check to see if there was a change in startTime.
+      long startTime = CsUtils.getStartTime(criteria.getSchedule().getStartTime());
+      if (startTime != reservation.getStartTime()) {
+        log.error("[ConnectionService] reserveConfirmed: reservation cid = {}, has changed startTime {}:{}",
+            connectionId, reservation.getStartTime(), startTime);
+        reservation.setStartTime(startTime);
+      }
+
+      // Check to see if there was a change in endTime.
+      long endTime = CsUtils.getStartTime(criteria.getSchedule().getEndTime());
+      if (endTime != reservation.getEndTime()) {
+        log.error("[ConnectionService] reserveConfirmed: reservation cid = {}, has changed endTime {}:{}",
+            connectionId, reservation.getEndTime(), endTime);
+        reservation.setEndTime(endTime);
+      }
+
+      // Add a serialized version of the service.
+      reservation.setServiceType(criteria.getServiceType());
+      try {
+        CsUtils.serializeP2PS(criteria.getServiceType(), criteria.getAny(), reservation);
+      } catch (JAXBException ex) {
+          log.error("[ConnectionService] reserveConfirmed serializeP2PS failed for connectionId = {}",
+              connectionId, ex);
+      }
+
+      // Update reservation state machine.
+      reservation.setReservationState(ReservationStateEnumType.RESERVE_HELD);
+
+      // Update last discovered time.
+      reservation.setDiscovered(System.currentTimeMillis());
+    }
+
+    // We have not seen this reservation before so store it.
+    log.info("[ConnectionService] reserveConfirmed: storing new reservation, cid = {}, reservation:\n{}",
+        connectionId, reservation);
+    reservationService.store(reservation);
 
     if (op != null) {
+      log.info("[ConnectionService] reserveConfirmed: releasing operation for correlationId = {}",
+          correlationId);
+
       op.setState(StateType.reserved);
       op.getCompleted().release();
     }
@@ -296,6 +337,35 @@ public class ConnectionService {
   }
 
   /**
+   * Lookup a reservation in the database based on stored operation (if available) or
+   * other provided criteria.
+   *
+   * @param providerNsa The providerNSA identifier returned in the NSI-CS response.
+   * @param correlationId The correlationId for the NSI-CS message exchange.
+   * @param connectionId The connectionId for the NSI-CS reservation.
+   * @return The reservation object from the database if found.
+   */
+  private Reservation getReservation(String providerNsa, String correlationId, String connectionId) {
+    Operation op = operationMap.get(correlationId);
+    if (op == null) {
+      log.error("[ConnectionService] getReservation: can't find outstanding operation for correlationId = {}",
+          correlationId);
+
+      // Maybe the operation timed out and has already been removed?  Look
+      // up the reservation using the connectionId.
+      return reservationService.getByProviderNsaAndConnectionId(providerNsa, connectionId)
+          .stream().max(comparing(Reservation::getVersion)).orElse(null);
+    } else {
+      // We need to find and update the associated reservation state machine.
+      log.info("[ConnectionService] getReservation: found outstanding operation uniqueId = {} for correlationId = {}",
+          op.getUniqueId(), correlationId);
+
+      // Use the uniqueId stored in operation to look up reservation.
+      return reservationService.getByUniqueId(op.getUniqueId());
+    }
+  }
+
+  /**
    * Endpoint receiving the NSI CS reserveFailed message.
    *
    * @param reserveFailed
@@ -305,43 +375,43 @@ public class ConnectionService {
    */
   public GenericAcknowledgmentType reserveFailed(GenericFailedType reserveFailed,
           Holder<CommonHeaderType> header) throws ServiceException {
-    CommonHeaderType value = header.value;
-    String cid = reserveFailed.getConnectionId();
+
+    // Pull specific attributes from NSI-CS SOAP header.
+    String providerNsa = header.value.getProviderNSA();
+    String correlationId = header.value.getCorrelationId();
+    String connectionId = reserveFailed.getConnectionId();
     String error = JaxbParser.jaxb2String(ServiceExceptionType.class, reserveFailed.getServiceException());
 
-    log.info("[ConnectionService] reserveFailed recieved for correlationId = {}, connectionId = {}, error = {}",
-            value.getCorrelationId(), cid, error);
+    log.info("[ConnectionService] reserveFailed: received for correlationId = {}, connectionId = {}, error = {}",
+        correlationId, connectionId, error);
 
-    // First we update the corresponding reservation in the datbase.  This
-    // reservation should not exist based on the current code logic where we
-    // add the reservation on the reserveConfirmed message.
-    Reservation r = reservationService.get(value.getProviderNSA(), cid);
-    if (r == null) {
-      // We have not seen this reservation before so ignore it.
-      log.info("[ConnectionService] reserveFailed: no reference to reservation, cid = {}", cid);
+    // Get reservation associated with this reserveFailed message.
+    Reservation reservation = getReservation(providerNsa, correlationId, connectionId);
+    if (reservation == null) {
+      log.error("[ConnectionService] reserveFailed: could not find reservation for connectionId = {}",
+          connectionId);
     } else {
-      // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] reserveFailed: storing reservation update, cid = {}", cid);
+      // We update the stored reservation.
+      log.info("[ConnectionService] reserveFailed: storing reservation update, cid = {}", connectionId);
 
-      if (reservationService.setReserveFailed(r.getId(), ReservationStateEnumType.RESERVE_FAILED,
-              Reservation.ErrorState.NSIRESERVEFAILED,
-              String.format("reserveFailed on cid = %s, serviceException = %s", cid, error),
-              System.currentTimeMillis()) != 1) {
-        log.info("[ConnectionService] error updating cid = {}", cid);
+      if (reservationService.setReserveFailed(reservation.getId(), ReservationStateEnumType.RESERVE_FAILED,
+          Reservation.ErrorState.NSIRESERVEFAILED,
+          String.format("reserveFailed on cid = %s, serviceException = %s", connectionId, error),
+          System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] error updating cid = {}", connectionId);
       }
-
-      //r.setReservationState(ReservationStateEnumType.RESERVE_FAILED);
-      //r.setErrorState(Reservation.ErrorState.NSIRESERVEFAILED);
-      //r.setErrorMessage(String.format("reserveFailed on cid = %s, serviceException = %s", cid, error));
-      //r.setDiscovered(System.currentTimeMillis());
-      //reservationService.store(r);
     }
 
-    Operation op = operationMap.get(value.getCorrelationId());
+    // Look up operation corresponding to the message correlationId.
+    Operation op = operationMap.get(correlationId);
     if (op == null) {
-      log.error("[ConnectionService] reserveFailed can't find outstanding operation for correlationId = {}",
-              value.getCorrelationId());
+      log.error("[ConnectionService] reserveFailed: can't find outstanding operation for correlationId = {}",
+          correlationId);
     } else {
+      log.info("[ConnectionService] reserveFailed: releasing outstanding operation for correlationId = {}",
+          correlationId);
+
+      // Now compete the operation.
       op.setState(StateType.failed);
       op.setException(reserveFailed.getServiceException());
       op.getCompleted().release();
@@ -361,37 +431,39 @@ public class ConnectionService {
   public GenericAcknowledgmentType reserveCommitConfirmed(GenericConfirmedType reserveCommitConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
 
-    CommonHeaderType value = header.value;
-    String cid = reserveCommitConfirmed.getConnectionId();
+    // Pull specific attributes from NSI-CS SOAP header.
+    String providerNsa = header.value.getProviderNSA();
+    String correlationId = header.value.getCorrelationId();
+    String connectionId = reserveCommitConfirmed.getConnectionId();
 
-    log.info("[ConnectionService] reserveCommitConfirmed recieved for correlationId = {}, cid = {}",
-            value.getCorrelationId(), cid);
+    log.info("[ConnectionService] reserveCommitConfirmed received for correlationId = {}, cid = {}",
+        correlationId, connectionId);
 
-    // The reservation should not yet be in the database, but if it is then we update it,
-    // otherwise we need to kickoff and audit.
-    Reservation r = reservationService.get(value.getProviderNSA(), cid);
-    if (r == null) {
-      // We have not seen this reservation before so kick off the audit.
-      log.info("[ConnectionService] reserveCommitConfirmed: no reference to reservation, cid = {}", cid);
+    // Get reservation associated with this reserveFailed message.
+    Reservation reservation = getReservation(providerNsa, correlationId, connectionId);
+    if (reservation == null) {
+      log.error("[ConnectionService] reserveCommitConfirmed: could not find reservation for connectionId = {}",
+          connectionId);
     } else {
-      // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] reserveCommitConfirmed: storing reservation update, cid = {}", cid);
+      // Update the reservation status to the stable state of RESERVE_START.
+      log.info("[ConnectionService] reserveCommitConfirmed: storing reservation update, cid = {}", connectionId);
 
-      if (reservationService.setReservationState(r.getId(), ReservationStateEnumType.RESERVE_START,
-              System.currentTimeMillis()) != 1) {
-        log.info("[ConnectionService] error updating cid = {}", cid);
+      if (reservationService.setReservationState(reservation.getId(), ReservationStateEnumType.RESERVE_START,
+          System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] reserveCommitConfirmed: error updating cid = {}", connectionId);
       }
-
-      //r.setReservationState(ReservationStateEnumType.RESERVE_START);
-      //r.setDiscovered(System.currentTimeMillis());
-      //reservationService.store(r);
     }
 
-    Operation op = operationMap.get(value.getCorrelationId());
+    // Look up operation corresponding to the message correlationId.
+    Operation op = operationMap.get(correlationId);
     if (op == null) {
-      log.error("[ConnectionService] reserveCommitConfirmed can't find outstanding operation for correlationId = {}",
-              value.getCorrelationId());
+      log.error("[ConnectionService] reserveCommitConfirmed: can't find outstanding operation for correlationId = {}",
+          correlationId);
     } else {
+      log.info("[ConnectionService] reserveCommitConfirmed: releasing outstanding operation for correlationId = {}",
+          correlationId);
+
+      // Now compete the operation.
       op.setState(StateType.committed);
       op.getCompleted().release();
     }
@@ -410,43 +482,44 @@ public class ConnectionService {
   public GenericAcknowledgmentType reserveCommitFailed(GenericFailedType reserveCommitFailed,
           Holder<CommonHeaderType> header) throws ServiceException {
 
-    CommonHeaderType value = header.value;
-    String cid = reserveCommitFailed.getConnectionId();
+    // Pull specific attributes from NSI-CS SOAP header.
+    String providerNsa = header.value.getProviderNSA();
+    String correlationId = header.value.getCorrelationId();
+    String connectionId = reserveCommitFailed.getConnectionId();
     String error = JaxbParser.jaxb2String(ServiceExceptionType.class, reserveCommitFailed.getServiceException());
 
-    log.info("[ConnectionService] reserveCommitFailed recieved for correlationId = {}, cid = {}, error = {}",
-            value.getCorrelationId(), cid, error);
+    log.info("[ConnectionService] reserveCommitFailed: received for correlationId = {}, cid = {}, error = {}",
+            correlationId, connectionId, error);
 
     // First we update the corresponding reservation in the database.  If we
     // are talking to an aggregator this CID is the parent reservation the commit
     // was done against. The child connections will get updated next querySummary.
-    Reservation r = reservationService.get(value.getProviderNSA(), cid);
-    if (r == null) {
-      // We have not seen this reservation before so ignore it.
-      log.info("[ConnectionService] reserveCommitFailed: no reference to reservation, cid = {}", cid);
+    Reservation reservation = getReservation(providerNsa, correlationId, connectionId);
+    if (reservation == null) {
+      log.error("[ConnectionService] reserveCommitFailed: could not find reservation for connectionId = {}",
+          connectionId);
     } else {
-      // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] reserveCommitFailed: storing reservation update, cid = {}", cid);
+      // Update the reservation status to the stable state of RESERVE_START.
+      log.info("[ConnectionService] reserveCommitFailed: storing reservation update, cid = {}", connectionId);
 
-      if (reservationService.setReserveFailed(r.getId(), ReservationStateEnumType.RESERVE_FAILED,
-              Reservation.ErrorState.NSIRESERVECOMMIT,
-              String.format("reserveCommitFailed on cid = %s, serviceException = %s", cid, error),
-              System.currentTimeMillis()) != 1) {
-        log.info("[ConnectionService] error updating cid = {}", cid);
+      if (reservationService.setReserveFailed(reservation.getId(), ReservationStateEnumType.RESERVE_FAILED,
+          Reservation.ErrorState.NSIRESERVECOMMIT,
+          String.format("reserveCommitFailed on cid = %s, serviceException = %s", connectionId, error),
+          System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] reserveCommitFailed: error updating cid = {}", connectionId);
       }
-
-      //r.setReservationState(ReservationStateEnumType.RESERVE_FAILED);
-      //r.setErrorState(Reservation.ErrorState.NSIRESERVECOMMIT);
-      //r.setErrorMessage(String.format("reserveCommitFailed on cid = %s, serviceException = %s", cid, error));
-      //r.setDiscovered(System.currentTimeMillis());
-      //reservationService.store(r);
     }
 
-    Operation op = operationMap.get(value.getCorrelationId());
+    // Look up operation corresponding to the message correlationId.
+    Operation op = operationMap.get(correlationId);
     if (op == null) {
-      log.error("[ConnectionService] reserveCommitFailed can't find outstanding operation for correlationId = {}",
-              value.getCorrelationId());
+      log.error("[ConnectionService] reserveCommitFailed: can't find outstanding operation for correlationId = {}",
+          correlationId);
     } else {
+      log.info("[ConnectionService] reserveCommitFailed: releasing outstanding operation for correlationId = {}",
+          correlationId);
+
+      // Now compete the operation.
       op.setState(StateType.failed);
       op.setException(reserveCommitFailed.getServiceException());
       op.getCompleted().release();
@@ -466,38 +539,40 @@ public class ConnectionService {
   public GenericAcknowledgmentType reserveAbortConfirmed(GenericConfirmedType reserveAbortConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
 
-    CommonHeaderType value = header.value;
-    String cid = reserveAbortConfirmed.getConnectionId();
+    String providerNsa = header.value.getProviderNSA();
+    String correlationId = header.value.getCorrelationId();
+    String connectionId = reserveAbortConfirmed.getConnectionId();
 
-    log.info("[ConnectionService] reserveAbortConfirmed recieved for correlationId = {}, cid = {}",
-            value.getCorrelationId(), cid);
+    log.info("[ConnectionService] reserveAbortConfirmed: received for correlationId = {}, cid = {}",
+        correlationId, connectionId);
 
     // First we update the corresponding reservation in the database.  If we
     // are talking to an aggregator this CID is the parent reservation the abort
     // was done against. The child connections will get updated next querySummary.
-    Reservation r = reservationService.get(value.getProviderNSA(), cid);
-    if (r == null) {
-      // We have not seen this reservation before so ignore it.
-      log.info("[ConnectionService] reserveAbortConfirmed: no reference to reservation, cid = {}", cid);
+    Reservation reservation = getReservation(providerNsa, correlationId, connectionId);
+    if (reservation == null) {
+      log.error("[ConnectionService] reserveAbortConfirmed: could not find reservation for connectionId = {}",
+          connectionId);
     } else {
-      // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] reserveAbortConfirmed: storing reservation update, cid = {}", cid);
+      // Update the reservation status to the stable state of RESERVE_START.
+      log.info("[ConnectionService] reserveAbortConfirmed: storing reservation update, cid = {}", connectionId);
 
-      if (reservationService.setReservationState(r.getId(), ReservationStateEnumType.RESERVE_START,
-              System.currentTimeMillis()) != 1) {
-        log.info("[ConnectionService] error updating cid = {}", cid);
+      if (reservationService.setReservationState(reservation.getId(), ReservationStateEnumType.RESERVE_START,
+          System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] reserveAbortConfirmed: error updating cid = {}", connectionId);
       }
-
-      //r.setReservationState(ReservationStateEnumType.RESERVE_START);
-      //r.setDiscovered(System.currentTimeMillis());
-      //reservationService.store(r);
     }
 
-    Operation op = operationMap.get(value.getCorrelationId());
+    // Look up operation corresponding to the message correlationId.
+    Operation op = operationMap.get(correlationId);
     if (op == null) {
-      log.error("[ConnectionService] reserveAbortConfirmed can't find outstanding operation for correlationId = {}",
-              value.getCorrelationId());
+      log.error("[ConnectionService] reserveAbortConfirmed: can't find outstanding operation for correlationId = {}",
+          correlationId);
     } else {
+      log.info("[ConnectionService] reserveAbortConfirmed: releasing outstanding operation for correlationId = {}",
+          correlationId);
+
+      // Now compete the operation.
       op.setState(StateType.aborted);
       op.getCompleted().release();
     }
@@ -516,42 +591,44 @@ public class ConnectionService {
   public GenericAcknowledgmentType provisionConfirmed(GenericConfirmedType provisionConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
 
-    CommonHeaderType value = header.value;
-    String cid = provisionConfirmed.getConnectionId();
+    String providerNsa = header.value.getProviderNSA();
+    String correlationId = header.value.getCorrelationId();
+    String connectionId = provisionConfirmed.getConnectionId();
 
-    log.info("[ConnectionService] provisionConfirmed recieved for correlationId = {}, connectionId: {}",
-            value.getCorrelationId(), cid);
+    log.info("[ConnectionService] provisionConfirmed: received for correlationId = {}, connectionId: {}",
+        correlationId, connectionId);
 
     // First we update the corresponding reservation in the database.  If we
     // are talking to an aggregator this CID is the parent reservation the provision
     // was done against. The child connections will get updated next querySummary.
-    Reservation r = reservationService.get(value.getProviderNSA(), cid);
-    if (r == null) {
-      // We have not seen this reservation before so ignore it.
-      log.info("[ConnectionService] provisionConfirmed: no reference to reservation, cid = {}", cid);
-    } else if (r.getLifecycleState() != LifecycleStateEnumType.CREATED) {
-      // Timing issue - reservation is terminated.
-      log.info("[ConnectionService] provisionConfirmed: reservation not in CREATED state = {}, cid = {}",
-              r.getLifecycleState(), cid);
+    Reservation reservation = getReservation(providerNsa, correlationId, connectionId);
+    if (reservation == null) {
+      log.error("[ConnectionService] provisionConfirmed: could not find reservation for connectionId = {}",
+          connectionId);
+    } else if (reservation.getLifecycleState() != LifecycleStateEnumType.CREATED) {
+        // Timing issue - reservation is terminated.
+        log.info("[ConnectionService] provisionConfirmed: reservation not in CREATED state = {}, cid = {}",
+            reservation.getLifecycleState(), connectionId);
     } else {
       // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] provisionConfirmed: storing reservation update, cid = {}", cid);
+      log.info("[ConnectionService] provisionConfirmed: storing reservation update, cid = {}", connectionId);
 
-      if (reservationService.setProvisionState(r.getId(), ProvisionStateEnumType.PROVISIONED,
-              System.currentTimeMillis()) != 1) {
-        log.info("[ConnectionService] error updating cid = {}", cid);
+      if (reservationService.setProvisionState(reservation.getId(), ProvisionStateEnumType.PROVISIONED,
+          System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] provisionConfirmed: error updating cid = {}", connectionId);
       }
-
-      //r.setProvisionState(ProvisionStateEnumType.PROVISIONED);
-      //r.setDiscovered(System.currentTimeMillis());
-      //reservationService.store(r);
     }
 
-    Operation op = operationMap.get(value.getCorrelationId());
+    // Look up operation corresponding to the message correlationId.
+    Operation op = operationMap.get(correlationId);
     if (op == null) {
-      log.error("[ConnectionService] provisionConfirmed can't find outstanding operation for correlationId = {}",
-              value.getCorrelationId());
+      log.error("[ConnectionService] provisionConfirmed: can't find outstanding operation for correlationId = {}",
+          correlationId);
     } else {
+      log.info("[ConnectionService] provisionConfirmed: releasing outstanding operation for correlationId = {}",
+          correlationId);
+
+      // Now compete the operation.
       op.setState(StateType.provisioned);
       op.getCompleted().release();
     }
@@ -570,42 +647,44 @@ public class ConnectionService {
   public GenericAcknowledgmentType releaseConfirmed(GenericConfirmedType releaseConfirmed,
           Holder<CommonHeaderType> header) throws ServiceException {
 
-    CommonHeaderType value = header.value;
-    String cid = releaseConfirmed.getConnectionId();
+    String providerNsa = header.value.getProviderNSA();
+    String correlationId = header.value.getCorrelationId();
+    String connectionId = releaseConfirmed.getConnectionId();
 
-    log.info("[ConnectionService] releaseConfirmed received for correlationId = {}, connectionId: {}",
-            value.getCorrelationId(), cid);
+    log.info("[ConnectionService] releaseConfirmed: received for correlationId = {}, connectionId: {}",
+        correlationId, connectionId);
 
     // First we update the corresponding reservation in the database.  If we
     // are talking to an aggregator this CID is the parent reservation the release
     // was done against. The child connections will get updated next querySummary.
-    Reservation r = reservationService.get(header.value.getProviderNSA(), cid);
-    if (r == null) {
-      // We have not seen this reservation before so ignore it.
-      log.info("[ConnectionService] releaseConfirmed: no reference to reservation, cid = {}", cid);
-    } else if (r.getLifecycleState() != LifecycleStateEnumType.CREATED) {
+    Reservation reservation = getReservation(providerNsa, correlationId, connectionId);
+    if (reservation == null) {
+      log.error("[ConnectionService] releaseConfirmed: could not find reservation for connectionId = {}",
+          connectionId);
+    } else if (reservation.getLifecycleState() != LifecycleStateEnumType.CREATED) {
       // Timing issue - reservation is terminated.
       log.info("[ConnectionService] releaseConfirmed: reservation not in CREATED state = {}, cid = {}",
-              r.getLifecycleState(), cid);
+          reservation.getLifecycleState(), connectionId);
     } else {
       // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] releaseConfirmed: storing reservation update, cid = {}", cid);
+      log.info("[ConnectionService] releaseConfirmed: storing reservation update, cid = {}", connectionId);
 
-      if (reservationService.setProvisionState(r.getId(), ProvisionStateEnumType.RELEASED,
-              System.currentTimeMillis()) != 1) {
-        log.info("[ConnectionService] error updating cid = {}", cid);
+      if (reservationService.setProvisionState(reservation.getId(), ProvisionStateEnumType.RELEASED,
+          System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] releaseConfirmed: error updating cid = {}", connectionId);
       }
-
-      //r.setProvisionState(ProvisionStateEnumType.RELEASED);
-      //r.setDiscovered(System.currentTimeMillis());
-      //reservationService.store(r);
     }
 
-    Operation op = operationMap.get(value.getCorrelationId());
+    // Look up operation corresponding to the message correlationId.
+    Operation op = operationMap.get(correlationId);
     if (op == null) {
-      log.error("[ConnectionService] releaseConfirmed can't find outstanding operation for correlationId = {}",
-              value.getCorrelationId());
+      log.error("[ConnectionService] releaseConfirmed: can't find outstanding operation for correlationId = {}",
+          correlationId);
     } else {
+      log.info("[ConnectionService] releaseConfirmed: releasing outstanding operation for correlationId = {}",
+          correlationId);
+
+      // Now compete the operation.
       op.setState(StateType.released);
       op.getCompleted().release();
     }
@@ -622,38 +701,40 @@ public class ConnectionService {
    * @throws ServiceException
    */
   public GenericAcknowledgmentType terminateConfirmed(GenericConfirmedType terminateConfirmed, Holder<CommonHeaderType> header) throws ServiceException {
-    CommonHeaderType value = header.value;
-    String cid = terminateConfirmed.getConnectionId();
+    String providerNsa = header.value.getProviderNSA();
+    String correlationId = header.value.getCorrelationId();
+    String connectionId = terminateConfirmed.getConnectionId();
 
-    log.info("[ConnectionService] terminateConfirmed received for correlationId = {}, connectionId: {}",
-            value.getCorrelationId(), cid);
+    log.info("[ConnectionService] terminateConfirmed: received for correlationId = {}, connectionId: {}",
+        correlationId, connectionId);
 
     // First we update the corresponding reservation in the database.  If we
     // are talking to an aggregator this CID is the parent reservation the terminate
     // was done against. The child connections will get updated next querySummary.
-    Reservation r = reservationService.get(header.value.getProviderNSA(), cid);
-    if (r == null) {
-      // We have not seen this reservation before so ignore it.
-      log.info("[ConnectionService] terminateConfirmed: no reference to reservation, cid = {}", cid);
+    Reservation reservation = getReservation(providerNsa, correlationId, connectionId);
+    if (reservation == null) {
+      log.error("[ConnectionService] terminateConfirmed: could not find reservation for connectionId = {}",
+          connectionId);
     } else {
       // We have to determine if the stored reservation needs to be updated.
-      log.info("[ConnectionService] terminateConfirmed: storing reservation update, cid = {}", cid);
+      log.info("[ConnectionService] terminateConfirmed: storing reservation update, cid = {}", connectionId);
 
-      if (reservationService.setLifecycleState(r.getId(), LifecycleStateEnumType.TERMINATED,
-              System.currentTimeMillis()) != 1) {
-        log.info("[ConnectionService] error updating cid = {}", cid);
+      if (reservationService.setLifecycleState(reservation.getId(), LifecycleStateEnumType.TERMINATED,
+          System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] terminateConfirmed: error updating cid = {}", connectionId);
       }
-
-      //r.setLifecycleState(LifecycleStateEnumType.TERMINATED);
-      //r.setDiscovered(System.currentTimeMillis());
-      //reservationService.store(r);
     }
 
-    Operation op = operationMap.get(value.getCorrelationId());
+    // Look up operation corresponding to the message correlationId.
+    Operation op = operationMap.get(correlationId);
     if (op == null) {
-      log.error("[ConnectionService] terminateConfirmed can't find outstanding operation for correlationId = {}",
-              value.getCorrelationId());
+      log.error("[ConnectionService] terminateConfirmed: can't find outstanding operation for correlationId = {}",
+          correlationId);
     } else {
+      log.info("[ConnectionService] terminateConfirmed: releasing outstanding operation for correlationId = {}",
+          correlationId);
+
+      // Now compete the operation.
       op.setState(StateType.terminated);
       op.getCompleted().release();
     }

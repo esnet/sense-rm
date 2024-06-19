@@ -1,0 +1,44 @@
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717>
+        <http://schemas.ogf.org/mrs/2013/12/topology#tag>
+                "urn:ogf:network:service+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy::Connection_1" ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717> .
+
+<urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717>
+        <http://schemas.ogf.org/mrs/2013/12/topology#tag>
+                "urn:ogf:network:service+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy::Connection_1" ;
+        <http://schemas.ogf.org/nml/2013/03/base#encoding>
+                <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> ;
+        <http://schemas.ogf.org/nml/2013/03/base#labelSwapping>
+                "true" .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717:service+bw>
+        <http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity>
+                "10000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity>
+                "10000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#priority>
+                "0" ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity>
+                "10000000000"^^xsd:long .
+
+<urn:ogf:network:es.net:2013::sunn-cr6:1_1_c3_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717>
+        <http://schemas.ogf.org/mrs/2013/12/topology#tag>
+                "urn:ogf:network:service+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy::Connection_1" ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlan+1717> .
+
+<urn:ogf:network:es.net:2013::lbnl59-cr6:2_1_c6_1:+:conn+6af3a5f3-a3ec-4fee-ad6b-dc5fb9e7cb7b:vt+l2-policy-Connection_1:vlanport+1717:service+bw>
+        <http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity>
+                "10000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity>
+                "10000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#priority>
+                "0" ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity>
+                "10000000000"^^xsd:long .

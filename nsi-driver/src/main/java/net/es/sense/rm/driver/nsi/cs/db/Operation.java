@@ -1,9 +1,10 @@
 package net.es.sense.rm.driver.nsi.cs.db;
 
-import java.io.Serializable;
-import java.util.concurrent.Semaphore;
 import lombok.Synchronized;
 import org.ogf.schemas.nsi._2013._12.framework.types.ServiceExceptionType;
+
+import java.io.Serializable;
+import java.util.concurrent.Semaphore;
 
 /**
  * This class is used to track the status of an individual NSI operation,
@@ -17,15 +18,14 @@ import org.ogf.schemas.nsi._2013._12.framework.types.ServiceExceptionType;
  *
  * @author hacksaw
  */
+@lombok.Builder
 public class Operation implements Serializable {
   private final Semaphore completed = new Semaphore(0);
+  private String uniqueId;
   private String correlationId;
   private OperationType operation;
   private StateType state;
   private ServiceExceptionType exception;
-
-  // Hack around Safnari bug where gid and description not returned in
-  Reservation reservation;
 
   public Semaphore getCompleted() {
     return completed;
@@ -64,6 +64,22 @@ public class Operation implements Serializable {
   }
 
   /**
+   * @return the uniqueId
+   */
+  @Synchronized
+  public String getUniqueId() {
+    return uniqueId;
+  }
+
+  /**
+   * @param uniqueId the uniqueId that correlates related structures.
+   */
+  @Synchronized
+  public void setUniqueId(String uniqueId) {
+    this.uniqueId = uniqueId;
+  }
+
+  /**
    * @return the state
    */
   @Synchronized
@@ -82,6 +98,7 @@ public class Operation implements Serializable {
   /**
    * @return the exception
    */
+  @Synchronized
   public ServiceExceptionType getException() {
     return exception;
   }
@@ -89,21 +106,8 @@ public class Operation implements Serializable {
   /**
    * @param exception the exception to set
    */
+  @Synchronized
   public void setException(ServiceExceptionType exception) {
     this.exception = exception;
-  }
-
-  /**
-   * @return the exception
-   */
-  public Reservation getReservation() {
-    return reservation;
-  }
-
-  /**
-   * @param exception the exception to set
-   */
-  public void setReservation(Reservation reservation) {
-    this.reservation = reservation;
   }
 }

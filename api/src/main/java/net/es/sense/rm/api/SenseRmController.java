@@ -123,6 +123,7 @@ public class SenseRmController {
     utilities = new UrlTransform(config.getProxy());
     Class<?> forName = Class.forName(config.getDriver());
     driver = context.getBean(forName.asSubclass(Driver.class));
+    log.info("SenseRmController: loading driver {} as {}", config.getDriver(), forName.getName());
   }
 
   /**
@@ -1028,7 +1029,7 @@ public class SenseRmController {
 
     try {
       DeltaResponse response = driver.getDelta(deltaId, model, ifms).get();
-      if (response == null || response.getStatus() != Status.OK) {
+      if (response == null || response.getDelta().isEmpty() || response.getStatus() != Status.OK) {
         return Common.toResponseEntity(headers, response);
       }
 
@@ -1195,6 +1196,9 @@ public class SenseRmController {
                   + " elements. If provided, the model reduction element is applied first, "
                   + " followed by the model addition element.", required = true) DeltaRequest deltaRequest) {
 
+    //
+    // NOT IMPLEMENTED
+    //
     log.info("propagateModelDelta: {}", deltaRequest);
 
     DeltaResource delta = new DeltaResource();

@@ -1,0 +1,134 @@
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+<urn:ogf:network:es.net:2013::wash-cr5:7_1_1:+>
+        <http://schemas.ogf.org/nml/2013/03/base#hasBidirectionalPort>
+                <urn:ogf:network:es.net:2013::wash-cr5:7_1_1:+:vlanport+3600> .
+
+<urn:ogf:network:es.net:2013::wash-cr5:7_1_1:+:vlanport+3600>
+        a       owl:Thing , rdfs:Resource , <http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort> ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013::wash-cr5:7_1_1:+> ;
+        <http://schemas.ogf.org/nml/2013/03/base#encoding>
+                <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        <http://schemas.ogf.org/nml/2013/03/base#existsDuring>
+                [ a       owl:Thing , rdfs:Resource , <http://schemas.ogf.org/nml/2013/03/base#Lifetime> ;
+                  <http://schemas.ogf.org/nml/2013/03/base#end>
+                          "2018-11-14T07:48:17.655-08:00"
+                ] ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasLabel>
+                <urn:ogf:network:es.net:2013::wash-cr5:7_1_1:+:vlanport+3600:label+3600> ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasService>
+                <urn:ogf:network:es.net:2013::wash-cr5:7_1_1:+:vlanport+3600:service+bw> ;
+        <http://schemas.ogf.org/nml/2013/03/base#name>
+                "urn:uuid:e83edf7a-9d7e-4313-b51b-cdae0ae9ef2f" .
+
+<urn:ogf:network:es.net:2013::wash-cr5:7_1_1:+:vlanport+3600:service+bw>
+        a       <http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService> , rdfs:Resource , owl:Thing ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#granularity>
+                "1000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity>
+                "100000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity>
+                "1000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#type>
+                "guaranteedCapped" ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#unit>
+                "bps" ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013::wash-cr5:7_1_1:+:vlanport+3600> .
+
+<urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+>
+        <http://schemas.ogf.org/nml/2013/03/base#hasBidirectionalPort>
+                <urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlanport+3608> .
+
+<urn:ogf:network:es.net:2013::ServiceDomain:EVTS.A-GOLE>
+        <http://schemas.ogf.org/mrs/2013/12/topology#providesSubnet>
+                <urn:ogf:network:es.net:2013::ServiceDomain:EVTS.A-GOLE:vlan+3608> .
+
+<urn:ogf:network:es.net:2013::wash-cr5:7_1_1:+:vlanport+3600:label+3600>
+        a       <http://schemas.ogf.org/nml/2013/03/base#Label> , owl:Thing , rdfs:Resource ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013::wash-cr5:7_1_1:+:vlanport+3600> ;
+        <http://schemas.ogf.org/nml/2013/03/base#labeltype>
+                <file:///vlan> ;
+        <http://schemas.ogf.org/nml/2013/03/base#value>
+                "3600" .
+
+<urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlanport+3608:label+3608>
+        a       <http://schemas.ogf.org/nml/2013/03/base#Label> , owl:Thing , rdfs:Resource ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlanport+3608> ;
+        <http://schemas.ogf.org/nml/2013/03/base#labeltype>
+                <file:///vlan> ;
+        <http://schemas.ogf.org/nml/2013/03/base#value>
+                "3608" .
+<urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlanport+3608:service+bw>
+        a       <http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService> , rdfs:Resource , owl:Thing ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#granularity>
+                "1000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity>
+                "100000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity>
+                "1000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity>
+                "1000000000"^^xsd:long ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#type>
+                "guaranteedCapped" ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#unit>
+                "bps" ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlanport+3608> .
+
+<urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlanport+3608>
+        a       owl:Thing , rdfs:Resource , <http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort> ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+> ;
+        <http://schemas.ogf.org/nml/2013/03/base#encoding>
+                <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        <http://schemas.ogf.org/nml/2013/03/base#existsDuring>
+                [ a       owl:Thing , rdfs:Resource , <http://schemas.ogf.org/nml/2013/03/base#Lifetime> ;
+                  <http://schemas.ogf.org/nml/2013/03/base#end>
+                          "2018-11-14T07:48:17.655-08:00"
+                ] ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasLabel>
+                <urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlanport+3608:label+3608> ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasService>
+                <urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlanport+3608:service+bw> ;
+        <http://schemas.ogf.org/nml/2013/03/base#name>
+                "urn:uuid:e83edf7a-9d7e-4313-b51b-cdae0ae9ef2f" .
+
+<urn:ogf:network:es.net:2013::ServiceDomain:EVTS.A-GOLE:vlan+3608>
+        a       owl:Thing , rdfs:Resource , <http://schemas.ogf.org/mrs/2013/12/topology#SwitchingSubnet> ;
+        <http://schemas.ogf.org/mrs/2013/12/topology#tag>
+                "serviceId=urn:uuid:e83edf7a-9d7e-4313-b51b-cdae0ae9ef2f" ;
+        <http://schemas.ogf.org/nml/2013/03/base#belongsTo>
+                <urn:ogf:network:es.net:2013::ServiceDomain:EVTS.A-GOLE> ;
+        <http://schemas.ogf.org/nml/2013/03/base#encoding>
+                <http://schemas.ogf.org/nml/2012/10/ethernet> ;
+        <http://schemas.ogf.org/nml/2013/03/base#existsDuring>
+                [ a       owl:Thing , rdfs:Resource , <http://schemas.ogf.org/nml/2013/03/base#Lifetime> ;
+                  <http://schemas.ogf.org/nml/2013/03/base#end>
+                          "2018-11-14T07:48:17.655-08:00"
+                ] ;
+        <http://schemas.ogf.org/nml/2013/03/base#hasBidirectionalPort>
+                <urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlanport+3608> , <urn:ogf:network:es.net:2013::wash-cr5:7_1_1:+:vlanport+3600> ;
+        <http://schemas.ogf.org/nml/2013/03/base#labelSwapping>
+                true ;
+        <http://schemas.ogf.org/nml/2013/03/base#labeltype>
+                <http://schemas.ogf.org/nml/2012/10/ethernet#vlan> .
+
+owl:Nothing  rdfs:subClassOf  <http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService> , <http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort> , <http://schemas.ogf.org/nml/2013/03/base#Label> , <http://schemas.ogf.org/mrs/2013/12/topology#SwitchingSubnet> .
+

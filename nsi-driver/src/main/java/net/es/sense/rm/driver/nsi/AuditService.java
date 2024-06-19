@@ -19,6 +19,8 @@
  */
 package net.es.sense.rm.driver.nsi;
 
+import java.io.IOException;
+
 /**
  *
  * @author hacksaw
@@ -27,6 +29,6 @@ public interface AuditService {
 
   void audit();
 
-  void audit(String topologyId);
+  void audit(String topologyId) throws IOException;
 
 }

@@ -35,6 +35,7 @@ import net.es.sense.rm.measurements.db.MetricType;
 import org.apache.jena.riot.Lang;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -82,7 +83,12 @@ public class AuditServiceBean implements AuditService {
   @Override
   public void audit() {
     // We really only have one model to audit.
-    audit(nsiProperties.getNetworkId());
+    try {
+      audit(nsiProperties.getNetworkId());
+    } catch (IOException e) {
+      // Ignore
+      log.error("AuditServiceBean::audit failed", e);
+    }
   }
 
   /**
@@ -91,7 +97,7 @@ public class AuditServiceBean implements AuditService {
    * @param topologyId
    */
   @Override
-  public void audit(String topologyId) {
+  public void audit(String topologyId) throws IOException {
     long start = System.currentTimeMillis();
 
     log.info("[AuditService] starting audit for {}.", topologyId);

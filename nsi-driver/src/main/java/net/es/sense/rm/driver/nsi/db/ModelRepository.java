@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
+ * This CrudRepository class handles storage for the Model structure.
  *
  * @author hacksaw
  */

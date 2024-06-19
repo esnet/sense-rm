@@ -25,7 +25,8 @@ import net.es.sense.rm.model.DeltaState;
 import java.io.Serializable;
 
 /**
- * A delta object for storage.
+ * A delta object for storage.  A SENSE delta object represents a topology change request
+ * that we map into an NSI-CS reservation operation.
  * 
  * @author hacksaw
  */
@@ -44,13 +45,16 @@ public class Delta implements Serializable {
   private String deltaId;           // The unique uuid identifying the delta within the RM.
 
   @Basic(optional = false)
-  private long lastModified = 0;    // Representing the time of the creation, last modification, or _state transition of the delta resource.
+  private long lastModified = 0;    // Representing the time of the creation, last modification, or _state
+                                    // transition of the delta resource.
 
   @Basic(optional = false)
   private String modelId;           // The UUID of the root model version to which this delta has been applied.
 
   @Basic(optional = false)
-  private DeltaState _state;         // The current _state of the delta resource. Will contain one of Accepting, Accepted, Committing, Committed, Activating, Activated, or Failed.
+  private DeltaState _state;         // The current _state of the delta resource. Will contain one of
+                                     // Accepting, Accepted, Committing, Committed, Activating, Activated,
+                                     // or Failed.
 
   @Lob
   @Basic(fetch=FetchType.LAZY, optional=true)

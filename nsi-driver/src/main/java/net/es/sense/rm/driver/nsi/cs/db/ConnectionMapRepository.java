@@ -19,20 +19,21 @@
  */
 package net.es.sense.rm.driver.nsi.cs.db;
 
-import net.es.sense.rm.driver.nsi.db.Model;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
+ * This CrudRepository class handles storage for the ConnectionMap structure.
  *
  * @author hacksaw
  */
 @Repository
 public interface ConnectionMapRepository extends CrudRepository<ConnectionMap, Long> {
 
+  public void deleteByUniqueId(@Param("uniqueId") String uniqueId);
   public ConnectionMap findOneById(@Param("id") long id);
-  public ConnectionMap findByDescription(@Param("description") String description);
+  public ConnectionMap findByUniqueId(@Param("uid") String uid);
   public Iterable<ConnectionMap> findByDeltaId(@Param("deltaId") String deltaId);
   public Iterable<ConnectionMap> findBySwitchingSubnetId(@Param("switchingSubnetId") String switchingSubnetId);
   public Iterable<ConnectionMap> findByDeltaIdAndSwitchingSubnetId(

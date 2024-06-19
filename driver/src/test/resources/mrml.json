@@ -1,0 +1,5432 @@
+[
+  {
+    "@id": "_:b0",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#Lifetime"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#end": [
+      {
+        "@value": "2017-11-14T10:15:13.129Z"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#start": [
+      {
+        "@value": "2017-09-15T10:15:13.128Z"
+      }
+    ]
+  },
+  {
+    "@id": "_:b1",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#Location"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#alt": [
+      {
+        "@value": "809.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#float"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#lat": [
+      {
+        "@value": "-122.24998",
+        "@type": "http://www.w3.org/2001/XMLSchema#float"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#long": [
+      {
+        "@value": "37.87619",
+        "@type": "http://www.w3.org/2001/XMLSchema#float"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#name": [
+      {
+        "@value": "ESnet Berkeley"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#unlocode": [
+      {
+        "@value": "Bogus String"
+      }
+    ]
+  },
+  {
+    "@id": "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+  },
+  {
+    "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+  },
+  {
+    "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+  },
+  {
+    "@id": "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+  },
+  {
+    "@id": "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+  },
+  {
+    "@id": "http://schemas.ogf.org/nml/2013/03/base#Lifetime"
+  },
+  {
+    "@id": "http://schemas.ogf.org/nml/2013/03/base#Location"
+  },
+  {
+    "@id": "http://schemas.ogf.org/nml/2013/03/base#SwitchingService"
+  },
+  {
+    "@id": "http://schemas.ogf.org/nml/2013/03/base#Topology"
+  },
+  {
+    "@id": "http://schemas.ogf.org/nsi/2013/12/services/definition#ServiceDefinition"
+  },
+  {
+    "@id": "urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:esnet"
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013:",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#Topology"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#existsDuring": [
+      {
+        "@id": "_:b0"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasBidirectionalPort": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::ServiceDomain:EVTS.A-GOLE"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_7:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_8:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:3_1_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#locatedAt": [
+      {
+        "@id": "_:b1"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#name": [
+      {
+        "@value": "es.net"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#version": [
+      {
+        "@value": "2017-09-15T10:15:13.128Z"
+      }
+    ],
+    "http://schemas.ogf.org/nsi/2013/12/services/definition#hasServiceDefinition": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::ServiceDefinition:EVTS.A-GOLE"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::ServiceDefinition:EVTS.A-GOLE",
+    "@type": [
+      "http://schemas.ogf.org/nsi/2013/12/services/definition#ServiceDefinition"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#name": [
+      {
+        "@value": "GLIF Automated GOLE Ethernet VLAN Transfer Service"
+      }
+    ],
+    "http://schemas.ogf.org/nsi/2013/12/services/definition#serviceType": [
+      {
+        "@value": "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::ServiceDomain:EVTS.A-GOLE",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#SwitchingService"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasBidirectionalPort": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_8:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_7:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:3_1_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+"
+      },
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labelSwapping": [
+      {
+        "@value": true
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nsi/2013/12/services/definition#hasServiceDefinition": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::ServiceDefinition:EVTS.A-GOLE"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:BandwidthService"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#isAlias": [
+      {
+        "@id": "urn:ogf:network:netherlight.net:2013:production7:esnet-1"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::amst-cr5:3_1_1:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "1000-1019"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::anl-mr2:xe-1_2_0:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-911,913-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:BandwidthService"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#isAlias": [
+      {
+        "@id": "urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_2:esnet"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:2_1_1:manlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "1779-1799,1800-1819,3400-3499"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:5_1_1:star-tb1"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_bnl-rt3_ip-a_v4:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan-mgmt_v4:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_montreal:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_canet_toronto:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_internet2:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::aofa-cr5:to_manlan_pilot:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_10:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_11:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_12:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:10_1_1:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "1662,1720-1725"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::atla-cr5:4_1_1:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "1662,1720-1725"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::cern-272-cr5:10_1_3:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::chic-cr5:3_2_1:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "80000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "80000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "80000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "80000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::chic-cr5:5_1_1:al2s"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4089"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::denv-cr5:10_1_11:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-0_2_0:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-908,910-918,920-1800,1802-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-1_3_0:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-910,912-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-2_2_0:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-7_0_0:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_0_0:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::fnal-mr2:xe-8_3_0:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-1799,1801-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-0_1_0:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-499,501-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-8_2_0:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::lbl-mr2:xe-9_3_0:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-911,913-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::nersc-mr2:xe-7_3_0:xo-osf-rt1"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-998,1000-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::newy-cr5:to_bnl-rt3_ip-a_v4:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_2:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:10_1_7:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::pnwg-cr5:2_1_1:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "1779-1799"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sacr-cr5:10_1_4:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_7:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_7:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_7:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_7:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_8:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_8:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_8:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:10_1_8:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "1779-1799"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:3_1_1:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:3_1_1:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:3_1_1:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:3_1_1:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "1662-1664"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_1_1:star-tb1"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:6_2_1:umich"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "3176-3179,3800-3809"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "100000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::star-cr5:to_star-tb1_ip-a:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:BandwidthService"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:10_1_6:+"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "2-4094"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:BandwidthService"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#isAlias": [
+      {
+        "@id": "urn:ogf:network:caltech.edu:2013::CER2024:eth2_1:esnet"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "40000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "40000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "40000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "40000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:caltech"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "3600-3619"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:BandwidthService"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#isAlias": [
+      {
+        "@id": "urn:ogf:network:snvaca.pacificwave.net:2016:topology:esnet-sunnyvale"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "40000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "40000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "40000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "40000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::sunn-cr5:8_1_1:pacwave"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "1779-1799"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#BidirectionalPort"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013:"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#encoding": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasLabelGroup": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#hasService": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:BandwidthService"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#isAlias": [
+      {
+        "@id": "urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_2:esnet"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:BandwidthService",
+    "@type": [
+      "http://schemas.ogf.org/mrs/2013/12/topology#BandwidthService"
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#availableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#granularity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#individualCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#maximumCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#minimumCapacity": [
+      {
+        "@value": "1000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#reservableCapacity": [
+      {
+        "@value": "10000000000",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#type": [
+      {
+        "@value": "guaranteedCapped"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#unit": [
+      {
+        "@value": "bps"
+      }
+    ],
+    "http://schemas.ogf.org/mrs/2013/12/topology#usedCapacity": [
+      {
+        "@value": "0",
+        "@type": "http://www.w3.org/2001/XMLSchema#long"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix:vlan",
+    "@type": [
+      "http://schemas.ogf.org/nml/2013/03/base#LabelGroup"
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#belongsTo": [
+      {
+        "@id": "urn:ogf:network:es.net:2013::wash-cr5:6_1_1:wix"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#labeltype": [
+      {
+        "@id": "http://schemas.ogf.org/nml/2012/10/ethernet#vlan"
+      }
+    ],
+    "http://schemas.ogf.org/nml/2013/03/base#values": [
+      {
+        "@value": "1720-1725,1860-1899,3400-3499"
+      }
+    ]
+  },
+  {
+    "@id": "urn:ogf:network:manlan.internet2.edu:2013::sw.net.manlan.internet2.edu:15_2:esnet"
+  },
+  {
+    "@id": "urn:ogf:network:netherlight.net:2013:production7:esnet-1"
+  },
+  {
+    "@id": "urn:ogf:network:snvaca.pacificwave.net:2016:topology:esnet-sunnyvale"
+  },
+  {
+    "@id": "urn:ogf:network:wix.internet2.edu:2013::sw.net.wix.internet2.edu:13_2:esnet"
+  }
+]

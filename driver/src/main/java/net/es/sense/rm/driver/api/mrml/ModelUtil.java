@@ -1,210 +1,481 @@
 package net.es.sense.rm.driver.api.mrml;
 
-import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
-import java.util.Arrays;
-import net.es.sense.rm.driver.schema.Nml;
+import com.google.common.base.Strings;
+import lombok.extern.slf4j.Slf4j;
+import net.es.sense.rm.driver.schema.*;
+import org.apache.jena.ontology.ObjectProperty;
+import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.*;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RiotException;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.vocabulary.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
+ * This utility class provides a set of methods for manipulating Jena Ontologies.
  *
  * @author hacksaw
  */
+@Slf4j
 public class ModelUtil {
+  public static final PrefixMapping PREFIXES = PrefixMapping.Factory.create()
+      .setNsPrefix("rdfs", RDFS.getURI())
+      .setNsPrefix("rdf", RDF.getURI())
+      .setNsPrefix("dc", DC_11.getURI())
+      .setNsPrefix("owl", OWL.getURI())
+      .setNsPrefix("xsd", XSD.getURI())
+      .setNsPrefix("nml", Nml.getURI())
+      .setNsPrefix("mrs", Mrs.getURI())
+      .setNsPrefix("spa", Spa.getURI())
+      .lock();
 
-  public static final String[] supported = {
-    "turtle",
-    "ttl"
+  // The types of model serialization encodings we support in this class.
+  public static final Lang[] SUPPORTED_ENCODINGS = {
+      Lang.TURTLE,
+      Lang.TTL,
+      Lang.RDFJSON,
+      Lang.RDFXML,
   };
 
+  // The list of ontology imports we need for our base MRML model.
+  public static final List<Schema> SCHEMA_IMPORTS = List.of(
+      new Schema(Rdf.getURI(), "/schema/rdf.ttl", Lang.TURTLE),
+      new Schema(Rdfs.getURI(), "/schema/rdfs.ttl", Lang.TURTLE),
+      new Schema(Owl.getURI(), "/schema/owl.ttl", Lang.TURTLE),
+      new Schema(Nml.getURI(), "/schema/nml.owl", Lang.RDFXML),
+      new Schema(Spa.getURI(), "/schema/spa.owl", Lang.RDFXML),
+      new Schema(Mrs.getURI(), "/schema/mrs.ttl", Lang.TURTLE));
+
+  /**
+   * Create a new empty MRML OntModel with OWL reasoning turned on.
+   *
+   * @return OntModel initialized with import models for MRML.
+   * @throws IOException If there are issues loading dependent models.
+   */
+  public static OntModel newMrmlModel() throws IOException {
+    // Create a new ontology model with reasoning enabled.
+    final OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+    model.setNsPrefixes(PREFIXES);
+
+    // Configure the document manager with imported schema models.
+    OntDocumentManager dm = model.getDocumentManager();
+    for (Schema schema : SCHEMA_IMPORTS) {
+      log.debug("[newSchemaModel] loading import {} {} {}", schema.getUri(), schema.getPath(), schema.getType());
+      try (InputStream file = ModelUtil.class.getResourceAsStream(schema.getPath())) {
+        OntModel impModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+        impModel.read(file, null, schema.getType().getName());
+        dm.addModel(schema.getUri(), impModel);
+      } catch (IOException e) {
+        throw new IOException(String.format("failure to load schema ontology models, %s", e.getMessage()));
+      }
+    }
+    return model;
+  }
+
+  /**
+   * Determine if the specified model encoding is supported by this class.
+   *
+   * @param type The requested encoding type.
+   * @return True if the requested encoding type is supported, false otherwise.
+   */
   public static boolean isSupported(String type) {
-    return Arrays.stream(supported).anyMatch(s -> s.equalsIgnoreCase(type));
+    return Arrays.stream(SUPPORTED_ENCODINGS).anyMatch(s -> s.getName().equalsIgnoreCase(type));
   }
 
-  public static OntModel unmarshalOntModel(String ttl) throws Exception {
-    OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
-    //$$ TODO: add ontology schema and namespace handling code
-    try {
-      model.read(new ByteArrayInputStream(ttl.getBytes()), null, "TURTLE");
-    } catch (Exception e) {
-      throw new Exception(String.format("failure to unmarshall ontology model, due to %s", e.getMessage()));
-    }
+  /**
+   * Unmarshal the serialized ontology using the specified encoding.
+   *
+   * @param serialized A string containing the serialized model.
+   * @param encoding The encoding used on the serialized model.
+   * @return An OntModel containing the unmarshalled model.
+   * @throws IOException If there was an issue unmarshalling the serialized model.
+   */
+  public static OntModel unmarshalOntModel(String serialized, String encoding) throws IOException, RiotException {
+    // Get a new MRML ontology model pre-populated with imported schema.
+    OntModel model = newMrmlModel();
+    model.read(new ByteArrayInputStream(serialized.getBytes()), null, encoding);
     return model;
   }
 
-  public static String marshalOntModel(OntModel model) throws Exception {
-    //$$ TODO: add namespace handling code
+  /**
+   * Unmarshal the supplied turtle model into an OntModel representation.
+   *
+   * @param ttl A string containing the turtle encoded model.
+   * @return An OntModel containing the unmarshalled model.
+   * @throws IOException If there was an issue unmarshalling the serialized model.
+   */
+  public static OntModel unmarshalOntModelTurtle(String ttl) throws IOException, RiotException {
+    return unmarshalOntModel(ttl, Lang.TURTLE.getLabel());
+  }
+
+  /**
+   * Unmarshal the supplied RDF/JSON model into an OntModel representation.
+   *
+   * @param json A string containing the RDF/JSON encoded model.
+   * @return An OntModel containing the unmarshalled model.
+   * @throws IOException If there was an issue unmarshalling the serialized model.
+   */
+  public static OntModel unmarshalOntModelJson(String json) throws IOException, RiotException {
+    return unmarshalOntModel(json, Lang.RDFJSON.getLabel());
+  }
+
+  /**
+   * Unmarshal the supplied RDF/XML model into an OntModel representation.
+   *
+   * @param json A string containing the RDF/XML encoded model.
+   * @return An OntModel containing the unmarshalled model.
+   * @throws IOException If there was an issue unmarshalling the serialized model.
+   */
+  public static OntModel unmarshalOntModelXml(String json) throws IOException, RiotException {
+    return unmarshalOntModel(json, Lang.RDFXML.getLabel());
+  }
+
+  /**
+   * Unmarshal an MRML model contained in filename using the specified encoding.
+   *
+   * @param filename The path to the file containing the model to unmarshal.
+   * @param encoding The encoding of the model in the file.
+   * @return A fully initialized MRML model containing the contents of the file.
+   * @throws IOException If there is an issue reading the model file.
+   */
+  public static OntModel unmarshalOntModelFromFile(String filename, String encoding)
+      throws IOException, RiotException {
+    try {
+      OntModel model = newMrmlModel();
+      model.read(new ByteArrayInputStream(Files.readAllBytes(Paths.get(filename))), null, encoding);
+      return model;
+    } catch (IOException io) {
+      throw new IOException(String.format("failure to unmarshall ontology model, due to %s \"%s\"",
+          filename, io.getMessage()));
+    }
+  }
+
+  /**
+   * Marshal into a string the specified model using the specified encoding.
+   *
+   * @param model The model to serialize.
+   * @param encoding The encoding to use for serialization.
+   * @return A string containing the serialized model.
+   */
+  public static String marshalOntModel(OntModel model, String encoding) {
     StringWriter out = new StringWriter();
-    try {
-      model.write(out, "TURTLE");
-    } catch (Exception e) {
-      throw new Exception(String.format("failure to marshall ontology model, due to %s", e.getMessage()));
-    }
-    String ttl = out.toString();
-    return ttl;
+    model.write(out, encoding);
+    return out.toString();
   }
 
-  public static OntModel unmarshalOntModelJson(String json) throws Exception {
-    OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
-    //$$ TODO: add ontology schema and namespace handling code
-    try {
-      model.read(new ByteArrayInputStream(json.getBytes()), null, "RDF/JSON");
-    } catch (Exception e) {
-      throw new Exception(String.format("failure to unmarshall ontology model, due to %s", e.getMessage()));
-    }
-    return model;
-  }
-
-  public static String marshalOntModelJson(OntModel model) throws Exception {
-    //$$ TODO: add namespace handling code
+  /**
+   * Marshal into a string the specified model using the specified encoding.
+   *
+   * @param model The model to serialize.
+   * @param encoding The encoding to use for serialization.
+   * @return A string containing the serialized model.
+   */
+  public static String marshalModel(Model model, String encoding) {
     StringWriter out = new StringWriter();
-    try {
-      model.write(out, "RDF/JSON");
-    } catch (Exception e) {
-      throw new Exception(String.format("failure to marshall ontology model, due to %s", e.getMessage()));
-    }
-    String ttl = out.toString();
-    return ttl;
+    model.write(out, encoding);
+    return out.toString();
   }
 
-  public static Model unmarshalModel(String ttl) {
-    Model model = ModelFactory.createDefaultModel();
-    //$$ TODO: add ontology schema and namespace handling code
-    model.read(new ByteArrayInputStream(ttl.getBytes()), null, "TURTLE");
-    return model;
+  /**
+   * We like the Turtle encoding so much we make it the default.
+   *
+   * @param model The model to serialize into Turtle.
+   * @return The OntModel serialized into a string.
+   */
+  public static String marshalOntModel(OntModel model) {
+    return marshalOntModelTurtle(model);
   }
 
-  public static String marshalModel(Model model) throws Exception {
-    //$$ TODO: add namespace handling code
-    StringWriter out = new StringWriter();
-    try {
-      model.write(out, "TURTLE");
-    } catch (Exception e) {
-      throw new Exception(String.format("failure to marshall ontology model, due to %s", e.getMessage()));
-    }
-    String ttl = out.toString();
-    return ttl;
+  /**
+   * Marshal the specified model into RDF/XML serialization.
+   *
+   * @param model The model to serialize into RDF/XML.
+   * @return The OntModel serialized into a string.
+   */
+  public static String marshalOntModelXml(OntModel model) {
+    return marshalOntModel(model, Lang.RDFXML.getLabel());
   }
 
-  public static Model unmarshalModelJson(String ttl) throws Exception {
-    Model model = ModelFactory.createDefaultModel();
-    //$$ TODO: add ontology schema and namespace handling code
-    try {
-      model.read(new ByteArrayInputStream(ttl.getBytes()), null, "RDF/JSON");
-    } catch (Exception e) {
-      throw new Exception(String.format("failure to unmarshall ontology model, due to %s", e.getMessage()));
-    }
-    return model;
+  /**
+   * Marshal the specified model into RDF/JSON serialization.
+   *
+   * @param model The model to serialize into RDF/JSON.
+   * @return The OntModel serialized into a string.
+   */
+  public static String marshalOntModelJson(OntModel model) {
+    return marshalOntModel(model, Lang.RDFJSON.getLabel());
   }
 
-  public static String marshalModelJson(Model model) throws Exception {
-    //$$ TODO: add namespace handling code
-    StringWriter out = new StringWriter();
-    try {
-      model.write(out, "RDF/JSON");
-    } catch (Exception e) {
-      throw new Exception(String.format("failure to marshall ontology model, due to %s", e.getMessage()));
-    }
-    String ttl = out.toString();
-    return ttl;
+  /**
+   * Marshal the specified model into a Turtle serialization.
+   *
+   * @param model The model to serialize into Turtle.
+   * @return The OntModel serialized into a string.
+   */
+  public static String marshalOntModelTurtle(OntModel model) {
+    return marshalOntModel(model, Lang.TURTLE.getLabel());
   }
 
-  public static OntModel cloneOntModel(OntModel model) {
-    OntModel cloned = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+  /**
+   * Clone an MRML model.
+   *
+   * @param model The model to clone.
+   * @return The new cloned copy of the input model.
+   * @throws IOException Thrown if there is an issue cloning the model.
+   */
+  public static OntModel cloneOntModel(OntModel model) throws IOException {
+    OntModel cloned = newMrmlModel();
     cloned.add(model.getBaseModel());
     return cloned;
   }
 
-  public static boolean isEmptyModel(Model model) {
+  /**
+   * Determine if the MRML model is empty of MRML related resources.
+   *
+   * @param model The model to interrogate.
+   * @return True if the model is empty, and false otherwise.
+   */
+  public static boolean isEmptyModel(OntModel model) {
     if (model == null) {
       return true;
     }
-    StmtIterator stmts = model.listStatements();
+    StmtIterator stmts = model.getBaseModel().listStatements();
     while (stmts.hasNext()) {
       Statement stmt = stmts.next();
       // check subject will be enough
-      if (stmt.getSubject().isResource() && stmt.getPredicate().toString().contains("ogf")) {
+      if (stmt.getPredicate().toString().contains("http://schemas.ogf.org/")) {
         return false;
       }
     }
     return true;
   }
 
-  public static Model getOddModel(Model model) {
-    Model odd = ModelFactory.createDefaultModel();
-    if (model == null) {
-      return odd;
-    }
-    StmtIterator stmts = model.listStatements();
-    while (stmts.hasNext()) {
-      Statement stmt = stmts.next();
-      // check subject will be enough
-      if (stmt.getSubject().isResource() && stmt.getPredicate().toString().contains("ogf")) {
-        odd.add(stmt);
+  /**
+   * Determine if a named resource is of a specific type.
+   *
+   * @param model The model to query.
+   * @param object The named resources to search for.
+   * @param predicate The resource type it must match.
+   * @return True if the named resource is in the model and of the specified type.
+   */
+  public static boolean isResourceOfType(OntModel model, Resource predicate, Resource object) {
+    return getResourceOfSubjectAndType(model, predicate, object) != null;
+  }
+
+  /**
+   * Search the provided model for the set of resources of provided resType.
+   *
+   * @param model The model to search.
+   * @param resType The resource type to match.
+   * @return The set of matching resources.
+   */
+  public static List<Resource> getResourcesOfType(OntModel model, Resource resType) {
+    StmtIterator stmtIterator = model.getBaseModel().listStatements(null, Rdf.type, resType);
+    return stmtIterator.toList().stream() // Convert StmtIterator to a stream.
+        .map(Statement::getSubject) // Extract the subject from each statement.
+        .distinct() // Optional: remove duplicates if you expect subjects to repeat.
+        .map(s -> model.getResource(s.getURI())) // Map each subject URI to the corresponding resource in the model.
+        .collect(Collectors.toList()); // Collect all results to a list.
+  }
+
+  /**
+   * Search the provided model for a resource of a specific subject and type.
+   *
+   * @param model The model to search.
+   * @param type The Rdf.type object to match.
+   * @param subject The resource id to match.
+   * @return The resource matching the id and type, or null if no match.
+   */
+  public static Resource getResourceOfSubjectAndType(OntModel model, Resource type, Resource subject) {
+    return getResourceOfSubjectAndType(model, type, subject.getURI());
+  }
+
+  /**
+   * Search the provided model for a resource of a specific type.
+   *
+   * @param model The model to search.
+   * @param type The Rdf.type object to match.
+   * @param subject The resource id to match.
+   * @return The resource matching the id and type, or null if no match.
+   */
+  public static Resource getResourceOfSubjectAndType(OntModel model, Resource type, String subject) {
+    Resource resource = model.getBaseModel().getResource(subject);
+    if (resource != null) {
+      Statement property = resource.getProperty(Rdf.type);
+      if (property != null && property.getObject().isURIResource() &&
+          property.getObject().toString().equalsIgnoreCase(type.getURI())) {
+        return resource;
       }
     }
-    return odd;
+    return null;
   }
 
-  public static boolean isResourceOfType(Model model, Resource res, Resource resType) {
-    String sparql = String.format("SELECT $s WHERE {$s a $t. FILTER($s = <%s> && $t = <%s>)}", res, resType);
-    ResultSet r = ModelUtil.sparqlQuery(model, sparql);
-    return r.hasNext();
-  }
-
-  public static ResultSet getResourcesOfType(Model model, Resource resType) {
-    String sparql = String.format("SELECT ?resource WHERE { ?resource a <%s> }", resType);
-    ResultSet r = ModelUtil.sparqlQuery(model, sparql);
-    return r;
-  }
-
-  public static Resource getResourceOfType(Model model, Resource res, Resource resType) {
-    String sparql = String.format("SELECT ?resource WHERE {?resource a ?type. FILTER($resource = <%s> && $type = <%s>)}", res, resType);
-    ResultSet r = ModelUtil.sparqlQuery(model, sparql);
-
-    if (r.hasNext()) {
-      return r.next().get("resource").asResource();
-    } else {
-      return null;
+  /**
+   * Return the mrs:tag property from the specified resource.
+   *
+   * @param resource The resource to return the mrs:tag property.
+   * @return The mrs:tag property if present, null otherwise.
+   */
+  public static String getMrsTag(Resource resource) {
+    if (resource != null) {
+      Statement property = resource.getProperty(Mrs.tag);
+      if (property != null && property.getObject().isLiteral()) {
+        return property.getObject().asLiteral().getString();
+      }
     }
+    return null;
   }
 
-  public static Resource getParentBidirectionalPort(Model model, Resource res) {
-    String sparql = String.format("SELECT ?resource WHERE { ?resource a <" + Nml.BidirectionalPort + ">. ?resource <" + Nml.hasBidirectionalPort + "> <%s> }", res);
-    ResultSet r = ModelUtil.sparqlQuery(model, sparql);
-
-    if (r.hasNext()) {
-      return r.next().get("resource").asResource();
-    } else {
-      return null;
+  /**
+   * Return the nml:belongsTo property from the specified resource.
+   *
+   * @param resource The resource to return the nml:belongsTo property.
+   * @return The nml:belongsTo property if present, null otherwise.
+   */
+  public static Resource getNmlBelongsTo(Resource resource) {
+    if (resource != null) {
+      Statement property = resource.getProperty(Nml.belongsTo);
+      if (property != null && property.getObject().isURIResource()) {
+        return property.getObject().asResource();
+      }
     }
+    return null;
   }
 
-  public static ResultSet sparqlQuery(Model model, String sparqlStringWithoutPrefix) {
-    String sparqlString
-            = "prefix sd:    <http://schemas.ogf.org/nsi/2013/12/services/definition#>\n"
-            + "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-            + "prefix owl:   <http://www.w3.org/2002/07/owl#>\n"
-            + "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n"
-            + "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
-            + "prefix nml:   <http://schemas.ogf.org/nml/2013/03/base#>\n"
-            + "prefix mrs:   <http://schemas.ogf.org/mrs/2013/12/topology#>\n"
-            + sparqlStringWithoutPrefix;
-
-    Query query = QueryFactory.create(sparqlString);
-    QueryExecution qexec = QueryExecutionFactory.create(query, model);
-    ResultSet rs = (ResultSet) qexec.execSelect();
-    return rs;
+  /**
+   * Return the rdf:type property from the specified resource.
+   *
+   * @param resource The resource to return the rdf:type property.
+   * @return The rdf:type property if present, null otherwise.
+   */
+  public static List<Resource> getRdfType(OntModel model, Resource resource) {
+    return getObjectsOfPredicateRelationship(model, resource, Rdf.type.asObjectProperty());
   }
 
-  public static Model applyDeltaAddition(Model original, Model addition) {
+  /**
+   * Get the list of subjects within the model that has a predicate property to the specified resource.
+   *
+   * @param model The model to search.
+   * @param predicate The relationship predicate to filter.
+   * @param object The object resource of the has statement.
+
+   * @return The list of matching resources.
+   */
+  public static List<Resource> getSubjectsOfPredicateRelationship(OntModel model,
+                                                                  ObjectProperty predicate, Resource object) {
+    StmtIterator stmtIterator = model.getBaseModel().listStatements(null, predicate, object);
+    return stmtIterator.toList().stream() // Convert StmtIterator to a stream.
+        .map(Statement::getSubject) // Extract the subject from each statement.
+        .distinct() // Optional: remove duplicates if you expect subjects to repeat.
+        .map(s -> model.getResource(s.getURI())) // Map each subject URI to the corresponding resource in the model.
+        .toList(); // Return list of results.
+  }
+
+  /**
+   * Get the list of objects within the model that has a subject and predicate property to the specified object.
+   *
+   * @param model The model to search.
+   * @param subject The subject resource of the statement.
+   * @param predicate The relationship predicate to filter.
+   *
+   * @return The list of matching resources.
+   */
+  public static List<Resource> getObjectsOfPredicateRelationship(OntModel model,
+                                                                 Resource subject, ObjectProperty predicate) {
+    StmtIterator stmtIterator = model.getBaseModel().listStatements(subject, predicate, (String) null);
+    return stmtIterator.toList().stream() // Convert StmtIterator to a stream.
+        .map(Statement::getObject) // Extract the object from each statement.
+        .map(RDFNode::asResource) // Get the object resource.
+        .toList(); // Return list of results.
+  }
+
+  /**
+   * Get a list of all Mrs.SwitchingSubnet in the model.
+   *
+   * @param model
+   * @return List of resources of Mrs.SwitchingSubnet type.
+   */
+  public static List<Resource> getAllSwitchingSubnet(OntModel model) {
+    return getRdfType(model, Mrs.SwitchingSubnet);
+  }
+
+  public static List<Resource> getAllWithExistsDuring(OntModel model, Resource existsDuring) {
+    //return model.listStatements(null, Nml.existsDuring, existsDuring)
+    //    .toList().stream().map(Statement::getSubject)
+    //    .map(s -> model.getResource(s.getURI())).toList();
+
+    return model.listStatements(null, Nml.existsDuring, existsDuring)
+        .toList().stream().map(Statement::getSubject).toList();
+  }
+
+  public static List<Resource> getAllSwitchingSubnetWithExistsDuring(OntModel model, Resource existsDuring) {
+    return getAllWithExistsDuring(model, existsDuring).stream()
+        .filter(ModelUtil::isSwitchingSubnet).toList();
+  }
+
+  /**
+   * Return the BidirectionalPort resource of the provided resource identifier.
+   *
+   * @param model The model to search.
+   * @param subject The BidirectionalPort resource identifier.
+   * @return The parent resource referring to the BidirectionalPort.
+   */
+  public static Resource getBidirectionalPort(OntModel model, Resource subject) {
+    return getResourceOfSubjectAndType(model, Nml.BidirectionalPort, subject);
+  }
+
+  /**
+   * Return the parent BidirectionalPort resource of the provided BidirectionalPort resource.
+   *
+   * @param model The model to search.
+   * @param subject The resource for witch we want to find the parent BidirectionalPort resource.
+   * @return The parent resource referring to the BidirectionalPort.
+   */
+  public static Resource getParentBidirectionalPort(OntModel model, Resource subject) {
+    List<Resource> subjects = getSubjectsOfPredicateRelationship(model, Nml.hasBidirectionalPort, subject);
+    for (Resource s : subjects) {
+      if (s.hasProperty(Rdf.type, Nml.BidirectionalPort)) {
+        return s;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Merge model1 and model2 creating a new distinct model.
+   *
+   * @param model1 First model to merge.
+   * @param model2 Second model to merge.
+   * @return
+   */
+  public static OntModel mergeModels(OntModel model1, OntModel model2) {
+    if (model1 == null) {
+      throw new IllegalArgumentException("applyDeltaAddition encountered null original model");
+    }
+
+    if (model2 == null) {
+      throw new IllegalArgumentException("applyDeltaAddition encountered null addition model");
+    }
+
+    OntModel result = ModelFactory.createOntologyModel(model1.getSpecification(), model1);
+    result.add(model2);
+
+    return result;
+  }
+
+  public static void applyDeltaAddition(OntModel original, OntModel addition) {
     if (original == null) {
       throw new IllegalArgumentException("applyDeltaAddition encountered null original model");
     }
@@ -214,11 +485,9 @@ public class ModelUtil {
     }
 
     original.add(addition);
-
-    return original;
   }
 
-  public static Model applyDeltaReduction(Model original, Model reduction) {
+  public static void applyDeltaReduction(OntModel original, OntModel reduction) {
     if (original == null) {
       throw new IllegalArgumentException("applyDeltaAddition encountered null original model");
     }
@@ -228,7 +497,104 @@ public class ModelUtil {
     }
 
     original.remove(reduction);
-
-    return original;
   }
+
+  /**
+   * Return a list of subjects contained in the specified model.
+   *
+   * @param m The model to search for subjects.
+   * @return A list of subjects.
+   */
+  public static List<Resource> getSubjects(OntModel m) {
+    return m.getBaseModel().listSubjects()
+        .filterDrop(s -> Strings.isNullOrEmpty(s.getURI()))
+        .filterDrop(s -> s.getURI().startsWith("http://www.w3.org"))
+        .toList();
+  }
+
+  /**
+   * For the given resolved resource return the Rdf.type URI as a string.
+   *
+   * @param res The resource for which to return the Rdf.type URI.
+   * @return A string containing the URI of the Rdf.type object, null otherwise.
+   */
+  public static String getResourceTypeUri(Resource res) {
+    Statement property = res.getProperty(Rdf.type);
+    if (property != null && property.getObject().isURIResource()) {
+      return property.getObject().asResource().getURI();
+    }
+
+    return null;
+  }
+
+  /**
+   * Determine if the given resources is an Nml.BidirectionalPort.
+   *
+   * @param res The resource to test.
+   * @return True if this resource is of type Nml.BidirectionalPort, false otherwise.
+   */
+  public static boolean isBidirectionalPort(Resource res) {
+    String uri = getResourceTypeUri(res);
+    if (Strings.isNullOrEmpty(uri)) {
+      return false;
+    }
+    return uri.equalsIgnoreCase(Nml.BidirectionalPort.getURI());
+  }
+
+  /**
+   * Determine if the given resources is an Nml.SwitchingService.
+   *
+   * @param res The resource to test.
+   * @return True if this resource is of type Nml.SwitchingService, false otherwise.
+   */
+  public static boolean isSwitchingService(Resource res) {
+    String uri = getResourceTypeUri(res);
+    if (Strings.isNullOrEmpty(uri)) {
+      return false;
+    }
+    return uri.equalsIgnoreCase(Nml.SwitchingService.getURI());
+  }
+
+  /**
+   * Determine if the given resources is an Mrs.SwitchingSubnet.
+   *
+   * @param res The resource to test.
+   * @return True if this resource is of type Mrs.SwitchingSubnet, false otherwise.
+   */
+  public static boolean isSwitchingSubnet(Resource res) {
+    String uri = getResourceTypeUri(res);
+    if (Strings.isNullOrEmpty(uri)) {
+      return false;
+    }
+    return uri.equalsIgnoreCase(Mrs.SwitchingSubnet.getURI());
+  }
+
+  /**
+   * Determine if the given resources is an Mrs.BandwidthService.
+   *
+   * @param res The resource to test.
+   * @return True if this resource is of type Mrs.BandwidthService, false otherwise.
+   */
+  public static boolean isBandwidthService(Resource res) {
+    String uri = getResourceTypeUri(res);
+    if (Strings.isNullOrEmpty(uri)) {
+      return false;
+    }
+    return uri.equalsIgnoreCase(Mrs.BandwidthService.getURI());
+  }
+
+  /**
+   * Determine if the given resources is an Nml.existsDuring.
+   *
+   * @param res The resource to test.
+   * @return True if this resource is of type Nml.existsDuring, false otherwise.
+   */
+  public static boolean isExistsDuring(Resource res) {
+    String uri = getResourceTypeUri(res);
+    if (Strings.isNullOrEmpty(uri)) {
+      return false;
+    }
+    return uri.equalsIgnoreCase(Nml.existsDuring.getURI());
+  }
+
 }

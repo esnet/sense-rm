@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.es.sense.rm.driver.api.mrml.ModelUtil;
 import net.es.sense.rm.driver.schema.Mrs;
 import net.es.sense.rm.driver.schema.Nml;
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 
@@ -44,8 +44,8 @@ public class MrsBandwidthService {
    * @param model
    * @throws IllegalArgumentException
    */
-  public MrsBandwidthService(Resource port, Model model) {
-    // Get the MrsBandwidthService assocated with this BidirectionalPort.
+  public MrsBandwidthService(Resource port, OntModel model) {
+    // Get the MrsBandwidthService associated with this BidirectionalPort.
     Statement bwServiceRef = port.getProperty(Nml.hasService);
 
     // No BandwidthService indicates "bestEffort" service.
@@ -55,7 +55,7 @@ public class MrsBandwidthService {
       return;
     }
 
-    Resource service = ModelUtil.getResourceOfType(model, bwServiceRef.getResource(), Mrs.BandwidthService);
+    Resource service = ModelUtil.getResourceOfSubjectAndType(model, Mrs.BandwidthService, bwServiceRef.getResource());
     if (service == null) {
       log.info("[MrsBandwidthService] BidirectionalPort does not contain BandwidthService {}", port.getURI());
       this.id = port.getURI() + ":BandwidthService";

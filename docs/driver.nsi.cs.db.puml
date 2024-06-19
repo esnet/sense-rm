@@ -1,0 +1,300 @@
+@startuml
+skinparam class {
+  BackgroundColor D0E2F2
+  ArrowColor Black
+  BorderColor Black
+}
+
+class ModelRepository {
+  This CrudRepository class handles storage 
+  for the Model structure.
+  --
+  crud : Map<long, Model>
+}
+
+class Model {
+  A SENSE Model object represents a point
+  in time snapshop of the network's MRML 
+  topology.
+  --
+  idx : long
+  topologyId : String
+  modelId : String
+  version : String
+  created : long
+  base : String
+}
+
+ModelRepository *--> "0..*" Model : crud 
+
+class DeltaRepository {
+  This CrudRepository class handles storage 
+  for the Delta structure.
+  --
+  crud : Map<long, Delta>
+}
+
+class Delta {
+  A SENSE delta object represents a topology 
+  change request that we map into an NSI-CS
+  reservation operation.
+  --
+  idx : long
+  deltaId : String
+  lastModified : long
+  modelId : String
+  _state : DeltaState
+  reduction : String
+  addition : String
+  _result : String
+}
+
+DeltaRepository *--> "0..*" Delta : crud 
+
+class ConnectionMapRepository {
+  This CrudRepository class handles storage 
+  for the ConnectionMap structure.
+  --
+  crud : Map<long, ConnectionMap>
+}
+
+class ConnectionMap {
+This class models a mapping of an
+MRML delta to an NSI reservation.
+--
+  id : long
+  lastAudit : long
+  description: String
+  deltaId : String
+  switchingSubnetId : String
+  serviceType String
+  existsDuringId String
+  tag : String
+  map : List<StpMapping>
+}
+
+ConnectionMapRepository *--> "0..*" ConnectionMap : crud 
+
+class StpMapping {
+ This class stores the user defined MRML
+ and NML identifiers for created resources
+ that can then be used to map back to the
+ requested MRML topology.
+ --
+  stpId : String
+  mrsTag : String
+  mrsPortId : String
+  mrsLabelId : String
+  mrsBandwidthId : String
+  nmlExistsDuringId : String
+}
+
+ConnectionMap *--> "0..*" StpMapping : map 
+
+class DeltaMapRepository {
+  Maintain a list of deltas with associated 
+  NSI connectionIds through to
+  the committed phase.
+  --
+  map : Map<String, DeltaConnection>
+}
+
+ConnectionMap --> Delta : deltaId
+
+class DeltaConnection {
+ This class maintains a mapping from the 
+ delta request Id to the NSI connectionIds
+ related to the delta.
+ --
+  deltaId : String
+  commits : Set<String>
+  terminates : Set<String>
+}
+
+DeltaMapRepository *--> "0..*" DeltaConnection : map 
+
+class Operation {
+  This class is used to track the status of an 
+  individual NSI operation, providing a blocking
+  semaphore allowing the delta request thread
+  initiating an NSI request to block on a result
+  returned via an NSI ConnectionService callback 
+  API thread.
+
+  If an error is encountered within the NSI 
+  ConnectionService callback API thread the state 
+  will be set to "failed" and the service exception 
+  will be provided describing the error.
+  --
+  completed : Semaphore
+  correlationId : String
+  operation : OperationType
+  state : StateType
+  exception : ServiceExceptionType
+  reservation : Reservation
+}
+
+enum OperationType {
+  The NSI-CS operation type.
+  --
+  reserve(0), 
+  reserveCommit(1), 
+  reserveAbort(2), 
+  provision(3), 
+  release(4), 
+  terminate(5);
+}
+
+Operation --> OperationType : operation
+Operation o--> Reservation : reservation
+
+enum StateType {
+  Models the NSI reservation states.
+  --
+  reserving(0), 
+  reserved(1), 
+  committing(2), 
+  committed(3), 
+  provisioning(4), 
+  provisioned(5),
+  releasing(6), 
+  released(7), 
+  terminating(8), 
+  terminated(9), 
+  failed(10), 
+  aborting(11), 
+  aborted(12), 
+  unknown(11);
+}
+
+Operation --> StateType : state
+
+class ServiceExceptionType {
+  Common service exception used for SOAP faults 
+  and Failed message.
+  --
+  nsaId : String
+  connectionId : String
+  serviceType : String
+  errorId : String
+  text : String
+  variables : VariablesType
+  childException : List<ServiceExceptionType>
+}
+
+Operation *--> "0..1" ServiceExceptionType : exception 
+
+ServiceExceptionType o--> "0..*" ServiceExceptionType : childException 
+
+class OperationMapRepository {
+  Manages NSI operation progress between the 
+  Delta processing threads and the NSI 
+  ConnectionService callback thread through 
+  the use of a semaphore.
+  --
+  map : Map<String, Operation>
+}
+
+OperationMapRepository *--> "0..*" Operation : map 
+
+class ReservationRepository {
+  This class models the CrudRepository class 
+  for the reservation database service.
+  --
+  crud : Map<long, Reservation>
+}
+
+class Reservation {
+  This class models a NSI-CS reservation and 
+  is stored in the database using hibernate.
+
+  The globalReservationId holds the original 
+  SwitchingSubnet name, while the description 
+  holds a unique identifier for the connection 
+  created by us before the connectionId is 
+  assigned by the PA.
+  --
+  id : long
+  uniqueId : String
+  discovered : long
+  dirty : boolean
+  providerNsa : String
+  globalReservationId : String
+  description : String
+  parentConnectionId : String
+  connectionId : String
+  topologyId : String
+  serviceType : String
+  startTime : long
+  endTime : long
+  reservationState : ReservationStateEnumType
+  provisionState : ProvisionStateEnumType
+  lifecycleState : LifecycleStateEnumType
+  dataPlaneActive : boolean
+  version : int
+  errorState : ErrorState
+  errorMessage : String
+  service : String
+}
+
+ReservationRepository *--> "0..*" Reservation : crud 
+Reservation --> ConnectionMap : description 
+
+enum ErrorState {
+  NONE("none"),
+  NSIRESERVEFAILED("nsiReserveFailed"),
+  NSIRESERVETIMEOUT("nsiReserveTimeout"),
+  NSIRESERVECOMMIT("nsiReserveCommit"),
+  NSIPROVISION("nsiProvision"),
+  NSITERMINATE("nsiTerminate"),
+  NSIERROR("nsiError"),
+  NSIERROREVENT("nsiErrorEvent"),
+  NSIMESSAGEDELIVERYTIMEOUT("nsiMessageDeliveryTimeout");
+}
+
+enum ReservationStateEnumType {
+  RESERVE_START("ReserveStart"),
+  RESERVE_CHECKING("ReserveChecking"),
+  RESERVE_FAILED("ReserveFailed"),
+  RESERVE_ABORTING("ReserveAborting"),
+  RESERVE_HELD("ReserveHeld"),
+  RESERVE_COMMITTING("ReserveCommitting"),
+  RESERVE_TIMEOUT("ReserveTimeout");
+}
+
+enum ProvisionStateEnumType {
+  RELEASED("Released"),
+  PROVISIONING("Provisioning"),
+  PROVISIONED("Provisioned"),
+  RELEASING("Releasing");
+}
+
+enum LifecycleStateEnumType {
+  INITIAL("Initial"),
+  CREATED("Created"),
+  FAILED("Failed"),
+  PASSED_END_TIME("PassedEndTime"),
+  TERMINATING("Terminating"),
+  TERMINATED("Terminated");  
+}
+
+Reservation --> ErrorState : errorState
+Reservation --> ReservationStateEnumType : reservationState
+Reservation --> ProvisionStateEnumType : provisionState
+Reservation --> LifecycleStateEnumType : lifecycleState
+
+DeltaConnection o--> "0..*" Reservation : commits
+DeltaConnection o--> "0..*" Reservation : terminates
+DeltaConnection --> Delta : deltaId
+
+interface CrudRepository {
+  
+}
+
+CrudRepository <|-- DeltaRepository
+CrudRepository <|-- ConnectionMapRepository
+CrudRepository <|-- ReservationRepository
+CrudRepository <|-- ModelRepository
+
+@enduml
+

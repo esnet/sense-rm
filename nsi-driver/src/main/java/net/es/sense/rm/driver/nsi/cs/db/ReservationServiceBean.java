@@ -2,22 +2,20 @@ package net.es.sense.rm.driver.nsi.cs.db;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  *
@@ -60,6 +58,10 @@ public class ReservationServiceBean implements ReservationService {
     return Lists.newArrayList(reservationRepository.findAll());
   }
 
+  public Reservation getByUniqueId(String uniqueId) {
+    return reservationRepository.findByUniqueId(uniqueId);
+  }
+
   @Override
   public Collection<Reservation> getByTopologyId(String topologyId) {
     return reservationRepository.findByTopologyId(topologyId);
@@ -81,8 +83,12 @@ public class ReservationServiceBean implements ReservationService {
   }
 
   @Override
-  public Reservation get(String providerNsa, String connectionId) {
+  public Collection<Reservation> getByProviderNsaAndConnectionId(String providerNsa, String connectionId) {
     return reservationRepository.findByProviderNsaAndConnectionId(providerNsa, connectionId);
+  }
+
+  public Reservation getByProviderNsaAndConnectionIdAndVersion(String providerNsa, String connectionId, int version) {
+    return reservationRepository.findByProviderNsaAndConnectionIdAndVersion(providerNsa, connectionId, version);
   }
 
   @Override
@@ -98,9 +104,9 @@ public class ReservationServiceBean implements ReservationService {
   @Override
   public Collection<Reservation> getByAnyConnectionId(String providerNsa, String connectionId)  {
     Set<Reservation> reservations = new HashSet<>();
-    Reservation r = reservationRepository.findByProviderNsaAndConnectionId(providerNsa, connectionId);
+    Collection<Reservation> r = reservationRepository.findByProviderNsaAndConnectionId(providerNsa, connectionId);
     if (r != null) {
-      reservations.add(r);
+      reservations.addAll(r);
     }
 
     Collection<Reservation> rc = reservationRepository.findByProviderNsaAndParentConnectionId(providerNsa, connectionId);
@@ -139,10 +145,20 @@ public class ReservationServiceBean implements ReservationService {
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
+  public void deleteByUniqueId(String uniqueId)  {
+    reservationRepository.deleteByUniqueId(uniqueId);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
   public void delete() {
-    for (Reservation reservation : reservationRepository.findAll()) {
-      reservationRepository.delete(reservation);
-    }
+    reservationRepository.deleteAll(reservationRepository.findAll());
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public int setConnectionId(long id, String connectionId) {
+    return reservationRepository.setConnectionId(id, connectionId);
   }
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
@@ -170,6 +186,12 @@ public class ReservationServiceBean implements ReservationService {
   @Override
   public int setReservationState(long id, ReservationStateEnumType reservationState, long discovered) {
     return reservationRepository.setReservationState(id, reservationState, discovered);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public int setReservationState(long id, ReservationStateEnumType reservationState) {
+    return reservationRepository.setReservationState(id, reservationState);
   }
 
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
@@ -202,5 +224,11 @@ public class ReservationServiceBean implements ReservationService {
   @Override
   public int setDirty(long id, boolean dirty) {
     return reservationRepository.setDirty(id, dirty);
+  }
+
+  @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
+  @Override
+  public int setVersion(long id, int version) {
+    return reservationRepository.setVersion(id, version);
   }
 }

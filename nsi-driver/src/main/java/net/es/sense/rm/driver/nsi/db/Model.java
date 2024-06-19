@@ -45,7 +45,7 @@ public class Model implements Serializable {
   String modelId;
 
   // A model is composed of two different data sources so we need a compound
-  // version number to encapulate the two versions of data.
+  // version number to encapsulate the two versions of data.
   private String version;
 
   // We need to know when this model was created so we can manage cleanup of

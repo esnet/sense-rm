@@ -19,13 +19,13 @@
  */
 package net.es.sense.rm.driver.nsi.cs.db;
 
-import java.util.Collection;
-import net.es.sense.rm.driver.nsi.dds.db.Document;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
 
 /**
  *
@@ -42,6 +42,8 @@ public interface ReservationService {
 
   public Reservation store(Reservation reservation);
 
+  public int setConnectionId(long id, String connectionId);
+
   public int setDataPlaneActive(long id, boolean dataPlaneActive, long discovered);
 
   public int setFailedState(long id, ReservationStateEnumType reservationState,
@@ -51,6 +53,8 @@ public interface ReservationService {
   public int setErrorState(long id, Reservation.ErrorState errorState, String errorMessage, long discovered);
 
   public int setReservationState(long id, ReservationStateEnumType reservationState, long discovered);
+
+  public int setReservationState(long id, ReservationStateEnumType reservationState);
 
   public int setProvisionState(long id, ProvisionStateEnumType provisionState, long discovered);
 
@@ -68,7 +72,11 @@ public interface ReservationService {
 
   public void delete();
 
+  public void deleteByUniqueId(@Param("uniqueId") String uniqueId);
+
   public int setDirty(long id, boolean dirty);
+
+  public int setVersion(long id, int version);
 
   public Collection<Reservation> get();
 
@@ -76,13 +84,17 @@ public interface ReservationService {
 
   public Collection<Reservation> getByGlobalReservationId(String globalReservationId);
 
+  public Reservation getByUniqueId(String uniqueId);
+
   public Reservation get(long id);
 
   public Collection<Reservation> get(String connectionId);
 
   public Collection<Reservation> getByProviderNsa(String providerNsa);
 
-  public Reservation get(String providerNSA, String connectionId);
+  public Collection<Reservation> getByProviderNsaAndConnectionId(String providerNSA, String connectionId);
+
+  public Reservation getByProviderNsaAndConnectionIdAndVersion(String providerNsa, String connectionId, int version);
 
   public Collection<Reservation> getByParentConnectionId(String parentConnectionId);
 

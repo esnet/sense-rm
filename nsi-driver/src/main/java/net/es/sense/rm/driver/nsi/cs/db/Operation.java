@@ -18,7 +18,6 @@ import java.util.concurrent.Semaphore;
  *
  * @author hacksaw
  */
-@lombok.Builder
 public class Operation implements Serializable {
   private final Semaphore completed = new Semaphore(0);
   private String uniqueId;

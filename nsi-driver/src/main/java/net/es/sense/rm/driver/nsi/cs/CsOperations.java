@@ -517,11 +517,10 @@ public class CsOperations {
    * @param correlationId
    */
   private void store(OperationType operation, StateType state, String correlationId) {
-    Operation op = Operation.builder()
-        .operation(operation)
-        .state(state)
-        .correlationId(correlationId)
-        .build();
+    Operation op = new Operation();
+    op.setOperation(operation);
+    op.setState(state);
+    op.setCorrelationId(correlationId);
     operationMap.store(op);
     this.addCorrelationId(correlationId);
   }

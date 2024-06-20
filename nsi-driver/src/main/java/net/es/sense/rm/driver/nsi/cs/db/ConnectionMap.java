@@ -34,7 +34,6 @@ import java.util.Optional;
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @lombok.Data
-@lombok.Builder
 @Entity
 @Table(name = "connectionmap")
 public class ConnectionMap implements Serializable {

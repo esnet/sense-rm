@@ -703,17 +703,17 @@ public class CsProvider {
       // TODO: Create and store a reservation in the database with the information we have.
       // TODO: Make sure to consider race conditions with the ACK and Confirmed messages.
 
-      // Now store the mapping for this SwitchingSubnet in our local database.  We will
-      // need it later to correlate between NSI-CS messages and SENSE MRML.
-      ConnectionMap cm = ConnectionMap.builder()
-          .uniqueId(uniqueId)
-          .version(rrc.getVersion())
-          .deltaId(deltaId)
-          .switchingSubnetId(switchingSubnet.getURI())
-          .existsDuringId(ssExistsDuring.getId())
-          .serviceType(serviceType)
-          .tag(tag)
-          .build();
+      // Now create and store the mapping for this SwitchingSubnet in our local
+      // database.  We will need it later to correlate between NSI-CS messages
+      // and SENSE MRML.
+      ConnectionMap cm = new ConnectionMap();
+      cm.setUniqueId(uniqueId);
+      cm.setVersion(rrc.getVersion());
+      cm.setDeltaId(deltaId);
+      cm.setSwitchingSubnetId(switchingSubnet.getURI());
+      cm.setExistsDuringId(ssExistsDuring.getId());
+      cm.setServiceType(serviceType);
+      cm.setTag(tag);
 
       // Add the MRML port to STP mapping information to the connection map.
       StpMapping smSrc = new StpMapping(src.getStp().getStpId(), src.getTag(), src.getMrsPortId(),
@@ -735,12 +735,11 @@ public class CsProvider {
 
       // Add this to the operation map to track progress asynchronously.  All
       // asynchronously messaging uses the operation map to record progress.
-      Operation op = Operation.builder()
-          .operation(OperationType.reserve)
-          .state(StateType.reserving)
-          .uniqueId(uniqueId)
-          .correlationId(correlationId)
-          .build();
+      Operation op = new Operation();
+      op.setOperation(OperationType.reserve);
+      op.setState(StateType.reserving);
+      op.setUniqueId(uniqueId);
+      op.setCorrelationId(correlationId);
       operationMap.store(op);
 
       // Add to the list of correlationIds we will wait to receive a reserveConfirmed.
@@ -1185,15 +1184,14 @@ public class CsProvider {
       // need it later to correlate between NSI-CS messages and SENSE MRML.  We ignore
       // the existing connection map for this reservation just in case the MRML
       // identifiers have changed.
-      ConnectionMap cm = ConnectionMap.builder()
-          .uniqueId(uniqueId)
-          .version(rrc.getVersion())
-          .deltaId(deltaId)
-          .switchingSubnetId(switchingSubnet.getURI())
-          .existsDuringId(ssExistsDuring.getId())
-          .serviceType(serviceType)
-          .tag(tag)
-          .build();
+      ConnectionMap cm = new ConnectionMap();
+      cm.setUniqueId(uniqueId);
+      cm.setVersion(rrc.getVersion());
+      cm.setDeltaId(deltaId);
+      cm.setSwitchingSubnetId(switchingSubnet.getURI());
+      cm.setExistsDuringId(ssExistsDuring.getId());
+      cm.setServiceType(serviceType);
+      cm.setTag(tag);
 
       // Add the MRML port to STP mapping information to the connection map.
       StpMapping smSrc = new StpMapping(src.getStp().getStpId(), src.getTag(), src.getMrsPortId(),
@@ -1215,12 +1213,11 @@ public class CsProvider {
 
       // Add this to the operation map to track progress asynchronously.  All
       // asynchronous messaging uses the operation map to record progress.
-      Operation op = Operation.builder()
-          .operation(OperationType.reserve)
-          .state(StateType.reserving)
-          .uniqueId(uniqueId)
-          .correlationId(correlationId)
-          .build();
+      Operation op = new Operation();
+      op.setOperation(OperationType.reserve);
+      op.setState(StateType.reserving);
+      op.setUniqueId(uniqueId);
+      op.setCorrelationId(correlationId);
       operationMap.store(op);
 
       // TODO: Create and store a reservation object in database.  Note: the
@@ -1409,12 +1406,11 @@ public class CsProvider {
           cid, reservation.getVersion(), reservation.getUniqueId());
 
       // Add this to the operation map to track progress.
-      Operation op = Operation.builder()
-          .uniqueId(reservation.getUniqueId())
-          .operation(OperationType.terminate)
-          .state(StateType.terminating)
-          .correlationId(correlationId)
-          .build();
+      Operation op = new Operation();
+      op.setUniqueId(reservation.getUniqueId());
+      op.setOperation(OperationType.terminate);
+      op.setState(StateType.terminating);
+      op.setCorrelationId(correlationId);
       operationMap.store(op);
 
       // Save the correlationId for later semaphore blocking.
@@ -1519,12 +1515,11 @@ public class CsProvider {
           cid, reservation.getVersion(), reservation.getUniqueId());
 
       // Add this to the operation map to track progress.
-      Operation op = Operation.builder()
-          .uniqueId(reservation.getUniqueId())
-          .operation(OperationType.reserveCommit)
-          .state(StateType.committing)
-          .correlationId(correlationId)
-          .build();
+      Operation op = new Operation();
+      op.setUniqueId(reservation.getUniqueId());
+      op.setOperation(OperationType.reserveCommit);
+      op.setState(StateType.committing);
+      op.setCorrelationId(correlationId);
       operationMap.store(op);
       correlationIds.add(correlationId);
 
@@ -1611,12 +1606,11 @@ public class CsProvider {
       }
 
       // Add this to the operation map to track progress.
-      Operation op = Operation.builder()
-          .uniqueId(reservation.getUniqueId())
-          .operation(OperationType.provision)
-          .state(StateType.provisioning)
-          .correlationId(correlationId)
-          .build();
+      Operation op = new Operation();
+      op.setUniqueId(reservation.getUniqueId());
+      op.setOperation(OperationType.provision);
+      op.setState(StateType.provisioning);
+      op.setCorrelationId(correlationId);
       operationMap.store(op);
       correlationIds.add(correlationId);
 

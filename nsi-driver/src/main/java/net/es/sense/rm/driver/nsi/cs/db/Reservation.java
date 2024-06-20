@@ -67,7 +67,7 @@ public class Reservation implements Serializable {
   // Internally generated unique identifier used to map to the
   // ConnectionMap information associated with this reservation
   // version.
-  @Basic(optional = false)
+  @Basic(optional = true)
   String uniqueId;
 
   // The time I first discovered this version of the connection.

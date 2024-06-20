@@ -119,20 +119,6 @@ public class DdsProvider implements DdsProviderI {
       log.error("[DdsProvider] Failed to initialize actor", ex);
     }
 
-    /**
-    // If there is a secure SSL context specified then we process it.
-    if (nsiProperties.getSecure() != null) {
-      HttpsContext.getInstance().load(nsiProperties.getSecure());
-    }
-
-    // We need to initialize the DDS client with specified configuration.
-    if (nsiProperties.getClient().isSecure()) {
-      ddsClient = new DdsClient(nsiProperties.getClient(), HttpsContext.getInstance());
-    } else {
-      ddsClient = new DdsClient(nsiProperties.getClient());
-    }
-     **/
-
     // Do a one time load of documents from remote DDS service since our web
     // server may not yet be servicing requests.  From this point on it is
     // controlled through the notification process.

@@ -162,6 +162,16 @@ public class CsProvider {
   }
 
   /**
+   * Method to determine if the providerNSA supports modification of reservations.
+   *
+   * @return True if the providerNSA supports modification, false otherwise.
+   */
+  private boolean supportModify() {
+    return documentReader.getNsa(nsiProperties.getProviderNsaId()).getFeature().stream()
+        .anyMatch(f -> f.getType().equalsIgnoreCase(Nsi.NSI_CS_MODIFY));
+  }
+
+  /**
    * Returns the connection actor.
    *
    * @return

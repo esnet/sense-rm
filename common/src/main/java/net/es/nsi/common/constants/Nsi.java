@@ -30,6 +30,8 @@ public class Nsi {
   public static final String NSI_CS_URA = "vnd.ogf.nsi.cs.v2.role.uRA";
   public static final String NSI_CS_UPA = "vnd.ogf.nsi.cs.v2.role.uPA";
   public static final String NSI_CS_AGG = "vnd.ogf.nsi.cs.v2.role.aggregator";
+  public static final String NSI_CS_MODIFY = "org.ogf.nsi.cs.v2.modify";
+  public static final String NSI_CS_COMMIT_TIMEOUT = "org.ogf.nsi.cs.v2.commitTimeout";
 
   public static final String NML_PEERSWITH_RELATION = "http://schemas.ogf.org/nsi/2013/09/topology#peersWith";
 

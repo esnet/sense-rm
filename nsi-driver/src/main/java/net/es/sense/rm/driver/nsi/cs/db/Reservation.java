@@ -95,7 +95,7 @@ public class Reservation implements Serializable {
   String parentConnectionId;
 
   // Connection identifier of this connection on the uPA.
-  @Basic(optional = false)
+  @Basic(optional = true)
   String connectionId;
 
   // The network hosting this connection.

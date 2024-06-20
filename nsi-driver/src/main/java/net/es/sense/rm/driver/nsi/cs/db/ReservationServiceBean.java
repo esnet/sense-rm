@@ -125,7 +125,10 @@ public class ReservationServiceBean implements ReservationService {
   @Transactional(propagation=Propagation.REQUIRED, readOnly=false)
   @Override
   public Reservation store(Reservation reservation) {
-    if (Strings.isNullOrEmpty(reservation.getProviderNsa()) || Strings.isNullOrEmpty(reservation.getConnectionId())) {
+    // We need the providerNSA and one of connectionId or uniqueId to be present.
+    if (Strings.isNullOrEmpty(reservation.getProviderNsa())
+        || (Strings.isNullOrEmpty(reservation.getConnectionId())
+            && Strings.isNullOrEmpty(reservation.getUniqueId()))) {
       return null;
     }
     return reservationRepository.save(reservation);

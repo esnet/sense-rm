@@ -19,6 +19,7 @@
  */
 package net.es.sense.rm.driver.nsi.cs.api;
 
+import com.google.common.base.Strings;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.ws.Holder;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,8 @@ import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static java.util.Comparator.comparing;
 
 /**
  * This class provides logic for creating and storing reservation objects
@@ -160,11 +163,22 @@ public class QuerySummary {
       });
 
       // Temporary hack to see what is going on with duplicate reservations.
-      Reservation r = rc.stream()
-          .filter(f -> f.getLifecycleState() != LifecycleStateEnumType.TERMINATED
-              && f.getLifecycleState() != LifecycleStateEnumType.FAILED)
-          .findFirst()
-          .orElse(null);
+      Reservation r;
+      if (rc.size() > 1) {
+        log.debug("[QuerySummary] multiple matching reservations {}", rc.size());
+        if (Strings.isNullOrEmpty(reservation.getGlobalReservationId())) {
+          log.debug("[QuerySummary] no globalId so filtering on most recent discovery date.");
+          r = rc.stream().max(comparing(Reservation::getDiscovered)).orElse(null);
+        } else {
+          log.debug("[QuerySummary] attempting to filter based on globalId = {}", reservation.getGlobalReservationId());
+          r = rc.stream()
+            .filter(f -> reservation.getGlobalReservationId().equalsIgnoreCase(f.getGlobalReservationId()))
+            .findFirst()
+            .orElse(null);
+        }
+      } else {
+        r = rc.stream().findFirst().orElse(null);
+      }
 
       if (r == null) {
         // We have not seen this reservation before so store it.

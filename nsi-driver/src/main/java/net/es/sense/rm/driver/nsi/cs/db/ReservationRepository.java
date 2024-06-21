@@ -80,7 +80,7 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
           @Param ("providerNsa") String providerNsa,
           @Param("connectionId") String connectionId);
 
-  public Reservation findByProviderNsaAndConnectionIdAndVersion(
+  public Collection<Reservation> findByProviderNsaAndConnectionIdAndVersion(
       @Param ("providerNsa") String providerNsa,
       @Param("connectionId") String connectionId,
       @Param("version") int version);

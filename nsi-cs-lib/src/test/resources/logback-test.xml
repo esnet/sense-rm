@@ -1,0 +1,29 @@
+<configuration>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%date{ISO8601} %-5level %X{akkaSource} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="org.apache.jena" level="INFO">
+    <appenderRef ref="STDOUT"/>
+  </logger>
+
+  <logger name="org.apache.jena.arq.exec" level="INFO">
+    <appenderRef ref="STDOUT"/>
+  </logger>
+
+  <logger name="org.apache.jena.arq.info" level="INFO">
+    <appenderRef ref="STDOUT"/>
+  </logger>
+
+  <logger name="org.apache.jena.riot" level="INFO">
+    <appenderRef ref="STDOUT"/>
+  </logger>
+
+  <root level="DEBUG">
+    <appender-ref ref="STDOUT" />
+  </root>
+
+</configuration>

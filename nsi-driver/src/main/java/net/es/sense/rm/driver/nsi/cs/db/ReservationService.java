@@ -94,7 +94,7 @@ public interface ReservationService {
 
   public Collection<Reservation> getByProviderNsaAndConnectionId(String providerNSA, String connectionId);
 
-  public Reservation getByProviderNsaAndConnectionIdAndVersion(String providerNsa, String connectionId, int version);
+  public Collection<Reservation> getByProviderNsaAndConnectionIdAndVersion(String providerNsa, String connectionId, int version);
 
   public Collection<Reservation> getByParentConnectionId(String parentConnectionId);
 

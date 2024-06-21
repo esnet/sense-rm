@@ -32,6 +32,7 @@ import org.ogf.schemas.nsi._2013._12.connection.types.*;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -148,8 +149,23 @@ public class QuerySummary {
       rAudit.add(reservation.getProviderNsa(), reservation.getConnectionId(), reservation.getVersion());
 
       // Look for this returned reservation in the existing reservation database.
-      Reservation r = reservationService.getByProviderNsaAndConnectionIdAndVersion(reservation.getProviderNsa(),
+      Collection<Reservation> rc = reservationService.getByProviderNsaAndConnectionIdAndVersion(reservation.getProviderNsa(),
           reservation.getConnectionId(), reservation.getVersion());
+
+      log.debug("[QuerySummary] returning query {} matches for: {} {} {}", rc.size(),
+          reservation.getProviderNsa(), reservation.getConnectionId(), reservation.getVersion());
+
+      rc.forEach(res -> {
+        log.debug("[QuerySummary]\n{}", res);
+      });
+
+      // Temporary hack to see what is going on with duplicate reservations.
+      Reservation r = rc.stream()
+          .filter(f -> f.getLifecycleState() != LifecycleStateEnumType.TERMINATED
+              && f.getLifecycleState() != LifecycleStateEnumType.FAILED)
+          .findFirst()
+          .orElse(null);
+
       if (r == null) {
         // We have not seen this reservation before so store it.
         log.debug("[QuerySummary] storing new reservation, cid = {}, discovered = {}",

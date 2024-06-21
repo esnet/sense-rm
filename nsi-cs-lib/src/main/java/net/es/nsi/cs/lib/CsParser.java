@@ -2,17 +2,14 @@ package net.es.nsi.cs.lib;
 
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
 import net.es.nsi.common.jaxb.JaxbParser;
-import org.ogf.schemas.nsi._2013._12.connection.types.DataPlaneStateChangeRequestType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ErrorEventType;
-import org.ogf.schemas.nsi._2013._12.connection.types.GenericErrorType;
-import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
-import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryResultType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ReserveConfirmedType;
-import org.ogf.schemas.nsi._2013._12.connection.types.ReserveTimeoutRequestType;
+import org.ogf.schemas.nsi._2013._12.connection.types.*;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
+import org.ogf.schemas.nsi._2013._12.services.types.TypeValueType;
 import org.w3c.dom.Node;
+
+import javax.xml.namespace.QName;
+import java.util.List;
 
 /**
  *
@@ -56,6 +53,18 @@ public class CsParser extends JaxbParser {
     return this.jaxb2Xml(P2P_FACTORY.createP2Ps(p2ps));
   }
 
+  public P2PServiceBaseType xml2p2ps(String xml) throws JAXBException {
+    return this.xml2Jaxb(P2PServiceBaseType.class, xml);
+  }
+
+  public String reserve2xml(ReserveType r) throws JAXBException {
+    return this.jaxb2Xml(TYPES_FACTORY.createReserve(r));
+  }
+
+  public ReserveType xml2reserve(String xml) throws JAXBException {
+    return this.xml2Jaxb(ReserveType.class, xml);
+  }
+
   // querySummaryConfirmed
   public String querySummaryConfirmed2xml(QuerySummaryConfirmedType value) throws JAXBException {
     JAXBElement<QuerySummaryConfirmedType> jaxb = TYPES_FACTORY.createQuerySummaryConfirmed(value);
@@ -67,10 +76,6 @@ public class CsParser extends JaxbParser {
   public String qsrt2xml(QuerySummaryResultType query) throws JAXBException {
     JAXBElement<QuerySummaryResultType> jaxb = new JAXBElement<QuerySummaryResultType>(_QuerySummaryResultType_QNAME, QuerySummaryResultType.class, null, query);
     return this.jaxb2Xml(jaxb);
-  }
-
-  public P2PServiceBaseType xml2p2ps(String xml) throws JAXBException {
-    return this.xml2Jaxb(P2PServiceBaseType.class, xml);
   }
 
   public String errorEvent2xml(ErrorEventType error) throws JAXBException {
@@ -96,5 +101,47 @@ public class CsParser extends JaxbParser {
   public String reserveConfirmedType2xml(ReserveConfirmedType value) throws JAXBException {
     JAXBElement<ReserveConfirmedType> jaxb = TYPES_FACTORY.createReserveConfirmed(value);
     return this.jaxb2Xml(jaxb);
+  }
+
+  public P2PServiceBaseType getP2PS(List<Object> anyList) throws JAXBException {
+    for (Object any : anyList) {
+      if (any instanceof JAXBElement) {
+        JAXBElement jaxb = (JAXBElement) any;
+        if (jaxb.getDeclaredType() == P2PServiceBaseType.class) {
+          // Get the network identifier from and STP
+          return (P2PServiceBaseType) jaxb.getValue();
+        }
+      } else if (any instanceof org.w3c.dom.Element) {
+        org.w3c.dom.Element element = (org.w3c.dom.Element) any;
+        if ("p2ps".equalsIgnoreCase(element.getLocalName())) {
+          return CsParser.getInstance().node2p2ps((Node) element);
+        }
+      }
+    }
+    return null;
+  }
+
+  private final static QName _Capacity_QNAME = new QName("http://schemas.ogf.org/nsi/2013/12/services/point2point", "capacity");
+  public Long getCapacity(List<Object> anyList) throws JAXBException {
+    return anyList.stream()
+        .filter((object) -> (object instanceof JAXBElement))
+        .map((object) -> (JAXBElement) object)
+        .filter((jaxb) -> (jaxb.getName().equals(_Capacity_QNAME)))
+        .map((jaxb) -> (Long) jaxb.getValue())
+        .findFirst()
+        .orElse(null);
+  }
+
+  public boolean getHitless(List<Object> anyList) throws JAXBException {
+    return anyList.stream()
+        .filter((object) -> (object instanceof JAXBElement))
+        .map((object) -> (JAXBElement) object)
+        .filter((jaxb) -> (jaxb.getValue() instanceof TypeValueType))
+        .map((jaxb) -> (TypeValueType) jaxb.getValue())
+        .filter(tvt -> "disruption-hitless".equalsIgnoreCase(tvt.getType()))
+        .map(TypeValueType::getValue)
+        .map(Boolean::parseBoolean)
+        .findFirst()
+        .orElse(false);
   }
 }

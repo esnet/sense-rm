@@ -87,7 +87,7 @@ public class ReservationServiceBean implements ReservationService {
     return reservationRepository.findByProviderNsaAndConnectionId(providerNsa, connectionId);
   }
 
-  public Reservation getByProviderNsaAndConnectionIdAndVersion(String providerNsa, String connectionId, int version) {
+  public Collection<Reservation> getByProviderNsaAndConnectionIdAndVersion(String providerNsa, String connectionId, int version) {
     return reservationRepository.findByProviderNsaAndConnectionIdAndVersion(providerNsa, connectionId, version);
   }
 

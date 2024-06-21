@@ -18,7 +18,7 @@ public class NsiCsTest {
   @LocalServerPort
   private int port;
 
-  private static ObjectFactory FACTORY = new ObjectFactory();
+  private static final ObjectFactory FACTORY = new ObjectFactory();
 
   @Before
   public void setUp() {

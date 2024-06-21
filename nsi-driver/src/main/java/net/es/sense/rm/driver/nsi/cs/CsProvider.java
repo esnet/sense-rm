@@ -749,8 +749,13 @@ public class CsProvider {
       Reservation newres = createReservation(r);
       newres.setUniqueId(uniqueId);
 
-      // Store this reservation for later reference.
+      // Store this reservation for later reference, and get the new handle for the object.
       newres = reservationService.store(newres);
+      if (newres == null) {
+        log.error("[processNewSwitchingSubnet] storage of new reservation uniqueId = {} failed", uniqueId);
+        throw new IllegalArgumentException("[processNewSwitchingSubnet] storage of new reservation uniqueId "
+            + uniqueId + " failed.");
+      }
 
       // Issue the NSI reservation request.
       try {

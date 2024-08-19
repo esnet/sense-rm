@@ -20,7 +20,6 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 public class OperationMapRepository {
-
   private final Map<String, Operation> map = new ConcurrentHashMap<>();
 
   public Operation store(Operation operation) {
@@ -36,12 +35,10 @@ public class OperationMapRepository {
   }
 
   public void delete(List<String> correlationIds) {
-    correlationIds.forEach((correlationId) -> {
-      map.remove(correlationId);
-    });
+    correlationIds.forEach(map::remove);
   }
 
-  public boolean wait(String correlationId) {
+  public boolean wait(String correlationId, int waitFor) {
     Operation op = get(correlationId);
 
     if (op == null) {
@@ -49,9 +46,9 @@ public class OperationMapRepository {
     }
 
     try {
-      return op.getCompleted().tryAcquire(120, TimeUnit.SECONDS);
+      return op.getCompleted().tryAcquire(waitFor, TimeUnit.SECONDS);
     } catch (InterruptedException ex) {
-      log.error("[OperationMapRepository] Interupted so giving up", ex);
+      log.error("[OperationMapRepository] Interrupted so giving up", ex);
       return false;
     }
   }

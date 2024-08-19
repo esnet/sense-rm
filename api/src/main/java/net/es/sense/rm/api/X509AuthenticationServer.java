@@ -30,6 +30,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
+ * Set the HTTP security policy.
  *
  * @author hacksaw
  */
@@ -39,6 +40,13 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableMethodSecurity(prePostEnabled = true)
 public class X509AuthenticationServer {
 
+  /**
+   * Security filter for HTTP sessions.
+   *
+   * @param http
+   * @return
+   * @throws Exception
+   */
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     log.debug("X509AuthenticationServer: filterChain");

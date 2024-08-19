@@ -1,5 +1,7 @@
 package net.es.sense.rm.driver.nsi.properties;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import jakarta.validation.constraints.NotBlank;
 import net.es.nsi.dds.lib.dao.AccessControlType;
@@ -9,9 +11,6 @@ import net.es.nsi.dds.lib.dao.ServerType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @lombok.Data
 @lombok.NoArgsConstructor
@@ -47,11 +46,15 @@ public class NsiProperties {
   // The NSA identifier of the target aggregator for our connection requests.
   @NotBlank(message = "providerNsaId cannot be null or empty")
   private String providerNsaId;
+
   // If left null this will be dynamically determined using the NSI-DDS documents.
   private String providerConnectionURL = "http://localhost:9000/nsi-v2/ConnectionServiceProvider";
 
   @NotBlank(message = "The SENSE-RM requesterConnectionURL must be set to receive asynchronous messages")
   private String requesterConnectionURL = "http://localhost:8080/nsi-v2/ConnectionServiceRequester";
+
+  // How many seconds do we block a requesting thread waiting for an asynchronous NSI response?
+  private int operationWaitTimer = 120;
 
   // The identifier of the network to expose through the RA.
   private String networkId;

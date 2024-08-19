@@ -26,6 +26,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
+ * Models an error for the HTTP REST interface.
  *
  * @author hacksaw
  */

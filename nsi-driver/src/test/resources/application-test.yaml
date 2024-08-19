@@ -11,6 +11,9 @@ nsi:
   providerNsaId: "urn:ogf:network:es.net:2013:nsa:nsi-aggr-west"
   networkId: "urn:ogf:network:es.net:2013:"
 
+  # How many seconds do we block a requesting thread waiting for an asynchronous NSI response?
+  operationWaitTimer: 240
+
   defaultServiceType: http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE
   defaultUnits: "bps"
   defaultGranularity: 1

@@ -19,6 +19,9 @@
  */
 package net.es.sense.rm.driver.nsi.cs;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeoutException;
 import jakarta.xml.ws.Holder;
 import jakarta.xml.ws.soap.SOAPFaultException;
 import lombok.extern.slf4j.Slf4j;
@@ -33,12 +36,12 @@ import net.es.sense.rm.driver.nsi.cs.db.StateType;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.ogf.schemas.nsi._2013._12.connection.provider.Error;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException;
-import org.ogf.schemas.nsi._2013._12.connection.types.*;
+import org.ogf.schemas.nsi._2013._12.connection.types.GenericRequestType;
+import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
+import org.ogf.schemas.nsi._2013._12.connection.types.QueryType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReserveResponseType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReserveType;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 /**
  * This is a refactoring error in progress - attempting to gather NSI CS operations
@@ -138,7 +141,7 @@ public class CsOperations {
         log.error("[CsOperations] no operation in map for correlationId = {}", id);
         failed.add(id);
         exceptions.add(new IllegalArgumentException("no operation in map for correlationId = " + id));
-      } else if (operationMap.wait(id)) {
+      } else if (operationMap.wait(id, nsiProperties.getOperationWaitTimer())) {
         log.info("[CsOperations] operation {} completed, correlationId = {}", op.getOperation(), id);
 
         switch(op.getOperation()) {

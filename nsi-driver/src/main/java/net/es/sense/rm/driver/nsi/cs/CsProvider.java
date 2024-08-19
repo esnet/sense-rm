@@ -19,6 +19,18 @@
  */
 package net.es.sense.rm.driver.nsi.cs;
 
+import static java.util.Comparator.comparing;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import com.google.common.base.Strings;
@@ -29,16 +41,39 @@ import jakarta.xml.ws.Holder;
 import jakarta.xml.ws.soap.SOAPFaultException;
 import lombok.extern.slf4j.Slf4j;
 import net.es.nsi.common.constants.Nsi;
-import net.es.nsi.cs.lib.*;
+import net.es.nsi.cs.lib.Client;
+import net.es.nsi.cs.lib.ClientUtil;
+import net.es.nsi.cs.lib.CsParser;
+import net.es.nsi.cs.lib.Helper;
+import net.es.nsi.cs.lib.NsiHeader;
+import net.es.nsi.cs.lib.SimpleLabel;
+import net.es.nsi.cs.lib.SimpleStp;
 import net.es.nsi.dds.lib.jaxb.nsa.InterfaceType;
 import net.es.nsi.dds.lib.jaxb.nsa.NsaType;
 import net.es.sense.rm.driver.api.mrml.ModelUtil;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.cs.api.CsUtils;
 import net.es.sense.rm.driver.nsi.cs.api.QuerySummary;
-import net.es.sense.rm.driver.nsi.cs.db.*;
+import net.es.sense.rm.driver.nsi.cs.db.ConnectionMap;
+import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
+import net.es.sense.rm.driver.nsi.cs.db.DeltaConnection;
+import net.es.sense.rm.driver.nsi.cs.db.DeltaMapRepository;
+import net.es.sense.rm.driver.nsi.cs.db.Operation;
+import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
+import net.es.sense.rm.driver.nsi.cs.db.OperationType;
+import net.es.sense.rm.driver.nsi.cs.db.Reservation;
+import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
+import net.es.sense.rm.driver.nsi.cs.db.StateType;
+import net.es.sense.rm.driver.nsi.cs.db.StpMapping;
 import net.es.sense.rm.driver.nsi.dds.api.DocumentReader;
-import net.es.sense.rm.driver.nsi.mrml.*;
+import net.es.sense.rm.driver.nsi.mrml.IllegalArgumentExceptionSupplier;
+import net.es.sense.rm.driver.nsi.mrml.MrsBandwidthService;
+import net.es.sense.rm.driver.nsi.mrml.MrsBandwidthType;
+import net.es.sense.rm.driver.nsi.mrml.MrsUnits;
+import net.es.sense.rm.driver.nsi.mrml.NmlExistsDuring;
+import net.es.sense.rm.driver.nsi.mrml.NmlLabel;
+import net.es.sense.rm.driver.nsi.mrml.NotFoundExceptionSupplier;
+import net.es.sense.rm.driver.nsi.mrml.StpHolder;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.spring.SpringExtension;
 import net.es.sense.rm.driver.schema.Mrs;
@@ -50,19 +85,21 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.ogf.schemas.nsi._2013._12.connection.provider.Error;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException;
-import org.ogf.schemas.nsi._2013._12.connection.types.*;
+import org.ogf.schemas.nsi._2013._12.connection.types.GenericRequestType;
+import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
+import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
+import org.ogf.schemas.nsi._2013._12.connection.types.QueryType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReservationRequestCriteriaType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReserveResponseType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReserveType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ScheduleType;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
 import org.ogf.schemas.nsi._2013._12.services.types.DirectionalityType;
 import org.ogf.schemas.nsi._2013._12.services.types.TypeValueType;
 import org.springframework.stereotype.Component;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.*;
-import java.util.concurrent.TimeoutException;
-
-import static java.util.Comparator.comparing;
 
 /**
  * A provider implementing MRML delta operations using the NSI Connection Service.
@@ -1698,7 +1735,7 @@ public class CsProvider {
     Optional<Exception> exception = Optional.empty();
     for (String id : correlationIds) {
       log.info("[waitForOperations] waiting for completion of correlationId = {}", id);
-      if (operationMap.wait(id)) {
+      if (operationMap.wait(id, nsiProperties.getOperationWaitTimer())) {
         Operation op = operationMap.delete(id);
 
         log.info("[waitForOperations] operation {} completed, correlationId = {}", op.getOperation(), id);

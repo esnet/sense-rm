@@ -221,6 +221,9 @@ nsi:
   # Our requester connection service endpoint.
   requesterConnectionURL : "http://localhost:8080/nsi/nsi-v2/ConnectionServiceRequester"
 
+  # How many seconds do we block a requesting thread waiting for an asynchronous NSI response?
+  operationWaitTimer: 240
+
   # How often we audit our associated NSA for new connections.
   connectionAuditTimer: 50
 

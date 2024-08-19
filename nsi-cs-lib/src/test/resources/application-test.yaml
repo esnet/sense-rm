@@ -17,6 +17,9 @@ nsi:
   # This is the list of topologies exposed through the SENSE-N-RM.
   networkId: urn:ogf:network:network2:2015:topology
 
+  # How many seconds do we block a requesting thread waiting for an asynchronous NSI response?
+  operationWaitTimer: 240
+
   defaultServiceType: http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE
   defaultUnits: "bps"
   defaultGranularity: 1

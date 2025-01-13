@@ -117,7 +117,7 @@ Open Grid Forum NSI Connection Services Protocol v2.0 - Service specific type sc
                 
                 Elements:
                 
-                lt - less than contitional element.
+                lt - less than conditional element.
                 lte - less than equal to conditional element.
                 gt - greater than conditional element.
                 gte - greater than equal to conditional eement.

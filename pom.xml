@@ -11,7 +11,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.1.8</version>
+    <version>3.1.12</version>
   </parent>
 
   <properties>
@@ -19,7 +19,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>17</java.version>
     <guava.version>32.1.1-jre</guava.version>
-    <jersey.version>3.1.9</jersey.version>
+    <jersey.version>3.1.10</jersey.version>
 
     <host.key>${basedir}/target/dist/config/server.key</host.key>
     <host.cer>${basedir}/target/dist/config/server.cer</host.cer>

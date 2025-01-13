@@ -828,6 +828,9 @@ public class CsProvider {
       }
     }
 
+    log.info("[processNewSwitchingSubnet] processing {} additions for delta {}",
+        correlationIds.size(), deltaId);
+
     // Return the list of connectionId for which we will expect a ReserveConfirmed.
     return correlationIds;
   }
@@ -1313,6 +1316,9 @@ public class CsProvider {
       }
     }
 
+    log.info("[processModifiedSwitchingSubnet] processing total of {} modifications for delta {}",
+        correlationIds.size(), deltaId);
+
     return correlationIds;
   }
 
@@ -1563,6 +1569,8 @@ public class CsProvider {
       op.setState(StateType.committing);
       op.setCorrelationId(correlationId);
       operationMap.store(op);
+
+      // Track the correlationId for this operation.
       correlationIds.add(correlationId);
 
       boolean error = true;
@@ -1584,7 +1592,7 @@ public class CsProvider {
                 cid, soap.getFault().toString());
         throw soap;
       } catch (ServiceException ex) {
-        //TODO: Consider whether we should unwrap any NSI reservations that were successful.
+        // TODO: Consider whether we should unwrap any NSI reservations that were successful.
         // For now just delete the correlationId we added.
         operationMap.delete(correlationIds);
 

@@ -28,12 +28,8 @@ import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.apache.cxf.Bus;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.EndpointImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 public class ConnectionServiceConfig {
@@ -62,6 +58,6 @@ public class ConnectionServiceConfig {
 
     endpoint.publish("/nsi-v2");
 
-    return (Endpoint) endpoint;
+    return endpoint;
   }
 }

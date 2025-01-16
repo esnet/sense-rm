@@ -21,6 +21,9 @@
     </encoder>
   </appender>
 
+  <logger name="log4j.logger.org.apache.cxf" level="INFO">
+    <appenderRef ref="FILE"/>
+  </logger>
   <logger name="org.springframework" level="ERROR" />
   <logger name="org.springframework.data" level="ERROR" />
   <logger name="org.springframework.web" level="ERROR" />

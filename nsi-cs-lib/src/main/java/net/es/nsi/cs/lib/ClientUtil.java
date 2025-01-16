@@ -1,11 +1,11 @@
 package net.es.nsi.cs.lib;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionProviderPort;
-
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionProviderPort;
 
 /**
  * Utility classes for building NSI-CS clients.
@@ -35,6 +35,11 @@ public class ClientUtil {
     fb.setAddress(url);
     fb.setProperties(setProps(fb.getProperties()));
     fb.setServiceClass(ConnectionProviderPort.class);
+
+    LoggingFeature loggingFeature = new LoggingFeature();
+    loggingFeature.setPrettyLogging(true);
+    fb.getFeatures().add(loggingFeature);
+
     return (ConnectionProviderPort) fb.create();
   }
 

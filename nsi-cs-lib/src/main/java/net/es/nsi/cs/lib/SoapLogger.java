@@ -1,14 +1,13 @@
 package net.es.nsi.cs.lib;
 
-import jakarta.xml.soap.SOAPMessage;
-import jakarta.xml.ws.handler.MessageContext;
-import jakarta.xml.ws.handler.soap.SOAPHandler;
-import jakarta.xml.ws.handler.soap.SOAPMessageContext;
-
 import javax.xml.namespace.QName;
 import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 import java.util.Set;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.soap.SOAPHandler;
+import jakarta.xml.ws.handler.soap.SOAPMessageContext;
 
 public class SoapLogger implements SOAPHandler<SOAPMessageContext> {
     org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
@@ -63,7 +62,6 @@ public class SoapLogger implements SOAPHandler<SOAPMessageContext> {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 soapMessage.writeTo(out);
                 logger.debug(out.toString());
-                System.out.println(out);
                 out.close();
             } catch (Exception ex) {
                 logger.debug("SoapLogger: Failed to process SOAP message", ex);

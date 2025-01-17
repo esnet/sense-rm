@@ -3,7 +3,6 @@ package net.es.nsi.cs.lib;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionProviderPort;
 
@@ -13,7 +12,6 @@ import org.ogf.schemas.nsi._2013._12.connection.provider.ConnectionProviderPort;
  */
 @Slf4j
 public class ClientUtil {
-
   private final ConnectionProviderPort proxy;
 
   public ClientUtil(String url) {
@@ -35,11 +33,6 @@ public class ClientUtil {
     fb.setAddress(url);
     fb.setProperties(setProps(fb.getProperties()));
     fb.setServiceClass(ConnectionProviderPort.class);
-
-    LoggingFeature loggingFeature = new LoggingFeature();
-    loggingFeature.setPrettyLogging(true);
-    fb.getFeatures().add(loggingFeature);
-
     return (ConnectionProviderPort) fb.create();
   }
 

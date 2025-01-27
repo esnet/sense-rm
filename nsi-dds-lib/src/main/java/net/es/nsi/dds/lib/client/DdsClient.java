@@ -1,5 +1,15 @@
 package net.es.nsi.dds.lib.client;
 
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import com.google.common.base.Strings;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
@@ -12,19 +22,16 @@ import net.es.nsi.common.constants.Nsi;
 import net.es.nsi.common.util.UrlHelper;
 import net.es.nsi.dds.lib.dao.ClientType;
 import net.es.nsi.dds.lib.jaxb.DdsParser;
-import net.es.nsi.dds.lib.jaxb.dds.*;
+import net.es.nsi.dds.lib.jaxb.dds.DocumentEventType;
+import net.es.nsi.dds.lib.jaxb.dds.DocumentListType;
+import net.es.nsi.dds.lib.jaxb.dds.ErrorType;
+import net.es.nsi.dds.lib.jaxb.dds.FilterCriteriaType;
+import net.es.nsi.dds.lib.jaxb.dds.FilterType;
+import net.es.nsi.dds.lib.jaxb.dds.ObjectFactory;
+import net.es.nsi.dds.lib.jaxb.dds.SubscriptionListType;
+import net.es.nsi.dds.lib.jaxb.dds.SubscriptionRequestType;
+import net.es.nsi.dds.lib.jaxb.dds.SubscriptionType;
 import org.apache.http.client.utils.DateUtils;
-
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * TODO: Instantiate this client in the context of a DDS service.
@@ -317,12 +324,11 @@ public class DdsClient extends RestClient {
         result.setSubscriptions(subscriptions.getSubscription()
                 .stream()
                 .filter(s -> (!id.equalsIgnoreCase(s.getId())))
-                .map(s -> {
+                .peek(s -> {
                   // Found one we need to remove.
                   log.debug("[DdsClient] found stale subscription {} on DDS {}", s.getHref(),
                           webTarget.getUri().toASCIIString());
                   unsubscribe(baseURL, s.getHref());
-                  return s;
                 }).collect(Collectors.toList()));
       } else {
         log.error("DdsClient] Failed to retrieve list of subscriptions {}, result = {}",
@@ -333,10 +339,10 @@ public class DdsClient extends RestClient {
         }
       }
     } catch (Exception ex) {
-      log.error("[DdsClient] GET failed for href={}, ex={}", webTarget.getUri().toASCIIString(), ex);
+      log.error("[DdsClient] GET failed for href={}", webTarget.getUri().toASCIIString(), ex);
     }
     finally {
-      optional.ifPresent(r -> r.close());
+      optional.ifPresent(Response::close);
     }
 
     return result;
@@ -351,6 +357,8 @@ public class DdsClient extends RestClient {
    */
 
   public SubscriptionResult unsubscribe(String baseURL, String url) {
+    log.debug("[unsubscribe]: baseURL = {}, url = {}", baseURL, url);
+
     SubscriptionResult result = new SubscriptionResult();
     result.setStatus(Status.BAD_REQUEST);
 
@@ -361,6 +369,8 @@ public class DdsClient extends RestClient {
     } else {
       webTarget = this.get().target(baseURL).path(url);
     }
+
+    log.debug("[unsubscribe]: webTarget = {}", webTarget.getUri().toASCIIString());
 
     Optional<Response> optional = Optional.empty();
     try {

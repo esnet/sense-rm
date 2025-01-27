@@ -1,5 +1,8 @@
 package net.es.sense.rm.driver.nsi.dds.actors;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
 import akka.actor.UntypedAbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
@@ -18,9 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
 
 /**
  * The Registration Actor handles local DDS subscription registrations to peer DDS services.
@@ -176,7 +176,7 @@ public class RegistrationActor extends UntypedAbstractActor {
                 subscriptionURL, subscribe.getLastModified());
         subscriptionService.update(subscription);
         break;
-    // An unexpected error has occured.
+    // An unexpected error has occurred.
       case NOT_FOUND:
         // Looks like our subscription was removed. We need to add it back in.
         log.error("[RegistrationActor] Subscription not found, url={}", subscriptionURL);
@@ -197,6 +197,8 @@ public class RegistrationActor extends UntypedAbstractActor {
   }
 
   private void delete(RegistrationEvent event) throws IllegalArgumentException {
+    log.debug("[RegistrationActor.delete] event = {}, url = {}, initiator = {}, path = {}",
+        event.getEvent(), event.getUrl(), event.getInitiator(), event.getPath());
     if (event.getEvent() != Event.Delete) {
       throw new IllegalArgumentException("[RegistrationActor] Delete contains invalid event type " + event.getEvent());
     }

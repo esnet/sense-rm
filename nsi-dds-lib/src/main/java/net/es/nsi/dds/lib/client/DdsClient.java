@@ -228,6 +228,9 @@ public class DdsClient extends RestClient {
    * @return
    */
   public SubscriptionResult subscribe(String baseURL, String nsaId, String callbackURL) {
+    log.info("[DdsClient::subscribe] baseURL = {}, nsaId = {}, callbackURL = {}",
+        baseURL, nsaId, callbackURL);
+
     // Allocate the object to hold our results.
     SubscriptionResult result = new SubscriptionResult();
     result.setStatus(Status.BAD_REQUEST);
@@ -247,12 +250,15 @@ public class DdsClient extends RestClient {
     try {
       encoded = DdsParser.getInstance().subscriptionRequest2Xml(request);
     } catch (JAXBException | IOException ex) {
-      log.error("[DdsClient] error rencoding subscription request on endpoint {}", baseURL, ex);
+      log.error("[DdsClient] error encoding subscription request on endpoint {}", baseURL, ex);
       return result;
     }
 
     // Try to subscribe.
     WebTarget webTarget = this.get().target(baseURL).path("subscriptions");
+
+    log.info("[DdsClient::subscribe] POSTing subscription to url = {}, contents =\n{}",
+        webTarget.getUri().toASCIIString(), encoded);
 
     Optional<Response> optional = Optional.empty();
     try {
@@ -268,6 +274,10 @@ public class DdsClient extends RestClient {
         result.setLastModified(response.getLastModified() == null ?
                 (System.currentTimeMillis() / 1000) * 1000 : response.getLastModified().getTime());
         result.setSubscription(response.readEntity(SubscriptionType.class));
+
+        log.info("[DdsClient::subscribe] success id = {}, href = {}, callback = {}",
+            result.getSubscription().getId(), result.getSubscription().getHref(),
+            result.getSubscription().getCallback());
       } else {
         log.error("[DdsClient] failed to create subscription {}, result = {}",
                 baseURL, response.getStatusInfo().getReasonPhrase());
@@ -286,7 +296,7 @@ public class DdsClient extends RestClient {
       log.error("[DdsClient] error subscribing on endpoint {}", baseURL, ex);
       result.setStatus(Status.INTERNAL_SERVER_ERROR);
     } finally {
-      optional.ifPresent(r -> r.close());
+      optional.ifPresent(Response::close);
     }
 
     return result;
@@ -301,6 +311,8 @@ public class DdsClient extends RestClient {
    * @return
    */
   public SubscriptionsResult unsubscribe(String baseURL, String nsaId, String id) {
+    log.info("[DdsClient::unsubscribe] baseURL = {}, nsaId = {}, id = {}", baseURL, nsaId, id);
+
     SubscriptionsResult result = new SubscriptionsResult();
     result.setStatus(Status.BAD_REQUEST);
 
@@ -308,6 +320,8 @@ public class DdsClient extends RestClient {
 
     WebTarget webTarget = this.get().target(baseURL).path("subscriptions")
             .queryParam("requesterId", nsaId);
+
+    log.info("[DdsClient::unsubscribe] sending query = {}", webTarget.getUri().toASCIIString());
 
     try {
       optional = Optional.of(this.get().target(baseURL).path("subscriptions")
@@ -326,20 +340,20 @@ public class DdsClient extends RestClient {
                 .filter(s -> (!id.equalsIgnoreCase(s.getId())))
                 .peek(s -> {
                   // Found one we need to remove.
-                  log.debug("[DdsClient] found stale subscription {} on DDS {}", s.getHref(),
+                  log.info("[DdsClient::unsubscribe] found stale subscription {} on DDS {}", s.getHref(),
                           webTarget.getUri().toASCIIString());
                   unsubscribe(baseURL, s.getHref());
                 }).collect(Collectors.toList()));
       } else {
-        log.error("DdsClient] Failed to retrieve list of subscriptions {}, result = {}",
+        log.error("DdsClient::unsubscribe] Failed to retrieve list of subscriptions {}, result = {}",
                 webTarget.getUri().toASCIIString(), response.getStatusInfo().getReasonPhrase());
         ErrorType error = response.readEntity(ErrorType.class);
         if (error != null) {
-          log.error("[DdsClient] operation returned, error={}.", error.getId());
+          log.error("[DdsClient::unsubscribe] operation returned, error={}.", error.getId());
         }
       }
     } catch (Exception ex) {
-      log.error("[DdsClient] GET failed for href={}", webTarget.getUri().toASCIIString(), ex);
+      log.error("[DdsClient::unsubscribe] GET failed for href={}", webTarget.getUri().toASCIIString(), ex);
     }
     finally {
       optional.ifPresent(Response::close);
@@ -355,9 +369,8 @@ public class DdsClient extends RestClient {
    * @param url The absolute URL to the subscription to be deleted.
    * @return
    */
-
   public SubscriptionResult unsubscribe(String baseURL, String url) {
-    log.debug("[unsubscribe]: baseURL = {}, url = {}", baseURL, url);
+    log.info("[DdsClient::unsubscribe]: baseURL = {}, url = {}", baseURL, url);
 
     SubscriptionResult result = new SubscriptionResult();
     result.setStatus(Status.BAD_REQUEST);
@@ -370,7 +383,7 @@ public class DdsClient extends RestClient {
       webTarget = this.get().target(baseURL).path(url);
     }
 
-    log.debug("[unsubscribe]: webTarget = {}", webTarget.getUri().toASCIIString());
+    log.info("[DdsClient::unsubscribe]: webTarget = {}", webTarget.getUri().toASCIIString());
 
     Optional<Response> optional = Optional.empty();
     try {
@@ -380,11 +393,12 @@ public class DdsClient extends RestClient {
       result.setStatus(Status.fromStatusCode(response.getStatus()));
       if (response.getStatus() == Status.NO_CONTENT.getStatusCode()) {
         // Looks like we successfully deleted the subscription.
+        log.info("[DdsClient::unsubscribe]: successfully unsubscribed = {}", webTarget.getUri().toASCIIString());
         result.setLastModified(response.getLastModified() == null ?
                 (System.currentTimeMillis() / 1000) * 1000 : response.getLastModified().getTime());
       } else {
-        log.error("[DdsClient] failed to delete subscription {}, result = {}",
-                url, response.getStatusInfo().getReasonPhrase());
+        log.error("[DdsClient] failed to delete subscription {}, webTarget = {}, result = {}",
+                url, webTarget.getUri().toASCIIString(), response.getStatusInfo().getReasonPhrase());
 
         Optional<ErrorType> error = Optional.ofNullable(response.readEntity(ErrorType.class));
         if (error.isPresent()) {
@@ -397,11 +411,11 @@ public class DdsClient extends RestClient {
         }
       }
     } catch (Exception ex) {
-      log.error("[DdsClient] DELETE failed for href={}, ex={}", url, ex);
+      log.error("[DdsClient] DELETE failed for href={}", url, ex);
       result.setStatus(Status.INTERNAL_SERVER_ERROR);
     }
     finally {
-      optional.ifPresent(r -> r.close());
+      optional.ifPresent(Response::close);
     }
 
     return result;
@@ -421,7 +435,7 @@ public class DdsClient extends RestClient {
     try {
       optional = Optional.ofNullable(this.get().target(url).request(Nsi.NSI_DDS_V1_XML).delete());
     } catch (Exception ex) {
-      log.error("[DdsClient] DELETED failed for href={}, ex={}", url, ex);
+      log.error("[DdsClient] DELETED failed for href={}", url, ex);
     }
     finally {
       optional.ifPresent(r -> {

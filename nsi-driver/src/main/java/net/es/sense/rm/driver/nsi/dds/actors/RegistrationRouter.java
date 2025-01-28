@@ -1,5 +1,10 @@
 package net.es.sense.rm.driver.nsi.dds.actors;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.Terminated;
@@ -13,10 +18,10 @@ import akka.routing.Router;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
 import net.es.sense.rm.driver.nsi.dds.db.Subscription;
 import net.es.sense.rm.driver.nsi.dds.db.SubscriptionService;
-import net.es.sense.rm.driver.nsi.messages.Message;
 import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQuery;
 import net.es.sense.rm.driver.nsi.dds.messages.SubscriptionQueryResult;
+import net.es.sense.rm.driver.nsi.messages.Message;
 import net.es.sense.rm.driver.nsi.messages.StartMsg;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import net.es.sense.rm.driver.nsi.spring.SpringExtension;
@@ -24,12 +29,6 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * The Registration Router handles routing and distribution of DDS subscription
@@ -98,11 +97,11 @@ public class RegistrationRouter extends UntypedAbstractActor {
    */
   @Override
   public void onReceive(Object msg) {
-    log.debug("[RegistrationRouter] onReceive {}", Message.getDebug(msg));
+    log.info("[RegistrationRouter::onReceive] onReceive {}", Message.getDebug(msg));
 
     // Check to see if we got the go ahead to start registering.
     if (msg instanceof StartMsg message) {
-      log.debug("[RegistrationRouter] start timer so convert to registration event.");
+      log.info("[RegistrationRouter::onReceive] start timer so convert to registration event.");
 
       // Create a Register event to start us off.
       RegistrationEvent event = new RegistrationEvent(message.getInitiator(), message.getPath());
@@ -114,17 +113,17 @@ public class RegistrationRouter extends UntypedAbstractActor {
       if (null != re.getEvent()) switch (re.getEvent()) {
         case Register -> {
           // This is our first time through after initialization.
-          log.info("[RegistrationRouter] routeRegister");
+          log.info("[RegistrationRouter::onReceive] routeRegister");
           routeRegister();
         }
         case Audit -> {
           // A regular audit event.
-          log.info("[RegistrationRouter] routeAudit request.");
+          log.info("[RegistrationRouter::onReceive] routeAudit request.");
           routeAudit();
         }
         case Delete -> {
           // We are shutting down so clean up.
-          log.info("[RegistrationRouter] routeShutdown");
+          log.info("[RegistrationRouter::onReceive] routeShutdown");
           routeShutdown();
           return;
         }
@@ -133,20 +132,20 @@ public class RegistrationRouter extends UntypedAbstractActor {
         }
       }
     } else if (msg instanceof SubscriptionQuery query) {
-      log.info("[RegistrationRouter] Subscription query.");
+      log.info("[RegistrationRouter::onReceive] Subscription query.");
       SubscriptionQueryResult subscription = new SubscriptionQueryResult();
       subscription.setSubscription(getSubscription(query.getUrl()));
       getSender().tell(subscription, self());
       return;
     } else if (msg instanceof Terminated terminated) {
-      log.error("[RegistrationRouter] terminate event for {}", terminated.actor().path());
+      log.error("[RegistrationRouter::onReceive] terminate event for {}", terminated.actor().path());
       router = router.removeRoutee(terminated.actor());
       ActorRef r = getContext().actorOf(Props.create(RegistrationActor.class));
       getContext().watch(r);
       router = router.addRoutee(new ActorRefRoutee(r));
       return;
     } else {
-      log.error("[RegistrationRouter] Unhandled event {}", Message.getDebug(msg));
+      log.error("[RegistrationRouter::onReceive] Unhandled event {}", Message.getDebug(msg));
       unhandled(msg);
       return;
     }
@@ -168,7 +167,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
       RegistrationEvent regEvent = new RegistrationEvent();
       regEvent.setEvent(RegistrationEvent.Event.Register);
       regEvent.setUrl(url);
-      log.debug("[onReceive] registering url={}", url);
+      log.info("[RegistrationRouter::routeRegister] registering url={}", url);
       router.route(regEvent, this.getSelf());
     });
   }
@@ -182,12 +181,14 @@ public class RegistrationRouter extends UntypedAbstractActor {
     Set<String> subscriptionURL = subscriptionService.keySet();
 
     for (String url : discoveryURL) {
+      log.info("[RegistrationRouter::routeAudit] processing discovery URL={}.", url);
+
       // See if we already have seen this URL.  If we have not then
       // we need to create a new remote subscription.
       Subscription sub = subscriptionService.get(url);
       if (sub == null) {
         // We have not seen this before.
-        log.info("[RegistrationRouter] creating new registration for url={}.", url);
+        log.info("[RegistrationRouter::routeAudit] creating new registration for url={}.", url);
 
         RegistrationEvent regEvent = new RegistrationEvent();
         regEvent.setEvent(RegistrationEvent.Event.Register);
@@ -195,7 +196,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
         router.route(regEvent, this.getSelf());
       } else {
         // We have seen this URL before.
-        log.info("[RegistrationRouter] auditing registration for url={}.", url);
+        log.info("[RegistrationRouter::routeAudit] auditing registration for url={}.", url);
         RegistrationEvent regEvent = new RegistrationEvent();
         regEvent.setEvent(RegistrationEvent.Event.Update);
         regEvent.setUrl(url);
@@ -211,11 +212,12 @@ public class RegistrationRouter extends UntypedAbstractActor {
     subscriptionURL.stream()
             .map(subscriptionService::get)
             .filter(Objects::nonNull).map((sub) -> {
-      // Should always be true unless modified while we are processing.
-      RegistrationEvent regEvent = new RegistrationEvent();
-      regEvent.setEvent(RegistrationEvent.Event.Delete);
-      regEvent.setUrl(sub.getDdsURL());
-      return regEvent;
+          // Should always be true unless modified while we are processing.
+          log.info("[RegistrationRouter::routeAudit] deleting remote url={}.", sub.getDdsURL());
+          RegistrationEvent regEvent = new RegistrationEvent();
+          regEvent.setEvent(RegistrationEvent.Event.Delete);
+          regEvent.setUrl(sub.getDdsURL());
+          return regEvent;
     }).forEach((regEvent) -> {
       router.route(regEvent, getSelf());
     });
@@ -225,13 +227,15 @@ public class RegistrationRouter extends UntypedAbstractActor {
    * Route an incoming shutdown message to an actor for processing.
    */
   private void routeShutdown() {
+    log.info("[RegistrationRouter::routeShutdown] shutting down.");
     subscriptionService.keySet().stream().map(subscriptionService::get)
             .filter(Objects::nonNull).map((sub) -> {
-      // Should always be true unless modified while we are processing.
-      RegistrationEvent regEvent = new RegistrationEvent();
-      regEvent.setEvent(RegistrationEvent.Event.Delete);
-      regEvent.setUrl(sub.getDdsURL());
-      return regEvent;
+          // Should always be true unless modified while we are processing.
+          log.info("[RegistrationRouter::routeShutdown] deleting subscription url = {}", sub.getDdsURL());
+          RegistrationEvent regEvent = new RegistrationEvent();
+          regEvent.setEvent(RegistrationEvent.Event.Delete);
+          regEvent.setUrl(sub.getDdsURL());
+          return regEvent;
     }).forEachOrdered((regEvent) -> {
       router.route(regEvent, getSelf());
     });

@@ -53,18 +53,10 @@ public class RegistrationActor extends UntypedAbstractActor {
       log.debug("[RegistrationActor] event={}, url={}", event.getEvent().name(), event.getUrl());
 
       switch (event.getEvent()) {
-        case Register:
-          register(event);
-          break;
-        case Update:
-          update(event);
-          break;
-        case Delete:
-          delete(event);
-          break;
-        default:
-          unhandled(msg);
-          break;
+        case Register -> register(event);
+        case Update -> update(event);
+        case Delete -> delete(event);
+        default -> unhandled(msg);
       }
     } else {
       unhandled(msg);
@@ -100,7 +92,8 @@ public class RegistrationActor extends UntypedAbstractActor {
     try {
       notificationURL = getNotificationURL();
     } catch (MalformedURLException mx) {
-      log.error("[RegistrationActor]: failed to get my notification callback URL, failing registration for {}", remoteDdsURL, mx);
+      log.error("[RegistrationActor]: failed to get my notification callback URL, failing registration for {}",
+          remoteDdsURL, mx);
       return;
     }
 
@@ -131,10 +124,20 @@ public class RegistrationActor extends UntypedAbstractActor {
     }
   }
 
+  /**
+   * This method handles the registration update event.
+   *
+   * @param event The update event to be processed.
+   *
+   * @throws IllegalArgumentException
+   */
   private void update(RegistrationEvent event) throws IllegalArgumentException {
     if (event.getEvent() != Event.Update) {
       throw new IllegalArgumentException("update: invalid event type " + event.getEvent());
     }
+
+    log.info("[RegistrationActor::update] processing update event url = {}, initiator = {}",
+        event.getUrl(), event.getInitiator());
 
     // First we retrieve the remote subscription to see if it is still
     // valid.  If it is not then we register again, otherwise we leave it
@@ -150,7 +153,7 @@ public class RegistrationActor extends UntypedAbstractActor {
     lastModified.setTime(subscription.getLastModified());
     subscription.setLastAudit(System.currentTimeMillis());
 
-    log.debug("[RegistrationActor] getting subscription={},lastModified={}, subLastModified={}",
+    log.info("[RegistrationActor::update] getting subscription={},lastModified={}, subLastModified={}",
               subscriptionURL, lastModified, subscription.getLastModified());
 
     // Read the remote subscription to determine if it exists and last update time.
@@ -158,41 +161,42 @@ public class RegistrationActor extends UntypedAbstractActor {
     SubscriptionResult subscribe = client.getSubscription(remoteDdsURL, subscriptionURL, lastModified);
 
     switch (subscribe.getStatus()) {
-    // We found the subscription and it was updated.
-      case NOT_MODIFIED:
+      // We found the subscription and it was updated.
+      case NOT_MODIFIED -> {
         // The subscription exists and has not been modified.
-        log.debug("[RegistrationActor] subscription exists (not modified), url={}.", subscriptionURL);
+        log.info("[RegistrationActor::update] subscription exists (not modified), url={}.", subscriptionURL);
         subscription.setLastSuccessfulAudit(System.currentTimeMillis());
         subscriptionService.update(subscription);
-        break;
-    // We did not find the subscription so will need to create a new one.
-      case OK:
+      }
+      // We did not find the subscription so will need to create a new one.
+      case OK -> {
         // The subscription exists but was modified since our last query.
         // Save the new version even though we should have know about it.
         subscription.setLastModified(subscribe.getLastModified());
         subscription.setLastSuccessfulAudit(System.currentTimeMillis());
         subscription.setHref(subscribe.getSubscription().getHref());
-        log.info("[RegistrationActor] Subscription update detected, url={}, lastModified={}",
-                subscriptionURL, subscribe.getLastModified());
+        log.info("[RegistrationActor::update] Subscription update detected, url={}, lastModified={}",
+            subscriptionURL, subscribe.getLastModified());
         subscriptionService.update(subscription);
-        break;
-    // An unexpected error has occurred.
-      case NOT_FOUND:
+      }
+      // An unexpected error has occurred.
+      case NOT_FOUND -> {
         // Looks like our subscription was removed. We need to add it back in.
-        log.error("[RegistrationActor] Subscription not found, url={}", subscriptionURL);
+        log.error("[RegistrationActor::update] Subscription not found, url={}", subscriptionURL);
         // Remove the stored subscription since a new one will be created.
         subscriptionService.delete(subscription.getDdsURL());
         event.setEvent(Event.Register);
         register(event);
-        break;
-      default:
-        log.error("[RegistrationActor] Subscription get failed, url={}, error={}", subscriptionURL, subscribe.getStatus());
+      }
+      default -> {
+        log.error("[RegistrationActor::update] Subscription get failed, url={}, error={}",
+            subscriptionURL, subscribe.getStatus());
 
         // Remove the stored subscription since a new one will be created.
         subscriptionService.delete(subscription.getDdsURL());
         event.setEvent(Event.Register);
         register(event);
-        break;
+      }
     }
   }
 

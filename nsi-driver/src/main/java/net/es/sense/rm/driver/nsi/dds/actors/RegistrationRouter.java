@@ -84,7 +84,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
     // Kick off those that need to be started.
     nsiActorSystem.getActorSystem().scheduler()
         .scheduleOnce(Duration.create(60, TimeUnit.SECONDS), this.getSelf(),
-            new StartMsg("RegistrationRouter:preStart", this.self().path()),
+            new StartMsg("RegistrationRouter::preStart", this.self().path()),
             nsiActorSystem.getActorSystem().dispatcher(), null);
 
     log.info("[RegistrationRouter] Initialization completed.");
@@ -132,9 +132,13 @@ public class RegistrationRouter extends UntypedAbstractActor {
         }
       }
     } else if (msg instanceof SubscriptionQuery query) {
-      log.info("[RegistrationRouter::onReceive] Subscription query.");
+      log.info("[RegistrationRouter::onReceive] Subscription query url = {}", query.getUrl());
       SubscriptionQueryResult subscription = new SubscriptionQueryResult();
       subscription.setSubscription(getSubscription(query.getUrl()));
+      subscription.setInitiator("RegistrationRouter::routeRegister");
+      subscription.setPath(getSelf().path());
+
+      log.info("[RegistrationRouter::onReceive] sending SubscriptionQueryResult = {}", subscription);
       getSender().tell(subscription, self());
       return;
     } else if (msg instanceof Terminated terminated) {
@@ -152,6 +156,8 @@ public class RegistrationRouter extends UntypedAbstractActor {
 
     RegistrationEvent event = new RegistrationEvent("RegistrationRouter:onReceive", this.getSelf().path());
     event.setEvent(RegistrationEvent.Event.Audit);
+    event.setInitiator("RegistrationRouter::routeRegister");
+    event.setPath(getSelf().path());
     getContext().getSystem().scheduler()
         .scheduleOnce(Duration.create(nsiProperties.getDdsAuditTimer(), TimeUnit.SECONDS),
             this.getSelf(), event, getContext().getSystem().dispatcher(), null);
@@ -167,6 +173,9 @@ public class RegistrationRouter extends UntypedAbstractActor {
       RegistrationEvent regEvent = new RegistrationEvent();
       regEvent.setEvent(RegistrationEvent.Event.Register);
       regEvent.setUrl(url);
+      regEvent.setInitiator("RegistrationRouter::routeRegister");
+      regEvent.setPath(getSelf().path());
+
       log.info("[RegistrationRouter::routeRegister] registering url={}", url);
       router.route(regEvent, this.getSelf());
     });
@@ -193,6 +202,8 @@ public class RegistrationRouter extends UntypedAbstractActor {
         RegistrationEvent regEvent = new RegistrationEvent();
         regEvent.setEvent(RegistrationEvent.Event.Register);
         regEvent.setUrl(url);
+        regEvent.setInitiator("RegistrationRouter::routeAudit");
+        regEvent.setPath(getSelf().path());
         router.route(regEvent, this.getSelf());
       } else {
         // We have seen this URL before.
@@ -200,6 +211,8 @@ public class RegistrationRouter extends UntypedAbstractActor {
         RegistrationEvent regEvent = new RegistrationEvent();
         regEvent.setEvent(RegistrationEvent.Event.Update);
         regEvent.setUrl(url);
+        regEvent.setInitiator("RegistrationRouter::routeAudit");
+        regEvent.setPath(getSelf().path());
         router.route(regEvent, this.getSelf());
 
         // Remove from the existing list as processed.
@@ -210,17 +223,19 @@ public class RegistrationRouter extends UntypedAbstractActor {
     // Now we see if there are any URL we missed from the old list and
     // unsubscribe them since we seem to no longer be interested.
     subscriptionURL.stream()
-            .map(subscriptionService::get)
-            .filter(Objects::nonNull).map((sub) -> {
+        .map(subscriptionService::get)
+        .filter(Objects::nonNull).map((sub) -> {
           // Should always be true unless modified while we are processing.
-          log.info("[RegistrationRouter::routeAudit] deleting remote url={}.", sub.getDdsURL());
+          log.info("[RegistrationRouter::routeAudit] deleting remote subscription = {}.", sub);
           RegistrationEvent regEvent = new RegistrationEvent();
           regEvent.setEvent(RegistrationEvent.Event.Delete);
           regEvent.setUrl(sub.getDdsURL());
+          regEvent.setInitiator("RegistrationRouter::routeAudit");
+          regEvent.setPath(getSelf().path());
           return regEvent;
-    }).forEach((regEvent) -> {
-      router.route(regEvent, getSelf());
-    });
+        }).forEach((regEvent) -> {
+          router.route(regEvent, getSelf());
+        });
   }
 
   /**
@@ -235,6 +250,8 @@ public class RegistrationRouter extends UntypedAbstractActor {
           RegistrationEvent regEvent = new RegistrationEvent();
           regEvent.setEvent(RegistrationEvent.Event.Delete);
           regEvent.setUrl(sub.getDdsURL());
+          regEvent.setInitiator("RegistrationRouter::routeShutdown");
+          regEvent.setPath(getSelf().path());
           return regEvent;
     }).forEachOrdered((regEvent) -> {
       router.route(regEvent, getSelf());

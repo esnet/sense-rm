@@ -1,12 +1,11 @@
 package net.es.sense.rm.driver.nsi.dds.messages;
 
+import java.io.Serial;
+import java.io.Serializable;
 import akka.actor.ActorPath;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.es.sense.rm.driver.nsi.messages.Message;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  *
@@ -64,5 +63,11 @@ public class RegistrationEvent extends Message implements Serializable {
    */
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("RegistrationEvent[event=%s, url=%s, initiator=%s, path=%s]",
+        this.getEvent(), this.getUrl(), this.getInitiator(), this.getPath());
   }
 }

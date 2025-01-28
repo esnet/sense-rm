@@ -1,5 +1,6 @@
 package net.es.sense.rm.driver.nsi.cs.actors;
 
+import java.util.concurrent.TimeUnit;
 import akka.actor.UntypedAbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
@@ -9,6 +10,7 @@ import net.es.nsi.cs.lib.Client;
 import net.es.nsi.cs.lib.Helper;
 import net.es.nsi.cs.lib.NsiHeader;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
+import net.es.sense.rm.driver.nsi.messages.Message;
 import net.es.sense.rm.driver.nsi.messages.TimerMsg;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException;
@@ -22,8 +24,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -70,6 +70,7 @@ public class ConnectionActor extends UntypedAbstractActor {
           .scheduleOnce(Duration.create(nsiProperties.getConnectionAuditTimer(), TimeUnit.SECONDS),
               this.getSelf(), (TimerMsg) msg, nsiActorSystem.getActorSystem().dispatcher(), null);
     } else {
+      log.error("[ConnectionActor::onReceive] Unhandled event {}", Message.getDebug(msg));
       unhandled(msg);
     }
   }

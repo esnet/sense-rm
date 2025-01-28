@@ -19,6 +19,7 @@
  */
 package net.es.sense.rm.driver.nsi.actors;
 
+import java.util.concurrent.TimeUnit;
 import akka.actor.Cancellable;
 import akka.actor.UntypedAbstractActor;
 import akka.event.Logging;
@@ -35,8 +36,6 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * This actor performs an audit on the topology model.
@@ -124,7 +123,7 @@ public class ModelAuditActor extends UntypedAbstractActor {
         log.error("[ModelAuditActor] TerminateRequest failed", ex);
       }
     } else {
-      log.error("[ModelAuditActor] Unhandled message {}.", msg.getClass().getName());
+      log.error("[ModelAuditActor::onReceive] Unhandled event {}", Message.getDebug(msg));
       unhandled(msg);
     }
   }

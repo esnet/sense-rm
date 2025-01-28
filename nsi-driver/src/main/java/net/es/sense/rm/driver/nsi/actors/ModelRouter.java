@@ -19,6 +19,8 @@
  */
 package net.es.sense.rm.driver.nsi.actors;
 
+import java.util.ArrayList;
+import java.util.List;
 import akka.actor.ActorRef;
 import akka.actor.UntypedAbstractActor;
 import akka.event.Logging;
@@ -35,9 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -78,7 +77,7 @@ public class ModelRouter extends UntypedAbstractActor {
     if (msg instanceof ModelQueryRequest) {
       router.route(msg, getSender());
     } else {
-      log.error("[ModelRouter] Unhandled message {}.", msg.getClass().getName());
+      log.error("[ModelRouter::onReceive] Unhandled event {}", Message.getDebug(msg));
       unhandled(msg);
     }
   }

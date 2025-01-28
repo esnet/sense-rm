@@ -7,6 +7,7 @@ import akka.actor.UntypedAbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import jakarta.ws.rs.core.Response.Status;
+import net.es.nsi.common.util.XmlUtilities;
 import net.es.nsi.dds.lib.client.DdsClient;
 import net.es.nsi.dds.lib.client.SubscriptionResult;
 import net.es.nsi.dds.lib.client.SubscriptionsResult;
@@ -50,7 +51,7 @@ public class RegistrationActor extends UntypedAbstractActor {
   @Override
   public void onReceive(Object msg) {
     if (msg instanceof RegistrationEvent event) {
-      log.debug("[RegistrationActor] event={}, url={}", event.getEvent().name(), event.getUrl());
+      log.info("[RegistrationActor::onReceive] event={}", event);
 
       switch (event.getEvent()) {
         case Register -> register(event);
@@ -59,6 +60,7 @@ public class RegistrationActor extends UntypedAbstractActor {
         default -> unhandled(msg);
       }
     } else {
+      log.error("[RegistrationActor::onReceive] unhandled={}", msg.getClass());
       unhandled(msg);
     }
   }
@@ -84,6 +86,8 @@ public class RegistrationActor extends UntypedAbstractActor {
       throw new IllegalArgumentException("register: invalid event type " + event.getEvent());
     }
 
+    log.info("[RegistrationActor::register] received event = {}", event);
+
     // We want to subscribe to the following DDS service.
     final String remoteDdsURL = event.getUrl();
 
@@ -92,18 +96,24 @@ public class RegistrationActor extends UntypedAbstractActor {
     try {
       notificationURL = getNotificationURL();
     } catch (MalformedURLException mx) {
-      log.error("[RegistrationActor]: failed to get my notification callback URL, failing registration for {}",
-          remoteDdsURL, mx);
+      log.error("[RegistrationActor::register]: failed to get notification callback URL, " +
+          "failing registration for {}", remoteDdsURL, event, mx);
       return;
     }
 
     // Send a subscription request.
     final DdsClient client = ddsProvider.getDdsClient();
 
+    log.info("[RegistrationActor::register] subscribing remoteDdsURL = {}, nsaId = {}, notificationURL = {}",
+        remoteDdsURL, nsiProperties.getNsaId(), notificationURL);
+
     // We will register for all events on all documents.
     SubscriptionResult subscribe = client.subscribe(remoteDdsURL, nsiProperties.getNsaId(), notificationURL);
     if (Status.CREATED == subscribe.getStatus()) {
       SubscriptionType newSubscription = subscribe.getSubscription();
+
+      log.info("[RegistrationActor::register] received subscription = {}",
+          XmlUtilities.jaxbToXml(SubscriptionType.class, newSubscription));
 
       // We will need to save this in our subscription cache.
       Subscription subscription = new Subscription();
@@ -112,15 +122,18 @@ public class RegistrationActor extends UntypedAbstractActor {
       subscription.setCreated(subscribe.getLastModified());
       subscriptionService.create(subscription);
 
+      log.info("[RegistrationActor::register] saving new subscription = {}", subscription);
+
       // Now that we have registered a new subscription make sure we clean up
       // any old ones that may exist on the remote DDS.
-      SubscriptionsResult unsubscribe = client.unsubscribe(remoteDdsURL, nsiProperties.getNsaId(), newSubscription.getId());
+      SubscriptionsResult unsubscribe =
+          client.unsubscribe(remoteDdsURL, nsiProperties.getNsaId(), newSubscription.getId());
       for (SubscriptionType s : unsubscribe.getSubscriptions()) {
-        log.info("[RegistrationActor] unregistered stale subscription, id = {}", s.getHref());
+        log.info("[RegistrationActor::register] unregistered stale subscription = {}", subscribe);
       }
     } else {
-      log.error("[RegistrationActor] failed to create subscription {}, result = {}", remoteDdsURL,
-              subscribe.getStatus());
+      log.error("[RegistrationActor::register] failed to create subscription " +
+              "remoteDdsURL = {}, subscription = {}", remoteDdsURL, subscribe);
     }
   }
 
@@ -136,8 +149,7 @@ public class RegistrationActor extends UntypedAbstractActor {
       throw new IllegalArgumentException("update: invalid event type " + event.getEvent());
     }
 
-    log.info("[RegistrationActor::update] processing update event url = {}, initiator = {}",
-        event.getUrl(), event.getInitiator());
+    log.info("[RegistrationActor::update] processing update event = {}", event);
 
     // First we retrieve the remote subscription to see if it is still
     // valid.  If it is not then we register again, otherwise we leave it
@@ -148,17 +160,18 @@ public class RegistrationActor extends UntypedAbstractActor {
       throw new IllegalArgumentException("update: invalid subscription URL " + remoteDdsURL);
     }
 
+    log.info("[RegistrationActor::update] found matching subscription = {}", subscription);
+
     String subscriptionURL = subscription.getHref();
     Date lastModified = new Date();
     lastModified.setTime(subscription.getLastModified());
     subscription.setLastAudit(System.currentTimeMillis());
 
-    log.info("[RegistrationActor::update] getting subscription={},lastModified={}, subLastModified={}",
-              subscriptionURL, lastModified, subscription.getLastModified());
-
     // Read the remote subscription to determine if it exists and last update time.
     final DdsClient client = ddsProvider.getDdsClient();
     SubscriptionResult subscribe = client.getSubscription(remoteDdsURL, subscriptionURL, lastModified);
+
+    log.info("[RegistrationActor::update] getSubscription result = {}", subscribe);
 
     switch (subscribe.getStatus()) {
       // We found the subscription and it was updated.
@@ -201,16 +214,17 @@ public class RegistrationActor extends UntypedAbstractActor {
   }
 
   private void delete(RegistrationEvent event) throws IllegalArgumentException {
-    log.debug("[RegistrationActor.delete] event = {}, url = {}, initiator = {}, path = {}",
-        event.getEvent(), event.getUrl(), event.getInitiator(), event.getPath());
+    log.info("[RegistrationActor::delete] event = {}", event);
     if (event.getEvent() != Event.Delete) {
       throw new IllegalArgumentException("[RegistrationActor] Delete contains invalid event type " + event.getEvent());
     }
 
     Subscription subscription = subscriptionService.get(event.getUrl());
+    log.info("[RegistrationActor::delete] looked up subscription = {}", subscription);
     if (subscription != null) {
       final DdsClient client = ddsProvider.getDdsClient();
-      client.unsubscribe(event.getUrl(), subscription.getHref());
+      SubscriptionResult unsubscribe = client.unsubscribe(event.getUrl(), subscription.getHref());
+      log.info("[RegistrationActor::delete] unsubscribe result = {}", unsubscribe);
     }
   }
 }

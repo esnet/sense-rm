@@ -1,5 +1,17 @@
 package net.es.sense.rm.driver.nsi.dds;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Objects;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.pattern.Patterns;
@@ -33,15 +45,6 @@ import org.springframework.stereotype.Component;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.io.IOException;
-import java.security.*;
-import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
 
 /**
  * The DdsProvider class provides access to all documents stored in the NSI-DDS peers.
@@ -182,6 +185,7 @@ public class DdsProvider implements DdsProviderI {
     // Unsubscribe from our peer DDS servers.
     RegistrationEvent event = new RegistrationEvent();
     event.setEvent(RegistrationEvent.Event.Delete);
+    event.setInitiator("DdsProvider::terminate");
     registrationRouter.tell(event, registrationRouter);
     try { Thread.sleep(4000); } catch (Exception ignored) {}
 

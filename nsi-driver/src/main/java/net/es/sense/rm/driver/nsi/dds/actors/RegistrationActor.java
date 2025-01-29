@@ -18,7 +18,6 @@ import net.es.sense.rm.driver.nsi.dds.db.SubscriptionService;
 import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent;
 import net.es.sense.rm.driver.nsi.dds.messages.RegistrationEvent.Event;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -34,15 +33,23 @@ public class RegistrationActor extends UntypedAbstractActor {
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
   private static final String NOTIFICATIONS_URL = "notifications";
+  private final NsiProperties nsiProperties;
+  private final SubscriptionService subscriptionService;
+  private final DdsProvider ddsProvider;
 
-  @Autowired
-  private NsiProperties nsiProperties;
-
-  @Autowired
-  private SubscriptionService subscriptionService;
-
-  @Autowired
-  private DdsProvider ddsProvider;
+  /**
+   * Constructor for bean injection.
+   *
+   * @param nsiProperties Configuration settings.
+   * @param subscriptionService The subscription service for storing NSI-DDS subscriptions.
+   * @param ddsProvider The DDS provider for reference to DDS services such as the DDS client.
+   */
+  public RegistrationActor(NsiProperties nsiProperties, SubscriptionService subscriptionService,
+                           DdsProvider ddsProvider) {
+    this.nsiProperties = nsiProperties;
+    this.subscriptionService = subscriptionService;
+    this.ddsProvider = ddsProvider;
+  }
 
   @Override
   public void preStart() {
@@ -157,7 +164,8 @@ public class RegistrationActor extends UntypedAbstractActor {
     final String remoteDdsURL = event.getUrl();
     Subscription subscription = subscriptionService.get(remoteDdsURL);
     if (subscription == null) {
-      throw new IllegalArgumentException("update: invalid subscription URL " + remoteDdsURL);
+      log.error("[RegistrationActor::update] invalid subscription URL " + remoteDdsURL);
+      throw new IllegalArgumentException("[RegistrationActor::update] invalid subscription URL " + remoteDdsURL);
     }
 
     log.info("[RegistrationActor::update] found matching subscription = {}", subscription);

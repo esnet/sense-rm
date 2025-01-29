@@ -1,6 +1,7 @@
 package net.es.sense.rm.driver.nsi.dds.actors;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -39,13 +40,15 @@ import scala.concurrent.duration.Duration;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RegistrationRouter extends UntypedAbstractActor {
-  private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
+  LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
   // These fields are injected through the constructor.
   private final SpringExtension springExtension;
   private final NsiActorSystem nsiActorSystem;
   private final NsiProperties nsiProperties;
   private final SubscriptionService subscriptionService;
+
+  private boolean shit = false;
 
   // The AKKA router that is created on preStart().
   private Router router;
@@ -88,6 +91,11 @@ public class RegistrationRouter extends UntypedAbstractActor {
             nsiActorSystem.getActorSystem().dispatcher(), null);
 
     log.info("[RegistrationRouter] Initialization completed.");
+    shit = true;
+  }
+
+  public void postRestart(Throwable reason) {
+    preStart();
   }
 
   /**
@@ -97,7 +105,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
    */
   @Override
   public void onReceive(Object msg) {
-    log.info("[RegistrationRouter::onReceive] onReceive {}", Message.getDebug(msg));
+    log.info("[RegistrationRouter::onReceive] shit = {}, onReceive {}", shit, Message.getDebug(msg));
 
     // Check to see if we got the go ahead to start registering.
     if (msg instanceof StartMsg message) {
@@ -185,19 +193,24 @@ public class RegistrationRouter extends UntypedAbstractActor {
    * Route an incoming registration audit message to an actor for processing.
    */
   private void routeAudit() {
+    log.info("[RegistrationRouter::routeAudit] entering.");
+
     // Check the list of discovery URL against what we already have.
     List<String> discoveryURL = nsiProperties.getPeers();
-    Set<String> subscriptionURL = subscriptionService.keySet();
+    Set<String> subscriptionURL = new HashSet<>(subscriptionService.keySet());
 
     for (String url : discoveryURL) {
-      log.info("[RegistrationRouter::routeAudit] processing discovery URL={}.", url);
+      log.info("[RegistrationRouter::routeAudit] processing discovery url = {}.", url);
 
       // See if we already have seen this URL.  If we have not then
       // we need to create a new remote subscription.
       Subscription sub = subscriptionService.get(url);
+      log.info("[RegistrationRouter::routeAudit] lookup of url = {}, found subscription = {}.",
+          url, sub);
+
       if (sub == null) {
         // We have not seen this before.
-        log.info("[RegistrationRouter::routeAudit] creating new registration for url={}.", url);
+        log.info("[RegistrationRouter::routeAudit] creating new registration for url = {}.", url);
 
         RegistrationEvent regEvent = new RegistrationEvent();
         regEvent.setEvent(RegistrationEvent.Event.Register);
@@ -207,7 +220,8 @@ public class RegistrationRouter extends UntypedAbstractActor {
         router.route(regEvent, this.getSelf());
       } else {
         // We have seen this URL before.
-        log.info("[RegistrationRouter::routeAudit] auditing registration for url={}.", url);
+        log.info("[RegistrationRouter::routeAudit] auditing registration for url = {}, subscription = {}.",
+            url, sub);
         RegistrationEvent regEvent = new RegistrationEvent();
         regEvent.setEvent(RegistrationEvent.Event.Update);
         regEvent.setUrl(url);
@@ -215,7 +229,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
         regEvent.setPath(getSelf().path());
         router.route(regEvent, this.getSelf());
 
-        // Remove from the existing list as processed.
+        // Remove from the working list since it has been processed.
         subscriptionURL.remove(url);
       }
     }

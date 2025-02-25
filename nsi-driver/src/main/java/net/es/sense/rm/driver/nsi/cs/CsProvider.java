@@ -918,7 +918,7 @@ public class CsProvider {
       log.info("[processModifiedSwitchingSubnet] processing modification for {}", switchingSubnet.getURI());
 
       // Look up NSI-CS reservation corresponding the mrs:SwitchingSubnet identifier.
-      // There could be multiple if we have been modifying the reservation so we want
+      // There could be multiple if we have been modifying the reservation, so we want
       // the newest version.
       ConnectionMap connection = connectionMapService.getNewestBySwitchingSubnetId(switchingSubnet.getURI());
       if (connection == null) {
@@ -929,7 +929,7 @@ public class CsProvider {
         throw new IllegalArgumentException("Multiple connections found for SwitchingSubnet id " + switchingSubnet.getURI() + ".");
       }
 
-      log.debug("[processModifiedSwitchingSubnet] found connection map  version {} of {}", connection.getVersion(),
+      log.debug("[processModifiedSwitchingSubnet] found connection map version {} of {}", connection.getVersion(),
           connection.getSwitchingSubnetId());
 
       // The mrs:SwitchingSubnet URN is mapped into the global reservation identifier.
@@ -1140,7 +1140,7 @@ public class CsProvider {
       }
 
       // Now we determine what parameters have changed.
-      // Populate the NSI-CS reservation request criteria and make this version 0 of the reservation.
+      // Populate the NSI-CS reservation request criteria and make this version +1 of the reservation.
       ReservationRequestCriteriaType rrc = CS_FACTORY.createReservationRequestCriteriaType();
       rrc.setVersion(reservation.getVersion() + 1);
 
@@ -1217,7 +1217,12 @@ public class CsProvider {
       String tag = ModelUtil.getMrsTag(switchingSubnet);
       if (Strings.isNullOrEmpty(tag)) {
         // No mrs:tag provided so compose our own.
+        log.debug("[processModifiedSwitchingSubnet] mrs:tag not provided.");
         tag = uniqueId;
+      }
+
+      if (tag.equalsIgnoreCase(reservation.getDescription())) {
+        log.debug("[processModifiedSwitchingSubnet] description remains the same.");
       }
 
       ReserveType r = CS_FACTORY.createReserveType();
@@ -1742,7 +1747,9 @@ public class CsProvider {
           throws ServiceException, IllegalArgumentException, TimeoutException {
     Optional<Exception> exception = Optional.empty();
     for (String id : correlationIds) {
-      log.info("[waitForOperations] waiting for completion of correlationId = {}", id);
+      log.info("[waitForOperations] waiting {} seconds for completion of correlationId = {}",
+          nsiProperties.getOperationWaitTimer(), id);
+
       if (operationMap.wait(id, nsiProperties.getOperationWaitTimer())) {
         Operation op = operationMap.delete(id);
 

@@ -19,12 +19,11 @@
  */
 package net.es.sense.rm.driver.nsi.mrml;
 
-import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
-import net.es.sense.rm.driver.nsi.cs.db.Reservation;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
+import net.es.sense.rm.driver.nsi.cs.db.Reservation;
 
 /**
  *
@@ -40,6 +39,7 @@ public class NmlSwitchingSubnet {
   private Optional<Long> startTime = Optional.empty();
   private Optional<Long> endTime = Optional.empty();
   private String tag;
+  private String oscarsId;
   private NetworkStatusEnum status;
   private Reservation.ErrorState errorState;
   private String errorMessage;

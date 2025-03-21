@@ -19,6 +19,11 @@
  */
 package net.es.sense.rm.driver.nsi.cs.api;
 
+import static java.util.Comparator.comparing;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import akka.actor.ActorRef;
 import com.google.common.base.Strings;
 import jakarta.jws.WebService;
@@ -30,12 +35,34 @@ import net.es.nsi.common.jaxb.JaxbParser;
 import net.es.nsi.cs.lib.CsParser;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.sense.rm.driver.nsi.RaController;
-import net.es.sense.rm.driver.nsi.cs.db.*;
+import net.es.sense.rm.driver.nsi.cs.db.Operation;
+import net.es.sense.rm.driver.nsi.cs.db.OperationMapRepository;
+import net.es.sense.rm.driver.nsi.cs.db.Reservation;
+import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
+import net.es.sense.rm.driver.nsi.cs.db.StateType;
 import net.es.sense.rm.driver.nsi.messages.AuditRequest;
 import net.es.sense.rm.driver.nsi.messages.TerminateRequest;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
 import org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException;
-import org.ogf.schemas.nsi._2013._12.connection.types.*;
+import org.ogf.schemas.nsi._2013._12.connection.types.DataPlaneStateChangeRequestType;
+import org.ogf.schemas.nsi._2013._12.connection.types.DataPlaneStatusType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ErrorEventType;
+import org.ogf.schemas.nsi._2013._12.connection.types.GenericAcknowledgmentType;
+import org.ogf.schemas.nsi._2013._12.connection.types.GenericConfirmedType;
+import org.ogf.schemas.nsi._2013._12.connection.types.GenericErrorType;
+import org.ogf.schemas.nsi._2013._12.connection.types.GenericFailedType;
+import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
+import org.ogf.schemas.nsi._2013._12.connection.types.MessageDeliveryTimeoutRequestType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory;
+import org.ogf.schemas.nsi._2013._12.connection.types.ProvisionStateEnumType;
+import org.ogf.schemas.nsi._2013._12.connection.types.QueryNotificationConfirmedType;
+import org.ogf.schemas.nsi._2013._12.connection.types.QueryRecursiveConfirmedType;
+import org.ogf.schemas.nsi._2013._12.connection.types.QueryResultConfirmedType;
+import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReservationConfirmCriteriaType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReserveConfirmedType;
+import org.ogf.schemas.nsi._2013._12.connection.types.ReserveTimeoutRequestType;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 import org.ogf.schemas.nsi._2013._12.framework.types.ServiceExceptionType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
@@ -43,12 +70,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.Comparator.comparing;
 
 /**
  * This is the NSI CS 2.1 web service requester endpoint used to receive responses from our associated uPA.
@@ -122,10 +143,10 @@ public class ConnectionService {
     ReservationConfirmCriteriaType criteria = reserveConfirmed.getCriteria();
 
     try {
-      log.info("[ConnectionService] reserveConfirmed received for correlationId = {}, reserveConfirmed:\n{}",
-          correlationId, CsParser.getInstance().reserveConfirmedType2xml(reserveConfirmed));
+      log.info("[ConnectionService::reserveConfirmed] received for correlationId = {}, cid = {}:\n{}",
+          correlationId, connectionId, CsParser.getInstance().reserveConfirmedType2xml(reserveConfirmed));
     } catch (JAXBException ex) {
-      log.error("[ConnectionService] reserveConfirmed could not encode log message, correlationId = {}",
+      log.error("[ConnectionService::reserveConfirmed] could not encode log message, correlationId = {}",
           correlationId, ex);
     }
 
@@ -135,27 +156,29 @@ public class ConnectionService {
     if (op == null) {
       // There is no pending operation for this reserveConfirmed so something must
       // have gone wrong like a timeout delay.  Try to recover.
-      log.error("[ConnectionService] reserveConfirmed can't find outstanding operation for correlationId = {}",
-          correlationId);
-      reservation = reservationService.getByAnyConnectionId(value.getProviderNSA(), connectionId)
-          .stream().max(comparing(Reservation::getVersion)).orElse(null);
+      log.error("[ConnectionService::reserveConfirmed] can't find outstanding operation for " +
+              "correlationId = {}, cid = {}", correlationId, connectionId);
+      reservation = reservationService.getByAnyConnectionId(value.getProviderNSA(), connectionId).stream()
+          .peek(r -> log.debug("[ConnectionService::reserveConfirmed] found cid = {}, version = {}",
+              r.getConnectionId(), r.getVersion()))
+          .max(comparing(Reservation::getVersion)).orElse(null);
       if (reservation == null) {
-        log.error("[ConnectionService] reserveConfirmed could not find reservation for connectionId = {}",
+        log.error("[ConnectionService] reserveConfirmed could not find reservation for cid = {}",
             connectionId);
       }
     } else {
-      log.error("[ConnectionService] reserveConfirmed found outstanding operation uniqueId = {} for correlationId = {}",
-          op.getUniqueId(), value.getCorrelationId());
+      log.error("[ConnectionService::reserveConfirmed] found outstanding operation uniqueId = {}, " +
+              "correlationId = {}, cid = {}", op.getUniqueId(), value.getCorrelationId(), connectionId);
       reservation = reservationService.getByUniqueId(op.getUniqueId());
       if (reservation == null) {
-        log.error("[ConnectionService] reserveConfirmed cannot find reservation for uniqueId = {}, correlationId = {}",
-            op.getUniqueId(), value.getCorrelationId());
+        log.error("[ConnectionService::reserveConfirmed] cannot find reservation for uniqueId = {}, " +
+                "correlationId = {}, cid = {}", op.getUniqueId(), value.getCorrelationId(), connectionId);
       }
     }
 
     // We have two cases to handle: 1) This is an unknown reservation, so we need to
-    // create one, 2) it is a known reservation so we need to update the existing
-    // one with this new information.
+    // create one, 2) it is a known reservation, so we need to update the existing
+    // one with this new information (i.e. a modify operation).
     if (reservation == null) {
       // Handle the unknown reservation case.
       DataPlaneStatusType dataPlaneStatus = FACTORY.createDataPlaneStatusType();
@@ -178,26 +201,28 @@ public class ConnectionService {
     } else {
       // Check to see if the reservation versions match.
       if (reservation.getVersion() != criteria.getVersion()) {
-        log.error("[ConnectionService] reserveConfirmed: reservation cid = {}, has inconsistent versions {}:{}",
+        log.error("[ConnectionService::reserveConfirmed] reservation cid = {}, has inconsistent versions {}:{}",
             connectionId, reservation.getVersion(), criteria.getVersion());
         reservation.setVersion(criteria.getVersion());
       }
 
-      // Check to see if there was a change in startTime.
+      // Check to see if there was a change in startTime.  The uPA may have added one if not provided.
       long startTime = CsUtils.getStartTime(criteria.getSchedule().getStartTime());
       if (startTime != reservation.getStartTime()) {
-        log.error("[ConnectionService] reserveConfirmed: reservation cid = {}, has changed startTime {}:{}",
+        log.error("[ConnectionService::reserveConfirmed] reservation cid = {}, has changed startTime {}:{}",
             connectionId, reservation.getStartTime(), startTime);
         reservation.setStartTime(startTime);
       }
 
-      // Check to see if there was a change in endTime.
+      // Check to see if there was a change in endTime.  The uPA may have added one if not provided.
       long endTime = CsUtils.getStartTime(criteria.getSchedule().getEndTime());
       if (endTime != reservation.getEndTime()) {
-        log.error("[ConnectionService] reserveConfirmed: reservation cid = {}, has changed endTime {}:{}",
+        log.error("[ConnectionService::reserveConfirmed] reservation cid = {}, has changed endTime {}:{}",
             connectionId, reservation.getEndTime(), endTime);
         reservation.setEndTime(endTime);
       }
+
+      // TODO: Check for a change in description or other fields that could have been modified.
 
       // Add a serialized version of the service.
       reservation.setServiceType(criteria.getServiceType());

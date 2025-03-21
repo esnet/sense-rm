@@ -19,6 +19,15 @@
  */
 package net.es.sense.rm.driver.nsi.mrml;
 
+import static java.util.Comparator.comparing;
+
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import com.google.common.base.Strings;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
@@ -28,15 +37,15 @@ import net.es.nsi.cs.lib.CsParser;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.nsi.dds.lib.jaxb.nml.NmlSwitchingServiceType;
 import net.es.nsi.dds.lib.jaxb.nml.ServiceDefinitionType;
-import net.es.sense.rm.driver.nsi.cs.db.*;
+import net.es.sense.rm.driver.nsi.cs.db.ConnectionMap;
+import net.es.sense.rm.driver.nsi.cs.db.ConnectionMapService;
+import net.es.sense.rm.driver.nsi.cs.db.Reservation;
+import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
+import net.es.sense.rm.driver.nsi.cs.db.StpMapping;
 import org.ogf.schemas.nsi._2013._12.connection.types.LifecycleStateEnumType;
 import org.ogf.schemas.nsi._2013._12.connection.types.ReservationStateEnumType;
 import org.ogf.schemas.nsi._2013._12.services.point2point.P2PServiceBaseType;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static java.util.Comparator.comparing;
+import org.ogf.schemas.nsi._2013._12.services.types.TypeValueType;
 
 /**
  * Create MRML SwitchingSubnet model from stored NSI reservations and connection maps.
@@ -219,6 +228,8 @@ public class SwitchingSubnetModel {
           continue;
         }
         default -> {
+          log.info("[SwitchingSubnetModel] processing reservation cid = {}, reservationState = {}",
+              reservation.getConnectionId(), reservation.getReservationState());
         }
       }
 
@@ -372,9 +383,16 @@ public class SwitchingSubnetModel {
             continue;
           }
 
+          // Check to see of there is a custom OSCARS connectionId in the P2P structure.
+          String oscarsId = p2ps.getParameter().stream()
+              .filter(p -> "oscarsId".equalsIgnoreCase(p.getType()))
+              .map(TypeValueType::getValue)
+              .findFirst()
+              .orElse(null);
+
           ServiceHolder holder = serviceHolder.get(srcSSid.get());
 
-          // If this is a SwtichingSubnet created by an MRML delta request
+          // If this is a SwitchingSubnet created by an MRML delta request
           // we will have a specific mapping name for this.
           String nssId;
           String nssExistsDuringId = null;
@@ -402,6 +420,7 @@ public class SwitchingSubnetModel {
           nss.setDiscovered(reservation.getDiscovered());
           nss.setTag("connectionId=" + topologyId + ":cid+" + ConnectionId.strip(reservation.getConnectionId()));
           nss.setStatus(NetworkStatus.parse(reservation));
+          nss.setOscarsId(oscarsId);
           nss.setErrorState(reservation.getErrorState());
           nss.setErrorMessage(reservation.getErrorMessage());
           holder.getSwitchingSubnets().add(nss);

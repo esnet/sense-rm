@@ -1,5 +1,13 @@
 package net.es.sense.rm.driver.nsi.mrml;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import com.google.common.base.Strings;
 import jakarta.xml.bind.JAXBElement;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +29,6 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.Lang;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * This class handles creation of an MRML model representing the network.
@@ -471,6 +474,14 @@ public class MrmlFactory {
         resNetworkStatus.addProperty(Mrs.type, "dataplane");
         resNetworkStatus.addProperty(Mrs.value, switchingSubnet.getStatus().toString());
         ssr.addProperty(Mrs.hasNetworkStatus, resNetworkStatus);
+
+        // Add the oscarsId SwitchingSubnet if present.
+        Optional.ofNullable(switchingSubnet.getOscarsId()).ifPresent(oscarsId -> {
+          Resource resNetworkAddress = createResource(model, switchingSubnet.getId() + ":oscarsId", Mrs.NetworkAddress);
+          resNetworkAddress.addProperty(Mrs.type, "oscarsId");
+          resNetworkAddress.addProperty(Mrs.value, oscarsId);
+          ssr.addProperty(Mrs.hasNetworkAddress, resNetworkAddress);
+        });
 
         // Add the errorStatus information if there is an error.
         if (switchingSubnet.getErrorState() != Reservation.ErrorState.NONE) {

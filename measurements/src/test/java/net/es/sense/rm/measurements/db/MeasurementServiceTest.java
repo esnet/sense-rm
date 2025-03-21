@@ -20,6 +20,7 @@
 package net.es.sense.rm.measurements.db;
 
 import lombok.extern.slf4j.Slf4j;
+import net.es.sense.rm.measurements.DbUnitTestConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

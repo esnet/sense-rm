@@ -19,12 +19,12 @@
  */
 package net.es.sense.rm.driver.nsi.mrml;
 
-import com.twitter.common.base.Either;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import com.twitter.common.base.Either;
 import net.es.nsi.cs.lib.SimpleLabel;
 import net.es.nsi.cs.lib.SimpleStp;
 import net.es.nsi.dds.lib.jaxb.nml.NmlLabelGroupType;
@@ -150,17 +150,12 @@ public class NmlPort {
   private List<NmlSwitchingServiceType> switchingServices = new ArrayList<>();
 
   public Optional<String> getServiceId() {
-    if (tag.isPresent()) {
-      return Optional.of("serviceId=" + tag.get());
-    }
-    else {
-      return Optional.empty();
-    }
+    return tag.map(s -> "serviceId=" + s);
   }
 
-  public Set<NmlLabelGroupType> setNmlLabels(SimpleStp stp) {
+  public void setNmlLabels(SimpleStp stp) {
     Set<SimpleLabel> simpleLabels = stp.getLabels();
-    simpleLabels.stream().forEach(label -> {
+    simpleLabels.forEach(label -> {
       NmlLabelGroupType lgt = FACTORY.createNmlLabelGroupType();
       if ("vlan".equalsIgnoreCase(label.getType())) {
         lgt.setLabeltype("http://schemas.ogf.org/nml/2012/10/ethernet#vlan");
@@ -171,6 +166,5 @@ public class NmlPort {
       labels.add(lgt);
     });
 
-    return labels;
   }
 }

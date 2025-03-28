@@ -5,16 +5,21 @@ import akka.actor.UntypedAbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import net.es.nsi.common.jaxb.JaxbParser;
 import net.es.nsi.cs.lib.Client;
 import net.es.nsi.cs.lib.Helper;
 import net.es.nsi.cs.lib.NsiHeader;
 import net.es.sense.rm.driver.nsi.actors.NsiActorSystem;
+import net.es.sense.rm.driver.nsi.cs.api.QuerySummary;
+import net.es.sense.rm.driver.nsi.cs.db.ReservationService;
 import net.es.sense.rm.driver.nsi.messages.Message;
 import net.es.sense.rm.driver.nsi.messages.TimerMsg;
 import net.es.sense.rm.driver.nsi.properties.NsiProperties;
+import org.ogf.schemas.nsi._2013._12.connection.provider.Error;
 import org.ogf.schemas.nsi._2013._12.connection.provider.ServiceException;
 import org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory;
+import org.ogf.schemas.nsi._2013._12.connection.types.QuerySummaryConfirmedType;
 import org.ogf.schemas.nsi._2013._12.connection.types.QueryType;
 import org.ogf.schemas.nsi._2013._12.framework.headers.CommonHeaderType;
 import org.ogf.schemas.nsi._2013._12.framework.types.ServiceExceptionType;
@@ -43,6 +48,9 @@ public class ConnectionActor extends UntypedAbstractActor {
   @Autowired
   private NsiProperties nsiProperties;
 
+  @Autowired
+  private ReservationService reservationService;
+
   private static final ObjectFactory FACTORY = new ObjectFactory();
 
   @Override
@@ -59,7 +67,8 @@ public class ConnectionActor extends UntypedAbstractActor {
     if (msg instanceof TimerMsg) {
       // Perform connection audit.
       try {
-        connectionSummaryAudit();
+        //connectionSummaryAudit();
+        connectionSummarySyncAudit();
       } catch (ServiceException ex) {
         log.error(ex, "[ConnectionActor] onReceive connection audit failed");
       }
@@ -107,6 +116,60 @@ public class ConnectionActor extends UntypedAbstractActor {
       log.error(JaxbParser.jaxb2String(ServiceExceptionType.class, ex.getFaultInfo()));
       throw ex;
     }
+  }
+
+  private static final org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory CS_FACTORY
+      = new org.ogf.schemas.nsi._2013._12.connection.types.ObjectFactory();
+
+  /**
+   * Send a summary query to our associated NSA to get a list of all available
+   * connections.  We add these to the connection repository for processing into
+   * MRML topology.
+   *
+   */
+  private void connectionSummarySyncAudit() throws ServiceException {
+    Client nsiClient = new Client(nsiProperties.getProviderConnectionURL());
+    Holder<CommonHeaderType> header = getNsiCsHeader();
+    QueryType query = CS_FACTORY.createQueryType();
+    try {
+      log.info("[connectionSummarySyncAudit] Sending querySummarySync: providerNSA = {}, correlationId = {}",
+          header.value.getProviderNSA(), header.value.getCorrelationId());
+      QuerySummaryConfirmedType querySummarySync = nsiClient.getProxy().querySummarySync(query, header);
+      log.info("[connectionSummarySyncAudit] QuerySummaryConfirmed received, providerNSA = {}, correlationId = {}",
+          header.value.getProviderNSA(), header.value.getCorrelationId());
+
+      QuerySummary q = new QuerySummary(nsiProperties.getNetworkId(), reservationService);
+      q.process(querySummarySync, header);
+    } catch (Error ex) {
+      log.error("[connectionSummarySyncAudit] querySummarySync exception on operation - {} {}",
+          ex.getFaultInfo().getServiceException().getErrorId(),
+          ex.getFaultInfo().getServiceException().getText());
+    } catch (org.ogf.schemas.nsi._2013._12.connection.requester.ServiceException ex) {
+      log.error("[connectionSummarySyncAudit] querySummarySync exception processing - {} {}",
+          ex.getFaultInfo().getErrorId(),
+          ex.getFaultInfo().getText());
+    } catch (SOAPFaultException ex) {
+      log.error("[connectionSummarySyncAudit] querySummarySync SOAPFaultException exception", ex);
+    } catch (Exception ex) {
+      log.error("[connectionSummarySyncAudit] querySummarySync exception processing results", ex);
+    }
+  }
+
+  /**
+   * This method returns a fully populated NSI-CS header for inclusion in a SOAP message.
+   *
+   * @return NSI-CS header.
+   */
+  private Holder<CommonHeaderType> getNsiCsHeader() {
+    Holder<CommonHeaderType> header = new Holder<>();
+    header.value = NsiHeader.builder()
+        .correlationId(Helper.getUUID())
+        .providerNSA(nsiProperties.getProviderNsaId())
+        .requesterNSA(nsiProperties.getNsaId())
+        .replyTo(nsiProperties.getRequesterConnectionURL())
+        .build()
+        .getRequestHeaderType();
+    return header;
   }
 
   /**

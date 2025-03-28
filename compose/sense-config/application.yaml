@@ -51,9 +51,17 @@ sense:
 server:
   address: sense-rm
   port: 8080
-  contextPath: /
   packageName: net.es.sense.rm.driver.nsi
   shutdown: graceful
+  servlet:
+    context-path: /
+  error.whitelabel.enabled: false
+#  compression:
+#    enabled: true
+#    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
+#  tomcat:
+#    max-http-form-post-size: 52428800
+#    max-swallow-size: 52428800
 
 #  ssl:
 #    enabled: true
@@ -84,14 +92,14 @@ springdoc.swagger-ui.path: /v3/swagger-ui
 # I will be totally honest - I don't think this does anything at all.
 # Spring-boot and logback configuration is black magic.  Instead edit the
 # logback.xml to control logging.
-logging:
-  config: file:./config/logback.xml
-  level:
-    ROOT: INFO
-    org.springframework: INFO
-    org.springframework.data: INFO
-    net.es.sense.rm: DEBUG
-  file: "var/log/sense-n-rm.log"
+#logging:
+# config: file:./config/logback.xml
+# level:
+#   ROOT: INFO
+#   org.springframework: INFO
+#   org.springframework.data: INFO
+#   net.es.sense.rm: DEBUG
+# file: "var/log/sense-n-rm.log"
 
 #########################################
 # Database configuration.               #
@@ -113,6 +121,10 @@ spring:
     username: sense
     password: sense
     continue-on-error: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
 
 # Possible ddl-auto options.
 #spring.jpa.hibernate.ddl-auto: create

@@ -475,7 +475,14 @@ public class ConnectionService {
 
       if (reservationService.setReservationState(reservation.getId(), ReservationStateEnumType.RESERVE_START,
           System.currentTimeMillis()) != 1) {
-        log.info("[ConnectionService] reserveCommitConfirmed: error updating cid = {}", connectionId);
+        log.info("[ConnectionService] reserveCommitConfirmed: error updating ReservationState for cid = {}",
+            connectionId);
+      }
+
+      if (reservationService.setLifecycleState(reservation.getId(), LifecycleStateEnumType.CREATED,
+          System.currentTimeMillis()) != 1) {
+        log.info("[ConnectionService] reserveCommitConfirmed: error updating LifecycleState for cid = {}",
+            connectionId);
       }
     }
 

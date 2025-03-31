@@ -48,8 +48,6 @@ public class RegistrationRouter extends UntypedAbstractActor {
   private final NsiProperties nsiProperties;
   private final SubscriptionService subscriptionService;
 
-  private boolean shit = false;
-
   // The AKKA router that is created on preStart().
   private Router router;
 
@@ -91,7 +89,6 @@ public class RegistrationRouter extends UntypedAbstractActor {
             nsiActorSystem.getActorSystem().dispatcher(), null);
 
     log.info("[RegistrationRouter] Initialization completed.");
-    shit = true;
   }
 
   public void postRestart(Throwable reason) {
@@ -105,7 +102,7 @@ public class RegistrationRouter extends UntypedAbstractActor {
    */
   @Override
   public void onReceive(Object msg) {
-    log.info("[RegistrationRouter::onReceive] shit = {}, onReceive {}", shit, Message.getDebug(msg));
+    log.info("[RegistrationRouter::onReceive] entering {}", Message.getDebug(msg));
 
     // Check to see if we got the go ahead to start registering.
     if (msg instanceof StartMsg message) {

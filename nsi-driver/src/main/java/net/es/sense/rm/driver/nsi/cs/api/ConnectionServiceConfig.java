@@ -32,6 +32,7 @@ import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.transport.common.gzip.GZIPFeature;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -73,10 +74,18 @@ public class ConnectionServiceConfig {
   public Endpoint endpoint() {
     EndpointImpl endpoint = new EndpointImpl(bus, new ConnectionService(nsiProperties, reservationService, operationMap, raController));
     endpoint.setProperties(ClientUtil.setProps(endpoint.getProperties()));
+
+    // Enable logging features.
     LoggingFeature lf = new LoggingFeature();
     lf.setPrettyLogging(true);
     endpoint.getFeatures().add(lf);
+
+    // Enable GZIP feature
+    GZIPFeature gzipFeature = new GZIPFeature();
+    endpoint.getFeatures().add(gzipFeature);
+
     endpoint.publish("/nsi-v2");
+
     return endpoint;
   }
 

@@ -188,11 +188,11 @@ public class QuerySummary {
       } else if (r.getLifecycleState() == LifecycleStateEnumType.TERMINATED) {
         // We want to make sure we do not undo a terminated/failed state (OpenNSA bug).
         log.debug("[QuerySummary] skipping update for a terminated " +
-                "reservation, cid = {}, discovered = {},\n    update = {},\n    existing = {}",
+                "reservation, cid = {}, discovered = {}, update = \n{},\nexisting = \n{}.\n",
                 reservation.getConnectionId(), reservation.getDiscovered(), reservation, r);
       } else if (r.getLifecycleState() == LifecycleStateEnumType.FAILED) {
         log.debug("[QuerySummary] skipping update for a failed " +
-                "reservation, cid = {}, discovered = {},\n    update = {},\n    existing = {}",
+                "reservation, cid = {}, discovered = {},update = \n{},\nexisting = \n{}.\n",
                 reservation.getConnectionId(), reservation.getDiscovered(), reservation, r);
       } else if (r.diff(reservation)) {
         // We have to determine if the stored reservation needs to be updated.

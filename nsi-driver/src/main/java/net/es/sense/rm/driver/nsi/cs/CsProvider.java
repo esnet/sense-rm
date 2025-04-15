@@ -536,8 +536,7 @@ public class CsProvider {
   private List<String> processNewSwitchingSubnet(String deltaId, OntModel model, List<String> uris, List<String> commits)
       throws DatatypeConfigurationException, ServiceException, IllegalArgumentException {
 
-    log.info("[processNewSwitchingSubnet] processing addition for delta {}:\n{}",
-        deltaId, model.getBaseModel().toString());
+    log.info("[processNewSwitchingSubnet] processing addition for delta {}", deltaId);
 
     // We return list of correlationId from the NSI-CS reservation requests created.
     List<String> correlationIds = new ArrayList<>();

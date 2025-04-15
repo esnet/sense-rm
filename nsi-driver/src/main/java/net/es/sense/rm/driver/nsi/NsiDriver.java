@@ -415,6 +415,12 @@ public class NsiDriver implements Driver {
         addition.ifPresent(a -> ModelUtil.applyDeltaAddition(updatedModel, a));
       }
 
+      // Dump the models for debug.
+      if (log.isDebugEnabled()) {
+        log.debug("[NsiDriver::propagateDelta] original model:\n{}", ModelUtil.marshalOntModelTurtle(originalModel));
+        log.debug("[NsiDriver::propagateDelta] updated model:\n{}", ModelUtil.marshalOntModelTurtle(updatedModel));
+      }
+
       // At this point rdfModel has been transformed into the topology requested by the delta.
       // Create and store a delta object representing this delta request.
       DeltaService deltaService = raController.getDeltaService();

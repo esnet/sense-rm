@@ -183,11 +183,5 @@ public class AuditServiceBean implements AuditService {
     
     // Delete older models (keep last 5).
     modelService.purge(topologyId, nsiProperties.getModelPruneSize());
-
-    // Dump the current contents as an audit log.
-    log.info("[AuditService] stored models after the audit...");
-    modelService.get().forEach((m) -> {
-      log.info(m.toString());
-    });
   }
 }

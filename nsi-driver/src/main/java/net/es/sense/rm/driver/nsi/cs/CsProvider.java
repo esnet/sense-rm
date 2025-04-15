@@ -262,7 +262,8 @@ public class CsProvider {
    * of reduction elements not being present, but strict about the creation
    * for addition elements.
    *
-   * @param updatedModel The original model referred to by the delta request.
+   * @param originalModel The original model referred to by the delta request.
+   * @param updatedModel The updated model containing the delta modifications.
    * @param deltaId The delta identifier being processed.
    * @param reduction The delta reduction model.
    * @param addition The delta addition model.
@@ -535,7 +536,8 @@ public class CsProvider {
   private List<String> processNewSwitchingSubnet(String deltaId, OntModel model, List<String> uris, List<String> commits)
       throws DatatypeConfigurationException, ServiceException, IllegalArgumentException {
 
-    log.info("[processNewSwitchingSubnet] processing addition for delta {}", deltaId);
+    log.info("[processNewSwitchingSubnet] processing addition for delta {}:\n{}",
+        deltaId, model.getBaseModel().toString());
 
     // We return list of correlationId from the NSI-CS reservation requests created.
     List<String> correlationIds = new ArrayList<>();
@@ -649,7 +651,14 @@ public class CsProvider {
 
         // Make sure we have a valid label.
         if (label == null) {
-          log.error("[processNewSwitchingSubnet] biChild labelRef missing label: " + labelRef);
+          log.error("[processNewSwitchingSubnet] biChild labelRef missing label: {}", labelRef);
+
+          // Do some debugging.
+          Resource resource = model.getBaseModel().getResource(labelRef.getResource().getURI());
+          log.error("[processNewSwitchingSubnet] did we find the label object?: {}", resource);
+          log.error("[processNewSwitchingSubnet] Label dump: {}", Nml.Label);
+          ModelUtil.findInstancesByType(model,Nml.Label)
+              .forEach(r -> log.error("[processNewSwitchingSubnet] {}", r.getURI()));
           throw new IllegalArgumentException("[processNewSwitchingSubnet] biChild labelRef missing label: " + labelRef);
         }
 
@@ -662,6 +671,7 @@ public class CsProvider {
           log.error("[processNewSwitchingSubnet] parentBi resource missing for biChild " + biChild);
           throw new IllegalArgumentException("[processNewSwitchingSubnet] parentBi resource missing: " + biChild);
         }
+
         log.debug("[processNewSwitchingSubnet] parentBi: " + parentBi.getURI());
 
         // Construct the target STP for this port and label.

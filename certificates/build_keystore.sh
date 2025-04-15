@@ -5,9 +5,9 @@
 #
 
 # Verify the correct number of parameters.
-if [[ "$#" -ne 6 ]]; then
+if [[ "$#" -ne 7 ]]; then
     echo "ERROR: Illegal number of parameters"
-    echo "Usage: $0 <keystoretype> <keystorefile> <passwd> <keyfile> <certfile> <ca-file>"
+    echo "Usage: $0 <keystoretype> <keystorefile> <passwd> <name> <keyfile> <certfile> <ca-file>"
     exit 2
 fi
 
@@ -24,20 +24,20 @@ if [[ -f "$2" ]]; then
 fi
 
 # Check if a vaild key file was specified.
-if [[ ! -f "$4" ]]; then
-    echo "ERROR: $4 does not exist"
-    exit 2
-fi
-
-# Check if a vaild certificate file was specified.
 if [[ ! -f "$5" ]]; then
     echo "ERROR: $5 does not exist"
     exit 2
 fi
 
-# Check if a vaild CA file was specified.
+# Check if a vaild certificate file was specified.
 if [[ ! -f "$6" ]]; then
     echo "ERROR: $6 does not exist"
+    exit 2
+fi
+
+# Check if a vaild CA file was specified.
+if [[ ! -f "$7" ]]; then
+    echo "ERROR: $7 does not exist"
     exit 2
 fi
 
@@ -47,9 +47,10 @@ tfile=$(mktemp /tmp/foo.XXXXXXXXX)
 # Create a temporary pkcs12 keystore.
 openssl pkcs12 -export \
     -out $tfile \
-    -inkey $4 \
-    -in $5 \
-    -certfile $6 \
+    -inkey $5 \
+    -in $6 \
+    -certfile $7 \
+    -name $4 \
     -passout pass:"$3"
 
 if [[ "$1" == "JKS" ]]; then

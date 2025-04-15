@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -597,4 +598,9 @@ public class ModelUtil {
     return uri.equalsIgnoreCase(Nml.existsDuring.getURI());
   }
 
+  public static List<Resource> findInstancesByType(OntModel model, Resource type) {
+    List<Resource> results = new ArrayList<>();
+    model.listStatements(null, RDF.type, type).forEach(r -> results.add(r.getSubject()));
+    return results;
+  }
 }

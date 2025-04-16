@@ -1,6 +1,26 @@
 package net.es.sense.rm.driver.nsi.mrml;
 
+import static org.assertj.core.api.Fail.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import com.google.common.base.Strings;
+import lombok.extern.slf4j.Slf4j;
+import net.es.sense.rm.driver.api.mrml.ModelUtil;
 import net.es.sense.rm.driver.nsi.db.ModelService;
+import net.es.sense.rm.driver.schema.Mrs;
+import net.es.sense.rm.driver.schema.Nml;
+import net.es.sense.rm.model.DeltaRequest;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -10,38 +30,61 @@ import org.slf4j.LoggerFactory;
  *
  * @author hacksaw
  */
+@Slf4j
 public class ModelAdditionTest {
 
-  private static final String MODEL_FILE = "src/test/resources/model-1.ttl";
-  private static final String ADDITION_FILE = "src/test/resources/addition-1.ttl";
-  private static final String MODEL_ID = "urn:uuid:c87c0ac1-e02b-484c-b595-e58d807a7661";
-
-  private final ModelService modelService = Mockito.mock(ModelService.class);
-  private static final Logger LOG = LoggerFactory.getLogger(ModelAdditionTest.class);
+  private static final String MODEL_FILE = "src/test/resources/original-6.ttl";
+  private static final String ADDITION_FILE = "src/test/resources/addition-6.ttl";
+  private static final String REDUCTION_FILE = "src/test/resources/reduction-6.ttl";
 
   @Test
   public void readTtl() throws Exception {
-    /*
     // Get the models for this delta operation.
-    Model m = ModelFactory.createDefaultModel();
-    m.read(MODEL_FILE, "TURTLE");
+    Path model = Path.of(MODEL_FILE);
+    OntModel originalModel = ModelUtil.unmarshalOntModelTurtle(Files.readString(model));
+    OntModel updatedModel = ModelUtil.unmarshalOntModelTurtle(Files.readString(model));
 
-    net.es.sense.rm.driver.nsi.db.Model model = new net.es.sense.rm.driver.nsi.db.Model();
-    model.setModelId(MODEL_ID);
-    model.setVersion("abcdef");
-    model.setTopologyId("urn:ogf:network:es.net:2013:");
-    model.setBase(ModelUtil.marshalModel(m));
+    Optional<OntModel> reduction = Optional.of(ModelUtil.unmarshalOntModelTurtle(Files.readString(Path.of(REDUCTION_FILE))));
+    reduction.ifPresent(r -> ModelUtil.applyDeltaReduction(updatedModel, r));
 
-    Mockito.when(modelService.get(MODEL_ID)).thenReturn(model);
+    Optional<OntModel> addition = Optional.of(ModelUtil.unmarshalOntModelTurtle(Files.readString(Path.of(ADDITION_FILE))));
+    addition.ifPresent(a -> ModelUtil.applyDeltaAddition(updatedModel, a));
 
-    // Get the models for this delta operation.
-    Model addition = ModelFactory.createDefaultModel();
-    addition.read(ADDITION_FILE, "TURTLE");
+    assertTrue(originalModel.validate().isValid());
+    assertTrue(updatedModel.validate().isValid());
 
-    DeltaRequest request = new DeltaRequest();
-    request.setModelId("urn:uuid:c87c0ac1-e02b-484c-b595-e58d807a7661");
-    request.setAddition(ModelUtil.marshalModel(addition));
+    List<Resource> switchingService =  ModelUtil.getResourcesOfType(originalModel, Nml.SwitchingService);
+    assertEquals(1, switchingService.size());
+    assertEquals("urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE",
+        switchingService.get(0).getURI());
 
-    processDeltaAddition(request);*/
+    List<Resource> switchingSubnet = ModelUtil.getResourcesOfType(updatedModel, Mrs.SwitchingSubnet);
+    assertEquals(1, switchingSubnet.size());
+    assertEquals("urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+48afebf5-d42f-4d04-a178-4d2cac603552:vt+l2-policy-Connection_1:vlan+2541",
+        switchingSubnet.get(0).getURI());
+
+    Resource resourceOfSubjectAndType = ModelUtil.getResourceOfSubjectAndType(updatedModel, Mrs.SwitchingSubnet,
+        "urn:ogf:network:es.net:2013:topology:ServiceDomain:EVTS.A-GOLE:conn+48afebf5-d42f-4d04-a178-4d2cac603552:vt+l2-policy-Connection_1:vlan+2541");
+    assertNotNull(resourceOfSubjectAndType);
+
+    List<String> creates = new ArrayList<>();
+    addition.ifPresent(a -> {
+      for (Resource subject : ModelUtil.getSubjects(a)) {
+        log.debug("[ModelAdditionTest::readTtl] subject {}", subject.getURI());
+
+        // Verify that the subject of the addition is not in the original model but is in the
+        // updated model.
+        if (ModelUtil.getResourceOfSubjectAndType(originalModel, Mrs.SwitchingSubnet, subject) == null) {
+          // Looks like this is a new subject so check to see if it is a mrs:SwitchingSubnet.
+          if (ModelUtil.getResourceOfSubjectAndType(updatedModel, Mrs.SwitchingSubnet, subject) != null) {
+            log.debug("[ModelAdditionTest::readTtl] SwitchingSubnet {} is in updated model.", subject.getURI());
+            // The mrs:SwitchingSubnet is present in the new model so add it for creation.
+            creates.add(subject.getURI());
+          }
+        }
+      }
+    });
+
+    assertEquals(1, creates.size());
   }
 }

@@ -1,0 +1,391 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix nml: <http://schemas.ogf.org/nml/2013/03/base#> .
+
+nml:
+  a owl:Ontology ;
+  rdfs:label "NML Schema" .
+
+nml:adaptationFunction
+  a owl:ObjectProperty ;
+  rdfs:domain [
+    a owl:Class ;
+    owl:unionOf (
+     nml:AdaptationService
+     nml:DeadaptationService
+   )
+  ] .
+
+nml:address
+  a owl:ObjectProperty ;
+  rdfs:domain nml:Location .
+
+nml:canProvidePort
+  a owl:ObjectProperty ;
+  rdfs:domain nml:Service ;
+  rdfs:range [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Port
+     nml:PortGroup
+     nml:BidirectionalPort
+   )
+  ] .
+
+nml:encoding
+  a owl:ObjectProperty ;
+  rdfs:domain [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Link
+     nml:LinkGroup
+     nml:Port
+     nml:PortGroup
+     nml:BidirectionalPort
+     nml:SwitchingService
+   )
+  ] .
+
+nml:existsDuring
+  a owl:ObjectProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range nml:Lifetime .
+
+nml:hasInboundPort
+  a owl:ObjectProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Port
+     nml:PortGroup
+   )
+  ] .
+
+nml:hasBidirectionalPort
+  a owl:ObjectProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range nml:BidirectionalPort .
+
+nml:hasLabel
+  a owl:ObjectProperty ;
+  rdfs:domain [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Link
+     nml:Port
+     nml:BidirectionalPort
+     nml:BidirectionalLink
+   )
+  ] ;
+  rdfs:range nml:Label .
+
+nml:hasLabelGroup
+  a owl:ObjectProperty ;
+  rdfs:domain [
+    a owl:Class ;
+    owl:unionOf (
+     nml:LinkGroup
+     nml:PortGroup
+     nml:BidirectionalPort
+     nml:BidirectionalLink
+   )
+  ] ;
+  rdfs:range nml:LabelGroup .
+
+nml:hasLink
+  a owl:ObjectProperty ;
+  rdfs:domain nml:Group ;
+  rdfs:range [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Link
+     nml:LinkGroup
+   )
+  ] .
+
+nml:hasBidirectionalLink
+  a owl:ObjectProperty ;
+  rdfs:domain nml:Group ;
+  rdfs:range nml:BidirectionalLink .
+
+nml:hasNode
+  a owl:ObjectProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range nml:Node .
+
+nml:hasOutboundPort
+  a owl:ObjectProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Port
+     nml:PortGroup
+   )
+  ] .
+
+nml:hasPort
+  a owl:ObjectProperty ;
+  rdfs:domain nml:Group ;
+  rdfs:range [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Port
+     nml:PortGroup
+   )
+  ] .
+
+nml:hasService
+  a owl:ObjectProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range nml:Service .
+
+nml:hasTopology
+  a owl:ObjectProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range nml:Topology .
+
+nml:implementedBy
+  a owl:ObjectProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range nml:NetworkObject .
+
+nml:isAlias
+  a owl:ObjectProperty, owl:SymmetricProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range nml:NetworkObject .
+
+nml:belongsTo
+  a owl:ObjectProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range nml:NetworkObject .
+
+nml:serviceProvidedBy
+  a owl:ObjectProperty ;
+  rdfs:domain nml:Service ;
+  rdfs:range nml:NetworkObject .
+
+nml:isSerialCompoundLink
+  a owl:ObjectProperty ;
+  rdfs:domain [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Link
+     nml:LinkGroup
+   )
+  ] ;
+  rdfs:range nml:ListItem .
+
+nml:isSink
+  a owl:ObjectProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Link
+     nml:LinkGroup
+   )
+  ] .
+
+nml:isSource
+  a owl:ObjectProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Link
+     nml:LinkGroup
+   )
+  ] .
+
+nml:item
+  a owl:ObjectProperty ;
+  rdfs:domain nml:ListItem .
+
+nml:labeltype
+  a owl:ObjectProperty ;
+  rdfs:domain [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Label
+     nml:LabelGroup
+   )
+  ] .
+
+nml:locatedAt
+  a owl:ObjectProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range nml:Location .
+
+nml:next
+  a owl:ObjectProperty ;
+  rdfs:domain nml:ListItem ;
+  rdfs:range nml:ListItem .
+
+nml:providesLink
+  a owl:ObjectProperty ;
+  rdfs:domain nml:Service ;
+  rdfs:range [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Link
+     nml:LinkGroup
+     nml:BidirectionalLink
+   )
+  ] .
+
+nml:providesPort
+  a owl:ObjectProperty ;
+  rdfs:domain nml:Service ;
+  rdfs:range [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Port
+     nml:PortGroup
+   )
+  ] .
+
+nml:alt
+  a owl:DatatypeProperty ;
+  rdfs:domain nml:Location ;
+  rdfs:range xsd:float .
+
+nml:end
+  a owl:DatatypeProperty ;
+  rdfs:domain nml:Lifetime ;
+  rdfs:range xsd:dateTime .
+
+nml:labelSwapping
+  a owl:DatatypeProperty ;
+  rdfs:domain nml:SwitchingService ;
+  rdfs:range xsd:boolean .
+
+nml:lat
+  a owl:DatatypeProperty ;
+  rdfs:domain nml:Location ;
+  rdfs:range xsd:float .
+
+nml:long
+  a owl:DatatypeProperty ;
+  rdfs:domain nml:Location ;
+  rdfs:range xsd:float .
+
+nml:name
+  a owl:DatatypeProperty ;
+  rdfs:domain [
+    a owl:Class ;
+    owl:unionOf (
+     nml:Location
+     nml:NetworkObject
+   )
+  ] ;
+  rdfs:range xsd:string .
+
+nml:noReturnTraffic
+  a owl:DatatypeProperty ;
+  rdfs:domain nml:Link ;
+  rdfs:range xsd:boolean .
+
+nml:parameter
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:string .
+
+nml:start
+  a owl:DatatypeProperty ;
+  rdfs:domain nml:Lifetime ;
+  rdfs:range xsd:dateTime .
+
+nml:unlocode
+  a owl:DatatypeProperty ;
+  rdfs:domain nml:Location ;
+  rdfs:range xsd:string .
+
+nml:value
+  a owl:DatatypeProperty ;
+  rdfs:domain nml:Label ;
+  rdfs:range xsd:string .
+
+nml:values
+  a owl:DatatypeProperty ;
+  rdfs:domain nml:LabelGroup ;
+  rdfs:range xsd:string .
+
+nml:version
+  a owl:DatatypeProperty ;
+  rdfs:domain nml:NetworkObject ;
+  rdfs:range xsd:dateTime .
+
+nml:AdaptationService
+  a owl:Class ;
+  rdfs:subClassOf nml:Service .
+
+nml:BidirectionalLink
+  a owl:Class ;
+  rdfs:subClassOf nml:Group .
+
+nml:BidirectionalPort
+  a owl:Class ;
+  rdfs:subClassOf nml:Group .
+
+nml:DeadaptationService
+  a owl:Class ;
+  rdfs:subClassOf nml:Service .
+
+nml:Group
+  a owl:Class ;
+  rdfs:subClassOf nml:NetworkObject .
+
+nml:Label
+  a owl:Class .
+
+nml:LabelGroup
+  a owl:Class ;
+  rdfs:subClassOf owl:Thing .
+
+nml:Lifetime
+  a owl:Class .
+
+nml:Link
+  a owl:Class ;
+  rdfs:subClassOf nml:NetworkObject .
+
+nml:LinkGroup
+  a owl:Class ;
+  rdfs:subClassOf nml:Group .
+
+nml:ListItem
+  a owl:Class ;
+  rdfs:subClassOf owl:Thing .
+
+nml:Location
+  a owl:Class ;
+  rdfs:subClassOf owl:Thing .
+
+nml:NetworkObject a owl:Class .
+nml:Node
+  a owl:Class ;
+  rdfs:subClassOf nml:NetworkObject .
+
+nml:Port
+  a owl:Class ;
+  rdfs:subClassOf nml:NetworkObject .
+
+nml:PortGroup
+  a owl:Class ;
+  rdfs:subClassOf nml:Group .
+
+nml:Service
+  a owl:Class ;
+  rdfs:subClassOf nml:NetworkObject .
+
+nml:SwitchingService
+  a owl:Class ;
+  rdfs:subClassOf nml:Service .
+
+nml:Topology
+  a owl:Class ;
+  rdfs:subClassOf nml:Group .
+

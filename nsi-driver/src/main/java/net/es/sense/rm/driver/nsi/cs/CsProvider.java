@@ -367,7 +367,7 @@ public class CsProvider {
           new NotFoundExceptionSupplier(String.format("subject %s not found in ontology model", subject.getURI())));
 
       // This subject is a mrs:SwitchingSubnet so see if it needs to be terminated.
-      if (ModelUtil.isSwitchingSubnet(target) &&
+      if (ModelUtil.isSwitchingSubnet(original, target) &&
           ModelUtil.getResourceOfSubjectAndType(updated, Mrs.SwitchingSubnet, target.getURI()) == null) {
         // The mrs:SwitchingSubnet is not present in the new model so add it for termination.
         terminate.add(target.getURI());
@@ -451,15 +451,15 @@ public class CsProvider {
     // Look for modified Mrs.BandwidthService resources.
     Set<Resource> bandwidthServices = getModifiedResource(original, updated, addition, Mrs.BandwidthService);
     for (Resource resource : bandwidthServices) {
-      if (ModelUtil.isBandwidthService(resource)) {
-        //Get the port this bandwidth service is associated with.
-        Resource belongsTo = ModelUtil.getNmlBelongsTo(resource);
-        if (belongsTo != null && ModelUtil.isBidirectionalPort(belongsTo)) {
+      if (ModelUtil.isBandwidthService(updated, resource)) {
+        // Get the port this bandwidth service is associated with.
+        Resource belongsTo = ModelUtil.getNmlBelongsTo(updated, resource);
+        if (belongsTo != null && ModelUtil.isBidirectionalPort(updated, belongsTo)) {
           // Now we need to find the SwitchingSubnet this port is associated with.  We do not have
           // a direct relationship modelled in the resource.
           List<Resource> subjects = ModelUtil.getSubjectsOfPredicateRelationship(updated, Nml.hasBidirectionalPort, belongsTo);
           for (Resource switchingSubnet: subjects) {
-            if (ModelUtil.isSwitchingSubnet(switchingSubnet)) {
+            if (ModelUtil.isSwitchingSubnet(updated, switchingSubnet)) {
               switchingSubnets.add(switchingSubnet);
             }
           }
@@ -470,7 +470,7 @@ public class CsProvider {
     // Look for modified Nml.existsDuring resources.
     Set<Resource> existsDuring = getModifiedResource(original, updated, addition, Nml.existsDuring);
     for (Resource resource : existsDuring) {
-      if (ModelUtil.isExistsDuring(resource)) {
+      if (ModelUtil.isExistsDuring(updated, resource)) {
         List<Resource> ss = ModelUtil.getAllSwitchingSubnetWithExistsDuring(updated, resource);
         switchingSubnets.addAll(ss);
       }
@@ -552,12 +552,11 @@ public class CsProvider {
       }
 
       // Get the existDuring lifetime object if it exists, so we can model a schedule.
-      NmlExistsDuring ssExistsDuring = getNmlExistsDuring(switchingSubnet);;
+      NmlExistsDuring ssExistsDuring = getNmlExistsDuring(model, switchingSubnet);;
 
       // We need the associated parent SwitchingService resource to determine
       // the ServiceDefinition that holds the serviceType.
-      Statement belongsTo = switchingSubnet.getProperty(Nml.belongsTo);
-      Resource switchingServiceRef = belongsTo.getResource();
+      Resource switchingServiceRef = ModelUtil.getNmlBelongsTo(model, switchingSubnet);
       log.debug("[processNewSwitchingSubnet] SwitchingServiceRef: {}", switchingServiceRef.getURI());
 
       // Get the full SwitchingService definition from the merged model.
@@ -568,6 +567,7 @@ public class CsProvider {
       log.debug("[processNewSwitchingSubnet] found SwitchingService: {}", switchingService.getURI());
 
       // Now we need the ServiceDefinition associated with this SwitchingService.
+      log.debug("switchingService {}", switchingService);
       Statement hasServiceDefinition = switchingService.getProperty(Sd.hasServiceDefinition);
       Resource serviceDefinitionRef = hasServiceDefinition.getResource();
       log.debug("[processNewSwitchingSubnet] looking for serviceDefinitionRef: " + serviceDefinitionRef.getURI());
@@ -634,9 +634,9 @@ public class CsProvider {
 
         // Now determine if there is an independent existsDuring object.
         String childExistsDuringId = ssExistsDuring.getId();
-        Optional<Statement> existsDuring = Optional.ofNullable(biChild.getProperty(Nml.existsDuring));
+        Optional<Resource> existsDuring = Optional.ofNullable(ModelUtil.getNmlExistsDuring(model, biChild));
         if (existsDuring.isPresent()) {
-          Resource childExistsDuringRef = existsDuring.get().getResource();
+          Resource childExistsDuringRef = existsDuring.get();
           log.debug("[processNewSwitchingSubnet] childExistsDuringRef: " + childExistsDuringRef.getURI());
           if (!ssExistsDuring.getId().contentEquals(childExistsDuringRef.getURI())) {
             // We have a different existsDuring reference than our SwitchingSubnet.
@@ -645,20 +645,17 @@ public class CsProvider {
         }
 
         // Now get the label for this port.
-        Statement labelRef = biChild.getProperty(Nml.hasLabel);
-        Resource label = ModelUtil.getResourceOfSubjectAndType(model, Nml.Label, labelRef.getResource());
+        Resource label = ModelUtil.getResourceOfSubjectAndType(model, Nml.Label, biChild);
 
         // Make sure we have a valid label.
         if (label == null) {
-          log.error("[processNewSwitchingSubnet] biChild labelRef missing label: {}", labelRef);
+          log.error("[processNewSwitchingSubnet] biChild labelRef missing label: {}", biChild.getURI());
 
           // Do some debugging.
-          Resource resource = model.getBaseModel().getResource(labelRef.getResource().getURI());
-          log.error("[processNewSwitchingSubnet] did we find the label object?: {}", resource);
           log.error("[processNewSwitchingSubnet] Label dump: {}", Nml.Label);
-          ModelUtil.findInstancesByType(model,Nml.Label)
+          ModelUtil.getResourcesOfType(model, Nml.Label)
               .forEach(r -> log.error("[processNewSwitchingSubnet] {}", r.getURI()));
-          throw new IllegalArgumentException("[processNewSwitchingSubnet] biChild labelRef missing label: " + labelRef);
+          throw new IllegalArgumentException("[processNewSwitchingSubnet] biChild labelRef missing label: " +  biChild.getURI());
         }
 
         NmlLabel nmlLabel = new NmlLabel(label);
@@ -678,7 +675,7 @@ public class CsProvider {
         log.debug("[processNewSwitchingSubnet] stpId: {}", stp.getStpId());
 
         // Get the mrs:tag property if one exists against the nml:BidirectionalPort object.
-        String biChildTag = ModelUtil.getMrsTag(biChild);
+        String biChildTag = ModelUtil.getMrsTag(model, biChild);
         if (Strings.isNullOrEmpty(biChildTag)) {
           // If the mrs:tag does not exist in the model then add the NSI STP value.
           biChildTag = stp.getStpId();
@@ -735,7 +732,7 @@ public class CsProvider {
       // Populate the reserve structure with the mrs:switchingSubnet ID as the global reservation ID,
       // and use the associated optional mrs:tag as the reservation description.
       String uniqueId = "deltaId+" + deltaId + ":uuid+" + UUID.randomUUID();
-      String tag = ModelUtil.getMrsTag(switchingSubnet);
+      String tag = ModelUtil.getMrsTag(model, switchingSubnet);
       if (Strings.isNullOrEmpty(tag)) {
         // No mrs:tag provided so compose our own.
         tag = uniqueId;
@@ -975,7 +972,7 @@ public class CsProvider {
       // we support modification of capacity, startTime, and endTime.
 
       // Get the existDuring lifetime object if it exists, so we can model a schedule.
-      NmlExistsDuring ssExistsDuring = getNmlExistsDuring(switchingSubnet);
+      NmlExistsDuring ssExistsDuring = getNmlExistsDuring(model, switchingSubnet);
 
       // We need the associated parent SwitchingService resource to determine
       // the ServiceDefinition that holds the serviceType.
@@ -1093,7 +1090,7 @@ public class CsProvider {
         log.debug("[processModifiedSwitchingSubnet] stpId: {}", stp.getStpId());
 
         // Get the mrs:tag property if one exists against the nml:BidirectionalPort object.
-        String biChildTag = ModelUtil.getMrsTag(biChild);
+        String biChildTag = ModelUtil.getMrsTag(model, biChild);
         if (Strings.isNullOrEmpty(biChildTag)) {
           // If the mrs:tag does not exist in the model then add the NSI STP value.
           biChildTag = stp.getStpId();
@@ -1223,7 +1220,7 @@ public class CsProvider {
       // Populate the reserve structure with the mrs:switchingSubnet ID as the global reservation ID,
       // and use the associated optional mrs:tag as the reservation description.
       String uniqueId = "deltaId+" + deltaId + ":uuid+" + UUID.randomUUID();
-      String tag = ModelUtil.getMrsTag(switchingSubnet);
+      String tag = ModelUtil.getMrsTag(model, switchingSubnet);
       if (Strings.isNullOrEmpty(tag)) {
         // No mrs:tag provided so compose our own.
         log.debug("[processModifiedSwitchingSubnet] mrs:tag not provided.");
@@ -1390,18 +1387,21 @@ public class CsProvider {
    * @return
    * @throws DatatypeConfigurationException
    */
-  private static NmlExistsDuring getNmlExistsDuring(Resource switchingSubnet) throws DatatypeConfigurationException {
-    Optional<Statement> existsDuring = Optional.ofNullable(switchingSubnet.getProperty(Nml.existsDuring));
+  private static NmlExistsDuring getNmlExistsDuring(OntModel model, Resource switchingSubnet)
+      throws DatatypeConfigurationException {
+    Optional<Resource> existsDuring = Optional.ofNullable(ModelUtil.getNmlExistsDuring(model, switchingSubnet));
     NmlExistsDuring ssExistsDuring;
     if (existsDuring.isPresent()) {
       // We have an existsDuring resource specifying the schedule time.
-      Resource existsDuringRef = existsDuring.get().getResource();
+      Resource existsDuringRef = existsDuring.get();
       log.debug("[getNmlExistsDuring] existsDuringRef: " + existsDuringRef.getURI());
 
       ssExistsDuring = new NmlExistsDuring(existsDuringRef);
     } else {
       // We need to create our own schedule using the defaults.
-      ssExistsDuring = new NmlExistsDuring(switchingSubnet.getURI() + ":existsDuring");
+
+      ssExistsDuring = new NmlExistsDuring(
+          Optional.ofNullable(switchingSubnet).map(Resource::getURI).orElse("DummyURN") + ":existsDuring");
     }
 
     log.debug("[getNmlExistsDuring] NmlExistsDuring: " + ssExistsDuring.getId());

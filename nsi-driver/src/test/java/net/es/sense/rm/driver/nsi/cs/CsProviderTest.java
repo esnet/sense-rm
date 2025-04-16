@@ -137,8 +137,11 @@ class CsProviderTest {
     ModelUtil.applyDeltaReduction(updated, reduction);
     ModelUtil.applyDeltaAddition(updated, addition);
 
+    log.debug("[getModifiedBandwidthServicesPositive] testing");
+
     // Find modified SwitchingSubnet.
     Set<Resource> modifiedSwitchingSubnets = CsProvider.getModifiedSwitchingSubnets(model, updated, addition);
+
     modifiedSwitchingSubnets.forEach(c -> log.debug("[getModifiedBandwidthServicesPositive] uri = {}", c.getURI()));
     assertEquals(1, modifiedSwitchingSubnets.size());
 

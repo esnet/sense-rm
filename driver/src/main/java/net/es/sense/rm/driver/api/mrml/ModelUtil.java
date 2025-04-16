@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,7 +54,7 @@ public class ModelUtil {
       new Schema(Rdf.getURI(), "/schema/rdf.ttl", Lang.TURTLE),
       new Schema(Rdfs.getURI(), "/schema/rdfs.ttl", Lang.TURTLE),
       new Schema(Owl.getURI(), "/schema/owl.ttl", Lang.TURTLE),
-      new Schema(Nml.getURI(), "/schema/nml.owl", Lang.RDFXML),
+      new Schema(Nml.getURI(), "/schema/nml.ttl", Lang.TURTLE),
       new Schema(Spa.getURI(), "/schema/spa.owl", Lang.RDFXML),
       new Schema(Mrs.getURI(), "/schema/mrs.ttl", Lang.TURTLE));
 
@@ -283,12 +282,13 @@ public class ModelUtil {
    * @return The set of matching resources.
    */
   public static List<Resource> getResourcesOfType(OntModel model, Resource resType) {
-    StmtIterator stmtIterator = model.getBaseModel().listStatements(null, Rdf.type, resType);
-    return stmtIterator.toList().stream() // Convert StmtIterator to a stream.
+    return model.getBaseModel()
+        .listStatements(null, Rdf.type, resType) // StmtIterator
+        .toList().stream() // Convert StmtIterator to a stream.
         .map(Statement::getSubject) // Extract the subject from each statement.
         .distinct() // Optional: remove duplicates if you expect subjects to repeat.
         .map(s -> model.getResource(s.getURI())) // Map each subject URI to the corresponding resource in the model.
-        .collect(Collectors.toList()); // Collect all results to a list.
+        .collect(Collectors.toList());// Collect all results to a list.
   }
 
   /**
@@ -300,7 +300,11 @@ public class ModelUtil {
    * @return The resource matching the id and type, or null if no match.
    */
   public static Resource getResourceOfSubjectAndType(OntModel model, Resource type, Resource subject) {
-    return getResourceOfSubjectAndType(model, type, subject.getURI());
+    if (model.contains(subject, RDF.type, type)) {
+      return subject;
+    }
+
+    return null;
   }
 
   /**
@@ -313,25 +317,23 @@ public class ModelUtil {
    */
   public static Resource getResourceOfSubjectAndType(OntModel model, Resource type, String subject) {
     Resource resource = model.getBaseModel().getResource(subject);
-    if (resource != null) {
-      Statement property = resource.getProperty(Rdf.type);
-      if (property != null && property.getObject().isURIResource() &&
-          property.getObject().toString().equalsIgnoreCase(type.getURI())) {
-        return resource;
-      }
+    if (model.contains(resource, RDF.type, type)) {
+      return resource;
     }
+
     return null;
   }
 
   /**
    * Return the mrs:tag property from the specified resource.
    *
+   * @param model The model to search.
    * @param resource The resource to return the mrs:tag property.
    * @return The mrs:tag property if present, null otherwise.
    */
-  public static String getMrsTag(Resource resource) {
+  public static String getMrsTag(OntModel model, Resource resource) {
     if (resource != null) {
-      Statement property = resource.getProperty(Mrs.tag);
+      Statement property = model.getProperty(resource, Mrs.tag);
       if (property != null && property.getObject().isLiteral()) {
         return property.getObject().asLiteral().getString();
       }
@@ -340,15 +342,33 @@ public class ModelUtil {
   }
 
   /**
+   * Return the Nml.existsDuring property from the specified resource.
+   *
+   * @param model The model to search.
+   * @param resource The resource to return the Nml.existsDuring property.
+   * @return The Nml.existsDuring property if present, null otherwise.
+   */
+  public static Resource getNmlExistsDuring(OntModel model, Resource resource) {
+    if (resource != null) {
+      Statement property = model.getProperty(resource, Nml.existsDuring);
+      if (property != null && property.getObject().isResource()) {
+        return property.getObject().asResource();
+      }
+    }
+    return null;
+  }
+
+  /**
    * Return the nml:belongsTo property from the specified resource.
    *
+   * @param model The model to search.
    * @param resource The resource to return the nml:belongsTo property.
    * @return The nml:belongsTo property if present, null otherwise.
    */
-  public static Resource getNmlBelongsTo(Resource resource) {
+  public static Resource getNmlBelongsTo(OntModel model, Resource resource) {
     if (resource != null) {
-      Statement property = resource.getProperty(Nml.belongsTo);
-      if (property != null && property.getObject().isURIResource()) {
+      Statement property = model.getProperty(resource, Nml.belongsTo);
+      if (property != null && property.getObject().isResource()) {
         return property.getObject().asResource();
       }
     }
@@ -423,7 +443,7 @@ public class ModelUtil {
 
   public static List<Resource> getAllSwitchingSubnetWithExistsDuring(OntModel model, Resource existsDuring) {
     return getAllWithExistsDuring(model, existsDuring).stream()
-        .filter(ModelUtil::isSwitchingSubnet).toList();
+        .filter(s -> ModelUtil.isSwitchingSubnet(model, s)).toList();
   }
 
   /**
@@ -529,78 +549,57 @@ public class ModelUtil {
   }
 
   /**
-   * Determine if the given resources is an Nml.BidirectionalPort.
+   * Determine if the given resources is a Nml.BidirectionalPort.
    *
-   * @param res The resource to test.
+   * @param model The model containing the resource to test.
+   * @param subject The resource to test.
    * @return True if this resource is of type Nml.BidirectionalPort, false otherwise.
    */
-  public static boolean isBidirectionalPort(Resource res) {
-    String uri = getResourceTypeUri(res);
-    if (Strings.isNullOrEmpty(uri)) {
-      return false;
-    }
-    return uri.equalsIgnoreCase(Nml.BidirectionalPort.getURI());
+  public static boolean isBidirectionalPort(OntModel model, Resource subject) {
+    return model.contains(subject, RDF.type, Nml.BidirectionalPort);
   }
 
   /**
-   * Determine if the given resources is an Nml.SwitchingService.
+   * Determine if the given resources is a Nml.SwitchingService.
    *
-   * @param res The resource to test.
+   * @param model The model containing the resource to test.
+   * @param subject The resource to test.
    * @return True if this resource is of type Nml.SwitchingService, false otherwise.
    */
-  public static boolean isSwitchingService(Resource res) {
-    String uri = getResourceTypeUri(res);
-    if (Strings.isNullOrEmpty(uri)) {
-      return false;
-    }
-    return uri.equalsIgnoreCase(Nml.SwitchingService.getURI());
+  public static boolean isSwitchingService(OntModel model, Resource subject) {
+    return model.contains(subject, RDF.type, Nml.SwitchingService);
   }
 
   /**
-   * Determine if the given resources is an Mrs.SwitchingSubnet.
+   * Determine if the given resources is a Mrs.SwitchingSubnet.
    *
-   * @param res The resource to test.
+   * @param model The model containing the resource to test.
+   * @param subject The resource to test.
    * @return True if this resource is of type Mrs.SwitchingSubnet, false otherwise.
    */
-  public static boolean isSwitchingSubnet(Resource res) {
-    String uri = getResourceTypeUri(res);
-    if (Strings.isNullOrEmpty(uri)) {
-      return false;
-    }
-    return uri.equalsIgnoreCase(Mrs.SwitchingSubnet.getURI());
+  public static boolean isSwitchingSubnet(OntModel model, Resource subject) {
+    return model.contains(subject, RDF.type, Mrs.SwitchingSubnet);
   }
 
   /**
-   * Determine if the given resources is an Mrs.BandwidthService.
+   * Determine if the given resources is a Mrs.BandwidthService.
    *
-   * @param res The resource to test.
+   * @param model The model containing the resource to test.
+   * @param subject The resource to test.
    * @return True if this resource is of type Mrs.BandwidthService, false otherwise.
    */
-  public static boolean isBandwidthService(Resource res) {
-    String uri = getResourceTypeUri(res);
-    if (Strings.isNullOrEmpty(uri)) {
-      return false;
-    }
-    return uri.equalsIgnoreCase(Mrs.BandwidthService.getURI());
+  public static boolean isBandwidthService(OntModel model, Resource subject) {
+    return model.contains(subject, RDF.type, Mrs.BandwidthService);
   }
 
   /**
-   * Determine if the given resources is an Nml.existsDuring.
+   * Determine if the given resources is a Nml.existsDuring.
    *
-   * @param res The resource to test.
+   * @param model The model containing the resource to test.
+   * @param subject The resource to test.
    * @return True if this resource is of type Nml.existsDuring, false otherwise.
    */
-  public static boolean isExistsDuring(Resource res) {
-    String uri = getResourceTypeUri(res);
-    if (Strings.isNullOrEmpty(uri)) {
-      return false;
-    }
-    return uri.equalsIgnoreCase(Nml.existsDuring.getURI());
-  }
-
-  public static List<Resource> findInstancesByType(OntModel model, Resource type) {
-    List<Resource> results = new ArrayList<>();
-    model.listStatements(null, RDF.type, type).forEach(r -> results.add(r.getSubject()));
-    return results;
+  public static boolean isExistsDuring(OntModel model, Resource subject) {
+    return model.contains(subject, RDF.type, Nml.existsDuring);
   }
 }

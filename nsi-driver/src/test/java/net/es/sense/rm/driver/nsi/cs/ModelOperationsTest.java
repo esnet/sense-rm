@@ -59,13 +59,13 @@ public class ModelOperationsTest {
       Resource resource = base.getResource(s.getURI());
       log.debug("[ModelOperationsTest::test] Found resource: {}", resource.getURI());
 
-      if (ModelUtil.isBidirectionalPort(resource)) {
+      if (ModelUtil.isBidirectionalPort(base, resource)) {
         log.debug("[ModelOperationsTest::test] Nml.BidirectionalPort");
-      } else if (ModelUtil.isSwitchingService(resource)) {
+      } else if (ModelUtil.isSwitchingService(base, resource)) {
         log.debug("[ModelOperationsTest::test] Mrs.SwitchingService");
-      } else if (ModelUtil.isSwitchingSubnet(resource)) {
+      } else if (ModelUtil.isSwitchingSubnet(base, resource)) {
         log.debug("[ModelOperationsTest::test] Nml.SwitchingSubnet");
-      } else if (ModelUtil.isBandwidthService(resource)) {
+      } else if (ModelUtil.isBandwidthService(base, resource)) {
         log.debug("[ModelOperationsTest::test] Mrs.BandwidthService");
       } else {
         log.debug("[ModelOperationsTest::test] Not interested in {}", resource.getURI());

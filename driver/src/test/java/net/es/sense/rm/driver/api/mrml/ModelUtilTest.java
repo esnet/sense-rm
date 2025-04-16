@@ -480,7 +480,7 @@ class ModelUtilTest {
         "urn:ogf:network:es.net:2013::switchingSubnet:62dca40f-929b-40fe-8aa1-c6a4ea62cdcd");
     assertNotNull(switchingSubnet);
 
-    String tag = ModelUtil.getMrsTag(switchingSubnet);
+    String tag = ModelUtil.getMrsTag(model, switchingSubnet);
     assertNotNull(tag);
     assertEquals("serviceId=urn:uuid:62dca40f-929b-40fe-8aa1-c6a4ea62cdcd", tag);
   }
@@ -557,22 +557,22 @@ class ModelUtilTest {
     OntModel model = ModelUtil.unmarshalOntModelFromFile(MRML_MODEL_1, Lang.TURTLE.getName());
     List<Resource> biPorts = ModelUtil.getResourcesOfType(model, Nml.BidirectionalPort);
     biPorts.forEach(r -> {
-      assertTrue(ModelUtil.isBidirectionalPort(r));
+      assertTrue(ModelUtil.isBidirectionalPort(model, r));
     });
 
     List<Resource> ss = ModelUtil.getResourcesOfType(model, Nml.SwitchingService);
     ss.forEach(r -> {
-      assertTrue(ModelUtil.isSwitchingService(r));
+      assertTrue(ModelUtil.isSwitchingService(model, r));
     });
 
     List<Resource> sws = ModelUtil.getResourcesOfType(model, Mrs.SwitchingSubnet);
     sws.forEach(r -> {
-      assertTrue(ModelUtil.isSwitchingSubnet(r));
+      assertTrue(ModelUtil.isSwitchingSubnet(model, r));
     });
 
     List<Resource> bs = ModelUtil.getResourcesOfType(model, Mrs.BandwidthService);
     bs.forEach(r -> {
-      assertTrue(ModelUtil.isBandwidthService(r));
+      assertTrue(ModelUtil.isBandwidthService(model, r));
     });
 
   }
